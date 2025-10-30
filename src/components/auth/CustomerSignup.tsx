@@ -84,7 +84,8 @@ export const CustomerSignup = ({ currentLanguage }: CustomerSignupProps) => {
         description: t.auth.checkEmailVerification
       });
 
-      navigate('/customer-dashboard');
+      // After signup, complete missing profile details first
+      navigate('/complete-profile?role=customer');
     } catch (err: any) {
       console.error('Customer signup error:', err);
       setError(t.auth.signupError);

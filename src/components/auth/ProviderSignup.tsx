@@ -103,9 +103,10 @@ export const ProviderSignup = ({ currentLanguage }: ProviderSignupProps) => {
         description: t.auth.checkEmailVerification
       });
 
-      // Stop loading and navigate immediately
-      setIsLoading(false);
-      navigate('/provider-dashboard', { replace: true });
+  // Stop loading and navigate immediately
+  setIsLoading(false);
+  // Route to Complete Profile to finish required fields
+  navigate('/complete-profile?role=provider', { replace: true });
     } catch (error: any) {
       console.error("Provider signup error:", error);
 
