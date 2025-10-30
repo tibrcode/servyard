@@ -185,8 +185,8 @@ export const ProviderSignup = ({ currentLanguage }: ProviderSignupProps) => {
         created_at: new Date(),
       }, { merge: true });
 
-      toast({ title: t.auth.signupSuccess });
-      navigate('/provider-dashboard', { replace: true });
+  toast({ title: t.auth.signupSuccess });
+  navigate('/complete-profile?role=provider', { replace: true });
     } catch (err: any) {
       console.error('Google provider signup error:', err);
       if (String(err?.message || '').includes('popup-closed-by-user')) {

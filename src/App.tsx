@@ -22,6 +22,7 @@ import EditProfile from "@/pages/EditProfile";
 import ProviderProfile from "@/pages/ProviderProfile";
 import AdminConsole from "@/pages/AdminConsole";
 import Terms from "@/pages/Terms";
+import CompleteProfile from "@/pages/CompleteProfile";
 import Privacy from "@/pages/Privacy";
 import Disclaimer from "@/pages/Disclaimer";
 import ContentPolicy from "@/pages/ContentPolicy";
@@ -198,6 +199,7 @@ const App = () => {
                       <Route path="/privacy" element={<Privacy currentLanguage={currentLanguage} />} />
                       <Route path="/disclaimer" element={<Disclaimer currentLanguage={currentLanguage} />} />
                       <Route path="/content-policy" element={<ContentPolicy currentLanguage={currentLanguage} />} />
+                      <Route path="/complete-profile" element={<CompleteProfile currentLanguage={currentLanguage} />} />
                       <Route path="/about" element={<AboutUs currentLanguage={currentLanguage} />} />
                       <Route path="/contact" element={<ContactUs currentLanguage={currentLanguage} />} />
                       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

@@ -307,7 +307,7 @@ export const CustomerSignup = ({ currentLanguage }: CustomerSignupProps) => {
                 }, { merge: true });
 
                 toast({ title: t.auth.signupSuccess });
-                navigate('/customer-dashboard');
+                navigate('/complete-profile?role=customer');
               } catch (err: any) {
                 console.error('Google customer signup error:', err);
                 if (String(err?.message || '').includes('popup-closed-by-user')) {
