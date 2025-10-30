@@ -31,6 +31,7 @@ import ContactUs from "@/pages/ContactUs";
 import NotFound from "@/pages/NotFound";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import EnsureProfile from "@/components/auth/EnsureProfile";
 
 const queryClient = new QueryClient();
 
@@ -151,6 +152,8 @@ const App = () => {
         <BrowserRouter>
           <AuthProvider>
             <SidebarProvider>
+              {/* Global guard: if user is signed-in but profile is incomplete, send to /complete-profile */}
+              <EnsureProfile />
               <div className="flex min-h-screen w-full">
                 <AppSidebar
                   currentLanguage={currentLanguage}
