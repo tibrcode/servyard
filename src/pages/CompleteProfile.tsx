@@ -83,15 +83,16 @@ export default function CompleteProfile({ currentLanguage }: CompleteProfileProp
     }
     setSaving(true);
     try {
-      const payload: any = {
+      const payload: Record<string, any> = {
         user_id: user.uid,
         full_name: fullName,
         city,
         country,
         terms_accepted_at: new Date(),
         updated_at: new Date(),
-        created_at: profile?.id ? undefined : new Date(),
       };
+      // Only set created_at when creating for the first time; never send undefined to Firestore
+      if (!profile?.id) payload.created_at = new Date();
       if (phone) payload.phone_numbers = [phone];
       if (role === 'provider' || role === 'customer') payload.user_type = role;
 
