@@ -312,6 +312,9 @@ export function AvailabilityManagement({ services, currentLanguage }: Availabili
                   <DialogContent>
                     <DialogHeader>
                       <DialogTitle>{t.availability.editAvailability}</DialogTitle>
+                      <DialogDescription>
+                        {t.availability.setAvailableDaysTime}
+                      </DialogDescription>
                     </DialogHeader>
                     <form onSubmit={handleAvailabilitySubmit} className="space-y-4">
                       <div className="space-y-2">
