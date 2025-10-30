@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Solid black background -->
+    <item android:drawable="@android:color/black" />
+
+    <!-- Centered logo with transparent background -->
+    <item>
+        <bitmap
+            android:src="@mipmap/ic_launcher_foreground"
+            android:gravity="center"
+            android:antialias="true" />
+    </item>
+</layer-list>

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">ServYard</string>
+    <string name="title_activity_main">ServYard</string>
+    <string name="package_name">com.servyard.app</string>
+    <string name="custom_url_scheme">com.servyard.app</string>
+</resources>
