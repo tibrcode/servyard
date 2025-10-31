@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Save, Plus, X } from "lucide-react";
+import { ArrowLeft, Save, Plus, X, Trash2 } from "lucide-react";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { currencyList, getCurrencyLabel } from "@/lib/currencies";
 import { useToast } from "@/hooks/use-toast";
@@ -13,6 +13,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "@/lib/i18n";
 import { db } from "@/integrations/firebase/client";
 import { doc, updateDoc, getDoc } from "firebase/firestore";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { deleteCurrentUserFully } from "@/lib/firebase/deleteAccount";
 
 interface EditProfileProps {
   currentLanguage: string;
@@ -43,6 +45,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ currentLanguage }) => {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [newPhoneNumber, setNewPhoneNumber] = useState("");
 
   const [formData, setFormData] = useState<ProfileData>({
@@ -207,6 +210,21 @@ const EditProfile: React.FC<EditProfileProps> = ({ currentLanguage }) => {
       navigate('/provider-dashboard');
     } else {
       navigate('/customer-dashboard');
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!user) return;
+    setDeleting(true);
+    try {
+  await deleteCurrentUserFully();
+  toast({ title: 'Account deleted', description: t.ui.interfaceUpdated });
+      navigate('/');
+    } catch (error: any) {
+      console.error('Error deleting account:', error);
+      toast({ variant: 'destructive', title: t.toast.error, description: error?.message || 'Failed to delete account' });
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -467,6 +485,43 @@ const EditProfile: React.FC<EditProfileProps> = ({ currentLanguage }) => {
               </Button>
             </div>
           </form>
+        </CardContent>
+      </Card>
+
+      {/* Danger Zone */}
+      <Card className="mt-8 border-red-300">
+        <CardHeader>
+          <CardTitle className="text-red-600 flex items-center gap-2">
+            <Trash2 className="w-5 h-5" />
+            {'Danger Zone'}
+          </CardTitle>
+          <CardDescription className="text-red-500">
+            {'Deleting your account will remove your profile, services, bookings, reviews and offers. This action is irreversible.'}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" disabled={deleting}>
+                <Trash2 className="w-4 h-4 mr-2" />
+                {deleting ? (t.ui.loading || 'Deleting...') : ('Delete my account')}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>{'Delete my account'}</AlertDialogTitle>
+                <AlertDialogDescription>
+                  {'Are you sure? This will permanently delete your account and all related data.'}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>{t.actions.cancel}</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDeleteAccount} className="bg-red-600 hover:bg-red-700">
+                  {t.actions.delete || 'Delete'}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </CardContent>
       </Card>
     </div>
