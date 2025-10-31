@@ -1,0 +1,20 @@
+{
+  "name": "servyard-functions",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "watch": "tsc -w -p tsconfig.json",
+    "serve": "firebase emulators:start --only functions",
+    "deploy": "firebase deploy --only functions"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.5.0",
+    "firebase-functions": "^5.0.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  }
+}

@@ -89,3 +89,35 @@ Prereqs: Xcode, CocoaPods.
 
 - This app now uses Firebase (Auth, Firestore/Storage) as the primary backend. Supabase has been removed.
 - You do not need Render unless you plan custom long-running APIs. If you later need server code, Vercel Serverless Functions are usually sufficient; use Render only when you need a persistent process or custom networking.
+
+## Admin deletion from Firebase Console (one click)
+
+We include Firebase Cloud Functions that delete a user and all related data when you remove them from Authentication in the Console, plus an optional admin HTTP endpoint.
+
+What gets deleted:
+
+- `profiles/{uid}`
+- All `services` by the provider (+ `service_availability`, `service_special_dates`)
+- `offers` by provider
+- `bookings` where the user is provider or customer
+- `reviews` written by or addressed to the user
+
+How to set up:
+
+1) Install Firebase CLI and log in.
+2) In the `functions/` folder:
+	- `npm install`
+	- Optionally set a secret for the HTTP endpoint:
+	  - `firebase functions:secrets:set ADMIN_DELETE_TOKEN`
+3) Deploy:
+	- `npm run deploy` (from `functions/`)
+
+How it works:
+
+- Trigger `onAuthDeleteUser`: When you delete a user from Firebase Console → Authentication → Users, the function cleans up all related data.
+- HTTP admin endpoint `adminDeleteUser`: POST with header `x-admin-key: <secret>` and JSON body `{ "uid": "..." }` to delete a user programmatically.
+
+Notes:
+
+- Update `functions/src/index.ts` if you add/change collections.
+- Functions use Firestore BulkWriter for efficient batched deletions.
