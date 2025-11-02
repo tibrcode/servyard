@@ -4,8 +4,9 @@ import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  // Use relative paths in production so index.html can load from file:// on Capacitor
-  base: mode === "development" ? "/" : "./",
+  // For web/Vercel builds use absolute base "/" so deep links like /console load assets correctly.
+  // Keep "app" mode (for Capacitor) using relative base "./" to support file://.
+  base: mode === "app" ? "./" : "/",
   server: {
     host: "::",
     port: 8080,
