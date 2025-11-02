@@ -20,6 +20,8 @@ import { auth } from "@/integrations/firebase/client";
 import { onAuthStateChanged } from "firebase/auth";
 import { useTranslation } from "@/lib/i18n";
 import { upsertCategoryTranslations } from "@/lib/firebase/migrations/upsertCategoryTranslations";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface AdminConsoleProps {
   currentLanguage: string;
@@ -37,6 +39,9 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
     pendingReports: 0,
     activeBookings: 0
   });
+  const [deleteField, setDeleteField] = useState<string>("");
+  const [deleteMode, setDeleteMode] = useState<"email" | "uid">("email");
+  const [deleting, setDeleting] = useState<boolean>(false);
   // Ensure auto-run only executes once
   const autoRanRef = useRef(false);
   // Query flags (dev-only migration bypass)
@@ -48,9 +53,9 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
       setCurrentUser(user);
 
       if (user) {
-        // For now, we'll just check if it's a specific admin email
-        // In a real app, you'd check admin roles in Firestore
-        const isAdmin = user.email === 'admin@servyard.com'; // Replace with your admin email
+        // Temporary admin check: allow specific email or tibrcode.com domain
+        const email = user.email?.toLowerCase() || '';
+        const isAdmin = email === 'admin@servyard.com' || /@tibrcode\.com$/i.test(email);
         setIsAuthorized(isAdmin);
       } else {
         setIsAuthorized(false);
@@ -201,10 +206,59 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
                 <CardTitle>User Management</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-center py-12 text-muted-foreground">
-                  <Users className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                  <h3 className="text-lg font-medium mb-2">User Management</h3>
-                  <p>User management features coming soon...</p>
+                <div className="grid gap-6">
+                  <div>
+                    <h3 className="text-base font-semibold mb-2 flex items-center gap-2">
+                      <Trash2 className="h-4 w-4 text-red-600" /> Delete a user (Auth + all related data)
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Choose by email or UID. This will permanently delete the Firebase Auth user and all Firestore records related to them.
+                    </p>
+                    <div className="flex flex-col md:flex-row gap-3 md:items-end">
+                      <div className="flex-1">
+                        <Label htmlFor="deleteField">{deleteMode === 'email' ? 'Email' : 'UID'}</Label>
+                        <Input id="deleteField" placeholder={deleteMode === 'email' ? 'user@example.com' : 'UID'} value={deleteField} onChange={(e) => setDeleteField(e.target.value)} />
+                      </div>
+                      <div className="flex gap-2">
+                        <Button type="button" variant={deleteMode === 'email' ? 'default' : 'outline'} onClick={() => setDeleteMode('email')}>By Email</Button>
+                        <Button type="button" variant={deleteMode === 'uid' ? 'default' : 'outline'} onClick={() => setDeleteMode('uid')}>By UID</Button>
+                      </div>
+                      <div>
+                        <Button
+                          variant="destructive"
+                          disabled={deleting || !deleteField}
+                          onClick={async () => {
+                            if (!currentUser) return;
+                            setDeleting(true);
+                            try {
+                              const idToken = await currentUser.getIdToken();
+                              const body: any = deleteMode === 'email' ? { email: deleteField } : { uid: deleteField };
+                              const resp = await fetch('https://us-central1-servyard-de527.cloudfunctions.net/adminDeleteUser', {
+                                method: 'POST',
+                                headers: {
+                                  'Content-Type': 'application/json',
+                                  'Authorization': `Bearer ${idToken}`,
+                                },
+                                body: JSON.stringify(body),
+                              });
+                              if (!resp.ok) {
+                                const text = await resp.text();
+                                throw new Error(text || `Request failed (${resp.status})`);
+                              }
+                              toast({ title: 'User deleted', description: 'Auth account and related data were removed.' });
+                              setDeleteField('');
+                            } catch (e: any) {
+                              toast({ variant: 'destructive', title: 'Deletion failed', description: e?.message || String(e) });
+                            } finally {
+                              setDeleting(false);
+                            }
+                          }}
+                        >
+                          {deleting ? 'Deleting…' : 'Delete'}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>

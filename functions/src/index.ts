@@ -1,7 +1,7 @@
 import * as admin from 'firebase-admin';
-import { defineSecret } from 'firebase-functions/params';
 import { onRequest } from 'firebase-functions/v2/https';
-import { onUserDeleted } from 'firebase-functions/v2/auth';
+import { auth } from 'firebase-functions/v1';
+import { defineSecret } from 'firebase-functions/params';
 
 admin.initializeApp();
 const db = admin.firestore();
@@ -64,20 +64,51 @@ async function deleteUserData(uid: string) {
 }
 
 // 1) Trigger: when a user is deleted from Firebase Authentication (e.g., from the Console)
-export const onAuthDeleteUser = onUserDeleted(async (event: any) => {
-  const uid = event.data.uid as string;
+export const onAuthDeleteUser = auth.user().onDelete(async (userRecord) => {
+  const uid = userRecord.uid as string;
   await deleteUserData(uid);
 });
 
 // 2) Admin HTTP endpoint: POST /adminDeleteUser with header x-admin-key and body { uid }
-export const adminDeleteUser = onRequest({ secrets: [ADMIN_DELETE_TOKEN], cors: true, maxInstances: 1 }, async (req: any, res: any) => {
+export const adminDeleteUser = onRequest({ cors: true, maxInstances: 1, secrets: [ADMIN_DELETE_TOKEN] }, async (req: any, res: any) => {
   if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
 
-  const key = (req.get('x-admin-key') || req.query.key) as string | undefined;
-  if (!key || key !== ADMIN_DELETE_TOKEN.value()) return res.status(401).send('Unauthorized');
+  // AuthN: either Bearer ID token with admin rights OR x-admin-key secret
+  const bearer = (req.get('Authorization') || '').replace(/^Bearer\s+/i, '').trim();
+  const headerKey = (req.get('x-admin-key') || req.query.key) as string | undefined;
+  const secretValue = ADMIN_DELETE_TOKEN.value();
 
-  const uid = (req.body?.uid || req.query.uid) as string | undefined;
-  if (!uid) return res.status(400).send('Missing uid');
+  let isAuthorized = false;
+  if (bearer) {
+    try {
+      const decoded = await admin.auth().verifyIdToken(bearer);
+      const email: string | undefined = (decoded as any)?.email;
+      const hasAdminClaim = (decoded as any)?.admin === true;
+      const emailDomainOk = typeof email === 'string' && /@tibrcode\.com$/i.test(email);
+      const specificAdmin = typeof email === 'string' && email.toLowerCase() === 'admin@servyard.com';
+      if (hasAdminClaim || emailDomainOk || specificAdmin) {
+        isAuthorized = true;
+      }
+    } catch {}
+  }
+  if (!isAuthorized) {
+    if (!secretValue) return res.status(500).send('Server not configured');
+    if (!headerKey || headerKey !== secretValue) return res.status(401).send('Unauthorized');
+    isAuthorized = true;
+  }
+
+  // Accept uid or email
+  let uid = (req.body?.uid || req.query.uid) as string | undefined;
+  const emailParam = (req.body?.email || req.query.email) as string | undefined;
+  try {
+    if (!uid && emailParam) {
+      const userRecord = await admin.auth().getUserByEmail(emailParam);
+      uid = userRecord.uid;
+    }
+  } catch (e: any) {
+    return res.status(404).send('User not found for email');
+  }
+  if (!uid) return res.status(400).send('Missing uid or email');
 
   // Try to delete Auth user first (ignore if not found)
   try {

@@ -2,8 +2,9 @@
   "name": "servyard-functions",
   "private": true,
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
+  "main": "lib/index.js",
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "watch": "tsc -w -p tsconfig.json",
