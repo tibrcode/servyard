@@ -22,6 +22,7 @@ import { useTranslation } from "@/lib/i18n";
 import { upsertCategoryTranslations } from "@/lib/firebase/migrations/upsertCategoryTranslations";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { isAdminEmail } from "@/lib/adminAccess";
 
 interface AdminConsoleProps {
   currentLanguage: string;
@@ -53,12 +54,8 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
       setCurrentUser(user);
 
       if (user) {
-        // Temporary admin check: allow specific email or tibrcode.com domain
-        const email = user.email?.toLowerCase() || '';
-        // Allow company domains and the dedicated admin account
-        const isAdmin =
-          email === 'admin@servyard.com' ||
-          /@(tibrcode\.com|servyard\.com|serv-yard\.com)$/i.test(email);
+        // Centralized admin check (env-configurable)
+        const isAdmin = isAdminEmail(user.email || undefined);
         setIsAuthorized(isAdmin);
       } else {
         setIsAuthorized(false);
@@ -100,9 +97,19 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
     }
   }, [isAuthorized, toast, hasUpsertParam, isLocalhost]);
 
-  // Redirect if not authorized, except when running dev migration via query flag on localhost
+  // If unauthorized (and not explicitly running dev migration on localhost), show message instead of silent redirect
   if (isAuthorized === false && !(hasUpsertParam && isLocalhost)) {
-    return <Navigate to="/" replace />;
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6">
+        <div className="max-w-md w-full text-center">
+          <Shield className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+          <h2 className="text-xl font-semibold mb-2">Unauthorized</h2>
+          <p className="text-muted-foreground mb-6">
+            You don't have access to the Admin Console. Please sign in with an authorized company email.
+          </p>
+        </div>
+      </div>
+    );
   }
 
   // Loading state

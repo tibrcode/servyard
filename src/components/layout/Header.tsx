@@ -13,6 +13,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Link, useNavigate } from "react-router-dom";
 import BrandLogo from "@/components/BrandLogo";
 import { useAuth } from "@/contexts/AuthContext";
+import { isAdminEmail } from "@/lib/adminAccess";
 
 interface HeaderProps {
   currentLanguage?: string;
@@ -72,14 +73,8 @@ export const Header = ({
     navigate('/auth');
   };
 
-  // Simple admin detection (matches AdminConsole guard): company domains or specific admin email
-  const isAdminUser = React.useMemo(() => {
-    const email = (user?.email || '').toLowerCase();
-    return (
-      email === 'admin@servyard.com' ||
-      /@(tibrcode\.com|servyard\.com|serv-yard\.com)$/i.test(email)
-    );
-  }, [user?.email]);
+  // Simple admin detection via centralized helper
+  const isAdminUser = React.useMemo(() => isAdminEmail(user?.email || undefined), [user?.email]);
 
   const languages = supportedLanguages;
   const handleThemeToggle = React.useCallback(() => {
