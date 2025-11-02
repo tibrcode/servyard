@@ -72,10 +72,13 @@ export const Header = ({
     navigate('/auth');
   };
 
-  // Simple admin detection (matches AdminConsole guard): tibrcode.com domain or specific admin email
+  // Simple admin detection (matches AdminConsole guard): company domains or specific admin email
   const isAdminUser = React.useMemo(() => {
     const email = (user?.email || '').toLowerCase();
-    return email === 'admin@servyard.com' || /@tibrcode\.com$/i.test(email);
+    return (
+      email === 'admin@servyard.com' ||
+      /@(tibrcode\.com|servyard\.com|serv-yard\.com)$/i.test(email)
+    );
   }, [user?.email]);
 
   const languages = supportedLanguages;

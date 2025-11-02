@@ -55,7 +55,10 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
       if (user) {
         // Temporary admin check: allow specific email or tibrcode.com domain
         const email = user.email?.toLowerCase() || '';
-        const isAdmin = email === 'admin@servyard.com' || /@tibrcode\.com$/i.test(email);
+        // Allow company domains and the dedicated admin account
+        const isAdmin =
+          email === 'admin@servyard.com' ||
+          /@(tibrcode\.com|servyard\.com|serv-yard\.com)$/i.test(email);
         setIsAuthorized(isAdmin);
       } else {
         setIsAuthorized(false);
