@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Globe, MapPin, User, UserPlus, LogOut, Sun, Moon } from "lucide-react";
+import { Globe, MapPin, User, UserPlus, LogOut, Sun, Moon, Shield } from "lucide-react";
 import { useTranslation, supportedLanguages } from "@/lib/i18n";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Link, useNavigate } from "react-router-dom";
@@ -71,6 +71,12 @@ export const Header = ({
     await doSignOut();
     navigate('/auth');
   };
+
+  // Simple admin detection (matches AdminConsole guard): tibrcode.com domain or specific admin email
+  const isAdminUser = React.useMemo(() => {
+    const email = (user?.email || '').toLowerCase();
+    return email === 'admin@servyard.com' || /@tibrcode\.com$/i.test(email);
+  }, [user?.email]);
 
   const languages = supportedLanguages;
   const handleThemeToggle = React.useCallback(() => {
@@ -232,6 +238,14 @@ export const Header = ({
               <DropdownMenuContent portalled={false} align="end" className="w-56 bg-background border shadow-lg z-[70] motion-safe:animate-in motion-safe:fade-in-0 motion-safe:zoom-in-95 duration-150">
                 {user ? (
                   <>
+                    {isAdminUser && (
+                      <DropdownMenuItem asChild>
+                        <Link to="/console" className="flex items-center">
+                          <Shield className="h-4 w-4 mr-2 flex-shrink-0" />
+                          <span className="break-words leading-tight">Admin Console</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
                     {(role === 'provider' || role === 'customer') && (
                       <DropdownMenuItem asChild>
                         <Link to={role === 'provider' ? '/provider-dashboard' : '/customer-dashboard'} className="flex items-center">
