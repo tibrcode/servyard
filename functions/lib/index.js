@@ -109,7 +109,7 @@ exports.adminDeleteUser = (0, https_1.onRequest)({ cors: true, maxInstances: 1, 
             const decoded = await admin.auth().verifyIdToken(bearer);
             const email = decoded?.email;
             const hasAdminClaim = decoded?.admin === true;
-            const emailDomainOk = typeof email === 'string' && /@tibrcode\.com$/i.test(email);
+            const emailDomainOk = typeof email === 'string' && /@(tibrcode\.com|servyard\.com|serv-yard\.com)$/i.test(email || '');
             const specificAdmin = typeof email === 'string' && email.toLowerCase() === 'admin@servyard.com';
             if (hasAdminClaim || emailDomainOk || specificAdmin) {
                 isAuthorized = true;

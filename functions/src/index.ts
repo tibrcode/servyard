@@ -82,10 +82,10 @@ export const adminDeleteUser = onRequest({ cors: true, maxInstances: 1, secrets:
   if (bearer) {
     try {
       const decoded = await admin.auth().verifyIdToken(bearer);
-      const email: string | undefined = (decoded as any)?.email;
-      const hasAdminClaim = (decoded as any)?.admin === true;
-      const emailDomainOk = typeof email === 'string' && /@tibrcode\.com$/i.test(email);
-      const specificAdmin = typeof email === 'string' && email.toLowerCase() === 'admin@servyard.com';
+  const email: string | undefined = (decoded as any)?.email;
+  const hasAdminClaim = (decoded as any)?.admin === true;
+  const emailDomainOk = typeof email === 'string' && /@(tibrcode\.com|servyard\.com|serv-yard\.com)$/i.test(email || '');
+  const specificAdmin = typeof email === 'string' && email.toLowerCase() === 'admin@servyard.com';
       if (hasAdminClaim || emailDomainOk || specificAdmin) {
         isAuthorized = true;
       }

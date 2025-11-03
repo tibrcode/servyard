@@ -135,19 +135,20 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
       let base = collection(db, 'profiles');
       let qBase;
       if (usersRoleFilter === 'all') {
-        qBase = query(base, orderBy('email'), limit(PAGE_SIZE));
+        // Order by createdAt desc if available; single-field index only
+        qBase = query(base, orderBy('createdAt', 'desc' as any), limit(PAGE_SIZE));
+        if (!reset && lastDocRef.current) {
+          qBase = query(base, orderBy('createdAt', 'desc' as any), startAfter(lastDocRef.current), limit(PAGE_SIZE));
+        }
       } else {
-        qBase = query(base, where('user_type', '==', usersRoleFilter), orderBy('email'), limit(PAGE_SIZE));
-      }
-      if (!reset && lastDocRef.current) {
-        if (usersRoleFilter === 'all') {
-          qBase = query(base, orderBy('email'), startAfter(lastDocRef.current), limit(PAGE_SIZE));
-        } else {
-          qBase = query(base, where('user_type', '==', usersRoleFilter), orderBy('email'), startAfter(lastDocRef.current), limit(PAGE_SIZE));
+        // Avoid composite index requirement: equality filter without orderBy, paginate by doc id
+        qBase = query(base, where('user_type', '==', usersRoleFilter), limit(PAGE_SIZE));
+        if (!reset && lastDocRef.current) {
+          qBase = query(base, where('user_type', '==', usersRoleFilter), startAfter(lastDocRef.current), limit(PAGE_SIZE));
         }
       }
       const snap = await getDocs(qBase);
-      const newDocs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  const newDocs = snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) }));
       if (snap.docs.length > 0) {
         lastDocRef.current = snap.docs[snap.docs.length - 1] as QueryDocumentSnapshot<DocumentData>;
       }
@@ -355,20 +356,33 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
                 </div>
 
                 <div className="rounded-md border divide-y">
-                  <div className="grid grid-cols-4 gap-2 px-3 py-2 text-xs text-muted-foreground">
+                  <div className="grid grid-cols-5 gap-2 px-3 py-2 text-xs text-muted-foreground">
                     <div>Name</div>
                     <div>Email</div>
                     <div>Role</div>
                     <div>UID</div>
+                    <div>Created</div>
                   </div>
-                  {users.map((u) => (
-                    <div key={u.id} className="grid grid-cols-4 gap-2 px-3 py-2 text-sm">
+                  {users.map((u) => {
+                    // createdAt could be a Firestore Timestamp
+                    let createdText = '—';
+                    const c: any = (u as any).createdAt;
+                    try {
+                      const ts = c?.seconds ? new Date(c.seconds * 1000) : (typeof c === 'string' ? new Date(c) : null);
+                      if (ts && !isNaN(ts.getTime())) {
+                        createdText = ts.toLocaleString();
+                      }
+                    } catch {}
+                    return (
+                      <div key={u.id} className="grid grid-cols-5 gap-2 px-3 py-2 text-sm">
                       <div className="truncate" title={u.full_name || '—'}>{u.full_name || '—'}</div>
                       <div className="truncate" title={u.email || '—'}>{u.email || '—'}</div>
                       <div>{u.user_type || 'unknown'}</div>
                       <div className="truncate" title={u.id}>{u.id}</div>
-                    </div>
-                  ))}
+                        <div className="truncate" title={createdText}>{createdText}</div>
+                      </div>
+                    );
+                  })}
                   {users.length === 0 && !usersLoading && (
                     <div className="px-3 py-6 text-center text-sm text-muted-foreground">No users to display.</div>
                   )}
@@ -482,14 +496,29 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
                             try {
                               const idToken = await currentUser.getIdToken();
                               const body: any = deleteMode === 'email' ? { email: deleteField } : { uid: deleteField };
-                              const resp = await fetch('https://us-central1-servyard-de527.cloudfunctions.net/adminDeleteUser', {
-                                method: 'POST',
-                                headers: {
-                                  'Content-Type': 'application/json',
-                                  'Authorization': `Bearer ${idToken}`,
-                                },
-                                body: JSON.stringify(body),
-                              });
+                              let resp: Response | null = null;
+                              const primaryUrl = 'https://us-central1-servyard-de527.cloudfunctions.net/adminDeleteUser';
+                              const fallbackUrl = 'https://admindeleteuser-btfczcxdyq-uc.a.run.app';
+                              try {
+                                resp = await fetch(primaryUrl, {
+                                  method: 'POST',
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${idToken}`,
+                                  },
+                                  body: JSON.stringify(body),
+                                });
+                              } catch (e) {
+                                // Network/CORS error: try Cloud Run direct URL
+                                resp = await fetch(fallbackUrl, {
+                                  method: 'POST',
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${idToken}`,
+                                  },
+                                  body: JSON.stringify(body),
+                                });
+                              }
                               if (!resp.ok) {
                                 const text = await resp.text();
                                 throw new Error(text || `Request failed (${resp.status})`);
