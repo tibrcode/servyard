@@ -427,65 +427,82 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
                   </div>
                 </div>
 
-                <div className="w-full overflow-x-auto">
-                  <div className="min-w-[720px] rounded-md border divide-y">
-                    <div className="grid grid-cols-3 md:grid-cols-6 gap-2 px-3 py-2 text-xs text-muted-foreground sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:backdrop-blur z-10">
-                    <div>Name</div>
-                    <div>Email</div>
-                    <div>Role</div>
-                      <div className="hidden md:block">UID</div>
-                      <div className="hidden md:block">Created</div>
-                      <div className="hidden md:block">Actions</div>
+                {/* Desktop table (md+) */}
+                <div className="hidden md:block">
+                  <div className="rounded-md border divide-y">
+                    <div className="grid grid-cols-6 gap-2 px-3 py-2 text-xs text-muted-foreground sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:backdrop-blur z-10">
+                      <div>Name</div>
+                      <div>Email</div>
+                      <div>Role</div>
+                      <div>UID</div>
+                      <div>Created</div>
+                      <div>Actions</div>
                     </div>
                     {users.map((u) => {
-                    // createdAt could be a Firestore Timestamp
-                    let createdText = '—';
-                    const c: any = (u as any).createdAt;
-                    try {
-                      const ts = c?.seconds ? new Date(c.seconds * 1000) : (typeof c === 'string' ? new Date(c) : null);
-                      if (ts && !isNaN(ts.getTime())) {
-                        createdText = ts.toLocaleString();
-                      }
-                    } catch {}
-                    return (
-                        <div key={u.id} className="grid grid-cols-3 md:grid-cols-6 gap-2 px-3 py-2 text-sm">
-                      <div className="truncate" title={u.full_name || '—'}>{u.full_name || '—'}</div>
-                      <div className="truncate" title={u.email || '—'}>{u.email || '—'}</div>
-                      <div>{u.user_type || 'unknown'}</div>
-                          <div className="hidden md:block truncate" title={u.id}>{u.id}</div>
-                          <div className="hidden md:block truncate" title={createdText}>{createdText}</div>
-                          <div className="hidden md:flex items-center gap-2">
-                          <Button size="sm" variant="outline" onClick={async () => {
-                            try { await navigator.clipboard.writeText(u.email || ''); toast({ title: 'Copied email' }); } catch {}
-                          }} disabled={!u.email}>
-                            <CopyIcon className="h-4 w-4 mr-1" /> Email
-                          </Button>
-                          <Button size="sm" variant="outline" onClick={async () => {
-                            try { await navigator.clipboard.writeText(u.id); toast({ title: 'Copied UID' }); } catch {}
-                          }}>
-                            <CopyIcon className="h-4 w-4 mr-1" /> UID
-                          </Button>
-                        </div>
-                          {/* Mobile-only stacked details */}
-                          <div className="col-span-3 md:hidden mt-1 text-xs text-muted-foreground flex items-center justify-between gap-2">
-                            <div className="truncate" title={u.id}><span className="font-medium text-foreground/80">UID:</span> {u.id}</div>
-                            <div className="truncate" title={createdText}><span className="font-medium text-foreground/80">Created:</span> {createdText}</div>
-                            <div className="flex items-center gap-1">
-                              <Button size="sm" variant="outline" className="h-7 px-2" onClick={async () => { try { await navigator.clipboard.writeText(u.email || ''); toast({ title: 'Copied email' }); } catch {} }} disabled={!u.email}>
-                                <CopyIcon className="h-3 w-3" />
-                              </Button>
-                              <Button size="sm" variant="outline" className="h-7 px-2" onClick={async () => { try { await navigator.clipboard.writeText(u.id); toast({ title: 'Copied UID' }); } catch {} }}>
-                                <CopyIcon className="h-3 w-3" />
-                              </Button>
-                            </div>
+                      let createdText = '—';
+                      const c: any = (u as any).createdAt;
+                      try {
+                        const ts = c?.seconds ? new Date(c.seconds * 1000) : (typeof c === 'string' ? new Date(c) : null);
+                        if (ts && !isNaN(ts.getTime())) createdText = ts.toLocaleString();
+                      } catch {}
+                      return (
+                        <div key={u.id} className="grid grid-cols-6 gap-2 px-3 py-2 text-sm">
+                          <div className="truncate" title={u.full_name || '—'}>{u.full_name || '—'}</div>
+                          <div className="truncate" title={u.email || '—'}>{u.email || '—'}</div>
+                          <div>{u.user_type || 'unknown'}</div>
+                          <div className="truncate" title={u.id}>{u.id}</div>
+                          <div className="truncate" title={createdText}>{createdText}</div>
+                          <div className="flex items-center gap-2">
+                            <Button size="sm" variant="outline" onClick={async () => { try { await navigator.clipboard.writeText(u.email || ''); toast({ title: 'Copied email' }); } catch {} }} disabled={!u.email}>
+                              <CopyIcon className="h-4 w-4 mr-1" /> Email
+                            </Button>
+                            <Button size="sm" variant="outline" onClick={async () => { try { await navigator.clipboard.writeText(u.id); toast({ title: 'Copied UID' }); } catch {} }}>
+                              <CopyIcon className="h-4 w-4 mr-1" /> UID
+                            </Button>
                           </div>
-                      </div>
+                        </div>
                       );
                     })}
                     {users.length === 0 && !usersLoading && (
                       <div className="px-3 py-6 text-center text-sm text-muted-foreground">No users to display.</div>
                     )}
                   </div>
+                </div>
+
+                {/* Mobile cards (below md) */}
+                <div className="md:hidden space-y-3">
+                  {users.map((u) => {
+                    let createdText = '—';
+                    const c: any = (u as any).createdAt;
+                    try {
+                      const ts = c?.seconds ? new Date(c.seconds * 1000) : (typeof c === 'string' ? new Date(c) : null);
+                      if (ts && !isNaN(ts.getTime())) createdText = ts.toLocaleString();
+                    } catch {}
+                    return (
+                      <div key={u.id} className="rounded-md border p-3">
+                        <div className="font-medium truncate" title={u.full_name || '—'}>{u.full_name || '—'}</div>
+                        <div className="text-sm text-muted-foreground truncate" title={u.email || '—'}>{u.email || '—'}</div>
+                        <div className="mt-1 flex items-center justify-between text-sm">
+                          <span className="px-2 py-0.5 rounded bg-accent/30 text-foreground/80">{u.user_type || 'unknown'}</span>
+                          <div className="flex items-center gap-2">
+                            <Button size="sm" variant="outline" className="h-8 px-2" onClick={async () => { try { await navigator.clipboard.writeText(u.email || ''); toast({ title: 'Copied email' }); } catch {} }} disabled={!u.email}>
+                              <CopyIcon className="h-4 w-4" />
+                            </Button>
+                            <Button size="sm" variant="outline" className="h-8 px-2" onClick={async () => { try { await navigator.clipboard.writeText(u.id); toast({ title: 'Copied UID' }); } catch {} }}>
+                              <CopyIcon className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                        <div className="mt-1 text-xs text-muted-foreground space-y-0.5">
+                          <div className="truncate"><span className="font-medium text-foreground/80">UID:</span> {u.id}</div>
+                          <div className="truncate"><span className="font-medium text-foreground/80">Created:</span> {createdText}</div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {users.length === 0 && !usersLoading && (
+                    <div className="px-3 py-6 text-center text-sm text-muted-foreground">No users to display.</div>
+                  )}
                 </div>
 
                 <div className="mt-3 flex items-center justify-between">
