@@ -379,7 +379,7 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
                       placeholder={searchField === 'email' ? 'Search email…' : 'Search name…'}
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="h-8 w-48"
+                      className="h-9 w-full md:w-64"
                     />
                     <div className="flex gap-1">
                       <Button size="sm" variant={searchField === 'email' ? 'default' : 'outline'} onClick={() => setSearchField('email')}>By Email</Button>
@@ -427,16 +427,17 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
                   </div>
                 </div>
 
-                <div className="rounded-md border divide-y">
-                  <div className="grid grid-cols-6 gap-2 px-3 py-2 text-xs text-muted-foreground">
+                <div className="w-full overflow-x-auto">
+                  <div className="min-w-[720px] rounded-md border divide-y">
+                    <div className="grid grid-cols-3 md:grid-cols-6 gap-2 px-3 py-2 text-xs text-muted-foreground">
                     <div>Name</div>
                     <div>Email</div>
                     <div>Role</div>
-                    <div>UID</div>
-                    <div>Created</div>
-                    <div>Actions</div>
-                  </div>
-                  {users.map((u) => {
+                      <div className="hidden md:block">UID</div>
+                      <div className="hidden md:block">Created</div>
+                      <div className="hidden md:block">Actions</div>
+                    </div>
+                    {users.map((u) => {
                     // createdAt could be a Firestore Timestamp
                     let createdText = '—';
                     const c: any = (u as any).createdAt;
@@ -447,13 +448,13 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
                       }
                     } catch {}
                     return (
-                      <div key={u.id} className="grid grid-cols-6 gap-2 px-3 py-2 text-sm">
+                        <div key={u.id} className="grid grid-cols-3 md:grid-cols-6 gap-2 px-3 py-2 text-sm">
                       <div className="truncate" title={u.full_name || '—'}>{u.full_name || '—'}</div>
                       <div className="truncate" title={u.email || '—'}>{u.email || '—'}</div>
                       <div>{u.user_type || 'unknown'}</div>
-                      <div className="truncate" title={u.id}>{u.id}</div>
-                        <div className="truncate" title={createdText}>{createdText}</div>
-                        <div className="flex items-center gap-2">
+                          <div className="hidden md:block truncate" title={u.id}>{u.id}</div>
+                          <div className="hidden md:block truncate" title={createdText}>{createdText}</div>
+                          <div className="hidden md:flex items-center gap-2">
                           <Button size="sm" variant="outline" onClick={async () => {
                             try { await navigator.clipboard.writeText(u.email || ''); toast({ title: 'Copied email' }); } catch {}
                           }} disabled={!u.email}>
@@ -466,11 +467,12 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
                           </Button>
                         </div>
                       </div>
-                    );
-                  })}
-                  {users.length === 0 && !usersLoading && (
-                    <div className="px-3 py-6 text-center text-sm text-muted-foreground">No users to display.</div>
-                  )}
+                      );
+                    })}
+                    {users.length === 0 && !usersLoading && (
+                      <div className="px-3 py-6 text-center text-sm text-muted-foreground">No users to display.</div>
+                    )}
+                  </div>
                 </div>
 
                 <div className="mt-3 flex items-center justify-between">
