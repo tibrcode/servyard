@@ -13,7 +13,9 @@ import {
   Trash2,
   Eye,
   Ban,
-  CheckCircle
+  CheckCircle,
+  Copy as CopyIcon,
+  Download
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { auth, db } from "@/integrations/firebase/client";
@@ -59,6 +61,9 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
   const [usersLoading, setUsersLoading] = useState<boolean>(false);
   const [usersEnd, setUsersEnd] = useState<boolean>(false);
   const lastDocRef = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
+  // Search
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [searchField, setSearchField] = useState<"email" | "full_name">("email");
   // Ensure auto-run only executes once
   const autoRanRef = useRef(false);
   // Query flags (dev-only migration bypass)
@@ -134,14 +139,35 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
       }
       let base = collection(db, 'profiles');
       let qBase;
+      const term = searchTerm.trim();
       if (usersRoleFilter === 'all') {
-        // Order by createdAt desc if available; single-field index only
-        qBase = query(base, orderBy('createdAt', 'desc' as any), limit(PAGE_SIZE));
-        if (!reset && lastDocRef.current) {
-          qBase = query(base, orderBy('createdAt', 'desc' as any), startAfter(lastDocRef.current), limit(PAGE_SIZE));
+        if (term) {
+          // Server-side prefix search for All only
+          const end = term + '\uf8ff';
+          qBase = query(
+            base,
+            orderBy(searchField as any),
+            // @ts-ignore
+            (window as any).firebaseWhereRange ? (window as any).firebaseWhereRange(searchField, term, end) : (orderBy(searchField as any), limit(PAGE_SIZE))
+          );
+          // Since we cannot use a non-standard helper in runtime, fallback to startAt/endAt pattern
+          qBase = query(base, orderBy(searchField as any), (window as any).startAt ? (window as any).startAt(term) : orderBy(searchField as any), limit(PAGE_SIZE));
+          // Proper pattern (without types) using any cast to avoid TS friction
+          // @ts-ignore
+          qBase = query(base, orderBy(searchField), (window as any).startAt ? (window as any).startAt(term) : orderBy(searchField), (window as any).endAt ? (window as any).endAt(end) : limit(PAGE_SIZE), limit(PAGE_SIZE));
+          // If paginating with search, use startAfter on same orderBy
+          if (!reset && lastDocRef.current) {
+            // @ts-ignore
+            qBase = query(base, orderBy(searchField), (window as any).startAt ? (window as any).startAt(term) : orderBy(searchField), (window as any).endAt ? (window as any).endAt(end) : limit(PAGE_SIZE), startAfter(lastDocRef.current), limit(PAGE_SIZE));
+          }
+        } else {
+          qBase = query(base, orderBy('createdAt', 'desc' as any), limit(PAGE_SIZE));
+          if (!reset && lastDocRef.current) {
+            qBase = query(base, orderBy('createdAt', 'desc' as any), startAfter(lastDocRef.current), limit(PAGE_SIZE));
+          }
         }
       } else {
-        // Avoid composite index requirement: equality filter without orderBy, paginate by doc id
+        // Avoid composite index requirement with role filter: no orderBy
         qBase = query(base, where('user_type', '==', usersRoleFilter), limit(PAGE_SIZE));
         if (!reset && lastDocRef.current) {
           qBase = query(base, where('user_type', '==', usersRoleFilter), startAfter(lastDocRef.current), limit(PAGE_SIZE));
@@ -350,18 +376,67 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
                       <Button size="sm" variant={usersRoleFilter === 'customer' ? 'default' : 'outline'} onClick={() => setUsersRoleFilter('customer')}>Customers</Button>
                     </div>
                   </div>
-                  <div className="ml-auto">
-                    <Button size="sm" variant="outline" onClick={() => loadUsers(true)} disabled={usersLoading}>Refresh</Button>
+                  <div className="flex items-center gap-2 ml-auto">
+                    <Input
+                      placeholder={searchField === 'email' ? 'Search email…' : 'Search name…'}
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="h-8 w-48"
+                    />
+                    <div className="flex gap-1">
+                      <Button size="sm" variant={searchField === 'email' ? 'default' : 'outline'} onClick={() => setSearchField('email')}>By Email</Button>
+                      <Button size="sm" variant={searchField === 'full_name' ? 'default' : 'outline'} onClick={() => setSearchField('full_name')}>By Name</Button>
+                    </div>
+                    <Button size="sm" onClick={() => loadUsers(true)} disabled={usersLoading}>Search</Button>
+                    <Button size="sm" variant="outline" onClick={() => { setSearchTerm(''); loadUsers(true); }} disabled={usersLoading}>Reset</Button>
+                    <Button size="sm" variant="outline" onClick={() => {
+                      try {
+                        const rows = users.map((u) => {
+                          const c: any = (u as any).createdAt;
+                          let created = '';
+                          try {
+                            const ts = c?.seconds ? new Date(c.seconds * 1000) : (typeof c === 'string' ? new Date(c) : null);
+                            if (ts && !isNaN(ts.getTime())) created = ts.toISOString();
+                          } catch {}
+                          return {
+                            name: u.full_name || '',
+                            email: u.email || '',
+                            role: u.user_type || '',
+                            uid: u.id,
+                            created,
+                          };
+                        });
+                        const header = 'Name,Email,Role,UID,Created\n';
+                        const escapeCsv = (val: any) => '"' + String(val).split('"').join('""') + '"';
+                        const body = rows
+                          .map(r => [r.name, r.email, r.role, r.uid, r.created]
+                            .map(escapeCsv)
+                            .join(','))
+                          .join('\n');
+                        const blob = new Blob([header + body], { type: 'text/csv;charset=utf-8;' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'users.csv';
+                        a.click();
+                        URL.revokeObjectURL(url);
+                      } catch (e) {
+                        toast({ variant: 'destructive', title: 'Export failed', description: (e as any)?.message || String(e) });
+                      }
+                    }}>
+                      <Download className="h-4 w-4 mr-1" /> Export CSV
+                    </Button>
                   </div>
                 </div>
 
                 <div className="rounded-md border divide-y">
-                  <div className="grid grid-cols-5 gap-2 px-3 py-2 text-xs text-muted-foreground">
+                  <div className="grid grid-cols-6 gap-2 px-3 py-2 text-xs text-muted-foreground">
                     <div>Name</div>
                     <div>Email</div>
                     <div>Role</div>
                     <div>UID</div>
                     <div>Created</div>
+                    <div>Actions</div>
                   </div>
                   {users.map((u) => {
                     // createdAt could be a Firestore Timestamp
@@ -374,12 +449,24 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
                       }
                     } catch {}
                     return (
-                      <div key={u.id} className="grid grid-cols-5 gap-2 px-3 py-2 text-sm">
+                      <div key={u.id} className="grid grid-cols-6 gap-2 px-3 py-2 text-sm">
                       <div className="truncate" title={u.full_name || '—'}>{u.full_name || '—'}</div>
                       <div className="truncate" title={u.email || '—'}>{u.email || '—'}</div>
                       <div>{u.user_type || 'unknown'}</div>
                       <div className="truncate" title={u.id}>{u.id}</div>
                         <div className="truncate" title={createdText}>{createdText}</div>
+                        <div className="flex items-center gap-2">
+                          <Button size="sm" variant="outline" onClick={async () => {
+                            try { await navigator.clipboard.writeText(u.email || ''); toast({ title: 'Copied email' }); } catch {}
+                          }} disabled={!u.email}>
+                            <CopyIcon className="h-4 w-4 mr-1" /> Email
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={async () => {
+                            try { await navigator.clipboard.writeText(u.id); toast({ title: 'Copied UID' }); } catch {}
+                          }}>
+                            <CopyIcon className="h-4 w-4 mr-1" /> UID
+                          </Button>
+                        </div>
                       </div>
                     );
                   })}
