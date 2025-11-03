@@ -184,13 +184,13 @@ export const ServiceCategories = ({
 
   return (
     <section
-      className="py-12"
+      className="py-10 md:py-12"
       dir={isRTL ? 'rtl' : 'ltr'}
     >
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-10">
-          <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">
+          <h2 className="text-2xl md:text-4xl font-display font-bold mb-4">
             {t.home.featuredCategories}
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
@@ -199,7 +199,7 @@ export const ServiceCategories = ({
         </div>
 
   {/* Categories Grid: 2 cols on very narrow phones, 3 cols otherwise; auto-fit on desktop */}
-  <div className="grid grid-cols-2 xs:grid-cols-3 gap-3 px-3 md:[grid-template-columns:repeat(auto-fit,minmax(180px,1fr))] md:gap-4 md:px-4 lg:[grid-template-columns:repeat(auto-fit,minmax(200px,1fr))] lg:gap-5 lg:px-6">
+  <div className="grid grid-cols-2 xs:grid-cols-3 gap-3 px-1.5 md:[grid-template-columns:repeat(auto-fit,minmax(180px,1fr))] md:gap-4 md:px-4 lg:[grid-template-columns:repeat(auto-fit,minmax(200px,1fr))] lg:gap-5 lg:px-6">
           {categories.map((category) => {
             const IconComponent = iconMap[category.icon_name || 'Users'] || Users;
             const colors = colorMap[category.color_scheme || 'blue'];

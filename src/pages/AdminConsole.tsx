@@ -253,7 +253,7 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-background p-8">
+    <div className="min-h-screen bg-background px-3 sm:px-6 md:px-8 py-6 md:py-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center gap-3 mb-8">
           <Shield className="h-8 w-8 text-primary" />
@@ -336,7 +336,7 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
 
         {/* Main Content */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-4 overflow-x-auto">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
@@ -374,19 +374,24 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
                       <Button size="sm" variant={usersRoleFilter === 'customer' ? 'default' : 'outline'} onClick={() => setUsersRoleFilter('customer')}>Customers</Button>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 ml-auto">
-                    <Input
-                      placeholder={searchField === 'email' ? 'Search email…' : 'Search name…'}
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="h-9 w-full md:w-64"
-                    />
-                    <div className="flex gap-1">
+                  {/* Controls: stack on mobile to avoid horizontal overflow */}
+                  <div className="ml-auto w-full md:w-auto flex items-center md:items-end gap-2 md:gap-2 flex-wrap">
+                    <div className="flex-1 min-w-0 md:min-w-[16rem]">
+                      <Input
+                        placeholder={searchField === 'email' ? 'Search email…' : 'Search name…'}
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="h-9 w-full"
+                      />
+                    </div>
+                    <div className="flex gap-1 flex-wrap">
                       <Button size="sm" variant={searchField === 'email' ? 'default' : 'outline'} onClick={() => setSearchField('email')}>By Email</Button>
                       <Button size="sm" variant={searchField === 'full_name' ? 'default' : 'outline'} onClick={() => setSearchField('full_name')}>By Name</Button>
                     </div>
-                    <Button size="sm" onClick={() => loadUsers(true)} disabled={usersLoading}>Search</Button>
-                    <Button size="sm" variant="outline" onClick={() => { setSearchTerm(''); loadUsers(true); }} disabled={usersLoading}>Reset</Button>
+                    <div className="flex gap-2">
+                      <Button size="sm" onClick={() => loadUsers(true)} disabled={usersLoading}>Search</Button>
+                      <Button size="sm" variant="outline" onClick={() => { setSearchTerm(''); loadUsers(true); }} disabled={usersLoading}>Reset</Button>
+                    </div>
                     <Button size="sm" variant="outline" onClick={() => {
                       try {
                         const rows = users.map((u) => {

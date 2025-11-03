@@ -14,7 +14,7 @@ export function CategoryCard({ icon, title, onClick, className = "", onTitleFit,
             onClick={onClick}
             aria-label={title}
             className={
-                "category-card relative rounded-2xl border border-white/10 bg-card aspect-[2/3] md:aspect-square overflow-hidden glow-card transition-transform hover:scale-[1.01] min-w-0 " +
+                "category-card relative rounded-2xl border border-border bg-card aspect-square overflow-hidden glow-card transition-transform hover:scale-[1.01] min-w-0 " +
                 className
             }
             type="button"
@@ -25,7 +25,7 @@ export function CategoryCard({ icon, title, onClick, className = "", onTitleFit,
                     text={title}
                     onFit={onTitleFit}
                     forcedSize={unifiedSize ?? null}
-                    className="block mx-auto text-center font-medium text-white w-[88%] max-w-[88%] leading-tight tracking-normal"
+                    className="block mx-auto text-center font-medium text-foreground w-[88%] max-w-[88%] leading-tight tracking-normal dark:text-white"
                     min={9}
                     max={11}
                     xsMin={8}
