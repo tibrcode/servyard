@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { auth, db } from "@/integrations/firebase/client";
-import { collection, doc, getDoc, getCountFromServer, query, where, limit, getDocs, orderBy, startAfter, QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
+import { collection, doc, getDoc, getCountFromServer, query, where, limit, getDocs, orderBy, startAfter, startAt, endAt, QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { useTranslation } from "@/lib/i18n";
 import { upsertCategoryTranslations } from "@/lib/firebase/migrations/upsertCategoryTranslations";
@@ -142,23 +142,10 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
       const term = searchTerm.trim();
       if (usersRoleFilter === 'all') {
         if (term) {
-          // Server-side prefix search for All only
-          const end = term + '\uf8ff';
-          qBase = query(
-            base,
-            orderBy(searchField as any),
-            // @ts-ignore
-            (window as any).firebaseWhereRange ? (window as any).firebaseWhereRange(searchField, term, end) : (orderBy(searchField as any), limit(PAGE_SIZE))
-          );
-          // Since we cannot use a non-standard helper in runtime, fallback to startAt/endAt pattern
-          qBase = query(base, orderBy(searchField as any), (window as any).startAt ? (window as any).startAt(term) : orderBy(searchField as any), limit(PAGE_SIZE));
-          // Proper pattern (without types) using any cast to avoid TS friction
-          // @ts-ignore
-          qBase = query(base, orderBy(searchField), (window as any).startAt ? (window as any).startAt(term) : orderBy(searchField), (window as any).endAt ? (window as any).endAt(end) : limit(PAGE_SIZE), limit(PAGE_SIZE));
-          // If paginating with search, use startAfter on same orderBy
+          const end = term + '\\uf8ff';
+          qBase = query(base, orderBy(searchField as any), startAt(term), endAt(end), limit(PAGE_SIZE));
           if (!reset && lastDocRef.current) {
-            // @ts-ignore
-            qBase = query(base, orderBy(searchField), (window as any).startAt ? (window as any).startAt(term) : orderBy(searchField), (window as any).endAt ? (window as any).endAt(end) : limit(PAGE_SIZE), startAfter(lastDocRef.current), limit(PAGE_SIZE));
+            qBase = query(base, orderBy(searchField as any), startAt(term), endAt(end), startAfter(lastDocRef.current), limit(PAGE_SIZE));
           }
         } else {
           qBase = query(base, orderBy('createdAt', 'desc' as any), limit(PAGE_SIZE));
@@ -175,6 +162,17 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
       }
       const snap = await getDocs(qBase);
   const newDocs = snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) }));
+      // Fallback: if All+no search returned empty on first load, retry without order to ensure something shows
+      if (reset && usersRoleFilter === 'all' && !term && newDocs.length === 0) {
+        const snap2 = await getDocs(query(base, limit(PAGE_SIZE)));
+        const newDocs2 = snap2.docs.map((d) => ({ id: d.id, ...(d.data() as any) }));
+        if (snap2.docs.length > 0) {
+          lastDocRef.current = snap2.docs[snap2.docs.length - 1] as QueryDocumentSnapshot<DocumentData>;
+        }
+        setUsers(newDocs2);
+        if (snap2.docs.length < PAGE_SIZE) setUsersEnd(true);
+        return;
+      }
       if (snap.docs.length > 0) {
         lastDocRef.current = snap.docs[snap.docs.length - 1] as QueryDocumentSnapshot<DocumentData>;
       }
