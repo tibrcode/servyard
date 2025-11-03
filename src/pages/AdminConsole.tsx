@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { auth, db } from "@/integrations/firebase/client";
-import { collection, doc, getDoc, getCountFromServer, query, where, limit, getDocs } from "firebase/firestore";
+import { collection, doc, getDoc, getCountFromServer, query, where, limit, getDocs, orderBy, startAfter, QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { useTranslation } from "@/lib/i18n";
 import { upsertCategoryTranslations } from "@/lib/firebase/migrations/upsertCategoryTranslations";
@@ -41,6 +41,10 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
     pendingReports: 0,
     activeBookings: 0
   });
+  const [derivedStats, setDerivedStats] = useState({
+    customers: 0,
+    incomplete: 0,
+  });
   const [loadingStats, setLoadingStats] = useState<boolean>(false);
   const [deleteField, setDeleteField] = useState<string>("");
   const [deleteMode, setDeleteMode] = useState<"email" | "uid">("email");
@@ -49,6 +53,12 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
   const [findMode, setFindMode] = useState<"email" | "uid">("email");
   const [finding, setFinding] = useState<boolean>(false);
   const [foundProfile, setFoundProfile] = useState<any | null>(null);
+  // Users list (paginated)
+  const [users, setUsers] = useState<any[]>([]);
+  const [usersRoleFilter, setUsersRoleFilter] = useState<"all" | "provider" | "customer">("all");
+  const [usersLoading, setUsersLoading] = useState<boolean>(false);
+  const [usersEnd, setUsersEnd] = useState<boolean>(false);
+  const lastDocRef = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
   // Ensure auto-run only executes once
   const autoRanRef = useRef(false);
   // Query flags (dev-only migration bypass)
@@ -81,10 +91,11 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
         const profilesRef = collection(db, "profiles");
         const servicesRef = collection(db, "services");
 
-        const [usersSnap, providersSnap, servicesSnap] = await Promise.all([
+        const [usersSnap, providersSnap, servicesSnap, customersSnap] = await Promise.all([
           getCountFromServer(profilesRef),
           getCountFromServer(query(profilesRef, where("user_type", "==", "provider"))),
           getCountFromServer(servicesRef),
+          getCountFromServer(query(profilesRef, where("user_type", "==", "customer"))),
         ]);
 
         if (cancelled) return;
@@ -94,6 +105,13 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
           totalProviders: providersSnap.data().count || 0,
           totalServices: servicesSnap.data().count || 0,
         }));
+        const total = usersSnap.data().count || 0;
+        const providers = providersSnap.data().count || 0;
+        const customers = customersSnap.data().count || 0;
+        setDerivedStats({
+          customers,
+          incomplete: Math.max(0, total - providers - customers),
+        });
       } catch (e) {
         console.warn("Failed to load admin stats", e);
       } finally {
@@ -102,6 +120,53 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
     })();
     return () => { cancelled = true; };
   }, [isAuthorized]);
+
+  // Load users list (paged by 50, ordered by email). Optional role filter.
+  const PAGE_SIZE = 50;
+  const loadUsers = async (reset = false) => {
+    if (usersLoading) return;
+    try {
+      setUsersLoading(true);
+      if (reset) {
+        setUsers([]);
+        setUsersEnd(false);
+        lastDocRef.current = null;
+      }
+      let base = collection(db, 'profiles');
+      let qBase;
+      if (usersRoleFilter === 'all') {
+        qBase = query(base, orderBy('email'), limit(PAGE_SIZE));
+      } else {
+        qBase = query(base, where('user_type', '==', usersRoleFilter), orderBy('email'), limit(PAGE_SIZE));
+      }
+      if (!reset && lastDocRef.current) {
+        if (usersRoleFilter === 'all') {
+          qBase = query(base, orderBy('email'), startAfter(lastDocRef.current), limit(PAGE_SIZE));
+        } else {
+          qBase = query(base, where('user_type', '==', usersRoleFilter), orderBy('email'), startAfter(lastDocRef.current), limit(PAGE_SIZE));
+        }
+      }
+      const snap = await getDocs(qBase);
+      const newDocs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      if (snap.docs.length > 0) {
+        lastDocRef.current = snap.docs[snap.docs.length - 1] as QueryDocumentSnapshot<DocumentData>;
+      }
+      setUsers((prev) => (reset ? newDocs : [...prev, ...newDocs]));
+      if (snap.docs.length < PAGE_SIZE) setUsersEnd(true);
+    } catch (e) {
+      console.warn('Failed to load users list', e);
+      toast({ variant: 'destructive', title: 'Failed to load users', description: (e as any)?.message || String(e) });
+    } finally {
+      setUsersLoading(false);
+    }
+  };
+
+  // Initial users load when authorized; reload when filter changes
+  useEffect(() => {
+    if (isAuthorized !== true) return;
+    loadUsers(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthorized, usersRoleFilter]);
 
   // Optional auto-run of category translations migration via URL query param
   useEffect(() => {
@@ -195,6 +260,26 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Customers</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{derivedStats.customers}</div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Incomplete Profiles</CardTitle>
+              <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-yellow-600">{derivedStats.incomplete}</div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Services</CardTitle>
               <BarChart3 className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
@@ -249,6 +334,58 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
           </TabsContent>
 
           <TabsContent value="users" className="space-y-6">
+            {/* Users list with role filter and load more */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Users List</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="mb-4 flex items-center gap-3 flex-wrap">
+                  <div className="flex items-center gap-2">
+                    <Label>Filter:</Label>
+                    <div className="flex gap-2">
+                      <Button size="sm" variant={usersRoleFilter === 'all' ? 'default' : 'outline'} onClick={() => setUsersRoleFilter('all')}>All</Button>
+                      <Button size="sm" variant={usersRoleFilter === 'provider' ? 'default' : 'outline'} onClick={() => setUsersRoleFilter('provider')}>Providers</Button>
+                      <Button size="sm" variant={usersRoleFilter === 'customer' ? 'default' : 'outline'} onClick={() => setUsersRoleFilter('customer')}>Customers</Button>
+                    </div>
+                  </div>
+                  <div className="ml-auto">
+                    <Button size="sm" variant="outline" onClick={() => loadUsers(true)} disabled={usersLoading}>Refresh</Button>
+                  </div>
+                </div>
+
+                <div className="rounded-md border divide-y">
+                  <div className="grid grid-cols-4 gap-2 px-3 py-2 text-xs text-muted-foreground">
+                    <div>Name</div>
+                    <div>Email</div>
+                    <div>Role</div>
+                    <div>UID</div>
+                  </div>
+                  {users.map((u) => (
+                    <div key={u.id} className="grid grid-cols-4 gap-2 px-3 py-2 text-sm">
+                      <div className="truncate" title={u.full_name || '—'}>{u.full_name || '—'}</div>
+                      <div className="truncate" title={u.email || '—'}>{u.email || '—'}</div>
+                      <div>{u.user_type || 'unknown'}</div>
+                      <div className="truncate" title={u.id}>{u.id}</div>
+                    </div>
+                  ))}
+                  {users.length === 0 && !usersLoading && (
+                    <div className="px-3 py-6 text-center text-sm text-muted-foreground">No users to display.</div>
+                  )}
+                </div>
+
+                <div className="mt-3 flex items-center justify-between">
+                  <div className="text-xs text-muted-foreground">
+                    Showing {users.length} {usersRoleFilter === 'all' ? 'users' : usersRoleFilter}
+                  </div>
+                  <div className="flex gap-2">
+                    {!usersEnd && (
+                      <Button size="sm" onClick={() => loadUsers(false)} disabled={usersLoading}>{usersLoading ? 'Loading…' : 'Load more'}</Button>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
             {/* Simple user lookup to verify presence of newly created accounts (requires profile doc) */}
             <Card>
               <CardHeader>
