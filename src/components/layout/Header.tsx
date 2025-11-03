@@ -189,9 +189,8 @@ export const Header = ({
                         setTimeout(() => onLanguageChange?.(language.code), 0);
                       }
                     }}
-                    className={`flex items-center gap-3 ${currentLanguage === language.code ? 'bg-accent' : ''}`}
+                    className={`${currentLanguage === language.code ? 'bg-accent' : ''}`}
                   >
-                    <span className="text-base flex-shrink-0">{language.flag}</span>
                     <span className="break-words leading-tight">{language.name}</span>
                   </DropdownMenuItem>
                 ))}

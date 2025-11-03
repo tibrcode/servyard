@@ -179,7 +179,6 @@ export function AppSidebar({ currentLanguage = 'en', onLanguageChange, onLocatio
                           }}
                           className={currentLanguage === language.code ? 'bg-accent' : ''}
                         >
-                          <span className="text-base mr-2">{language.flag}</span>
                           <span className="truncate">{language.name}</span>
                         </DropdownMenuItem>
                       ))}
@@ -268,7 +267,6 @@ export function AppSidebar({ currentLanguage = 'en', onLanguageChange, onLocatio
                           }}
                           className={currentLanguage === language.code ? 'bg-accent' : ''}
                         >
-                          <span className="text-base mr-2">{language.flag}</span>
                           <span className="truncate">{language.name}</span>
                         </DropdownMenuItem>
                       ))}
