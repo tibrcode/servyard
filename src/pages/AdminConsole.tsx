@@ -429,7 +429,7 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
 
                 <div className="w-full overflow-x-auto">
                   <div className="min-w-[720px] rounded-md border divide-y">
-                    <div className="grid grid-cols-3 md:grid-cols-6 gap-2 px-3 py-2 text-xs text-muted-foreground">
+                    <div className="grid grid-cols-3 md:grid-cols-6 gap-2 px-3 py-2 text-xs text-muted-foreground sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:backdrop-blur z-10">
                     <div>Name</div>
                     <div>Email</div>
                     <div>Role</div>
@@ -466,6 +466,19 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
                             <CopyIcon className="h-4 w-4 mr-1" /> UID
                           </Button>
                         </div>
+                          {/* Mobile-only stacked details */}
+                          <div className="col-span-3 md:hidden mt-1 text-xs text-muted-foreground flex items-center justify-between gap-2">
+                            <div className="truncate" title={u.id}><span className="font-medium text-foreground/80">UID:</span> {u.id}</div>
+                            <div className="truncate" title={createdText}><span className="font-medium text-foreground/80">Created:</span> {createdText}</div>
+                            <div className="flex items-center gap-1">
+                              <Button size="sm" variant="outline" className="h-7 px-2" onClick={async () => { try { await navigator.clipboard.writeText(u.email || ''); toast({ title: 'Copied email' }); } catch {} }} disabled={!u.email}>
+                                <CopyIcon className="h-3 w-3" />
+                              </Button>
+                              <Button size="sm" variant="outline" className="h-7 px-2" onClick={async () => { try { await navigator.clipboard.writeText(u.id); toast({ title: 'Copied UID' }); } catch {} }}>
+                                <CopyIcon className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          </div>
                       </div>
                       );
                     })}
