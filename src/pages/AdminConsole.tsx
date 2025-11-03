@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Navigate } from "react-router-dom";
+// No redirect; show explicit Unauthorized message when needed
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,7 +16,8 @@ import {
   CheckCircle
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { auth } from "@/integrations/firebase/client";
+import { auth, db } from "@/integrations/firebase/client";
+import { collection, doc, getDoc, getCountFromServer, query, where, limit, getDocs } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { useTranslation } from "@/lib/i18n";
 import { upsertCategoryTranslations } from "@/lib/firebase/migrations/upsertCategoryTranslations";
@@ -40,9 +41,14 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
     pendingReports: 0,
     activeBookings: 0
   });
+  const [loadingStats, setLoadingStats] = useState<boolean>(false);
   const [deleteField, setDeleteField] = useState<string>("");
   const [deleteMode, setDeleteMode] = useState<"email" | "uid">("email");
   const [deleting, setDeleting] = useState<boolean>(false);
+  const [findField, setFindField] = useState<string>("");
+  const [findMode, setFindMode] = useState<"email" | "uid">("email");
+  const [finding, setFinding] = useState<boolean>(false);
+  const [foundProfile, setFoundProfile] = useState<any | null>(null);
   // Ensure auto-run only executes once
   const autoRanRef = useRef(false);
   // Query flags (dev-only migration bypass)
@@ -64,6 +70,38 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
 
     return () => unsubscribe();
   }, []);
+
+  // Load basic stats from Firestore (profiles/services). New users appear after profile creation.
+  useEffect(() => {
+    if (isAuthorized !== true) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        setLoadingStats(true);
+        const profilesRef = collection(db, "profiles");
+        const servicesRef = collection(db, "services");
+
+        const [usersSnap, providersSnap, servicesSnap] = await Promise.all([
+          getCountFromServer(profilesRef),
+          getCountFromServer(query(profilesRef, where("user_type", "==", "provider"))),
+          getCountFromServer(servicesRef),
+        ]);
+
+        if (cancelled) return;
+        setStats((s) => ({
+          ...s,
+          totalUsers: usersSnap.data().count || 0,
+          totalProviders: providersSnap.data().count || 0,
+          totalServices: servicesSnap.data().count || 0,
+        }));
+      } catch (e) {
+        console.warn("Failed to load admin stats", e);
+      } finally {
+        if (!cancelled) setLoadingStats(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [isAuthorized]);
 
   // Optional auto-run of category translations migration via URL query param
   useEffect(() => {
@@ -211,6 +249,70 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
           </TabsContent>
 
           <TabsContent value="users" className="space-y-6">
+            {/* Simple user lookup to verify presence of newly created accounts (requires profile doc) */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Find a user</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4">
+                  <div className="flex flex-col md:flex-row gap-3 md:items-end">
+                    <div className="flex-1">
+                      <Label htmlFor="findField">{findMode === 'email' ? 'Email' : 'UID'}</Label>
+                      <Input id="findField" placeholder={findMode === 'email' ? 'user@example.com' : 'UID'} value={findField} onChange={(e) => setFindField(e.target.value)} />
+                    </div>
+                    <div className="flex gap-2">
+                      <Button type="button" variant={findMode === 'email' ? 'default' : 'outline'} onClick={() => setFindMode('email')}>By Email</Button>
+                      <Button type="button" variant={findMode === 'uid' ? 'default' : 'outline'} onClick={() => setFindMode('uid')}>By UID</Button>
+                    </div>
+                    <div>
+                      <Button
+                        disabled={finding || !findField}
+                        onClick={async () => {
+                          setFinding(true);
+                          setFoundProfile(null);
+                          try {
+                            if (findMode === 'uid') {
+                              const snap = await getDoc(doc(db, 'profiles', findField.trim()));
+                              setFoundProfile(snap.exists() ? { id: snap.id, ...snap.data() } : null);
+                            } else {
+                              const q = query(collection(db, 'profiles'), where('email', '==', findField.trim().toLowerCase()), limit(1));
+                              const qs = await getDocs(q);
+                              const first = qs.docs[0];
+                              setFoundProfile(first ? { id: first.id, ...first.data() } : null);
+                            }
+                          } catch (e: any) {
+                            toast({ variant: 'destructive', title: 'Lookup failed', description: e?.message || String(e) });
+                          } finally {
+                            setFinding(false);
+                          }
+                        }}
+                      >
+                        {finding ? 'Searching…' : 'Find'}
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div>
+                    {foundProfile ? (
+                      <div className="rounded-md border p-4 text-left">
+                        <div className="font-medium mb-1">Profile</div>
+                        <div className="text-sm text-muted-foreground break-words">
+                          <div><strong>UID:</strong> {foundProfile.id}</div>
+                          {foundProfile.full_name && (<div><strong>Name:</strong> {foundProfile.full_name}</div>)}
+                          {foundProfile.email && (<div><strong>Email:</strong> {foundProfile.email}</div>)}
+                          {foundProfile.user_type && (<div><strong>Role:</strong> {foundProfile.user_type}</div>)}
+                        </div>
+                      </div>
+                    ) : (
+                      findField && !finding && (
+                        <div className="text-sm text-muted-foreground">No profile found. New Auth users appear here after creating their profile.</div>
+                      )
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
             <Card>
               <CardHeader>
                 <CardTitle>User Management</CardTitle>
