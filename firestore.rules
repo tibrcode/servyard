@@ -21,7 +21,19 @@ service cloud.firestore {
     match /profiles/{userId} {
       allow read: if true; // Public profiles for browsing
       allow create: if isSignedIn() && request.auth.uid == userId;
-      allow update, delete: if isOwner(userId);
+      allow update: if isOwner(userId) && (
+        // التحقق من صحة الإحداثيات إذا تم تقديمها
+        !request.resource.data.keys().hasAny(['latitude', 'longitude']) ||
+        (
+          request.resource.data.latitude is number &&
+          request.resource.data.longitude is number &&
+          request.resource.data.latitude >= -90 &&
+          request.resource.data.latitude <= 90 &&
+          request.resource.data.longitude >= -180 &&
+          request.resource.data.longitude <= 180
+        )
+      );
+      allow delete: if isOwner(userId);
     }
     
     // Services Collection

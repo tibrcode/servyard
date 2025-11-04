@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, Filter, MapPin, Star, Clock, ExternalLink } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
@@ -17,6 +18,8 @@ import { collection, getDocs, doc, getDoc, query as fsQuery, where } from "fireb
 import { ServiceCategory, initializeServiceCategories } from "@/lib/firebase/collections";
 import { upsertDefaultServiceCategories } from "@/lib/firebase/defaultCategories";
 import { getCategoryLabel } from "@/lib/categoriesLocale";
+import { filterByRadius, formatDistance, RADIUS_OPTIONS, DEFAULT_RADIUS_KM, Coordinates } from "@/lib/geolocation";
+import { Slider } from "@/components/ui/slider";
 
 interface ServicesProps {
   currentLanguage: string;
@@ -41,6 +44,9 @@ interface Provider {
   country?: string;
   profile_description?: string;
   currency_code?: string;
+  latitude?: number;
+  longitude?: number;
+  location_address?: string;
 }
 
 const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
@@ -60,9 +66,30 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [selectedProvider, setSelectedProvider] = useState<Provider | null>(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
+  
+  // Location-based filtering states
+  const [userLocation, setUserLocation] = useState<Coordinates | null>(null);
+  const [radiusKm, setRadiusKm] = useState(DEFAULT_RADIUS_KM);
+  const [locationLoading, setLocationLoading] = useState(false);
 
   const { t, isRTL } = useTranslation(currentLanguage);
   const { toast } = useToast();
+
+  // محاولة استرجاع الموقع المحفوظ عند بداية الصفحة
+  useEffect(() => {
+    const savedLocation = localStorage.getItem('userLocation');
+    if (savedLocation) {
+      try {
+        const { latitude, longitude, timestamp } = JSON.parse(savedLocation);
+        // استخدام الموقع إذا كان أقل من ساعة
+        if (Date.now() - timestamp < 3600000) {
+          setUserLocation({ latitude, longitude });
+        }
+      } catch (e) {
+        console.error('Error parsing saved location:', e);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const loadData = async () => {
@@ -198,11 +225,119 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
     }
   };
 
-  const filteredServices = services.filter(service => {
-    if (!searchQuery) return true;
-    return service.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      service.description?.toLowerCase().includes(searchQuery.toLowerCase());
-  });
+  const handleGetLocation = () => {
+    if (!navigator.geolocation) {
+      toast({
+        variant: "destructive",
+        title: isRTL ? "الموقع غير مدعوم" : "Location Not Supported",
+        description: isRTL 
+          ? "المتصفح لا يدعم تحديد الموقع"
+          : "Your browser doesn't support geolocation"
+      });
+      return;
+    }
+
+    setLocationLoading(true);
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setUserLocation({ latitude, longitude });
+        
+        // حفظ في localStorage
+        localStorage.setItem('userLocation', JSON.stringify({ 
+          latitude, 
+          longitude,
+          timestamp: Date.now()
+        }));
+
+        toast({
+          title: isRTL ? "تم تحديد موقعك" : "Location Set",
+          description: isRTL 
+            ? `سيتم عرض الخدمات القريبة منك ضمن ${radiusKm} كم`
+            : `Showing services within ${radiusKm} km`
+        });
+        
+        setLocationLoading(false);
+      },
+      (error) => {
+        setLocationLoading(false);
+        let errorMessage = isRTL ? "فشل تحديد الموقع" : "Failed to get location";
+        
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = isRTL 
+              ? "تم رفض إذن الموقع. يرجى السماح بالوصول إلى الموقع من إعدادات المتصفح"
+              : "Permission denied. Please allow location access";
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = isRTL 
+              ? "معلومات الموقع غير متاحة"
+              : "Location information unavailable";
+            break;
+          case error.TIMEOUT:
+            errorMessage = isRTL 
+              ? "انتهت مهلة طلب الموقع"
+              : "Location request timeout";
+            break;
+        }
+        
+        toast({
+          variant: "destructive",
+          title: isRTL ? "خطأ" : "Error",
+          description: errorMessage
+        });
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 0
+      }
+    );
+  };
+
+  // فلترة الخدمات حسب البحث والفئة والموقع
+  const filteredServices = (() => {
+    let filtered = services;
+
+    // فلترة حسب الفئة
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter(s => s.category_id === selectedCategory);
+    }
+
+    // فلترة حسب البحث
+    if (searchQuery) {
+      filtered = filtered.filter(service => 
+        service.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        service.description?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    // فلترة حسب الموقع الجغرافي
+    if (userLocation && radiusKm > 0) {
+      const servicesWithLocation = filtered
+        .map(service => {
+          const provider = providers[service.provider_id];
+          return {
+            ...service,
+            provider,
+            latitude: provider?.latitude,
+            longitude: provider?.longitude
+          };
+        })
+        .filter(s => s.latitude && s.longitude) as (Service & Coordinates & { provider: Provider })[];
+
+      const nearby = filterByRadius(userLocation, servicesWithLocation, radiusKm);
+      
+      // إرجاع الخدمات مع معلومات المسافة
+      return nearby.map(({ distance, provider, latitude, longitude, ...service }) => ({
+        ...service,
+        distance
+      }));
+    }
+
+    return filtered;
+  })();
 
   if (loading) {
     return (
@@ -259,8 +394,79 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
             </div>
           </div>
 
+          {/* Location-based Filter */}
+          <Card className="mt-4">
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <MapPin className="w-4 h-4" />
+                {isRTL ? "البحث حسب الموقع" : "Search by Location"}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Button
+                  onClick={handleGetLocation}
+                  disabled={locationLoading}
+                  variant={userLocation ? "secondary" : "default"}
+                  className="flex-1"
+                >
+                  <MapPin className="w-4 h-4 mr-2" />
+                  {locationLoading 
+                    ? (isRTL ? "جاري تحديد الموقع..." : "Getting location...")
+                    : userLocation
+                      ? (isRTL ? "تم تحديد الموقع" : "Location Set")
+                      : (isRTL ? "استخدم موقعي" : "Use My Location")
+                  }
+                </Button>
+                {userLocation && (
+                  <Button
+                    onClick={() => {
+                      setUserLocation(null);
+                      localStorage.removeItem('userLocation');
+                      toast({
+                        title: isRTL ? "تم إلغاء الفلتر" : "Filter Cleared",
+                        description: isRTL ? "سيتم عرض جميع الخدمات" : "Showing all services"
+                      });
+                    }}
+                    variant="outline"
+                  >
+                    {isRTL ? "إلغاء" : "Clear"}
+                  </Button>
+                )}
+              </div>
+
+              {userLocation && (
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <Label>
+                      {isRTL ? "نطاق البحث:" : "Search Radius:"}
+                    </Label>
+                    <Badge variant="secondary">
+                      {radiusKm === 0 
+                        ? (isRTL ? "أي مسافة" : "Any distance")
+                        : `${radiusKm} ${isRTL ? "كم" : "km"}`
+                      }
+                    </Badge>
+                  </div>
+                  <Slider
+                    value={[radiusKm]}
+                    onValueChange={(values) => setRadiusKm(values[0])}
+                    min={0}
+                    max={500}
+                    step={5}
+                    className="w-full"
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>{isRTL ? "قريب جداً" : "Very Close"}</span>
+                    <span>{isRTL ? "بعيد" : "Far"}</span>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
           {qParam && (
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground mt-4">
               {t.actions.search}: "{qParam}" • {filteredServices.length}
             </p>
           )}
@@ -348,6 +554,14 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                           <div className="flex items-center gap-1">
                             <MapPin className="h-4 w-4" />
                             <span>{provider.city}</span>
+                          </div>
+                        )}
+
+                        {/* Display distance if available */}
+                        {(service as any).distance !== undefined && (
+                          <div className="flex items-center gap-1 text-primary font-medium">
+                            <MapPin className="h-4 w-4" />
+                            <span>{formatDistance((service as any).distance, currentLanguage === 'ar' ? 'ar' : 'en')}</span>
                           </div>
                         )}
                       </div>

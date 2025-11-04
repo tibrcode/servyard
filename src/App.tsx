@@ -46,6 +46,12 @@ const AppContent = () => {
   const { t } = useTranslation(currentLanguage);
   const { toast } = useToast();
   const { user } = useAuth();
+  
+  // State للموقع الجغرافي
+  const [userLocation, setUserLocation] = React.useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
 
   // تفعيل الإشعارات عند تسجيل الدخول
   React.useEffect(() => {
@@ -119,52 +125,116 @@ const AppContent = () => {
   }, []);
 
   const handleLocationChange = () => {
+    // التحقق من دعم المتصفح للموقع الجغرافي
     if (!navigator.geolocation) {
       toast({
-        title: t.toast.locationNotSupported,
-        description: t.toast.locationNotSupportedDesc,
+        title: t.toast.locationNotSupported || "Location Not Supported",
+        description: t.toast.locationNotSupportedDesc || "Your browser doesn't support geolocation",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // التحقق من أن الصفحة تعمل على HTTPS (مطلوب للـ geolocation)
+    if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
+      toast({
+        title: "HTTPS Required",
+        description: "Location services require a secure connection (HTTPS)",
         variant: "destructive"
       });
       return;
     }
 
     toast({
-      title: t.toast.locatingUser,
-      description: t.toast.locatingUserDesc
+      title: t.toast.locatingUser || "Locating...",
+      description: t.toast.locatingUserDesc || "Please wait while we determine your location"
     });
 
+    // محاولة الحصول على الموقع مع خيارات محسّنة
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        const { latitude, longitude } = position.coords;
+        const { latitude, longitude, accuracy } = position.coords;
+        
+        // حفظ الموقع في State
+        setUserLocation({ latitude, longitude });
+        
+        // حفظ في localStorage للاستخدام لاحقاً
+        localStorage.setItem('userLocation', JSON.stringify({ 
+          latitude, 
+          longitude,
+          timestamp: Date.now()
+        }));
+        
+        const accuracyText = accuracy < 100 ? "دقيق" : accuracy < 500 ? "جيد" : "تقريبي";
+        
         toast({
-          title: t.toast.locationSuccess,
-          description: `خط العرض: ${latitude.toFixed(6)}\nخط الطول: ${longitude.toFixed(6)}`,
+          title: t.toast.locationSuccess || "Location Found!",
+          description: `Latitude: ${latitude.toFixed(6)}\nLongitude: ${longitude.toFixed(6)}\nAccuracy: ${accuracy.toFixed(0)}m (${accuracyText})`,
         });
-        console.log("Location obtained:", { latitude, longitude });
+        
+        console.log("Location obtained:", { 
+          latitude, 
+          longitude, 
+          accuracy,
+          timestamp: new Date().toISOString()
+        });
       },
       (error) => {
-        let errorMessage = t.toast.locationFailed;
+        // معالجة مفصلة للأخطاء
+        let errorMessage = t.toast.locationFailed || "Failed to get location";
+        let errorDescription = "";
+        
         switch (error.code) {
           case error.PERMISSION_DENIED:
-            errorMessage = t.toast.locationPermissionDenied;
+            errorMessage = t.toast.locationPermissionDenied || "Permission Denied";
+            errorDescription = "Please allow location access in your browser settings";
             break;
           case error.POSITION_UNAVAILABLE:
-            errorMessage = t.toast.locationUnavailable;
+            errorMessage = t.toast.locationUnavailable || "Location Unavailable";
+            errorDescription = "Location information is not available. Please check your GPS/Wi-Fi";
             break;
           case error.TIMEOUT:
-            errorMessage = t.toast.locationTimeout;
+            errorMessage = t.toast.locationTimeout || "Request Timeout";
+            errorDescription = "Location request timed out. Please try again";
             break;
+          default:
+            errorDescription = error.message || "Unknown error occurred";
         }
+        
+        console.error("Geolocation error:", {
+          code: error.code,
+          message: error.message,
+          timestamp: new Date().toISOString()
+        });
+        
         toast({
-          title: t.toast.locationFailed,
-          description: errorMessage,
+          title: errorMessage,
+          description: errorDescription,
           variant: "destructive"
         });
+        
+        // محاولة استخدام الموقع المحفوظ إذا كان متاحاً
+        const savedLocation = localStorage.getItem('userLocation');
+        if (savedLocation) {
+          try {
+            const { latitude, longitude, timestamp } = JSON.parse(savedLocation);
+            // استخدام الموقع المحفوظ إذا كان أقل من ساعة
+            if (Date.now() - timestamp < 3600000) {
+              setUserLocation({ latitude, longitude });
+              toast({
+                title: "Using Saved Location",
+                description: "Using your previously saved location",
+              });
+            }
+          } catch (e) {
+            console.error("Error parsing saved location:", e);
+          }
+        }
       },
       {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 60000
+        enableHighAccuracy: true, // استخدام GPS عالي الدقة
+        timeout: 15000, // زيادة الوقت إلى 15 ثانية
+        maximumAge: 300000 // قبول مواقع محفوظة حتى 5 دقائق
       }
     );
   };

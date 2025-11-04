@@ -15,6 +15,7 @@ import { db } from "@/integrations/firebase/client";
 import { doc, updateDoc, getDoc } from "firebase/firestore";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { deleteCurrentUserFully } from "@/lib/firebase/deleteAccount";
+import LocationPicker from "@/components/provider/LocationPicker";
 
 interface EditProfileProps {
   currentLanguage: string;
@@ -35,6 +36,10 @@ interface ProfileData {
   facebook_url: string;
   tiktok_url: string;
   currency_code?: string;
+  // حقول الموقع الجغرافي
+  latitude?: number;
+  longitude?: number;
+  location_address?: string;
 }
 
 const EditProfile: React.FC<EditProfileProps> = ({ currentLanguage }) => {
@@ -62,7 +67,10 @@ const EditProfile: React.FC<EditProfileProps> = ({ currentLanguage }) => {
     instagram_url: '',
     facebook_url: '',
     tiktok_url: '',
-    currency_code: ''
+    currency_code: '',
+    latitude: undefined,
+    longitude: undefined,
+    location_address: ''
   });
 
   // Fetch user profile data
@@ -101,7 +109,10 @@ const EditProfile: React.FC<EditProfileProps> = ({ currentLanguage }) => {
           instagram_url: profile.instagram_url || '',
           facebook_url: profile.facebook_url || '',
           tiktok_url: profile.tiktok_url || '',
-          currency_code: profile.currency_code || ''
+          currency_code: profile.currency_code || '',
+          latitude: profile.latitude,
+          longitude: profile.longitude,
+          location_address: profile.location_address || ''
         });
 
       } catch (error) {
@@ -180,6 +191,10 @@ const EditProfile: React.FC<EditProfileProps> = ({ currentLanguage }) => {
         facebook_url: formData.facebook_url.trim(),
         tiktok_url: formData.tiktok_url.trim(),
         currency_code: (formData.currency_code || '').trim() || null,
+        // حفظ الموقع الجغرافي
+        latitude: formData.latitude || null,
+        longitude: formData.longitude || null,
+        location_address: formData.location_address?.trim() || null,
         updated_at: new Date()
       });
 
@@ -469,6 +484,29 @@ const EditProfile: React.FC<EditProfileProps> = ({ currentLanguage }) => {
                     />
                   </div>
                 </div>
+
+                {/* مكون تحديد الموقع الجغرافي للمزود */}
+                <LocationPicker
+                  currentLanguage={currentLanguage}
+                  value={
+                    formData.latitude && formData.longitude
+                      ? {
+                          latitude: formData.latitude,
+                          longitude: formData.longitude,
+                          address: formData.location_address
+                        }
+                      : undefined
+                  }
+                  onChange={(location) => {
+                    setFormData(prev => ({
+                      ...prev,
+                      latitude: location.latitude,
+                      longitude: location.longitude,
+                      location_address: location.address
+                    }));
+                  }}
+                  isRTL={isRTL}
+                />
               </div>
             )}
 
