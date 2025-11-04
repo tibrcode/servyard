@@ -119,6 +119,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ currentLanguage }) => {
     if (!authLoading) {
       fetchProfile();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, authLoading, navigate, toast]);
 
   const handleInputChange = (field: keyof ProfileData, value: string | string[]) => {

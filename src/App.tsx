@@ -9,6 +9,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { Header } from "@/components/layout/Header";
+import { requestNotificationPermission, onMessageListener } from "@/lib/firebase/notifications";
+import { useAuth } from "@/contexts/AuthContext";
 import Index from "@/pages/Index";
 import Auth from "@/pages/Auth";
 import ProviderSignup from "@/pages/ProviderSignup";
@@ -35,7 +37,7 @@ import EnsureProfile from "@/components/auth/EnsureProfile";
 
 const queryClient = new QueryClient();
 
-const App = () => {
+const AppContent = () => {
   const [currentLanguage, setCurrentLanguage] = React.useState(() => {
     // Get saved language from localStorage or default to English on first run
     const savedLanguage = localStorage.getItem('preferred-language');
@@ -43,6 +45,29 @@ const App = () => {
   });
   const { t } = useTranslation(currentLanguage);
   const { toast } = useToast();
+  const { user } = useAuth();
+
+  // تفعيل الإشعارات عند تسجيل الدخول
+  React.useEffect(() => {
+    if (user?.uid) {
+      requestNotificationPermission(user.uid).catch(error => {
+        console.error('Error requesting notification permission:', error);
+      });
+    }
+  }, [user?.uid]);
+
+  // الاستماع للإشعارات عندما يكون التطبيق مفتوحاً
+  React.useEffect(() => {
+    const unsubscribe = onMessageListener((payload) => {
+      toast({
+        title: payload.notification?.title || 'إشعار جديد',
+        description: payload.notification?.body,
+      });
+    });
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, [toast]);
 
   const closeAllOverlays = () => {
     try {
@@ -150,8 +175,7 @@ const App = () => {
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <AuthProvider>
-            <SidebarProvider>
+          <SidebarProvider>
               {/* Global guard: if user is signed-in but profile is incomplete, send to /complete-profile */}
               <EnsureProfile />
               <div className="flex min-h-screen w-full">
@@ -212,10 +236,17 @@ const App = () => {
                 </div>
               </div>
             </SidebarProvider>
-          </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
+  );
+};
+
+const App = () => {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 };
 

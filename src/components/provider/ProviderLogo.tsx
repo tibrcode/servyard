@@ -2,6 +2,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import 'react-lazy-load-image-component/src/effects/blur.css';
 
 interface ProviderLogoProps {
   providerName: string;
@@ -39,10 +41,18 @@ export const ProviderLogo = ({
     <div className={cn("flex items-center gap-3 min-w-0", className)}>
       <div className="relative flex-shrink-0">
         <Avatar className={sizeClasses[size]}>
-          <AvatarImage src={avatarUrl} alt={providerName} />
-          <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
-            {getInitials(providerName)}
-          </AvatarFallback>
+          {avatarUrl ? (
+            <LazyLoadImage
+              src={avatarUrl}
+              alt={providerName}
+              effect="blur"
+              className="object-cover w-full h-full rounded-full"
+            />
+          ) : (
+            <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
+              {getInitials(providerName)}
+            </AvatarFallback>
+          )}
         </Avatar>
         {verified && (
           <div className="absolute bottom-0 right-0 translate-x-1/4 translate-y-1/4 rounded-full ring-2 ring-background">

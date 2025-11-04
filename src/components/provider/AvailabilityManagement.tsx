@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -90,14 +90,7 @@ export function AvailabilityManagement({ services, currentLanguage }: Availabili
     }
   }, [services]);
 
-  useEffect(() => {
-    if (selectedService && currentUser) {
-      loadAvailability();
-      loadSpecialDates();
-    }
-  }, [selectedService, currentUser]);
-
-  const loadAvailability = async () => {
+  const loadAvailability = useCallback(async () => {
     if (!selectedService || !currentUser) return;
 
     try {
@@ -116,9 +109,9 @@ export function AvailabilityManagement({ services, currentLanguage }: Availabili
     } catch (error) {
       console.error('Error loading availability:', error);
     }
-  };
+  }, [selectedService, currentUser]);
 
-  const loadSpecialDates = async () => {
+  const loadSpecialDates = useCallback(async () => {
     if (!selectedService || !currentUser) return;
 
     try {
@@ -137,7 +130,14 @@ export function AvailabilityManagement({ services, currentLanguage }: Availabili
     } catch (error) {
       console.error('Error loading special dates:', error);
     }
-  };
+  }, [selectedService, currentUser]);
+
+  useEffect(() => {
+    if (selectedService && currentUser) {
+      loadAvailability();
+      loadSpecialDates();
+    }
+  }, [selectedService, currentUser, loadAvailability, loadSpecialDates]);
 
   const handleAvailabilitySubmit = async (e: React.FormEvent) => {
     e.preventDefault();

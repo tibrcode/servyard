@@ -12,6 +12,7 @@ import { auth, db } from "@/integrations/firebase/client";
 import { collection, addDoc, doc, getDoc } from "firebase/firestore";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "@/lib/i18n";
+import { trackBookingCreated, trackPhoneClick } from "@/lib/firebase/analytics";
 
 interface Service {
   id: string;
@@ -109,6 +110,9 @@ export const BookingModal = ({ service, provider, isOpen, onClose, currentLangua
       };
 
       await addDoc(collection(db, 'bookings'), booking);
+
+      // تتبع الحجز في Analytics
+      trackBookingCreated(service.id, service.provider_id, bookingData.booking_date);
 
       toast({
         title: t.toast.bookingConfirmed,
