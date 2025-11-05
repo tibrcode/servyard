@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { auth, db } from "@/integrations/firebase/client";
@@ -14,6 +15,9 @@ import { ServiceCategory } from "@/lib/firebase/collections";
 import { getCategoryLabel } from "@/lib/categoriesLocale";
 import { useTranslation } from "@/lib/i18n";
 import { upsertDefaultServiceCategories } from "@/lib/firebase/defaultCategories";
+import { ServiceBookingSettings } from "@/components/booking/ServiceBookingSettings";
+import { ServiceScheduleSetup } from "@/components/booking/ServiceScheduleSetup";
+import { BookingSettings } from "@/types/booking";
 
 interface EditServiceProps {
   currentLanguage: string;
@@ -30,6 +34,14 @@ interface Service {
   price_range: string;
   provider_id: string;
   is_active: boolean;
+  // Booking settings
+  booking_enabled?: boolean;
+  max_concurrent_bookings?: number;
+  advance_booking_days?: number;
+  buffer_time_minutes?: number;
+  cancellation_policy_hours?: number;
+  require_confirmation?: boolean;
+  allow_customer_cancellation?: boolean;
 }
 
 const EditService: React.FC<EditServiceProps> = ({ currentLanguage }) => {
@@ -51,6 +63,17 @@ const EditService: React.FC<EditServiceProps> = ({ currentLanguage }) => {
     duration_minutes: 60,
     specialty_description: '',
     price_range: 'budget'
+  });
+
+  const [bookingSettings, setBookingSettings] = useState<BookingSettings>({
+    booking_enabled: false,
+    duration_minutes: 30,
+    max_concurrent_bookings: 1,
+    advance_booking_days: 30,
+    buffer_time_minutes: 0,
+    cancellation_policy_hours: 24,
+    require_confirmation: true,
+    allow_customer_cancellation: true,
   });
 
   // Fetch categories and service data
@@ -141,6 +164,18 @@ const EditService: React.FC<EditServiceProps> = ({ currentLanguage }) => {
           price_range: serviceData.price_range || 'budget'
         });
 
+        // Load booking settings
+        setBookingSettings({
+          booking_enabled: serviceData.booking_enabled || false,
+          duration_minutes: serviceData.duration_minutes || 30,
+          max_concurrent_bookings: serviceData.max_concurrent_bookings || 1,
+          advance_booking_days: serviceData.advance_booking_days || 30,
+          buffer_time_minutes: serviceData.buffer_time_minutes || 0,
+          cancellation_policy_hours: serviceData.cancellation_policy_hours || 24,
+          require_confirmation: serviceData.require_confirmation !== undefined ? serviceData.require_confirmation : true,
+          allow_customer_cancellation: serviceData.allow_customer_cancellation !== undefined ? serviceData.allow_customer_cancellation : true,
+        });
+
       } catch (error) {
         console.error('Error fetching data:', error);
         toast({
@@ -191,7 +226,9 @@ const EditService: React.FC<EditServiceProps> = ({ currentLanguage }) => {
         duration_minutes: formData.duration_minutes,
         specialty_description: formData.specialty_description,
         price_range: formData.price_range,
-        updated_at: new Date()
+        updated_at: new Date(),
+        // Booking settings
+        ...bookingSettings
       });
 
       toast({
@@ -254,7 +291,22 @@ const EditService: React.FC<EditServiceProps> = ({ currentLanguage }) => {
         </CardHeader>
 
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <Tabs defaultValue="basic" className="w-full">
+            <TabsList className="grid w-full grid-cols-3 mb-6">
+              <TabsTrigger value="basic">
+                {isRTL ? 'معلومات الخدمة' : 'Service Info'}
+              </TabsTrigger>
+              <TabsTrigger value="booking">
+                {isRTL ? 'إعدادات الحجز' : 'Booking Settings'}
+              </TabsTrigger>
+              <TabsTrigger value="schedule">
+                {isRTL ? 'الجدول الأسبوعي' : 'Weekly Schedule'}
+              </TabsTrigger>
+            </TabsList>
+
+            {/* Basic Info Tab */}
+            <TabsContent value="basic">
+              <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="name">{t.addService.serviceName} *</Label>
@@ -343,20 +395,54 @@ const EditService: React.FC<EditServiceProps> = ({ currentLanguage }) => {
               />
             </div>
 
-            <div className="flex justify-end space-x-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => navigate('/provider-dashboard')}
-              >
-                {t.forms.cancel}
-              </Button>
-              <Button type="submit" disabled={saving}>
-                <Save className="mr-2 h-4 w-4" />
-                {saving ? t.editProfile.saving : t.editProfile.saveChanges}
-              </Button>
-            </div>
-          </form>
+                <div className="flex justify-end space-x-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => navigate('/provider-dashboard')}
+                  >
+                    {t.forms.cancel}
+                  </Button>
+                  <Button type="submit" disabled={saving}>
+                    <Save className="mr-2 h-4 w-4" />
+                    {saving ? t.editProfile.saving : t.editProfile.saveChanges}
+                  </Button>
+                </div>
+              </form>
+            </TabsContent>
+
+            {/* Booking Settings Tab */}
+            <TabsContent value="booking">
+              <ServiceBookingSettings
+                serviceId={service.id}
+                currentSettings={bookingSettings}
+                onSettingsChange={(newSettings) => {
+                  setBookingSettings(newSettings);
+                  // Auto-save when settings change
+                  updateDoc(doc(db, 'services', service.id), {
+                    ...newSettings,
+                    updated_at: new Date()
+                  });
+                }}
+                language={currentLanguage as 'en' | 'ar'}
+              />
+            </TabsContent>
+
+            {/* Schedule Tab */}
+            <TabsContent value="schedule">
+              <ServiceScheduleSetup
+                serviceId={service.id}
+                providerId={service.provider_id}
+                language={currentLanguage as 'en' | 'ar'}
+                onScheduleChange={() => {
+                  toast({
+                    title: t.editProfile.successTitle,
+                    description: isRTL ? 'تم تحديث الجدول بنجاح' : 'Schedule updated successfully',
+                  });
+                }}
+              />
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
     </div>

@@ -33,6 +33,7 @@ import { doc, getDoc, collection, getDocs, query, where, updateDoc } from "fireb
 import { useTranslation } from "@/lib/i18n";
 import { toast } from "@/hooks/use-toast";
 import { ShareProfile } from "@/components/provider/ShareProfile";
+import { BookingManagement } from "@/components/booking/BookingManagement";
 
 interface ProviderDashboardProps {
   currentLanguage: string;
@@ -441,8 +442,9 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
         {/* Dashboard Tabs - With proper spacing from content */}
         <div className="space-y-4">
           <Tabs defaultValue="services" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5 mb-6">
+            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6 mb-6">
               <TabsTrigger value="services">{t.provider.services}</TabsTrigger>
+              <TabsTrigger value="appointments">{isRTL ? 'المواعيد' : 'Appointments'}</TabsTrigger>
               <TabsTrigger value="bookings">{t.provider.bookings}</TabsTrigger>
               <TabsTrigger value="offers">{t.provider.offers}</TabsTrigger>
               <TabsTrigger value="availability">{t.provider.availability}</TabsTrigger>
@@ -454,7 +456,17 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
               <ServiceManagement currentLanguage={currentLanguage} currencyCode={providerProfile.currency_code} />
             </TabsContent>
 
-            {/* Bookings Tab */}
+            {/* Appointments Tab - New Booking System */}
+            <TabsContent value="appointments">
+              {providerProfile && (
+                <BookingManagement
+                  providerId={providerProfile.id}
+                  language={currentLanguage as 'en' | 'ar'}
+                />
+              )}
+            </TabsContent>
+
+            {/* Bookings Tab - Old Direct Contact Bookings */}
             <TabsContent value="bookings" className="space-y-4">
               <div className="w-full max-w-full min-w-0">
                 {bookings.length === 0 ? (

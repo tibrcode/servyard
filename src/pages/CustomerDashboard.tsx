@@ -27,6 +27,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { auth, db } from "@/integrations/firebase/client";
 import { collection, query, where, getDocs, doc, getDoc, orderBy, updateDoc, addDoc } from "firebase/firestore";
 import { Booking, Review } from "@/lib/firebase/collections";
+import { MyBookings } from "@/components/booking/MyBookings";
 
 interface CustomerDashboardProps {
   currentLanguage: string;
@@ -397,9 +398,13 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
         {/* Main Content */}
         <div className="space-y-4">
           <Tabs defaultValue="bookings" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 mb-6">
-              <TabsTrigger value="bookings">
+            <TabsList className="grid w-full grid-cols-4 mb-6">
+              <TabsTrigger value="appointments">
                 <Calendar className="w-3 h-3 sm:w-4 sm:h-4 mr-2 flex-shrink-0" />
+                <span className="break-words text-xs sm:text-sm">{isRTL ? 'مواعيدي' : 'My Appointments'}</span>
+              </TabsTrigger>
+              <TabsTrigger value="bookings">
+                <Clock className="w-3 h-3 sm:w-4 sm:h-4 mr-2 flex-shrink-0" />
                 <span className="break-words text-xs sm:text-sm">{t.customer.myBookings}</span>
               </TabsTrigger>
               <TabsTrigger value="reviews">
@@ -412,7 +417,25 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
               </TabsTrigger>
             </TabsList>
 
-            {/* Bookings Tab */}
+            {/* Appointments Tab - New Booking System */}
+            <TabsContent value="appointments" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>{isRTL ? 'مواعيدي' : 'My Appointments'}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {user && (
+                    <MyBookings
+                      customerId={user.uid}
+                      language={currentLanguage as 'en' | 'ar'}
+                      cancellationPolicyHours={24}
+                    />
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Bookings Tab - Old Direct Contact Bookings */}
             <TabsContent value="bookings" className="space-y-6">
               <Card>
                 <CardHeader>

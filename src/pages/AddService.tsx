@@ -13,6 +13,8 @@ import { auth, db } from "@/integrations/firebase/client";
 import { collection, getDocs, query, where, addDoc, getDoc, doc, orderBy } from "firebase/firestore";
 import { upsertDefaultServiceCategories } from "@/lib/firebase/defaultCategories";
 import { getCategoryLabel } from "@/lib/categoriesLocale";
+import { ServiceBookingSettings } from "@/components/booking/ServiceBookingSettings";
+import { BookingSettings } from "@/types/booking";
 
 interface AddServiceProps {
   currentLanguage: string;
@@ -31,6 +33,17 @@ const AddService = ({ currentLanguage }: AddServiceProps) => {
     durationMinutes: '',
     priceRange: '',
     specialtyDescription: ''
+  });
+
+  const [bookingSettings, setBookingSettings] = useState<BookingSettings>({
+    booking_enabled: false,
+    duration_minutes: 30,
+    max_concurrent_bookings: 1,
+    advance_booking_days: 30,
+    buffer_time_minutes: 0,
+    cancellation_policy_hours: 24,
+    require_confirmation: true,
+    allow_customer_cancellation: true,
   });
 
   const [categories, setCategories] = useState<any[]>([]);
@@ -107,7 +120,9 @@ const AddService = ({ currentLanguage }: AddServiceProps) => {
         specialty_description: formData.specialtyDescription,
         is_active: true,
         created_at: new Date(),
-        updated_at: new Date()
+        updated_at: new Date(),
+        // Booking settings
+        ...bookingSettings
       };
 
       await addDoc(collection(db, 'services'), serviceData);
@@ -294,6 +309,16 @@ const AddService = ({ currentLanguage }: AddServiceProps) => {
                     disabled={loading}
                   />
                 </div>
+              </div>
+
+              {/* Booking Settings */}
+              <div className="space-y-4">
+                <ServiceBookingSettings
+                  serviceId=""
+                  currentSettings={bookingSettings}
+                  onSettingsChange={setBookingSettings}
+                  language={currentLanguage as 'en' | 'ar'}
+                />
               </div>
 
               {/* Form Actions */}

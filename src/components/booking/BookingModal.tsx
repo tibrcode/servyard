@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +14,8 @@ import { collection, addDoc, doc, getDoc } from "firebase/firestore";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "@/lib/i18n";
 import { trackBookingCreated, trackPhoneClick } from "@/lib/firebase/analytics";
+import { ServiceBooking } from "@/components/booking/ServiceBooking";
+import { BookingSettings } from "@/types/booking";
 
 interface Service {
   id: string;
@@ -22,6 +25,13 @@ interface Service {
   approximate_price?: string;
   duration_minutes?: number;
   price_range?: string;
+  booking_enabled?: boolean;
+  max_concurrent_bookings?: number;
+  advance_booking_days?: number;
+  buffer_time_minutes?: number;
+  cancellation_policy_hours?: number;
+  require_confirmation?: boolean;
+  allow_customer_cancellation?: boolean;
 }
 
 interface Provider {
@@ -32,6 +42,7 @@ interface Provider {
   profile_description?: string;
   phone_numbers?: string[];
   whatsapp_number?: string;
+  currency_code?: string;
 }
 
 interface BookingModalProps {
@@ -139,6 +150,53 @@ export const BookingModal = ({ service, provider, isOpen, onClose, currentLangua
     }
   };
 
+  // If booking is enabled for this service, use the new booking system
+  if (service.booking_enabled && user && role === 'customer') {
+    const bookingSettings: BookingSettings = {
+      booking_enabled: service.booking_enabled,
+      duration_minutes: service.duration_minutes || 30,
+      max_concurrent_bookings: service.max_concurrent_bookings || 1,
+      advance_booking_days: service.advance_booking_days || 30,
+      buffer_time_minutes: service.buffer_time_minutes || 0,
+      cancellation_policy_hours: service.cancellation_policy_hours || 24,
+      require_confirmation: service.require_confirmation !== undefined ? service.require_confirmation : true,
+      allow_customer_cancellation: service.allow_customer_cancellation !== undefined ? service.allow_customer_cancellation : true,
+    };
+
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" dir={isRTL ? 'rtl' : 'ltr'}>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Calendar className="w-5 h-5" />
+              {isRTL ? 'حجز موعد' : 'Book Appointment'}: {service.name}
+            </DialogTitle>
+          </DialogHeader>
+          <ServiceBooking
+            serviceId={service.id}
+            providerId={service.provider_id}
+            customerId={user.uid}
+            customerName={user.displayName || ''}
+            customerPhone={user.phoneNumber || ''}
+            serviceTitle={service.name}
+            price={parseFloat(service.approximate_price || '0')}
+            currency={provider.currency_code || 'AED'}
+            bookingSettings={bookingSettings}
+            language={currentLanguage as 'en' | 'ar'}
+            onBookingComplete={() => {
+              toast({
+                title: isRTL ? 'تم بنجاح!' : 'Success!',
+                description: isRTL ? 'تم حجز موعدك بنجاح' : 'Your appointment has been booked successfully',
+              });
+              onClose();
+            }}
+          />
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  // Otherwise, use the old direct contact modal
   if (!isOpen) return null;
 
   return (

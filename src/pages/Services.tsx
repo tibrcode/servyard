@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Filter, MapPin, Star, Clock, ExternalLink } from "lucide-react";
+import { Search, Filter, MapPin, Star, Clock, ExternalLink, Calendar } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
 // Currency display uses Latin currency code (e.g., AED) instead of symbol
@@ -35,6 +35,14 @@ interface Service {
   duration_minutes?: number;
   price_range?: string;
   is_active: boolean;
+  // Booking settings
+  booking_enabled?: boolean;
+  max_concurrent_bookings?: number;
+  advance_booking_days?: number;
+  buffer_time_minutes?: number;
+  cancellation_policy_hours?: number;
+  require_confirmation?: boolean;
+  allow_customer_cancellation?: boolean;
 }
 
 interface Provider {
@@ -585,19 +593,33 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                         )}
                       </div>
 
-                      <Button
-                        variant="outline"
-                        className="w-full mt-4"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (provider?.id) {
-                            window.location.href = `/provider/${provider.id}`;
-                          }
-                        }}
-                      >
-                        <ExternalLink className="h-4 w-4 mr-2" />
-                        {t.actions.viewProvider}
-                      </Button>
+                      <div className="flex gap-2 mt-4">
+                        {service.booking_enabled && (
+                          <Button
+                            className="flex-1"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleServiceClick(service);
+                            }}
+                          >
+                            <Calendar className="h-4 w-4 mr-2" />
+                            {isRTL ? 'حجز موعد' : 'Book Appointment'}
+                          </Button>
+                        )}
+                        <Button
+                          variant="outline"
+                          className={service.booking_enabled ? 'flex-1' : 'w-full'}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (provider?.id) {
+                              window.location.href = `/provider/${provider.id}`;
+                            }
+                          }}
+                        >
+                          <ExternalLink className="h-4 w-4 mr-2" />
+                          {t.actions.viewProvider}
+                        </Button>
+                      </div>
 
                       <Button className="w-full mt-2" onClick={(e) => {
                         e.stopPropagation();
