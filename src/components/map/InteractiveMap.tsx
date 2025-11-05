@@ -45,7 +45,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
-  const markersRef = useRef<google.maps.marker.AdvancedMarkerElement[]>([]);
+  const markersRef = useRef<google.maps.Marker[]>([]);
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
@@ -157,12 +157,13 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   const addMarker = (location: Location, label?: string, draggable = false) => {
     if (!mapInstanceRef.current) return;
 
-    // استخدام AdvancedMarkerElement (الـ API الجديد)
-    const marker = new google.maps.marker.AdvancedMarkerElement({
+    // استخدام Marker العادي (AdvancedMarker يحتاج Map ID من Google Console)
+    const marker = new google.maps.Marker({
       position: { lat: location.latitude, lng: location.longitude },
       map: mapInstanceRef.current,
       title: label || `${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)}`,
-      gmpDraggable: draggable,
+      draggable: draggable,
+      animation: google.maps.Animation.DROP
     });
 
     // إذا كانت العلامة قابلة للسحب
@@ -195,7 +196,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   // حذف جميع العلامات
   const clearMarkers = () => {
     markersRef.current.forEach(marker => {
-      marker.map = null; // AdvancedMarkerElement uses .map property instead of .setMap()
+      marker.setMap(null);
     });
     markersRef.current = [];
   };
