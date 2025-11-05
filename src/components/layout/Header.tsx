@@ -113,7 +113,10 @@ export const Header = ({
         <div className="flex items-center justify-between min-h-12 gap-2 flex-nowrap w-full overflow-x-hidden">
           {/* Menu Trigger & Logo */}
           <div className="flex items-center gap-2 sm:gap-4 min-w-0">
-            <SidebarTrigger aria-label="Toggle sidebar" className="ml-1 sm:ml-2 h-10 w-10 sm:h-12 sm:w-12 p-0 flex-shrink-0 [&>svg]:h-8 [&>svg]:w-8 sm:[&>svg]:h-10 sm:[&>svg]:w-10" />
+            <SidebarTrigger 
+              aria-label="Toggle sidebar" 
+              className="ml-0 sm:ml-2 h-12 w-12 sm:h-12 sm:w-12 p-2 flex-shrink-0 border border-border/50 rounded-md hover:bg-accent [&>svg]:h-8 [&>svg]:w-8 sm:[&>svg]:h-10 sm:[&>svg]:w-10" 
+            />
             <Link to="/" className="flex items-center leading-none min-w-0 overflow-hidden" aria-label="ServYard home">
               {/* Responsive logo sizes to keep everything on a single row on small screens */}
               <span className="sm:hidden block"><BrandLogo height={40} /></span>

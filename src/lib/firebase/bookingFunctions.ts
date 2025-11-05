@@ -75,15 +75,18 @@ export async function getServiceBookings(
   serviceId: string,
   date: string
 ): Promise<Booking[]> {
+  // Remove orderBy to avoid index requirement, sort in JavaScript instead
   const q = query(
     bookingsCollection,
     where('service_id', '==', serviceId),
-    where('booking_date', '==', date),
-    orderBy('start_time', 'asc')
+    where('booking_date', '==', date)
   );
 
   const snapshot = await getDocs(q);
-  return snapshot.docs.map(doc => doc.data() as Booking);
+  const bookings = snapshot.docs.map(doc => doc.data() as Booking);
+  
+  // Sort by start_time in JavaScript
+  return bookings.sort((a, b) => a.start_time.localeCompare(b.start_time));
 }
 
 /**
@@ -95,15 +98,12 @@ export async function getProviderBookings(
   startDate?: string,
   endDate?: string
 ): Promise<Booking[]> {
+  // Remove orderBy to avoid index requirement, sort in JavaScript instead
   let q = query(
     bookingsCollection,
-    where('provider_id', '==', providerId),
-    orderBy('booking_date', 'desc'),
-    orderBy('start_time', 'desc')
+    where('provider_id', '==', providerId)
   );
 
-  // Note: Firestore doesn't support range queries with OR,
-  // so we'll filter in memory if date range is provided
   const snapshot = await getDocs(q);
   let bookings = snapshot.docs.map(doc => doc.data() as Booking);
 
@@ -114,7 +114,12 @@ export async function getProviderBookings(
     );
   }
 
-  return bookings;
+  // Sort by booking_date and start_time in JavaScript
+  return bookings.sort((a, b) => {
+    const dateCompare = b.booking_date.localeCompare(a.booking_date);
+    if (dateCompare !== 0) return dateCompare;
+    return b.start_time.localeCompare(a.start_time);
+  });
 }
 
 /**
@@ -122,15 +127,21 @@ export async function getProviderBookings(
  * الحصول على جميع حجوزات العميل
  */
 export async function getCustomerBookings(customerId: string): Promise<Booking[]> {
+  // Remove orderBy to avoid index requirement, sort in JavaScript instead
   const q = query(
     bookingsCollection,
-    where('customer_id', '==', customerId),
-    orderBy('booking_date', 'desc'),
-    orderBy('start_time', 'desc')
+    where('customer_id', '==', customerId)
   );
 
   const snapshot = await getDocs(q);
-  return snapshot.docs.map(doc => doc.data() as Booking);
+  const bookings = snapshot.docs.map(doc => doc.data() as Booking);
+  
+  // Sort by booking_date and start_time in JavaScript
+  return bookings.sort((a, b) => {
+    const dateCompare = b.booking_date.localeCompare(a.booking_date);
+    if (dateCompare !== 0) return dateCompare;
+    return b.start_time.localeCompare(a.start_time);
+  });
 }
 
 /**
