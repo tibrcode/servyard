@@ -104,11 +104,18 @@ export function BookingManagement({
 
   useEffect(() => {
     loadBookings();
+    
+    // Auto-refresh every 30 seconds to reflect updates
+    const interval = setInterval(() => {
+      loadBookings();
+    }, 30000);
+    
+    return () => clearInterval(interval);
   }, [providerId]);
 
   useEffect(() => {
     filterBookings();
-  }, [bookings, viewMode, statusFilter]);
+  }, [bookings, viewMode, statusFilter, showOnlyPending]);
 
   const loadBookings = async () => {
     setIsLoading(true);
@@ -246,7 +253,7 @@ export function BookingManagement({
               <div className="flex-1">
                 <h3 className="font-semibold text-lg">{booking.service_title}</h3>
                 <p className="text-sm text-muted-foreground mt-1">
-                  #{booking.booking_id.substring(0, 8)}
+                  {booking.customer_name}
                 </p>
               </div>
               {getStatusBadge(booking.status)}

@@ -88,6 +88,13 @@ export function MyBookings({
 
   useEffect(() => {
     loadBookings();
+    
+    // Auto-refresh every 30 seconds to reflect updates
+    const interval = setInterval(() => {
+      loadBookings();
+    }, 30000);
+    
+    return () => clearInterval(interval);
   }, [customerId]);
 
   const loadBookings = async () => {
@@ -157,9 +164,13 @@ export function MyBookings({
   };
 
   const isUpcoming = (booking: Booking) => {
+    // Upcoming = confirmed OR pending, AND date in future
     const bookingDate = new Date(`${booking.booking_date}T${booking.start_time}`);
     const now = new Date();
-    return bookingDate >= now && booking.status !== 'cancelled' && booking.status !== 'completed';
+    const isFutureDate = bookingDate >= now;
+    const isActiveStatus = booking.status === 'confirmed' || booking.status === 'pending';
+    
+    return isFutureDate && isActiveStatus;
   };
 
   const upcomingBookings = bookings.filter(isUpcoming);
@@ -175,10 +186,10 @@ export function MyBookings({
           <div className="space-y-4">
             {/* Service Title */}
             <div className="flex items-start justify-between">
-              <div>
+              <div className="flex-1">
                 <h3 className="font-semibold text-lg">{booking.service_title}</h3>
                 {booking.notes && (
-                  <p className="text-sm text-muted-foreground mt-1">{booking.notes}</p>
+                  <p className="text-sm text-muted-foreground mt-2">{booking.notes}</p>
                 )}
               </div>
               {getStatusBadge(booking.status)}
