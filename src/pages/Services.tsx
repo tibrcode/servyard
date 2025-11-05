@@ -9,11 +9,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Filter, MapPin, Star, Clock, ExternalLink, Calendar } from "lucide-react";
+import { Search, Filter, MapPin, Star, Clock, ExternalLink, Calendar, Map as MapIcon, List } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
 // Currency display uses Latin currency code (e.g., AED) instead of symbol
 import { db } from "@/integrations/firebase/client";
+import InteractiveMap from "@/components/map/InteractiveMap";
 import { collection, getDocs, doc, getDoc, query as fsQuery, where } from "firebase/firestore";
 import { ServiceCategory, initializeServiceCategories } from "@/lib/firebase/collections";
 import { upsertDefaultServiceCategories } from "@/lib/firebase/defaultCategories";
@@ -79,6 +80,9 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
   const [userLocation, setUserLocation] = useState<Coordinates | null>(null);
   const [radiusKm, setRadiusKm] = useState(DEFAULT_RADIUS_KM);
   const [locationLoading, setLocationLoading] = useState(false);
+  
+  // View toggle: 'list' or 'map'
+  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
 
   const { t, isRTL } = useTranslation(currentLanguage);
   const { toast } = useToast();
@@ -478,9 +482,29 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
               {t.actions.search}: "{qParam}" • {filteredServices.length}
             </p>
           )}
+          
+          {/* View Toggle */}
+          <div className="flex gap-2 mt-4">
+            <Button
+              variant={viewMode === 'list' ? 'default' : 'outline'}
+              onClick={() => setViewMode('list')}
+              className="flex-1"
+            >
+              <List className="w-4 h-4 mr-2" />
+              {isRTL ? 'عرض القائمة' : 'List View'}
+            </Button>
+            <Button
+              variant={viewMode === 'map' ? 'default' : 'outline'}
+              onClick={() => setViewMode('map')}
+              className="flex-1"
+            >
+              <MapIcon className="w-4 h-4 mr-2" />
+              {isRTL ? 'عرض الخريطة' : 'Map View'}
+            </Button>
+          </div>
         </div>
 
-        {/* Services Grid */}
+        {/* Services Grid or Map */}
         {filteredServices.length === 0 ? (
           <Card>
             <CardContent className="p-12 text-center">
@@ -489,7 +513,34 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
               <p className="text-muted-foreground">{t.home.searchPlaceholder}</p>
             </CardContent>
           </Card>
+        ) : viewMode === 'map' ? (
+          /* Map View */
+          <div className="w-full h-[600px]">
+            <InteractiveMap
+              markers={filteredServices
+                .map(service => {
+                  const provider = providers[service.provider_id];
+                  if (!provider?.latitude || !provider?.longitude) return null;
+                  
+                  return {
+                    latitude: provider.latitude,
+                    longitude: provider.longitude,
+                    label: `${service.name} - ${provider.full_name}`
+                  };
+                })
+                .filter((marker): marker is NonNullable<typeof marker> => marker !== null)
+              }
+              center={userLocation 
+                ? { latitude: userLocation.latitude, longitude: userLocation.longitude }
+                : { latitude: 25.276987, longitude: 55.296249 } // Dubai default
+              }
+              zoom={userLocation ? 12 : 11}
+              currentLanguage={currentLanguage}
+              showCurrentLocation={true}
+            />
+          </div>
         ) : (
+          /* List View */
           <div className="w-full max-w-full overflow-x-clip">
             <div className="grid w-full grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {filteredServices.map((service) => {
