@@ -31,6 +31,19 @@
   <meta name="twitter:description" content="Connect with verified service providers in your area" />
   <meta name="twitter:image" content="https://servyard.com/og-image.jpg" />
 
+  <!-- Google Maps API -->
+  <script>
+    window.GOOGLE_MAPS_API_KEY = 'AIzaSyCWyxfuREVLTTAyTqDbByxbPSqVwYg830Y';
+    // Callback function for Google Maps initialization
+    window.initGoogleMaps = function() {
+      window.googleMapsLoaded = true;
+      console.log('✅ Google Maps API loaded successfully');
+    };
+  </script>
+  <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCWyxfuREVLTTAyTqDbByxbPSqVwYg830Y&libraries=places&callback=initGoogleMaps">
+  </script>
+
   <!-- Theme and PWA -->
   <meta name="theme-color" content="#f59e0b" />
   <link rel="canonical" href="https://servyard.com" />

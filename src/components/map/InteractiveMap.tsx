@@ -70,41 +70,40 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
 
   // تحميل Google Maps API
   useEffect(() => {
-    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-    
-    if (!apiKey) {
-      setError(t.apiKeyMissing);
-      setLoading(false);
-      return;
-    }
-
-    // التحقق إذا كان API محمّل مسبقاً
-    if (window.google && window.google.maps) {
-      setApiLoaded(true);
-      setLoading(false);
-      return;
-    }
-
-    // تحميل Google Maps script
-    const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&language=${currentLanguage}`;
-    script.async = true;
-    script.defer = true;
-    
-    script.onload = () => {
-      setApiLoaded(true);
-      setLoading(false);
+    // التحقق من تحميل API (محمّل من index.html)
+    const checkGoogleMaps = () => {
+      if (window.google && window.google.maps) {
+        console.log('✅ InteractiveMap: Google Maps API ready');
+        setApiLoaded(true);
+        setLoading(false);
+        return true;
+      }
+      return false;
     };
-    
-    script.onerror = () => {
-      setError(t.error);
-      setLoading(false);
-    };
-    
-    document.head.appendChild(script);
+
+    // تحقق فوري
+    if (checkGoogleMaps()) return;
+
+    // انتظار callback من index.html
+    const checkInterval = setInterval(() => {
+      if (checkGoogleMaps()) {
+        clearInterval(checkInterval);
+      }
+    }, 100);
+
+    // timeout بعد 10 ثواني
+    const timeoutId = setTimeout(() => {
+      if (!window.google || !window.google.maps) {
+        console.error('❌ Google Maps API failed to load after 10s');
+        setError(t.error);
+        setLoading(false);
+      }
+      clearInterval(checkInterval);
+    }, 10000);
 
     return () => {
-      // لا نحذف script لأنه قد يُستخدم في مكونات أخرى
+      clearInterval(checkInterval);
+      clearTimeout(timeoutId);
     };
   }, []);
 
@@ -142,10 +141,17 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
       });
     }
 
-    // إضافة العلامات
-    markers.forEach(marker => addMarker(marker, marker.label));
+    // حذف العلامات القديمة
+    clearMarkers();
+    
+    // إضافة العلامات الجديدة
+    console.log('🗺️ Adding markers to map:', markers.length);
+    markers.forEach((marker, index) => {
+      console.log(`  Marker ${index + 1}:`, marker.label, `(${marker.latitude}, ${marker.longitude})`);
+      addMarker(marker, marker.label);
+    });
 
-  }, [apiLoaded, center, zoom]);
+  }, [apiLoaded, center, zoom, markers]);
 
   // إضافة علامة
   const addMarker = (location: Location, label?: string, draggable = false) => {

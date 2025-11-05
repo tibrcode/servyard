@@ -534,6 +534,20 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
               const servicesOnMap = mapMarkers.length;
               const servicesWithoutLocation = totalServices - servicesOnMap;
               
+              // Debug logging
+              console.log('🗺️ Map Debug Info:');
+              console.log('Total filtered services:', totalServices);
+              console.log('Services on map:', servicesOnMap);
+              console.log('Map markers:', mapMarkers);
+              console.log('All providers:', Object.keys(providers).length);
+              console.log('Providers with GPS:', Object.values(providers).filter(p => p?.latitude && p?.longitude).length);
+              console.log('First 3 providers:', Object.values(providers).slice(0, 3).map(p => ({
+                id: p?.id,
+                name: p?.full_name,
+                lat: p?.latitude,
+                lng: p?.longitude
+              })));
+              
               return (
                 <>
                   {/* Map Statistics */}
