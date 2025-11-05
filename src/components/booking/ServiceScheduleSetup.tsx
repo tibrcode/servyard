@@ -87,7 +87,9 @@ export function ServiceScheduleSetup({
   const loadSchedules = async () => {
     setIsLoading(true);
     try {
+      console.log('📥 Loading schedules for service:', serviceId);
       const existingSchedules = await getAllServiceSchedules(serviceId);
+      console.log('📋 Found existing schedules:', existingSchedules.length);
       
       // Create schedule objects for all 7 days
       const allDays: DaySchedule[] = [];
@@ -95,6 +97,7 @@ export function ServiceScheduleSetup({
         const existing = existingSchedules.find(s => s.day_of_week === day);
         
         if (existing) {
+          console.log(`✅ Day ${day} has schedule: ${existing.start_time}-${existing.end_time} (active: ${existing.is_active})`);
           allDays.push({
             day_of_week: day as DayOfWeek,
             is_active: existing.is_active,
@@ -104,6 +107,7 @@ export function ServiceScheduleSetup({
             schedule_id: existing.schedule_id,
           });
         } else {
+          console.log(`⚠️ Day ${day} has no schedule, using defaults`);
           // Default schedule
           allDays.push({
             day_of_week: day as DayOfWeek,
@@ -117,7 +121,7 @@ export function ServiceScheduleSetup({
       
       setSchedules(allDays);
     } catch (error) {
-      console.error('Error loading schedules:', error);
+      console.error('❌ Error loading schedules:', error);
       toast({
         title: isRTL ? 'خطأ' : 'Error',
         description: isRTL ? 'فشل تحميل الجدول' : 'Failed to load schedule',
@@ -255,13 +259,22 @@ export function ServiceScheduleSetup({
           is_active: schedule.is_active,
         };
 
+        console.log('💾 Saving schedule:', {
+          day: schedule.day_of_week,
+          active: schedule.is_active,
+          times: `${schedule.start_time} - ${schedule.end_time}`,
+          breaks: schedule.break_times.length
+        });
+
         if (schedule.schedule_id) {
           // Update existing
           await updateServiceSchedule(schedule.schedule_id, scheduleData);
+          console.log('✅ Updated schedule:', schedule.schedule_id);
         } else {
           // Create new
           const newId = await createServiceSchedule(scheduleData);
           schedule.schedule_id = newId;
+          console.log('✅ Created new schedule:', newId);
         }
       }
 

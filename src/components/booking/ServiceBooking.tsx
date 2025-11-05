@@ -121,11 +121,40 @@ export function ServiceBooking({
       const dateString = formatDate(date);
       const dayOfWeek = getDayOfWeek(dateString);
 
+      console.log('🔍 Loading availability:', { 
+        dateString, 
+        dayOfWeek, 
+        serviceId 
+      });
+
       // Get schedule for this day
       const schedule = await getServiceSchedule(serviceId, dayOfWeek);
       
+      console.log('📅 Schedule loaded:', schedule);
+      
+      if (!schedule) {
+        console.warn('⚠️ No schedule found for this day');
+        toast({
+          title: isRTL ? 'تنبيه' : 'Notice',
+          description: isRTL 
+            ? 'لم يتم تحديد جدول عمل لهذا اليوم. يرجى مراجعة مزود الخدمة.' 
+            : 'No schedule set for this day. Please contact the service provider.',
+          variant: 'destructive',
+        });
+        setAvailability({
+          date: dateString,
+          day_of_week: dayOfWeek,
+          is_available: false,
+          slots: []
+        });
+        setIsLoadingSlots(false);
+        return;
+      }
+      
       // Get existing bookings
       const bookings = await getServiceBookings(serviceId, dateString);
+      
+      console.log('📋 Bookings loaded:', bookings.length);
 
       // Calculate availability
       const dailyAvailability = getDailyAvailability(
@@ -135,9 +164,11 @@ export function ServiceBooking({
         bookingSettings
       );
 
+      console.log('✅ Availability calculated:', dailyAvailability);
+
       setAvailability(dailyAvailability);
     } catch (error) {
-      console.error('Error loading availability:', error);
+      console.error('❌ Error loading availability:', error);
       toast({
         title: isRTL ? 'خطأ' : 'Error',
         description: isRTL ? 'فشل تحميل الأوقات المتاحة' : 'Failed to load available times',

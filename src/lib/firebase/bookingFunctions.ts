@@ -244,14 +244,17 @@ export async function getServiceSchedule(
  * الحصول على جميع جداول الخدمة
  */
 export async function getAllServiceSchedules(serviceId: string): Promise<ServiceSchedule[]> {
+  // Remove orderBy to avoid index requirement, sort in JavaScript instead
   const q = query(
     schedulesCollection,
-    where('service_id', '==', serviceId),
-    orderBy('day_of_week', 'asc')
+    where('service_id', '==', serviceId)
   );
 
   const snapshot = await getDocs(q);
-  return snapshot.docs.map(doc => doc.data() as ServiceSchedule);
+  const schedules = snapshot.docs.map(doc => doc.data() as ServiceSchedule);
+  
+  // Sort by day_of_week in JavaScript
+  return schedules.sort((a, b) => a.day_of_week - b.day_of_week);
 }
 
 /**
