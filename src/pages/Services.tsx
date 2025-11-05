@@ -515,9 +515,9 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
           </Card>
         ) : viewMode === 'map' ? (
           /* Map View */
-          <div className="w-full h-[600px]">
-            <InteractiveMap
-              markers={filteredServices
+          <div className="space-y-4">
+            {(() => {
+              const mapMarkers = filteredServices
                 .map(service => {
                   const provider = providers[service.provider_id];
                   if (!provider?.latitude || !provider?.longitude) return null;
@@ -528,16 +528,63 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                     label: `${service.name} - ${provider.full_name}`
                   };
                 })
-                .filter((marker): marker is NonNullable<typeof marker> => marker !== null)
-              }
-              center={userLocation 
-                ? { latitude: userLocation.latitude, longitude: userLocation.longitude }
-                : { latitude: 25.276987, longitude: 55.296249 } // Dubai default
-              }
-              zoom={userLocation ? 12 : 11}
-              currentLanguage={currentLanguage}
-              showCurrentLocation={true}
-            />
+                .filter((marker): marker is NonNullable<typeof marker> => marker !== null);
+              
+              const totalServices = filteredServices.length;
+              const servicesOnMap = mapMarkers.length;
+              const servicesWithoutLocation = totalServices - servicesOnMap;
+              
+              return (
+                <>
+                  {/* Map Statistics */}
+                  <div className="flex flex-wrap gap-2 items-center justify-between p-4 bg-muted/50 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-5 h-5 text-primary" />
+                      <span className="font-semibold">
+                        {isRTL 
+                          ? `${servicesOnMap} من ${totalServices} خدمة على الخريطة`
+                          : `${servicesOnMap} of ${totalServices} services on map`
+                        }
+                      </span>
+                    </div>
+                    {servicesWithoutLocation > 0 && (
+                      <Badge variant="secondary">
+                        {isRTL 
+                          ? `${servicesWithoutLocation} بدون موقع`
+                          : `${servicesWithoutLocation} without location`
+                        }
+                      </Badge>
+                    )}
+                  </div>
+                  
+                  {/* Map */}
+                  <div className="w-full h-[600px] rounded-lg overflow-hidden border">
+                    <InteractiveMap
+                      markers={mapMarkers}
+                      center={userLocation 
+                        ? { latitude: userLocation.latitude, longitude: userLocation.longitude }
+                        : { latitude: 25.276987, longitude: 55.296249 } // Dubai default
+                      }
+                      zoom={userLocation ? 12 : 11}
+                      currentLanguage={currentLanguage}
+                      showCurrentLocation={true}
+                    />
+                  </div>
+                  
+                  {/* Help Message */}
+                  {servicesWithoutLocation > 0 && (
+                    <div className="p-4 bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                      <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                        {isRTL 
+                          ? '💡 بعض مقدمي الخدمات لم يضيفوا موقعهم بعد. يمكنهم إضافة الموقع من صفحة تحرير الملف الشخصي.'
+                          : '💡 Some service providers have not added their location yet. They can add it from their Edit Profile page.'
+                        }
+                      </p>
+                    </div>
+                  )}
+                </>
+              );
+            })()}
           </div>
         ) : (
           /* List View */
