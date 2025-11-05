@@ -48,10 +48,18 @@ export function BookingManagement({
   const isRTL = language === 'ar';
   const dateLocale = language === 'ar' ? ar : enUS;
 
-  // Translation
+  // Translation - Different titles based on mode
+  const titleText = showOnlyPending 
+    ? (isRTL ? 'المواعيد المعلقة' : 'Pending Appointments')
+    : (isRTL ? 'إدارة الحجوزات' : 'Booking Management');
+  
+  const subtitleText = showOnlyPending
+    ? (isRTL ? 'الحجوزات التي تحتاج موافقتك' : 'Bookings awaiting your approval')
+    : (isRTL ? 'عرض وإدارة جميع حجوزات خدماتك' : 'View and manage all your service bookings');
+
   const t = {
-    title: isRTL ? 'إدارة الحجوزات' : 'Booking Management',
-    subtitle: isRTL ? 'عرض وإدارة جميع حجوزات خدماتك' : 'View and manage all your service bookings',
+    title: titleText,
+    subtitle: subtitleText,
     today: isRTL ? 'اليوم' : 'Today',
     week: isRTL ? 'هذا الأسبوع' : 'This Week',
     month: isRTL ? 'هذا الشهر' : 'This Month',
@@ -368,52 +376,7 @@ export function BookingManagement({
 
   return (
     <div className="space-y-6" dir={isRTL ? 'rtl' : 'ltr'}>
-      {/* Statistics */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t.totalBookings}</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.total_bookings}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t.pendingBookings}</CardTitle>
-            <AlertCircle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.pending}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t.confirmedBookings}</CardTitle>
-            <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.confirmed}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t.revenue}</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {stats.total_revenue} {stats.currency}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Main Card */}
+      {/* Main Card - Moved to top */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -464,6 +427,53 @@ export function BookingManagement({
           </div>
         </CardContent>
       </Card>
+
+      {/* Statistics - Moved to bottom */}
+      {!showOnlyPending && (
+        <div className="grid gap-4 md:grid-cols-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">{t.totalBookings}</CardTitle>
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.total_bookings}</div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">{t.pendingBookings}</CardTitle>
+              <AlertCircle className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.pending}</div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">{t.confirmedBookings}</CardTitle>
+              <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.confirmed}</div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">{t.revenue}</CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {stats.total_revenue} {stats.currency}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }
