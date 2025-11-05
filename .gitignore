@@ -35,3 +35,4 @@ android/app/build/
 android/build/
 ios/App/build/
 ios/Pods/
+.env.local

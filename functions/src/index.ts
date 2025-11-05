@@ -265,3 +265,240 @@ export const sendReviewNotification = onDocumentCreated(
     }
   }
 );
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 🌍 Cloud Functions للبحث الجغرافي
+// Geographic Search Cloud Functions
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * حساب المسافة بين نقطتين باستخدام Haversine formula
+ * Calculate distance between two points using Haversine formula
+ */
+function calculateDistance(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number
+): number {
+  const R = 6371; // نصف قطر الأرض بالكيلومتر
+  const dLat = toRadians(lat2 - lat1);
+  const dLon = toRadians(lon2 - lon1);
+  
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+function toRadians(degrees: number): number {
+  return degrees * (Math.PI / 180);
+}
+
+/**
+ * البحث عن المزودين القريبين
+ * Find nearby providers within radius
+ * 
+ * استخدام:
+ * POST /findNearbyProviders
+ * Body: {
+ *   latitude: 31.9454,
+ *   longitude: 35.9284,
+ *   radiusKm: 25,
+ *   categoryId?: 'category_id', // اختياري
+ *   limit?: 50 // اختياري (افتراضي 50)
+ * }
+ */
+export const findNearbyProviders = onRequest(
+  { cors: true },
+  async (req, res) => {
+    try {
+      // التحقق من البيانات المطلوبة
+      const { latitude, longitude, radiusKm = 25, categoryId, limit = 50 } = req.body;
+
+      if (typeof latitude !== 'number' || typeof longitude !== 'number') {
+        res.status(400).json({ 
+          error: 'Invalid latitude or longitude' 
+        });
+        return;
+      }
+
+      if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+        res.status(400).json({ 
+          error: 'Latitude/longitude out of range' 
+        });
+        return;
+      }
+
+      // حساب bounding box للبحث السريع
+      const latDelta = radiusKm / 111; // تقريباً 111 كم لكل درجة
+      const lonDelta = radiusKm / (111 * Math.cos(toRadians(latitude)));
+
+      const minLat = latitude - latDelta;
+      const maxLat = latitude + latDelta;
+      const minLon = longitude - lonDelta;
+      const maxLon = longitude + lonDelta;
+
+      // جلب المزودين ضمن bounding box
+      let query = db.collection('profiles')
+        .where('user_type', '==', 'provider')
+        .where('latitude', '>=', minLat)
+        .where('latitude', '<=', maxLat);
+
+      const snapshot = await query.get();
+
+      // فلترة النتائج حسب المسافة الدقيقة
+      const providers: any[] = [];
+      
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        
+        // التحقق من وجود الإحداثيات
+        if (typeof data.latitude !== 'number' || typeof data.longitude !== 'number') {
+          return;
+        }
+
+        // التحقق من longitude ضمن النطاق
+        if (data.longitude < minLon || data.longitude > maxLon) {
+          return;
+        }
+
+        // حساب المسافة الدقيقة
+        const distance = calculateDistance(
+          latitude,
+          longitude,
+          data.latitude,
+          data.longitude
+        );
+
+        // فلترة حسب النطاق
+        if (distance <= radiusKm) {
+          providers.push({
+            id: doc.id,
+            full_name: data.full_name,
+            city: data.city,
+            country: data.country,
+            latitude: data.latitude,
+            longitude: data.longitude,
+            profile_description: data.profile_description,
+            distance: Math.round(distance * 100) / 100, // تقريب إلى منزلتين
+          });
+        }
+      });
+
+      // إذا كان هناك فلتر للفئة، جلب الخدمات
+      if (categoryId) {
+        const servicesSnapshot = await db.collection('services')
+          .where('category_id', '==', categoryId)
+          .where('is_active', '==', true)
+          .get();
+
+        const providerIds = new Set(
+          servicesSnapshot.docs.map(doc => doc.data().provider_id)
+        );
+
+        // فلترة المزودين حسب الفئة
+        const filtered = providers.filter(p => providerIds.has(p.id));
+        
+        // ترتيب حسب المسافة
+        filtered.sort((a, b) => a.distance - b.distance);
+
+        res.json({
+          success: true,
+          count: filtered.length,
+          providers: filtered.slice(0, limit),
+          filters: {
+            latitude,
+            longitude,
+            radiusKm,
+            categoryId,
+            limit
+          }
+        });
+        return;
+      }
+
+      // ترتيب حسب المسافة
+      providers.sort((a, b) => a.distance - b.distance);
+
+      res.json({
+        success: true,
+        count: providers.length,
+        providers: providers.slice(0, limit),
+        filters: {
+          latitude,
+          longitude,
+          radiusKm,
+          limit
+        }
+      });
+      return;
+
+    } catch (error: any) {
+      console.error('Error in findNearbyProviders:', error);
+      res.status(500).json({ 
+        error: 'Internal server error',
+        message: error.message 
+      });
+      return;
+    }
+  }
+);
+
+/**
+ * الحصول على إحصائيات المزودين حسب المنطقة
+ * Get provider statistics by region
+ */
+export const getLocationStats = onRequest(
+  { cors: true },
+  async (req, res) => {
+    try {
+      const snapshot = await db.collection('profiles')
+        .where('user_type', '==', 'provider')
+        .get();
+
+      const stats: Record<string, { count: number; providers: string[] }> = {};
+
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        const country = data.country || 'Unknown';
+        const city = data.city || 'Unknown';
+        const region = `${country} - ${city}`;
+
+        if (!stats[region]) {
+          stats[region] = { count: 0, providers: [] };
+        }
+
+        stats[region].count++;
+        stats[region].providers.push(doc.id);
+      });
+
+      // ترتيب حسب الأكثر
+      const sorted = Object.entries(stats)
+        .sort(([, a], [, b]) => b.count - a.count)
+        .map(([region, data]) => ({
+          region,
+          count: data.count,
+          // لا نرسل IDs للعملاء، فقط الإحصائيات
+        }));
+
+      res.json({
+        success: true,
+        totalRegions: sorted.length,
+        totalProviders: snapshot.size,
+        regions: sorted
+      });
+      return;
+
+    } catch (error: any) {
+      console.error('Error in getLocationStats:', error);
+      res.status(500).json({ 
+        error: 'Internal server error',
+        message: error.message 
+      });
+      return;
+    }
+  }
+);
