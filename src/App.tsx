@@ -57,16 +57,13 @@ const AppContent = () => {
   React.useEffect(() => {
     if (user?.uid) {
       // تحقق من الـ permission الحالي بدون طلب
-      if ('Notification' in window && Notification.permission === 'default') {
-        // لا تطلب permission تلقائياً - Safari يرفض هذا
-        // سيطلب المستخدم permission لاحقاً من الـ settings
-        console.log('Notification permission not yet requested');
-      } else if (Notification.permission === 'granted') {
-        // إذا كان granted مسبقاً، احصل على token
-        requestNotificationPermission(user.uid).catch(error => {
-          console.error('Error getting notification token:', error);
+      if ('Notification' in window && Notification.permission === 'granted') {
+        // إذا كان granted مسبقاً، احصل على token (بدون prompt)
+        requestNotificationPermission(user.uid, true).catch(() => {
+          // Silent failure - notifications optional
         });
       }
+      // إذا كان 'default' أو 'denied'، لا تفعل شيء - المستخدم يفعلها من settings
     }
   }, [user?.uid]);
 

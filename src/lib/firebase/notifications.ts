@@ -24,7 +24,7 @@ export const initializeMessaging = () => {
 };
 
 // طلب إذن الإشعارات وحفظ التوكن
-export const requestNotificationPermission = async (userId: string): Promise<string | null> => {
+export const requestNotificationPermission = async (userId: string, skipPrompt = false): Promise<string | null> => {
   try {
     // تحقق من دعم Notification API
     if (!('Notification' in window)) {
@@ -39,8 +39,12 @@ export const requestNotificationPermission = async (userId: string): Promise<str
       return null;
     }
 
-    // طلب الإذن (يجب أن يكون من user gesture في Safari)
-    const permission = await Notification.requestPermission();
+    let permission = Notification.permission;
+
+    // طلب الإذن فقط إذا لم يتم منحه مسبقاً ولم يُطلب تخطيه
+    if (permission === 'default' && !skipPrompt) {
+      permission = await Notification.requestPermission();
+    }
     
     if (permission !== 'granted') {
       return null;
