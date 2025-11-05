@@ -50,14 +50,22 @@
       const originalWarn = console.warn;
       const originalError = console.error;
       
-      // List of known Google Maps false-positive warnings to suppress
+      // List of known false-positive warnings to suppress
       const suppressedPatterns = [
+        // Google Maps API warnings (known bugs)
         'Google Maps JavaScript API',
         'google.maps.Marker is deprecated',
         'loading=async',
         'js-api-loading',
         'scheduled to be discontinued',
-        'AdvancedMarkerElement'
+        'AdvancedMarkerElement',
+        // Safari-specific Firestore warnings (CORS/security model)
+        'Fetch API cannot load',
+        'firestore.googleapis.com',
+        'due to access control checks',
+        // Notification warnings (handled by user interaction)
+        'Notification prompting can only be done from a user gesture',
+        'Notification permission denied'
       ];
       
       console.warn = function(...args) {

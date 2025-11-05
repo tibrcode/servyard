@@ -53,12 +53,20 @@ const AppContent = () => {
     longitude: number;
   } | null>(null);
 
-  // تفعيل الإشعارات عند تسجيل الدخول
+  // تفعيل الإشعارات عند تسجيل الدخول (Safari-friendly)
   React.useEffect(() => {
     if (user?.uid) {
-      requestNotificationPermission(user.uid).catch(error => {
-        console.error('Error requesting notification permission:', error);
-      });
+      // تحقق من الـ permission الحالي بدون طلب
+      if ('Notification' in window && Notification.permission === 'default') {
+        // لا تطلب permission تلقائياً - Safari يرفض هذا
+        // سيطلب المستخدم permission لاحقاً من الـ settings
+        console.log('Notification permission not yet requested');
+      } else if (Notification.permission === 'granted') {
+        // إذا كان granted مسبقاً، احصل على token
+        requestNotificationPermission(user.uid).catch(error => {
+          console.error('Error getting notification token:', error);
+        });
+      }
     }
   }, [user?.uid]);
 

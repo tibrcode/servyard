@@ -26,20 +26,23 @@ export const initializeMessaging = () => {
 // طلب إذن الإشعارات وحفظ التوكن
 export const requestNotificationPermission = async (userId: string): Promise<string | null> => {
   try {
+    // تحقق من دعم Notification API
+    if (!('Notification' in window)) {
+      return null;
+    }
+
     if (!messaging) {
       messaging = initializeMessaging();
     }
 
     if (!messaging) {
-      console.warn('Messaging not available');
       return null;
     }
 
-    // طلب الإذن
+    // طلب الإذن (يجب أن يكون من user gesture في Safari)
     const permission = await Notification.requestPermission();
     
     if (permission !== 'granted') {
-      console.log('Notification permission denied');
       return null;
     }
 
