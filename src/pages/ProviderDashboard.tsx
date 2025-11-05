@@ -13,18 +13,12 @@ import { Button } from "@/components/ui/button";
 import { StarRating } from "@/components/ui/star-rating";
 import {
   Calendar,
-  MessageCircle,
   Star,
-  TrendingUp,
   Users,
-  DollarSign,
   Clock,
   Settings,
   Plus,
-  LogOut,
-  Check,
-  X,
-  Phone
+  LogOut
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { auth, db } from "@/integrations/firebase/client";
@@ -64,21 +58,6 @@ interface Service {
   updated_at?: any;
 }
 
-interface Booking {
-  id: string;
-  booking_date: string;
-  booking_time: string;
-  status: string;
-  customer_notes?: string;
-  service_id: string;
-  customer_id: string;
-  created_at: any;
-  // Customer information populated from customer profile
-  customer_name?: string;
-  customer_phone_numbers?: string[];
-  customer_whatsapp?: string;
-}
-
 interface Profile {
   id: string;
   full_name: string;
@@ -113,7 +92,6 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [providerProfile, setProviderProfile] = useState<Profile | null>(null);
   const [services, setServices] = useState<Service[]>([]);
-  const [bookings, setBookings] = useState<Booking[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [offers, setOffers] = useState<Offer[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -160,34 +138,6 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
           ...doc.data()
         })) as Service[];
         setServices(servicesData);
-
-        // Load bookings
-        const bookingsQuery = query(
-          collection(db, 'bookings'),
-          where('provider_id', '==', user.uid)
-        );
-        const bookingsSnapshot = await getDocs(bookingsQuery);
-        const bookingsData = await Promise.all(
-          bookingsSnapshot.docs.map(async (bookingDoc) => {
-            const bookingData = { id: bookingDoc.id, ...bookingDoc.data() } as any;
-
-            // Load customer information
-            try {
-              const customerDoc = await getDoc(doc(db, 'profiles', bookingData.customer_id));
-              if (customerDoc.exists()) {
-                const customerData = customerDoc.data();
-                bookingData.customer_name = customerData.full_name;
-                bookingData.customer_phone_numbers = customerData.phone_numbers;
-                bookingData.customer_whatsapp = customerData.whatsapp_number;
-              }
-            } catch (error) {
-              console.error('Error loading customer data for booking:', bookingData.id, error);
-            }
-
-            return bookingData;
-          })
-        );
-        setBookings(bookingsData as Booking[]);
 
         // Load offers
         const offersQuery = query(
@@ -238,10 +188,7 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
   }
 
   const activeServices = services.filter(service => service.is_active);
-  const pendingBookings = bookings.filter(booking => booking.status === 'pending');
-  const completedBookings = bookings.filter(booking => booking.status === 'completed');
-  const totalRevenue = completedBookings.length * 150; // Placeholder calculation
-
+  
   // Calculate average rating
   const averageRating = reviews.length > 0
     ? (reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length).toFixed(1)
@@ -253,39 +200,6 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
       navigate('/auth');
     } catch (error) {
       console.error('Error signing out:', error);
-    }
-  };
-
-  const handleBookingAction = async (bookingId: string, action: 'confirmed' | 'rejected' | 'completed') => {
-    try {
-      const bookingRef = doc(db, 'bookings', bookingId);
-      await updateDoc(bookingRef, {
-        status: action,
-        updated_at: new Date()
-      });
-
-      // Update local state
-      setBookings(bookings.map(booking =>
-        booking.id === bookingId
-          ? { ...booking, status: action }
-          : booking
-      ));
-
-      toast({
-        title: action === 'confirmed' ? t.toast.bookingConfirmed :
-          action === 'rejected' ? t.toast.bookingRejected :
-            t.toast.bookingCompleted,
-        description: action === 'confirmed' ? t.toast.bookingConfirmedDesc :
-          action === 'rejected' ? t.toast.bookingRejectedDesc :
-            t.toast.bookingCompletedDesc,
-      });
-    } catch (error) {
-      console.error('Error updating booking:', error);
-      toast({
-        title: t.toast.bookingError,
-        description: t.toast.bookingErrorDesc,
-        variant: 'destructive',
-      });
     }
   };
 
@@ -396,36 +310,6 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
           <Card className="h-auto">
             <CardHeader className="pb-2">
               <div className="flex items-start justify-between gap-2">
-                <CardTitle className="text-xs sm:text-sm font-medium break-words leading-tight min-w-0 flex-1 hyphens-auto">{t.provider.bookings}</CardTitle>
-                <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
-              </div>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="text-lg sm:text-xl lg:text-2xl font-bold leading-tight break-words mb-1">{pendingBookings.length}</div>
-              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed break-words hyphens-auto">
-                {t.provider.pendingBookings}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="h-auto">
-            <CardHeader className="pb-2">
-              <div className="flex items-start justify-between gap-2">
-                <CardTitle className="text-xs sm:text-sm font-medium break-words leading-tight min-w-0 flex-1 hyphens-auto">{t.provider.revenue}</CardTitle>
-                <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
-              </div>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="text-lg sm:text-xl lg:text-2xl font-bold leading-tight break-words mb-1">{providerProfile.currency_code ? `${providerProfile.currency_code} ` : ''}{totalRevenue}</div>
-              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed break-words hyphens-auto">
-                {t.provider.thisMonth}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="h-auto">
-            <CardHeader className="pb-2">
-              <div className="flex items-start justify-between gap-2">
                 <CardTitle className="text-xs sm:text-sm font-medium break-words leading-tight min-w-0 flex-1 hyphens-auto">{t.provider.rating}</CardTitle>
                 <Star className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
               </div>
@@ -456,131 +340,26 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
               <ServiceManagement currentLanguage={currentLanguage} currencyCode={providerProfile.currency_code} />
             </TabsContent>
 
-            {/* Appointments Tab - New Booking System */}
+            {/* Appointments Tab - Pending Bookings Only */}
             <TabsContent value="appointments">
+              {providerProfile && (
+                <BookingManagement
+                  providerId={providerProfile.id}
+                  language={currentLanguage as 'en' | 'ar'}
+                  defaultStatusFilter="pending"
+                  showOnlyPending={true}
+                />
+              )}
+            </TabsContent>
+
+            {/* Bookings Tab - All Bookings (New System) */}
+            <TabsContent value="bookings" className="space-y-4">
               {providerProfile && (
                 <BookingManagement
                   providerId={providerProfile.id}
                   language={currentLanguage as 'en' | 'ar'}
                 />
               )}
-            </TabsContent>
-
-            {/* Bookings Tab - Old Direct Contact Bookings */}
-            <TabsContent value="bookings" className="space-y-4">
-              <div className="w-full max-w-full min-w-0">
-                {bookings.length === 0 ? (
-                  <Card>
-                    <CardContent className="text-center py-12">
-                      <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                      <h3 className="text-lg font-semibold mb-2 leading-snug break-words hyphens-auto">{t.provider.noServicesYet}</h3>
-                      <p className="text-muted-foreground leading-relaxed break-words hyphens-auto">{t.provider.createFirstService}</p>
-                    </CardContent>
-                  </Card>
-                ) : (
-                  <div className="space-y-4">
-                    {bookings.map((booking) => (
-                      <Card key={booking.id}>
-                        <CardContent className="p-4">
-                          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                            <div className="space-y-2 min-w-0 flex-1">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <Badge
-                                  variant={
-                                    booking.status === 'pending' ? 'default' :
-                                      booking.status === 'confirmed' ? 'secondary' :
-                                        booking.status === 'completed' ? 'default' :
-                                          'destructive'
-                                  }
-                                  className={`whitespace-nowrap leading-none px-2.5 py-0.5 hyphens-none ${(booking.status === 'pending' || booking.status === 'completed')
-                                    ? 'text-slate-900 dark:text-slate-900'
-                                    : ''
-                                    }`}
-                                >
-                                  {t.booking.statuses[booking.status as keyof typeof t.booking.statuses] ?? booking.status}
-                                </Badge>
-                                <span className="text-xs sm:text-sm text-muted-foreground leading-relaxed break-words">
-                                  {new Date(booking.booking_date).toLocaleDateString(currentLanguage)} • {booking.booking_time}
-                                </span>
-                              </div>
-                              {booking.customer_name && (
-                                <p className="text-sm sm:text-base font-semibold leading-snug break-words hyphens-auto">{booking.customer_name}</p>
-                              )}
-                              {booking.customer_notes && (
-                                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed break-words hyphens-auto">{booking.customer_notes}</p>
-                              )}
-                              <div className="flex gap-2 flex-wrap">
-                                {booking.customer_whatsapp && (
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => window.open(`https://wa.me/${booking.customer_whatsapp?.replace(/[^\d]/g, '')}`, '_blank')}
-                                    className="flex items-center gap-2 whitespace-normal break-words leading-tight"
-                                  >
-                                    <MessageCircle className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-                                    <span className="break-words text-xs sm:text-sm">{t.customer.whatsapp}</span>
-                                  </Button>
-                                )}
-                                {booking.customer_phone_numbers && booking.customer_phone_numbers.length > 0 && (
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => {
-                                      const dial = booking.customer_phone_numbers?.[0] || '';
-                                      const sanitized = dial.replace(/[^\d+]/g, '');
-                                      // Use location to ensure opening dialer within WebView
-                                      window.location.href = `tel:${sanitized}`;
-                                    }}
-                                    className="flex items-center gap-2 whitespace-normal break-words leading-tight"
-                                  >
-                                    <Phone className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-                                    <span className="break-words text-xs sm:text-sm">{t.customer.call}</span>
-                                  </Button>
-                                )}
-                              </div>
-                            </div>
-
-                            {booking.status === 'pending' && (
-                              <div className="flex gap-2 flex-wrap">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => handleBookingAction(booking.id, 'confirmed')}
-                                  className="flex items-center gap-2 whitespace-normal break-words leading-tight"
-                                >
-                                  <Check className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-                                  <span className="break-words text-xs sm:text-sm">{t.booking.confirm}</span>
-                                </Button>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => handleBookingAction(booking.id, 'rejected')}
-                                  className="flex items-center gap-2 whitespace-normal break-words leading-tight"
-                                >
-                                  <X className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-                                  <span className="break-words text-xs sm:text-sm">{t.booking.reject}</span>
-                                </Button>
-                              </div>
-                            )}
-
-                            {booking.status === 'confirmed' && (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleBookingAction(booking.id, 'completed')}
-                                className="flex items-center gap-2 whitespace-normal break-words leading-tight"
-                              >
-                                <Check className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-                                <span className="break-words text-xs sm:text-sm">{t.booking.completed}</span>
-                              </Button>
-                            )}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                )}
-              </div>
             </TabsContent>
 
             {/* Offers Tab */}

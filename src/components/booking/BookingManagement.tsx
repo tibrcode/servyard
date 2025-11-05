@@ -25,6 +25,8 @@ import {
 interface BookingManagementProps {
   providerId: string;
   language?: 'ar' | 'en';
+  defaultStatusFilter?: BookingStatus | 'all';
+  showOnlyPending?: boolean;
 }
 
 type ViewMode = 'all' | 'today' | 'week' | 'month';
@@ -32,13 +34,15 @@ type ViewMode = 'all' | 'today' | 'week' | 'month';
 export function BookingManagement({
   providerId,
   language = 'ar',
+  defaultStatusFilter = 'all',
+  showOnlyPending = false,
 }: BookingManagementProps) {
   const { toast } = useToast();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [filteredBookings, setFilteredBookings] = useState<Booking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [viewMode, setViewMode] = useState<ViewMode>('today');
-  const [statusFilter, setStatusFilter] = useState<BookingStatus | 'all'>('all');
+  const [statusFilter, setStatusFilter] = useState<BookingStatus | 'all'>(defaultStatusFilter);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   const isRTL = language === 'ar';
@@ -118,31 +122,36 @@ export function BookingManagement({
   const filterBookings = () => {
     let filtered = [...bookings];
 
-    // Filter by date range
-    const now = new Date();
-    const today = formatDate(now);
-    
-    if (viewMode === 'today') {
-      filtered = filtered.filter(b => b.booking_date === today);
-    } else if (viewMode === 'week') {
-      const weekFromNow = new Date();
-      weekFromNow.setDate(weekFromNow.getDate() + 7);
-      filtered = filtered.filter(b => {
-        const bookingDate = new Date(b.booking_date);
-        return bookingDate >= now && bookingDate <= weekFromNow;
-      });
-    } else if (viewMode === 'month') {
-      const monthFromNow = new Date();
-      monthFromNow.setMonth(monthFromNow.getMonth() + 1);
-      filtered = filtered.filter(b => {
-        const bookingDate = new Date(b.booking_date);
-        return bookingDate >= now && bookingDate <= monthFromNow;
-      });
-    }
+    // If showing only pending, override all other filters
+    if (showOnlyPending) {
+      filtered = filtered.filter(b => b.status === 'pending');
+    } else {
+      // Filter by date range
+      const now = new Date();
+      const today = formatDate(now);
+      
+      if (viewMode === 'today') {
+        filtered = filtered.filter(b => b.booking_date === today);
+      } else if (viewMode === 'week') {
+        const weekFromNow = new Date();
+        weekFromNow.setDate(weekFromNow.getDate() + 7);
+        filtered = filtered.filter(b => {
+          const bookingDate = new Date(b.booking_date);
+          return bookingDate >= now && bookingDate <= weekFromNow;
+        });
+      } else if (viewMode === 'month') {
+        const monthFromNow = new Date();
+        monthFromNow.setMonth(monthFromNow.getMonth() + 1);
+        filtered = filtered.filter(b => {
+          const bookingDate = new Date(b.booking_date);
+          return bookingDate >= now && bookingDate <= monthFromNow;
+        });
+      }
 
-    // Filter by status
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(b => b.status === statusFilter);
+      // Filter by status
+      if (statusFilter !== 'all') {
+        filtered = filtered.filter(b => b.status === statusFilter);
+      }
     }
 
     // Sort by date and time
@@ -415,20 +424,21 @@ export function BookingManagement({
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Filters */}
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as ViewMode)} className="flex-1">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="today">{t.today}</TabsTrigger>
-                <TabsTrigger value="week">{t.week}</TabsTrigger>
-                <TabsTrigger value="month">{t.month}</TabsTrigger>
-                <TabsTrigger value="all">{t.all}</TabsTrigger>
-              </TabsList>
-            </Tabs>
+          {/* Filters - Hide if showing only pending */}
+          {!showOnlyPending && (
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as ViewMode)} className="flex-1">
+                <TabsList className="grid w-full grid-cols-4">
+                  <TabsTrigger value="today">{t.today}</TabsTrigger>
+                  <TabsTrigger value="week">{t.week}</TabsTrigger>
+                  <TabsTrigger value="month">{t.month}</TabsTrigger>
+                  <TabsTrigger value="all">{t.all}</TabsTrigger>
+                </TabsList>
+              </Tabs>
 
-            <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as BookingStatus | 'all')}>
-              <SelectTrigger className="w-full sm:w-[180px]">
-                <SelectValue placeholder={t.filterByStatus} />
+              <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as BookingStatus | 'all')}>
+                <SelectTrigger className="w-full sm:w-[180px]">
+                  <SelectValue placeholder={t.filterByStatus} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">{t.statuses.all}</SelectItem>
@@ -439,7 +449,8 @@ export function BookingManagement({
                 <SelectItem value="no-show">{t.statuses['no-show']}</SelectItem>
               </SelectContent>
             </Select>
-          </div>
+            </div>
+          )}
 
           {/* Bookings List */}
           <div className="space-y-4">
