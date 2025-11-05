@@ -13,7 +13,9 @@ import {
   where, 
   orderBy,
   Timestamp,
-  writeBatch
+  writeBatch,
+  onSnapshot,
+  Unsubscribe
 } from 'firebase/firestore';
 import { db } from '@/integrations/firebase/client';
 import { 
@@ -315,4 +317,62 @@ export async function bulkCreateSchedules(
   }
 
   await batch.commit();
+}
+
+/**
+ * Subscribe to customer bookings in real-time
+ * الاشتراك في حجوزات العميل بشكل فوري
+ */
+export function subscribeToCustomerBookings(
+  customerId: string,
+  callback: (bookings: Booking[]) => void
+): Unsubscribe {
+  const q = query(
+    bookingsCollection,
+    where('customer_id', '==', customerId)
+  );
+
+  return onSnapshot(q, (snapshot) => {
+    const bookings = snapshot.docs.map(doc => doc.data() as Booking);
+    
+    // Sort by booking_date and start_time in JavaScript
+    const sorted = bookings.sort((a, b) => {
+      const dateCompare = b.booking_date.localeCompare(a.booking_date);
+      if (dateCompare !== 0) return dateCompare;
+      return b.start_time.localeCompare(a.start_time);
+    });
+    
+    callback(sorted);
+  }, (error) => {
+    console.error('Error in customer bookings subscription:', error);
+  });
+}
+
+/**
+ * Subscribe to provider bookings in real-time
+ * الاشتراك في حجوزات المزود بشكل فوري
+ */
+export function subscribeToProviderBookings(
+  providerId: string,
+  callback: (bookings: Booking[]) => void
+): Unsubscribe {
+  const q = query(
+    bookingsCollection,
+    where('provider_id', '==', providerId)
+  );
+
+  return onSnapshot(q, (snapshot) => {
+    const bookings = snapshot.docs.map(doc => doc.data() as Booking);
+    
+    // Sort by booking_date and start_time in JavaScript
+    const sorted = bookings.sort((a, b) => {
+      const dateCompare = b.booking_date.localeCompare(a.booking_date);
+      if (dateCompare !== 0) return dateCompare;
+      return b.start_time.localeCompare(a.start_time);
+    });
+    
+    callback(sorted);
+  }, (error) => {
+    console.error('Error in provider bookings subscription:', error);
+  });
 }

@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { Booking, BookingStatus } from '@/types/booking';
-import { getCustomerBookings, cancelBooking } from '@/lib/firebase/bookingFunctions';
+import { getCustomerBookings, cancelBooking, subscribeToCustomerBookings } from '@/lib/firebase/bookingFunctions';
 import { formatTimeDisplay, canCancelBooking } from '@/lib/bookingUtils';
 import { Calendar, Clock, MapPin, Phone, X, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { format } from 'date-fns';
@@ -87,17 +87,20 @@ export function MyBookings({
   };
 
   useEffect(() => {
-    loadBookings();
+    setIsLoading(true);
     
-    // Auto-refresh every 30 seconds to reflect updates
-    const interval = setInterval(() => {
-      loadBookings();
-    }, 30000);
+    // Subscribe to real-time updates
+    const unsubscribe = subscribeToCustomerBookings(customerId, (data) => {
+      setBookings(data);
+      setIsLoading(false);
+    });
     
-    return () => clearInterval(interval);
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
   }, [customerId]);
 
   const loadBookings = async () => {
+    // Kept for manual refresh if needed
     setIsLoading(true);
     try {
       const data = await getCustomerBookings(customerId);

@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { Booking, BookingStatus, BookingStatistics } from '@/types/booking';
-import { getProviderBookings, updateBookingStatus } from '@/lib/firebase/bookingFunctions';
+import { getProviderBookings, updateBookingStatus, subscribeToProviderBookings } from '@/lib/firebase/bookingFunctions';
 import { formatTimeDisplay, formatDate } from '@/lib/bookingUtils';
 import { Calendar, Clock, User, Phone, CheckCircle2, X, AlertCircle, TrendingUp } from 'lucide-react';
 import { format } from 'date-fns';
@@ -103,14 +103,16 @@ export function BookingManagement({
   };
 
   useEffect(() => {
-    loadBookings();
+    setIsLoading(true);
     
-    // Auto-refresh every 30 seconds to reflect updates
-    const interval = setInterval(() => {
-      loadBookings();
-    }, 30000);
+    // Subscribe to real-time updates
+    const unsubscribe = subscribeToProviderBookings(providerId, (data) => {
+      setBookings(data);
+      setIsLoading(false);
+    });
     
-    return () => clearInterval(interval);
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
   }, [providerId]);
 
   useEffect(() => {
@@ -118,6 +120,7 @@ export function BookingManagement({
   }, [bookings, viewMode, statusFilter, showOnlyPending]);
 
   const loadBookings = async () => {
+    // Kept for manual refresh if needed
     setIsLoading(true);
     try {
       const data = await getProviderBookings(providerId);
