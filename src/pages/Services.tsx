@@ -19,7 +19,7 @@ import { collection, getDocs, doc, getDoc, query as fsQuery, where } from "fireb
 import { ServiceCategory, initializeServiceCategories } from "@/lib/firebase/collections";
 import { upsertDefaultServiceCategories } from "@/lib/firebase/defaultCategories";
 import { getCategoryLabel } from "@/lib/categoriesLocale";
-import { filterByRadius, formatDistance, RADIUS_OPTIONS, DEFAULT_RADIUS_KM, Coordinates } from "@/lib/geolocation";
+import { filterByRadius, formatDistance, calculateDistance, RADIUS_OPTIONS, DEFAULT_RADIUS_KM, Coordinates } from "@/lib/geolocation";
 import { Slider } from "@/components/ui/slider";
 
 interface ServicesProps {
@@ -346,31 +346,42 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
     return filtered;
   }, [services, selectedCategory, searchQuery]);
 
-  // فلترة للقائمة (تشمل فلترة الموقع)
+  // فلترة للقائمة (تشمل فلترة الموقع + إضافة المسافة)
   const filteredServices = useMemo(() => {
     let filtered = baseFilteredServices;
 
-    // فلترة حسب الموقع الجغرافي (فقط في وضع القائمة)
-    if (userLocation && radiusKm > 0 && viewMode === 'list') {
+    // إضافة معلومات المسافة لكل خدمة (إذا كان موقع المستخدم متوفر)
+    if (userLocation) {
       const servicesWithLocation = filtered
         .map(service => {
           const provider = providers[service.provider_id];
-          return {
-            ...service,
-            provider,
-            latitude: provider?.latitude,
-            longitude: provider?.longitude
-          };
-        })
-        .filter(s => s.latitude && s.longitude) as (Service & Coordinates & { provider: Provider })[];
+          if (!provider?.latitude || !provider?.longitude) {
+            return { ...service, distance: undefined };
+          }
+          
+          const distance = calculateDistance(
+            userLocation,
+            { latitude: provider.latitude, longitude: provider.longitude }
+          );
+          
+          return { ...service, distance };
+        });
 
-      const nearby = filterByRadius(userLocation, servicesWithLocation, radiusKm);
+      // فلترة حسب النطاق الجغرافي (فقط في وضع القائمة)
+      if (radiusKm > 0 && viewMode === 'list') {
+        filtered = servicesWithLocation
+          .filter(s => s.distance !== undefined && s.distance <= radiusKm)
+          .sort((a, b) => (a.distance || 0) - (b.distance || 0));
+      } else {
+        // ترتيب حسب المسافة بدون فلترة
+        filtered = servicesWithLocation.sort((a, b) => {
+          if (a.distance === undefined) return 1;
+          if (b.distance === undefined) return -1;
+          return a.distance - b.distance;
+        });
+      }
       
-      // إرجاع الخدمات مع معلومات المسافة
-      return nearby.map(({ distance, provider, latitude, longitude, ...service }) => ({
-        ...service,
-        distance
-      }));
+      return filtered;
     }
 
     return filtered;
@@ -735,6 +746,27 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                     </div>
                                   </div>
                                 </div>
+                                
+                                {/* المسافة */}
+                                {userLocation && provider.latitude && provider.longitude && (
+                                  <div className="flex items-center gap-2 p-3 bg-primary/10 rounded-lg">
+                                    <MapPin className="w-5 h-5 text-primary" />
+                                    <div>
+                                      <div className="text-sm text-muted-foreground">
+                                        {isRTL ? 'المسافة التقديرية' : 'Estimated Distance'}
+                                      </div>
+                                      <div className="text-lg font-semibold text-primary">
+                                        {formatDistance(
+                                          calculateDistance(
+                                            userLocation,
+                                            { latitude: provider.latitude, longitude: provider.longitude }
+                                          ),
+                                          currentLanguage === 'ar' ? 'ar' : 'en'
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
                                 
                                 {/* الموقع */}
                                 {provider.location_address && (
