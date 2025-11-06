@@ -163,13 +163,22 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
 
   // تحديث العلامات على الخريطة
   useEffect(() => {
-    if (!mapInstanceRef.current) return;
+    console.log('🗺️ Markers useEffect triggered');
+    console.log('  mapInstanceRef.current:', !!mapInstanceRef.current);
+    console.log('  markers.length:', markers.length);
+    
+    if (!mapInstanceRef.current) {
+      console.log('❌ No map instance, skipping markers');
+      return;
+    }
 
     // حذف العلامات القديمة
     clearMarkers();
     
     // إضافة العلامات الجديدة
-    markers.forEach((marker) => {
+    console.log('✅ Adding', markers.length, 'markers to map');
+    markers.forEach((marker, index) => {
+      console.log(`  Adding marker ${index + 1}:`, marker.label);
       addMarker(marker, marker.label);
     });
   }, [markers, currentLanguage]);
