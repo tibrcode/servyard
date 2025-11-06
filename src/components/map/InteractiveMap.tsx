@@ -162,28 +162,39 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
 
   // تحديث العلامات عند تغييرها
   useEffect(() => {
-    if (!mapInstanceRef.current) return;
+    if (!mapInstanceRef.current) {
+      console.log('❌ Cannot update markers: mapInstanceRef is null');
+      return;
+    }
 
     console.log('🗺️ Updating markers:', markers.length);
+    console.log('  Map instance exists:', !!mapInstanceRef.current);
     
     // حذف العلامات القديمة
+    console.log('  Clearing old markers...');
     clearMarkers();
+    console.log('  Old markers cleared');
     
     // إضافة العلامات الجديدة
     markers.forEach((marker, index) => {
-      console.log(`  Marker ${index + 1}:`, marker.label, `(${marker.latitude}, ${marker.longitude})`);
+      console.log(`  Adding Marker ${index + 1}:`, marker.label, `at (${marker.latitude}, ${marker.longitude})`);
       addMarker(marker, marker.label);
     });
 
-    console.log('✅ Markers updated on map');
+    console.log('✅ Markers updated on map. Total markers now:', markersRef.current.length);
   }, [markers, currentLanguage]);
 
   // إضافة علامة محسّنة مع معلومات الخدمات
   const addMarker = (location: Location, label?: string, draggable = false) => {
-    if (!mapInstanceRef.current) return;
+    if (!mapInstanceRef.current) {
+      console.log('❌ addMarker: mapInstanceRef is null');
+      return;
+    }
 
     const isRTL = currentLanguage === 'ar';
 
+    console.log('  📍 Creating marker at:', location.latitude, location.longitude);
+    
     // استخدام Marker العادي (AdvancedMarker يحتاج Map ID من Google Console)
     const marker = new google.maps.Marker({
       position: { lat: location.latitude, lng: location.longitude },
@@ -192,6 +203,8 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
       draggable: draggable,
       animation: google.maps.Animation.DROP
     });
+    
+    console.log('  ✅ Marker created successfully');
 
     // إذا كانت العلامة قابلة للسحب
     if (draggable && onLocationSelect) {
