@@ -335,8 +335,9 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
       );
     }
 
-    // فلترة حسب الموقع الجغرافي
-    if (userLocation && radiusKm > 0) {
+    // فلترة حسب الموقع الجغرافي (فقط في وضع القائمة)
+    // في وضع الخريطة، نعرض جميع الخدمات التي لها GPS
+    if (userLocation && radiusKm > 0 && viewMode === 'list') {
       const servicesWithLocation = filtered
         .map(service => {
           const provider = providers[service.provider_id];
@@ -359,7 +360,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
     }
 
     return filtered;
-  }, [services, selectedCategory, searchQuery, userLocation, radiusKm, providers]);
+  }, [services, selectedCategory, searchQuery, userLocation, radiusKm, providers, viewMode]);
 
   // حساب mapMarkers مرة واحدة
   const mapMarkers = useMemo(() => {
