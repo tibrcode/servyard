@@ -154,14 +154,18 @@ export function BookingManagement({
         const weekFromNow = new Date();
         weekFromNow.setDate(weekFromNow.getDate() + 7);
         filtered = filtered.filter(b => {
-          const bookingDate = new Date(b.booking_date);
+          // Parse date properly
+          const [year, month, day] = b.booking_date.split('-').map(Number);
+          const bookingDate = new Date(year, month - 1, day);
           return bookingDate >= now && bookingDate <= weekFromNow;
         });
       } else if (viewMode === 'month') {
         const monthFromNow = new Date();
         monthFromNow.setMonth(monthFromNow.getMonth() + 1);
         filtered = filtered.filter(b => {
-          const bookingDate = new Date(b.booking_date);
+          // Parse date properly
+          const [year, month, day] = b.booking_date.split('-').map(Number);
+          const bookingDate = new Date(year, month - 1, day);
           return bookingDate >= now && bookingDate <= monthFromNow;
         });
       }
@@ -172,10 +176,16 @@ export function BookingManagement({
       }
     }
 
-    // Sort by date and time
+    // Sort by date and time (parse properly)
     filtered.sort((a, b) => {
-      const dateA = new Date(`${a.booking_date}T${a.start_time}`);
-      const dateB = new Date(`${b.booking_date}T${b.start_time}`);
+      const [yearA, monthA, dayA] = a.booking_date.split('-').map(Number);
+      const [hourA, minuteA] = a.start_time.split(':').map(Number);
+      const dateA = new Date(yearA, monthA - 1, dayA, hourA, minuteA);
+      
+      const [yearB, monthB, dayB] = b.booking_date.split('-').map(Number);
+      const [hourB, minuteB] = b.start_time.split(':').map(Number);
+      const dateB = new Date(yearB, monthB - 1, dayB, hourB, minuteB);
+      
       return dateA.getTime() - dateB.getTime();
     });
 

@@ -168,10 +168,28 @@ export function MyBookings({
 
   const isUpcoming = (booking: Booking) => {
     // Upcoming = confirmed OR pending, AND date in future
-    const bookingDate = new Date(`${booking.booking_date}T${booking.start_time}`);
-    const now = new Date();
-    const isFutureDate = bookingDate >= now;
     const isActiveStatus = booking.status === 'confirmed' || booking.status === 'pending';
+    
+    // Parse booking date + time carefully
+    const [year, month, day] = booking.booking_date.split('-').map(Number);
+    const [hour, minute] = booking.start_time.split(':').map(Number);
+    
+    const bookingDate = new Date(year, month - 1, day, hour, minute);
+    const now = new Date();
+    
+    // Debug log
+    console.log('Booking check:', {
+      booking_id: booking.booking_id,
+      date: booking.booking_date,
+      time: booking.start_time,
+      bookingDate: bookingDate.toISOString(),
+      now: now.toISOString(),
+      isFuture: bookingDate > now,
+      status: booking.status,
+      isActiveStatus
+    });
+    
+    const isFutureDate = bookingDate > now;
     
     return isFutureDate && isActiveStatus;
   };
