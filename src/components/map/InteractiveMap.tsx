@@ -115,9 +115,9 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
     };
   }, []);
 
-  // إنشاء الخريطة
+  // إنشاء الخريطة (مرة واحدة فقط)
   useEffect(() => {
-    if (!apiLoaded || !mapRef.current) return;
+    if (!apiLoaded || !mapRef.current || mapInstanceRef.current) return;
 
     const defaultCenter = center || { latitude: 31.9454, longitude: 35.9284 }; // عمّان، الأردن
 
@@ -148,18 +148,31 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
         }
       });
     }
+  }, [apiLoaded]);
+
+  // تحديث موقع ومستوى التكبير للخريطة
+  useEffect(() => {
+    if (!mapInstanceRef.current || !center) return;
+
+    mapInstanceRef.current.setCenter({ 
+      lat: center.latitude, 
+      lng: center.longitude 
+    });
+    mapInstanceRef.current.setZoom(zoom);
+  }, [center, zoom]);
+
+  // تحديث العلامات على الخريطة
+  useEffect(() => {
+    if (!mapInstanceRef.current) return;
 
     // حذف العلامات القديمة
     clearMarkers();
     
     // إضافة العلامات الجديدة
-    console.log('🗺️ Adding markers to map:', markers.length);
-    markers.forEach((marker, index) => {
-      console.log(`  Marker ${index + 1}:`, marker.label, `(${marker.latitude}, ${marker.longitude})`);
+    markers.forEach((marker) => {
       addMarker(marker, marker.label);
     });
-
-  }, [apiLoaded, center, zoom, markers]);
+  }, [markers, currentLanguage]);
 
   // إضافة علامة محسّنة مع معلومات الخدمات
   const addMarker = (location: Location, label?: string, draggable = false) => {
