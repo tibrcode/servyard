@@ -64,6 +64,14 @@ export function MyBookings({
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const [existingReviews, setExistingReviews] = useState<Set<string>>(new Set());
   
+  // Edit booking state
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedBookingForEdit, setSelectedBookingForEdit] = useState<Booking | null>(null);
+  const [editDate, setEditDate] = useState('');
+  const [editTime, setEditTime] = useState('');
+  const [editNotes, setEditNotes] = useState('');
+  const [isUpdatingBooking, setIsUpdatingBooking] = useState(false);
+  
   // Provider contact info
   const [providerContacts, setProviderContacts] = useState<Record<string, {phone?: string[], whatsapp?: string}>>({});
 
@@ -101,7 +109,18 @@ export function MyBookings({
       ? `يجب إلغاء الحجز قبل ${cancellationPolicyHours} ساعة على الأقل`
       : `Booking must be cancelled at least ${cancellationPolicyHours} hours before`,
     contactProvider: isRTL ? 'اتصل بمقدم الخدمة' : 'Contact Provider',
-    edit: isRTL ? 'تعديل' : 'Edit',
+    edit: isRTL ? 'تعديل الحجز' : 'Edit Booking',
+    editTitle: isRTL ? 'تعديل الحجز' : 'Edit Booking',
+    editDesc: isRTL ? 'يمكنك تعديل موعد الحجز أو إضافة ملاحظات' : 'You can modify the booking date/time or add notes',
+    newDate: isRTL ? 'التاريخ الجديد' : 'New Date',
+    newTime: isRTL ? 'الوقت الجديد' : 'New Time',
+    additionalNotes: isRTL ? 'ملاحظات إضافية' : 'Additional Notes',
+    notesPlaceholder: isRTL ? 'أضف أي ملاحظات أو متطلبات خاصة...' : 'Add any notes or special requirements...',
+    saveChanges: isRTL ? 'حفظ التعديلات' : 'Save Changes',
+    saving: isRTL ? 'جاري الحفظ...' : 'Saving...',
+    editSuccess: isRTL ? 'تم تحديث الحجز' : 'Booking Updated',
+    editSuccessDesc: isRTL ? 'تم تحديث تفاصيل حجزك بنجاح' : 'Your booking has been updated successfully',
+    editError: isRTL ? 'فشل تحديث الحجز' : 'Failed to update booking',
     review: isRTL ? 'تقييم الخدمة' : 'Review Service',
     rateService: isRTL ? 'قيّم الخدمة' : 'Rate Service',
     yourRating: isRTL ? 'تقييمك' : 'Your Rating',
@@ -254,6 +273,62 @@ export function MyBookings({
     }
   };
 
+  // Handle open edit dialog
+  const handleOpenEditDialog = (booking: Booking) => {
+    setSelectedBookingForEdit(booking);
+    setEditDate(booking.booking_date);
+    setEditTime(booking.start_time);
+    setEditNotes(booking.notes || '');
+    setEditDialogOpen(true);
+  };
+
+  // Handle update booking
+  const handleUpdateBooking = async () => {
+    if (!selectedBookingForEdit || !editDate || !editTime) {
+      toast({
+        title: t.editError,
+        description: isRTL ? 'الرجاء إدخال التاريخ والوقت' : 'Please enter date and time',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsUpdatingBooking(true);
+
+    try {
+      const bookingRef = doc(db, 'bookings', selectedBookingForEdit.booking_id);
+      
+      // Update the booking with new data
+      const { updateDoc } = await import('firebase/firestore');
+      await updateDoc(bookingRef, {
+        booking_date: editDate,
+        start_time: editTime,
+        notes: editNotes.trim(),
+        updated_at: new Date(),
+      });
+
+      toast({
+        title: t.editSuccess,
+        description: t.editSuccessDesc,
+      });
+
+      setEditDialogOpen(false);
+      setSelectedBookingForEdit(null);
+      setEditDate('');
+      setEditTime('');
+      setEditNotes('');
+    } catch (error) {
+      console.error('Error updating booking:', error);
+      toast({
+        title: t.editError,
+        description: String(error),
+        variant: 'destructive',
+      });
+    } finally {
+      setIsUpdatingBooking(false);
+    }
+  };
+
   const handleCancelBooking = async (booking: Booking) => {
     if (!canCancelBooking(booking, cancellationPolicyHours)) {
       toast({
@@ -381,6 +456,18 @@ export function MyBookings({
               <>
                 <Separator />
                 <div className="flex gap-2 flex-wrap">
+                  {/* Edit Button */}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleOpenEditDialog(booking)}
+                    className="flex-1 min-w-[120px]"
+                  >
+                    <Edit className="h-4 w-4 mr-1" />
+                    {t.edit}
+                  </Button>
+
+                  {/* Cancel Button */}
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button
@@ -420,6 +507,7 @@ export function MyBookings({
                     </AlertDialogContent>
                   </AlertDialog>
 
+                  {/* Phone Button */}
                   {providerContacts[booking.provider_id]?.phone && providerContacts[booking.provider_id]?.phone.length > 0 && (
                     <Button variant="outline" size="sm" className="flex-1 min-w-[120px]" asChild>
                       <a href={`tel:${providerContacts[booking.provider_id].phone[0]}`}>
@@ -429,6 +517,7 @@ export function MyBookings({
                     </Button>
                   )}
 
+                  {/* WhatsApp Button */}
                   {providerContacts[booking.provider_id]?.whatsapp && (
                     <Button variant="outline" size="sm" className="flex-1 min-w-[120px]" asChild>
                       <a href={`https://wa.me/${providerContacts[booking.provider_id].whatsapp.replace(/[^\d]/g, '')}`} target="_blank" rel="noopener noreferrer">
@@ -596,6 +685,71 @@ export function MyBookings({
               disabled={isSubmittingReview}
             >
               {isSubmittingReview ? t.submitting : t.submitReview}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Booking Dialog */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent dir={isRTL ? 'rtl' : 'ltr'}>
+          <DialogHeader>
+            <DialogTitle>{t.editTitle}</DialogTitle>
+            <DialogDescription>{t.editDesc}</DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            {/* Date Input */}
+            <div className="space-y-2">
+              <Label htmlFor="edit-date">{t.newDate}</Label>
+              <input
+                id="edit-date"
+                type="date"
+                value={editDate}
+                onChange={(e) => setEditDate(e.target.value)}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              />
+            </div>
+
+            {/* Time Input */}
+            <div className="space-y-2">
+              <Label htmlFor="edit-time">{t.newTime}</Label>
+              <input
+                id="edit-time"
+                type="time"
+                value={editTime}
+                onChange={(e) => setEditTime(e.target.value)}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              />
+            </div>
+
+            {/* Notes Input */}
+            <div className="space-y-2">
+              <Label htmlFor="edit-notes">{t.additionalNotes}</Label>
+              <Textarea
+                id="edit-notes"
+                placeholder={t.notesPlaceholder}
+                value={editNotes}
+                onChange={(e) => setEditNotes(e.target.value)}
+                rows={4}
+                className="resize-none"
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setEditDialogOpen(false)}
+              disabled={isUpdatingBooking}
+            >
+              {isRTL ? 'إلغاء' : 'Cancel'}
+            </Button>
+            <Button
+              onClick={handleUpdateBooking}
+              disabled={isUpdatingBooking}
+            >
+              {isUpdatingBooking ? t.saving : t.saveChanges}
             </Button>
           </DialogFooter>
         </DialogContent>
