@@ -164,11 +164,13 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   // تحديث العلامات على الخريطة
   useEffect(() => {
     console.log('🗺️ Markers useEffect triggered');
+    console.log('  apiLoaded:', apiLoaded);
     console.log('  mapInstanceRef.current:', !!mapInstanceRef.current);
     console.log('  markers.length:', markers.length);
     
-    if (!mapInstanceRef.current) {
-      console.log('❌ No map instance, skipping markers');
+    // انتظار تحميل API وإنشاء الخريطة
+    if (!apiLoaded || !mapInstanceRef.current) {
+      console.log('❌ Waiting for map to be ready...');
       return;
     }
 
@@ -181,7 +183,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
       console.log(`  Adding marker ${index + 1}:`, marker.label);
       addMarker(marker, marker.label);
     });
-  }, [markers, currentLanguage]);
+  }, [apiLoaded, markers, currentLanguage]);
 
   // إضافة علامة محسّنة مع معلومات الخدمات
   const addMarker = (location: Location, label?: string, draggable = false) => {
