@@ -13,7 +13,8 @@ import {
   User,
   MapPin,
   MessageCircle,
-  Settings
+  Settings,
+  Bell
 } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
@@ -22,6 +23,7 @@ import { auth, db } from "@/integrations/firebase/client";
 import { collection, query, where, getDocs, doc, getDoc, updateDoc, addDoc, onSnapshot } from "firebase/firestore";
 import { Review } from "@/lib/firebase/collections";
 import { MyBookings } from "@/components/booking/MyBookings";
+import { NotificationSettings } from "@/components/settings/NotificationSettings";
 
 interface CustomerDashboardProps {
   currentLanguage: string;
@@ -274,7 +276,7 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
         {/* Main Content */}
         <div className="space-y-4">
           <Tabs defaultValue="appointments" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 mb-6">
+            <TabsList className="grid w-full grid-cols-4 mb-6">
               <TabsTrigger value="appointments">
                 <Calendar className="w-3 h-3 sm:w-4 sm:h-4 mr-2 flex-shrink-0" />
                 <span className="break-words text-xs sm:text-sm">{isRTL ? 'حجوزاتي' : 'My Bookings'}</span>
@@ -286,6 +288,10 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
               <TabsTrigger value="profile">
                 <User className="w-3 h-3 sm:w-4 sm:h-4 mr-2 flex-shrink-0" />
                 <span className="break-words text-xs sm:text-sm">{t.customer.profile}</span>
+              </TabsTrigger>
+              <TabsTrigger value="settings">
+                <Bell className="w-3 h-3 sm:w-4 sm:h-4 mr-2 flex-shrink-0" />
+                <span className="break-words text-xs sm:text-sm">{isRTL ? 'الإعدادات' : 'Settings'}</span>
               </TabsTrigger>
             </TabsList>
 
@@ -413,6 +419,23 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
                       </Button>
                     </div>
                   </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Settings Tab - Notification Preferences */}
+            <TabsContent value="settings" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>{isRTL ? 'إعدادات الإشعارات' : 'Notification Settings'}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {user && (
+                    <NotificationSettings
+                      userId={user.uid}
+                      language={currentLanguage as 'en' | 'ar'}
+                    />
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>

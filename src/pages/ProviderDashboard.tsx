@@ -18,7 +18,8 @@ import {
   Clock,
   Settings,
   Plus,
-  LogOut
+  LogOut,
+  Bell
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { auth, db } from "@/integrations/firebase/client";
@@ -28,6 +29,7 @@ import { useTranslation } from "@/lib/i18n";
 import { toast } from "@/hooks/use-toast";
 import { ShareProfile } from "@/components/provider/ShareProfile";
 import { BookingManagement } from "@/components/booking/BookingManagement";
+import { NotificationSettings } from "@/components/settings/NotificationSettings";
 
 interface ProviderDashboardProps {
   currentLanguage: string;
@@ -326,13 +328,17 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
         {/* Dashboard Tabs - With proper spacing from content */}
         <div className="space-y-4">
           <Tabs defaultValue="services" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6 mb-6">
+            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-7 mb-6">
               <TabsTrigger value="services">{t.provider.services}</TabsTrigger>
               <TabsTrigger value="appointments">{isRTL ? 'المواعيد' : 'Appointments'}</TabsTrigger>
               <TabsTrigger value="bookings">{t.provider.bookings}</TabsTrigger>
               <TabsTrigger value="offers">{t.provider.offers}</TabsTrigger>
               <TabsTrigger value="availability">{t.provider.availability}</TabsTrigger>
               <TabsTrigger value="share">{t.provider.shareProfile}</TabsTrigger>
+              <TabsTrigger value="settings">
+                <Bell className="w-3 h-3 sm:w-4 sm:h-4 mr-2 flex-shrink-0" />
+                <span className="break-words text-xs sm:text-sm">{isRTL ? 'الإعدادات' : 'Settings'}</span>
+              </TabsTrigger>
             </TabsList>
 
             {/* Services Tab */}
@@ -384,6 +390,23 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
                 providerName={providerProfile.full_name}
                 currentLanguage={currentLanguage}
               />
+            </TabsContent>
+
+            {/* Settings Tab - Notification Preferences */}
+            <TabsContent value="settings" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>{isRTL ? 'إعدادات الإشعارات' : 'Notification Settings'}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {providerProfile && (
+                    <NotificationSettings
+                      userId={providerProfile.id}
+                      language={currentLanguage as 'en' | 'ar'}
+                    />
+                  )}
+                </CardContent>
+              </Card>
             </TabsContent>
           </Tabs>
         </div>
