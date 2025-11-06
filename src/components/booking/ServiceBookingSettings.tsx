@@ -44,6 +44,16 @@ export function ServiceBookingSettings({
   });
   const [isSaving, setIsSaving] = useState(false);
 
+  // Update settings when currentSettings changes
+  useEffect(() => {
+    if (currentSettings) {
+      setSettings(prev => ({
+        ...DEFAULT_SETTINGS,
+        ...currentSettings,
+      }));
+    }
+  }, [currentSettings]);
+
   const isRTL = language === 'ar';
 
   // Translation object (simplified - will use full i18n later)
@@ -199,18 +209,11 @@ export function ServiceBookingSettings({
                   max={10}
                   value={settings.max_concurrent_bookings}
                   onChange={(e) => {
-                    const value = parseInt(e.target.value);
-                    if (!isNaN(value) && value >= 1 && value <= 10) {
-                      setSettings({
-                        ...settings,
-                        max_concurrent_bookings: value,
-                      });
-                    } else if (e.target.value === '') {
-                      setSettings({
-                        ...settings,
-                        max_concurrent_bookings: 1,
-                      });
-                    }
+                    const value = e.target.value === '' ? 1 : parseInt(e.target.value);
+                    setSettings({
+                      ...settings,
+                      max_concurrent_bookings: value,
+                    });
                   }}
                   className="max-w-[100px]"
                 />
@@ -229,18 +232,11 @@ export function ServiceBookingSettings({
                   max={365}
                   value={settings.advance_booking_days}
                   onChange={(e) => {
-                    const value = parseInt(e.target.value);
-                    if (!isNaN(value) && value >= 1 && value <= 365) {
-                      setSettings({
-                        ...settings,
-                        advance_booking_days: value,
-                      });
-                    } else if (e.target.value === '') {
-                      setSettings({
-                        ...settings,
-                        advance_booking_days: 30,
-                      });
-                    }
+                    const value = e.target.value === '' ? 30 : parseInt(e.target.value);
+                    setSettings({
+                      ...settings,
+                      advance_booking_days: value,
+                    });
                   }}
                   className="max-w-[100px]"
                 />
@@ -259,18 +255,11 @@ export function ServiceBookingSettings({
                   max={60}
                   value={settings.buffer_time_minutes || 0}
                   onChange={(e) => {
-                    const value = parseInt(e.target.value);
-                    if (!isNaN(value) && value >= 0 && value <= 60) {
-                      setSettings({
-                        ...settings,
-                        buffer_time_minutes: value,
-                      });
-                    } else if (e.target.value === '') {
-                      setSettings({
-                        ...settings,
-                        buffer_time_minutes: 0,
-                      });
-                    }
+                    const value = e.target.value === '' ? 0 : parseInt(e.target.value);
+                    setSettings({
+                      ...settings,
+                      buffer_time_minutes: value,
+                    });
                   }}
                   className="max-w-[100px]"
                 />
@@ -292,18 +281,11 @@ export function ServiceBookingSettings({
                   max={168}
                   value={settings.cancellation_policy_hours}
                   onChange={(e) => {
-                    const value = parseInt(e.target.value);
-                    if (!isNaN(value) && value >= 0 && value <= 168) {
-                      setSettings({
-                        ...settings,
-                        cancellation_policy_hours: value,
-                      });
-                    } else if (e.target.value === '') {
-                      setSettings({
-                        ...settings,
-                        cancellation_policy_hours: 24,
-                      });
-                    }
+                    const value = e.target.value === '' ? 24 : parseInt(e.target.value);
+                    setSettings({
+                      ...settings,
+                      cancellation_policy_hours: value,
+                    });
                   }}
                   className="max-w-[100px]"
                 />
