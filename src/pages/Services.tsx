@@ -517,18 +517,37 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
           /* Map View */
           <div className="space-y-4">
             {(() => {
-              const mapMarkers = filteredServices
-                .map(service => {
-                  const provider = providers[service.provider_id];
-                  if (!provider?.latitude || !provider?.longitude) return null;
-                  
-                  return {
-                    latitude: provider.latitude,
-                    longitude: provider.longitude,
-                    label: `${service.name} - ${provider.full_name}`
-                  };
-                })
-                .filter((marker): marker is NonNullable<typeof marker> => marker !== null);
+              // تجميع الخدمات حسب الموقع (provider)
+              const servicesByLocation = new Map<string, typeof filteredServices>();
+              
+              filteredServices.forEach(service => {
+                const provider = providers[service.provider_id];
+                if (!provider?.latitude || !provider?.longitude) return;
+                
+                const locationKey = `${provider.latitude},${provider.longitude}`;
+                if (!servicesByLocation.has(locationKey)) {
+                  servicesByLocation.set(locationKey, []);
+                }
+                servicesByLocation.get(locationKey)!.push(service);
+              });
+              
+              // إنشاء markers مع معلومات كل الخدمات
+              const mapMarkers = Array.from(servicesByLocation.entries()).map(([locationKey, services]) => {
+                const provider = providers[services[0].provider_id];
+                if (!provider) return null;
+                
+                return {
+                  latitude: provider.latitude!,
+                  longitude: provider.longitude!,
+                  label: `${provider.full_name} - ${services.length} ${isRTL ? 'خدمة' : 'services'}`,
+                  services: services.map(service => ({
+                    id: service.id,
+                    name: service.name,
+                    price: service.approximate_price || service.price_range || (isRTL ? 'السعر عند الطلب' : 'Price on request'),
+                    provider_name: provider.full_name
+                  }))
+                };
+              }).filter((marker): marker is NonNullable<typeof marker> => marker !== null);
               
               const totalServices = filteredServices.length;
               const servicesOnMap = mapMarkers.length;
@@ -582,6 +601,13 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                       zoom={userLocation ? 12 : 11}
                       currentLanguage={currentLanguage}
                       showCurrentLocation={true}
+                      onServiceClick={(serviceId) => {
+                        // فتح صفحة تفاصيل الخدمة
+                        const service = filteredServices.find(s => s.id === serviceId);
+                        if (service) {
+                          window.location.href = `/provider-profile?id=${service.provider_id}`;
+                        }
+                      }}
                     />
                   </div>
                   

@@ -8,12 +8,19 @@ interface Location {
   latitude: number;
   longitude: number;
   label?: string;
+  services?: Array<{
+    id: string;
+    name: string;
+    price: string;
+    provider_name: string;
+  }>;
 }
 
 interface InteractiveMapProps {
   center?: Location;
   markers?: Location[];
   onLocationSelect?: (location: Location) => void;
+  onServiceClick?: (serviceId: string) => void;
   height?: string;
   currentLanguage: string;
   showCurrentLocation?: boolean;
@@ -38,6 +45,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   center,
   markers = [],
   onLocationSelect,
+  onServiceClick,
   height = "400px",
   currentLanguage,
   showCurrentLocation = true,
@@ -153,9 +161,11 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
 
   }, [apiLoaded, center, zoom, markers]);
 
-  // إضافة علامة
+  // إضافة علامة محسّنة مع معلومات الخدمات
   const addMarker = (location: Location, label?: string, draggable = false) => {
     if (!mapInstanceRef.current) return;
+
+    const isRTL = currentLanguage === 'ar';
 
     // استخدام Marker العادي (AdvancedMarker يحتاج Map ID من Google Console)
     const marker = new google.maps.Marker({
@@ -179,11 +189,102 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
       });
     }
 
-    // إضافة info window
-    if (label) {
+    // إضافة info window محسّن مع كل الخدمات
+    if (label || location.services) {
+      let content = '';
+      
+      if (location.services && location.services.length > 0) {
+        // عرض قائمة الخدمات بتصميم جميل
+        const providerName = location.services[0].provider_name;
+        const servicesCount = location.services.length;
+        
+        content = `
+          <div style="
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            min-width: 280px;
+            max-width: 400px;
+            padding: 0;
+            direction: ${isRTL ? 'rtl' : 'ltr'};
+          ">
+            <!-- Header -->
+            <div style="
+              background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+              color: white;
+              padding: 12px 16px;
+              border-radius: 8px 8px 0 0;
+              margin: -12px -16px 12px -16px;
+            ">
+              <div style="font-size: 16px; font-weight: 600; margin-bottom: 4px;">
+                ${providerName}
+              </div>
+              <div style="font-size: 12px; opacity: 0.9;">
+                ${isRTL ? `${servicesCount} خدمة متوفرة` : `${servicesCount} services available`}
+              </div>
+            </div>
+            
+            <!-- Services List -->
+            <div style="max-height: 300px; overflow-y: auto;">
+              ${location.services.map((service, index) => `
+                <div style="
+                  padding: 10px 0;
+                  border-bottom: ${index < location.services!.length - 1 ? '1px solid #e5e7eb' : 'none'};
+                  cursor: pointer;
+                  transition: background 0.2s;
+                " 
+                onmouseover="this.style.background='#f3f4f6'"
+                onmouseout="this.style.background='transparent'"
+                onclick="window.handleServiceClick?.('${service.id}')">
+                  <div style="
+                    font-size: 14px;
+                    font-weight: 500;
+                    color: #111827;
+                    margin-bottom: 4px;
+                  ">
+                    ${service.name}
+                  </div>
+                  <div style="
+                    font-size: 13px;
+                    color: #f59e0b;
+                    font-weight: 600;
+                  ">
+                    ${service.price}
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+            
+            <!-- Footer -->
+            <div style="
+              margin-top: 12px;
+              padding-top: 12px;
+              border-top: 1px solid #e5e7eb;
+              text-align: center;
+            ">
+              <div style="
+                color: #6b7280;
+                font-size: 11px;
+              ">
+                ${isRTL ? '👆 اضغط على أي خدمة لعرض التفاصيل' : '👆 Click any service to view details'}
+              </div>
+            </div>
+          </div>
+        `;
+      } else {
+        // fallback للـ label العادي
+        content = `<div style="padding: 8px; font-weight: 500;">${label}</div>`;
+      }
+      
       const infoWindow = new google.maps.InfoWindow({
-        content: `<div style="padding: 8px; font-weight: 500;">${label}</div>`
+        content: content
       });
+      
+      // تفعيل callback للخدمات
+      if (onServiceClick) {
+        (window as any).handleServiceClick = (serviceId: string) => {
+          onServiceClick(serviceId);
+          infoWindow.close();
+        };
+      }
       
       marker.addListener('click', () => {
         infoWindow.open(mapInstanceRef.current!, marker);
