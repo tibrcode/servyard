@@ -318,8 +318,8 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
     );
   };
 
-  // فلترة الخدمات حسب البحث والفئة والموقع
-  const filteredServices = useMemo(() => {
+  // فلترة أساسية (فئة + بحث فقط)
+  const baseFilteredServices = useMemo(() => {
     let filtered = services;
 
     // فلترة حسب الفئة
@@ -335,8 +335,14 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
       );
     }
 
+    return filtered;
+  }, [services, selectedCategory, searchQuery]);
+
+  // فلترة للقائمة (تشمل فلترة الموقع)
+  const filteredServices = useMemo(() => {
+    let filtered = baseFilteredServices;
+
     // فلترة حسب الموقع الجغرافي (فقط في وضع القائمة)
-    // في وضع الخريطة، نعرض جميع الخدمات التي لها GPS
     if (userLocation && radiusKm > 0 && viewMode === 'list') {
       const servicesWithLocation = filtered
         .map(service => {
@@ -360,14 +366,15 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
     }
 
     return filtered;
-  }, [services, selectedCategory, searchQuery, userLocation, radiusKm, providers, viewMode]);
+  }, [baseFilteredServices, userLocation, radiusKm, providers, viewMode]);
 
-  // حساب mapMarkers مرة واحدة
+  // حساب mapMarkers من الفلترة الأساسية (بدون فلترة الموقع)
   const mapMarkers = useMemo(() => {
-    // تجميع الخدمات حسب الموقع (provider)
+    // استخدام baseFilteredServices بدلاً من filteredServices
+    // لتجنب تأثير فلترة الموقع على الخريطة
     const servicesByLocation = new Map<string, Service[]>();
     
-    filteredServices.forEach(service => {
+    baseFilteredServices.forEach(service => {
       const provider = providers[service.provider_id];
       if (!provider?.latitude || !provider?.longitude) return;
       
@@ -400,7 +407,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
     markers.forEach((m, i) => console.log(`  Marker ${i + 1}:`, m.label, `(${m.latitude}, ${m.longitude})`));
     
     return markers;
-  }, [filteredServices, providers, isRTL]);
+  }, [baseFilteredServices, providers, isRTL]);
 
   if (loading) {
     return (
