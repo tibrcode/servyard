@@ -620,11 +620,17 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
             <div className="w-full h-[600px] rounded-lg overflow-hidden border">
               <InteractiveMap
                 markers={mapMarkers}
-                center={userLocation 
-                  ? { latitude: userLocation.latitude, longitude: userLocation.longitude }
-                  : { latitude: 25.276987, longitude: 55.296249 } // Dubai default
+                center={
+                  userLocation 
+                    ? { latitude: userLocation.latitude, longitude: userLocation.longitude }
+                    : mapMarkers.length > 0
+                      ? { 
+                          latitude: mapMarkers[0].latitude, 
+                          longitude: mapMarkers[0].longitude 
+                        }
+                      : { latitude: 25.276987, longitude: 55.296249 } // Dubai default fallback
                 }
-                zoom={userLocation ? 12 : 11}
+                zoom={userLocation ? 12 : mapMarkers.length > 0 ? 12 : 11}
                 currentLanguage={currentLanguage}
                 showCurrentLocation={true}
                 onServiceClick={(serviceId) => {
