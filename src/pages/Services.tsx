@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Footer } from "@/components/layout/Footer";
 import { ProviderLogo } from "@/components/provider/ProviderLogo";
@@ -83,6 +83,13 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
   
   // View toggle: 'list' or 'map'
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
+  
+  // Selected service from map
+  const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
+  const selectedServiceRef = useRef<HTMLDivElement>(null);
+  
+  // Booking modal state
+  const [bookingService, setBookingService] = useState<Service | null>(null);
 
   const { t, isRTL } = useTranslation(currentLanguage);
   const { toast } = useToast();
@@ -602,14 +609,151 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                       currentLanguage={currentLanguage}
                       showCurrentLocation={true}
                       onServiceClick={(serviceId) => {
-                        // فتح صفحة تفاصيل الخدمة
-                        const service = filteredServices.find(s => s.id === serviceId);
-                        if (service) {
-                          window.location.href = `/provider-profile?id=${service.provider_id}`;
-                        }
+                        // عرض الخدمة تحت الخريطة
+                        setSelectedServiceId(serviceId);
+                        // Smooth scroll للخدمة المختارة
+                        setTimeout(() => {
+                          selectedServiceRef.current?.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'nearest'
+                          });
+                        }, 100);
                       }}
                     />
                   </div>
+                  
+                  {/* Selected Service Display */}
+                  {selectedServiceId && (() => {
+                    const service = filteredServices.find(s => s.id === selectedServiceId);
+                    const provider = service ? providers[service.provider_id] : null;
+                    
+                    if (!service || !provider) return null;
+                    
+                    return (
+                      <div 
+                        ref={selectedServiceRef}
+                        className="mt-6 animate-in fade-in slide-in-from-bottom-4 duration-500"
+                      >
+                        <Card className="border-2 border-primary/50 shadow-lg">
+                          <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5">
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <Badge variant="secondary" className="text-xs">
+                                    {isRTL ? '✨ مختار من الخريطة' : '✨ Selected from map'}
+                                  </Badge>
+                                </div>
+                                <CardTitle className="text-2xl">
+                                  {service.name}
+                                </CardTitle>
+                                <p className="text-sm text-muted-foreground mt-2">
+                                  {service.description || (isRTL ? 'لا يوجد وصف' : 'No description')}
+                                </p>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setSelectedServiceId(null)}
+                                className="shrink-0"
+                              >
+                                ✕
+                              </Button>
+                            </div>
+                          </CardHeader>
+                          <CardContent className="pt-6">
+                            <div className="grid md:grid-cols-2 gap-6">
+                              {/* معلومات الخدمة */}
+                              <div className="space-y-4">
+                                <h3 className="font-semibold text-lg border-b pb-2">
+                                  {isRTL ? '📋 تفاصيل الخدمة' : '📋 Service Details'}
+                                </h3>
+                                
+                                {/* السعر */}
+                                <div className="flex items-center gap-2">
+                                  <span className="text-muted-foreground">{isRTL ? 'السعر:' : 'Price:'}</span>
+                                  <span className="text-xl font-bold text-primary">
+                                    {service.approximate_price || service.price_range || (isRTL ? 'السعر عند الطلب' : 'Price on request')}
+                                  </span>
+                                </div>
+                                
+                                {/* المدة */}
+                                {service.duration_minutes && (
+                                  <div className="flex items-center gap-2 text-sm">
+                                    <Clock className="w-4 h-4 text-muted-foreground" />
+                                    <span>{service.duration_minutes} {isRTL ? 'دقيقة' : 'minutes'}</span>
+                                  </div>
+                                )}
+                                
+                                {/* الفئة */}
+                                <div className="flex items-center gap-2">
+                                  <Badge variant="outline">
+                                    {categories.find(c => c.id === service.category_id)?.[isRTL ? 'name_ar' : 'name_en']}
+                                  </Badge>
+                                </div>
+                              </div>
+                              
+                              {/* معلومات المزود */}
+                              <div className="space-y-4">
+                                <h3 className="font-semibold text-lg border-b pb-2">
+                                  {isRTL ? '👤 معلومات المزود' : '👤 Provider Info'}
+                                </h3>
+                                
+                                <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg">
+                                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-lg">
+                                    {provider.full_name.charAt(0).toUpperCase()}
+                                  </div>
+                                  <div>
+                                    <div className="font-semibold">{provider.full_name}</div>
+                                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                      <MapPin className="w-3 h-3" />
+                                      <span>{provider.city || (isRTL ? 'مزود خدمة' : 'Service Provider')}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                                
+                                {/* الموقع */}
+                                {provider.location_address && (
+                                  <div className="flex items-start gap-2 text-sm">
+                                    <MapPin className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+                                    <span className="text-muted-foreground">{provider.location_address}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                            
+                            {/* الأزرار */}
+                            <div className="flex flex-wrap gap-3 mt-6 pt-6 border-t">
+                              {service.booking_enabled && (
+                                <Button
+                                  size="lg"
+                                  onClick={() => {
+                                    setBookingService(service);
+                                    setSelectedServiceId(null);
+                                  }}
+                                  className="flex-1 min-w-[200px]"
+                                >
+                                  <Calendar className="w-4 h-4 mr-2" />
+                                  {isRTL ? 'حجز موعد' : 'Book Appointment'}
+                                </Button>
+                              )}
+                              
+                              <Button
+                                variant="outline"
+                                size="lg"
+                                onClick={() => {
+                                  window.location.href = `/provider-profile?id=${service.provider_id}`;
+                                }}
+                                className="flex-1 min-w-[200px]"
+                              >
+                                <ExternalLink className="w-4 h-4 mr-2" />
+                                {isRTL ? 'عرض كل خدمات المزود' : 'View All Provider Services'}
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    );
+                  })()}
                   
                   {/* Help Message */}
                   {servicesWithoutLocation > 0 && (
@@ -794,6 +938,17 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
             setSelectedService(null);
             setSelectedProvider(null);
           }}
+          currentLanguage={currentLanguage}
+        />
+      )}
+
+      {/* Booking Modal */}
+      {bookingService && (
+        <BookingModal
+          isOpen={!!bookingService}
+          onClose={() => setBookingService(null)}
+          service={bookingService}
+          provider={providers[bookingService.provider_id]}
           currentLanguage={currentLanguage}
         />
       )}
