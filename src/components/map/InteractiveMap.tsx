@@ -115,12 +115,13 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
     };
   }, []);
 
-  // إنشاء الخريطة
+  // إنشاء الخريطة (مرة واحدة فقط)
   useEffect(() => {
-    if (!apiLoaded || !mapRef.current) return;
+    if (!apiLoaded || !mapRef.current || mapInstanceRef.current) return;
 
     const defaultCenter = center || { latitude: 31.9454, longitude: 35.9284 }; // عمّان، الأردن
 
+    console.log('🗺️ Creating new Google Map instance...');
     const map = new google.maps.Map(mapRef.current, {
       center: { lat: defaultCenter.latitude, lng: defaultCenter.longitude },
       zoom: zoom,
@@ -131,6 +132,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
     });
 
     mapInstanceRef.current = map;
+    console.log('✅ Map instance created');
 
     // إضافة event listener للنقر
     if (onLocationSelect) {
@@ -148,18 +150,33 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
         }
       });
     }
+  }, [apiLoaded]);
 
+  // تحديث المركز والزوم عند تغييرهم
+  useEffect(() => {
+    if (!mapInstanceRef.current || !center) return;
+    
+    mapInstanceRef.current.setCenter({ lat: center.latitude, lng: center.longitude });
+    mapInstanceRef.current.setZoom(zoom);
+  }, [center, zoom]);
+
+  // تحديث العلامات عند تغييرها
+  useEffect(() => {
+    if (!mapInstanceRef.current) return;
+
+    console.log('🗺️ Updating markers:', markers.length);
+    
     // حذف العلامات القديمة
     clearMarkers();
     
     // إضافة العلامات الجديدة
-    console.log('🗺️ Adding markers to map:', markers.length);
     markers.forEach((marker, index) => {
       console.log(`  Marker ${index + 1}:`, marker.label, `(${marker.latitude}, ${marker.longitude})`);
       addMarker(marker, marker.label);
     });
 
-  }, [apiLoaded, center, zoom, markers]);
+    console.log('✅ Markers updated on map');
+  }, [markers, currentLanguage]);
 
   // إضافة علامة محسّنة مع معلومات الخدمات
   const addMarker = (location: Location, label?: string, draggable = false) => {
