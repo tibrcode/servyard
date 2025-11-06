@@ -120,10 +120,25 @@ export const BookingModal = ({ service, provider, isOpen, onClose, currentLangua
         updated_at: new Date()
       };
 
-      await addDoc(collection(db, 'bookings'), booking);
+      const bookingDoc = await addDoc(collection(db, 'bookings'), booking);
 
       // تتبع الحجز في Analytics
       trackBookingCreated(service.id, service.provider_id, bookingData.booking_date);
+
+      // Send notification to provider
+      try {
+        await fetch('https://notifynewbooking-btfczcxdyq-uc.a.run.app', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            bookingId: bookingDoc.id,
+            booking: booking
+          })
+        });
+      } catch (notifError) {
+        console.error('Error sending booking notification:', notifError);
+        // Don't fail the booking if notification fails
+      }
 
       toast({
         title: t.toast.bookingConfirmed,

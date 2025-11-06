@@ -157,6 +157,11 @@ export async function updateBookingStatus(
 ): Promise<void> {
   const docRef = doc(db, 'bookings', bookingId);
   
+  // Get old booking data before update
+  const bookingSnap = await getDoc(docRef);
+  const oldBooking = bookingSnap.data();
+  const oldStatus = oldBooking?.status;
+  
   const updateData: any = {
     status,
     updated_at: Timestamp.now()
@@ -167,6 +172,26 @@ export async function updateBookingStatus(
   }
 
   await updateDoc(docRef, updateData);
+
+  // Send notification about status change
+  if (oldStatus !== status) {
+    try {
+      const updatedBooking = { ...oldBooking, ...updateData };
+      await fetch('https://notifybookingstatuschange-btfczcxdyq-uc.a.run.app', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          bookingId: bookingId,
+          booking: updatedBooking,
+          oldStatus: oldStatus,
+          newStatus: status
+        })
+      });
+    } catch (notifError) {
+      console.error('Error sending status change notification:', notifError);
+      // Don't fail the update if notification fails
+    }
+  }
 }
 
 /**
