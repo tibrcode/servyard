@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Footer } from "@/components/layout/Footer";
 import { ProviderLogo } from "@/components/provider/ProviderLogo";
@@ -110,6 +110,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
     }
   }, []);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -215,10 +216,12 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
 
       } catch (error) {
         console.error('Error loading services:', error);
+        const errorTitle = isRTL ? 'خطأ' : 'Error';
+        const errorDesc = isRTL ? 'فشل تحميل الخدمات' : 'Failed to load services';
         toast({
           variant: "destructive",
-          title: t.toast.error,
-          description: t.ui.errorLoadingServices
+          title: errorTitle,
+          description: errorDesc
         });
       } finally {
         setLoading(false);
@@ -226,7 +229,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
     };
 
     loadData();
-  }, [selectedCategory, toast]);
+  }, [selectedCategory, toast, isRTL]);
 
   const handleSearch = () => {
     toast({
@@ -316,7 +319,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
   };
 
   // فلترة الخدمات حسب البحث والفئة والموقع
-  const filteredServices = (() => {
+  const filteredServices = useMemo(() => {
     let filtered = services;
 
     // فلترة حسب الفئة
@@ -356,7 +359,47 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
     }
 
     return filtered;
-  })();
+  }, [services, selectedCategory, searchQuery, userLocation, radiusKm, providers]);
+
+  // حساب mapMarkers مرة واحدة
+  const mapMarkers = useMemo(() => {
+    // تجميع الخدمات حسب الموقع (provider)
+    const servicesByLocation = new Map<string, Service[]>();
+    
+    filteredServices.forEach(service => {
+      const provider = providers[service.provider_id];
+      if (!provider?.latitude || !provider?.longitude) return;
+      
+      const locationKey = `${provider.latitude},${provider.longitude}`;
+      if (!servicesByLocation.has(locationKey)) {
+        servicesByLocation.set(locationKey, []);
+      }
+      servicesByLocation.get(locationKey)!.push(service);
+    });
+    
+    // إنشاء markers مع معلومات كل الخدمات
+    const markers = Array.from(servicesByLocation.entries()).map(([locationKey, services]) => {
+      const provider = providers[services[0].provider_id];
+      if (!provider) return null;
+      
+      return {
+        latitude: provider.latitude!,
+        longitude: provider.longitude!,
+        label: `${provider.full_name} - ${services.length} ${isRTL ? 'خدمة' : 'services'}`,
+        services: services.map(service => ({
+          id: service.id,
+          name: service.name,
+          price: service.approximate_price || service.price_range || (isRTL ? 'السعر عند الطلب' : 'Price on request'),
+          provider_name: provider.full_name
+        }))
+      };
+    }).filter((marker): marker is NonNullable<typeof marker> => marker !== null);
+    
+    console.log('🗺️ useMemo: Calculated mapMarkers:', markers.length);
+    markers.forEach((m, i) => console.log(`  Marker ${i + 1}:`, m.label, `(${m.latitude}, ${m.longitude})`));
+    
+    return markers;
+  }, [filteredServices, providers, isRTL]);
 
   if (loading) {
     return (
@@ -523,107 +566,54 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
         ) : viewMode === 'map' ? (
           /* Map View */
           <div className="space-y-4">
-            {(() => {
-              // تجميع الخدمات حسب الموقع (provider)
-              const servicesByLocation = new Map<string, typeof filteredServices>();
-              
-              filteredServices.forEach(service => {
-                const provider = providers[service.provider_id];
-                if (!provider?.latitude || !provider?.longitude) return;
-                
-                const locationKey = `${provider.latitude},${provider.longitude}`;
-                if (!servicesByLocation.has(locationKey)) {
-                  servicesByLocation.set(locationKey, []);
+            {/* Map Statistics */}
+            <div className="flex flex-wrap gap-2 items-center justify-between p-4 bg-muted/50 rounded-lg">
+              <div className="flex items-center gap-2">
+                <MapPin className="w-5 h-5 text-primary" />
+                <span className="font-semibold">
+                  {isRTL 
+                    ? `${mapMarkers.length} من ${filteredServices.length} خدمة على الخريطة`
+                    : `${mapMarkers.length} of ${filteredServices.length} services on map`
+                  }
+                </span>
+              </div>
+              {(filteredServices.length - mapMarkers.length) > 0 && (
+                <Badge variant="secondary">
+                  {isRTL 
+                    ? `${filteredServices.length - mapMarkers.length} بدون موقع`
+                    : `${filteredServices.length - mapMarkers.length} without location`
+                  }
+                </Badge>
+              )}
+            </div>
+            
+            {/* Map */}
+            <div className="w-full h-[600px] rounded-lg overflow-hidden border">
+              <InteractiveMap
+                markers={mapMarkers}
+                center={userLocation 
+                  ? { latitude: userLocation.latitude, longitude: userLocation.longitude }
+                  : { latitude: 25.276987, longitude: 55.296249 } // Dubai default
                 }
-                servicesByLocation.get(locationKey)!.push(service);
-              });
-              
-              // إنشاء markers مع معلومات كل الخدمات
-              const mapMarkers = Array.from(servicesByLocation.entries()).map(([locationKey, services]) => {
-                const provider = providers[services[0].provider_id];
-                if (!provider) return null;
-                
-                return {
-                  latitude: provider.latitude!,
-                  longitude: provider.longitude!,
-                  label: `${provider.full_name} - ${services.length} ${isRTL ? 'خدمة' : 'services'}`,
-                  services: services.map(service => ({
-                    id: service.id,
-                    name: service.name,
-                    price: service.approximate_price || service.price_range || (isRTL ? 'السعر عند الطلب' : 'Price on request'),
-                    provider_name: provider.full_name
-                  }))
-                };
-              }).filter((marker): marker is NonNullable<typeof marker> => marker !== null);
-              
-              const totalServices = filteredServices.length;
-              const servicesOnMap = mapMarkers.length;
-              const servicesWithoutLocation = totalServices - servicesOnMap;
-              
-              // Debug logging
-              console.log('🗺️ Map Debug Info:');
-              console.log('Total filtered services:', totalServices);
-              console.log('Services on map:', servicesOnMap);
-              console.log('Map markers:', mapMarkers);
-              console.log('All providers:', Object.keys(providers).length);
-              console.log('Providers with GPS:', Object.values(providers).filter(p => p?.latitude && p?.longitude).length);
-              console.log('First 3 providers:', Object.values(providers).slice(0, 3).map(p => ({
-                id: p?.id,
-                name: p?.full_name,
-                lat: p?.latitude,
-                lng: p?.longitude
-              })));
-              
-              return (
-                <>
-                  {/* Map Statistics */}
-                  <div className="flex flex-wrap gap-2 items-center justify-between p-4 bg-muted/50 rounded-lg">
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-5 h-5 text-primary" />
-                      <span className="font-semibold">
-                        {isRTL 
-                          ? `${servicesOnMap} من ${totalServices} خدمة على الخريطة`
-                          : `${servicesOnMap} of ${totalServices} services on map`
-                        }
-                      </span>
-                    </div>
-                    {servicesWithoutLocation > 0 && (
-                      <Badge variant="secondary">
-                        {isRTL 
-                          ? `${servicesWithoutLocation} بدون موقع`
-                          : `${servicesWithoutLocation} without location`
-                        }
-                      </Badge>
-                    )}
-                  </div>
-                  
-                  {/* Map */}
-                  <div className="w-full h-[600px] rounded-lg overflow-hidden border">
-                    <InteractiveMap
-                      markers={mapMarkers}
-                      center={userLocation 
-                        ? { latitude: userLocation.latitude, longitude: userLocation.longitude }
-                        : { latitude: 25.276987, longitude: 55.296249 } // Dubai default
-                      }
-                      zoom={userLocation ? 12 : 11}
-                      currentLanguage={currentLanguage}
-                      showCurrentLocation={true}
-                      onServiceClick={(serviceId) => {
-                        // عرض الخدمة تحت الخريطة
-                        setSelectedServiceId(serviceId);
-                        // Smooth scroll للخدمة المختارة
-                        setTimeout(() => {
-                          selectedServiceRef.current?.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'nearest'
-                          });
-                        }, 100);
-                      }}
-                    />
-                  </div>
-                  
-                  {/* Selected Service Display */}
-                  {selectedServiceId && (() => {
+                zoom={userLocation ? 12 : 11}
+                currentLanguage={currentLanguage}
+                showCurrentLocation={true}
+                onServiceClick={(serviceId) => {
+                  // عرض الخدمة تحت الخريطة
+                  setSelectedServiceId(serviceId);
+                  // Smooth scroll للخدمة المختارة
+                  setTimeout(() => {
+                    selectedServiceRef.current?.scrollIntoView({
+                      behavior: 'smooth',
+                      block: 'nearest'
+                    });
+                  }, 100);
+                }}
+              />
+            </div>
+            
+            {/* Selected Service Display */}
+            {selectedServiceId && (() => {
                     const service = filteredServices.find(s => s.id === selectedServiceId);
                     const provider = service ? providers[service.provider_id] : null;
                     
@@ -754,21 +744,18 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                       </div>
                     );
                   })()}
-                  
-                  {/* Help Message */}
-                  {servicesWithoutLocation > 0 && (
-                    <div className="p-4 bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-                      <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                        {isRTL 
-                          ? '💡 بعض مقدمي الخدمات لم يضيفوا موقعهم بعد. يمكنهم إضافة الموقع من صفحة تحرير الملف الشخصي.'
-                          : '💡 Some service providers have not added their location yet. They can add it from their Edit Profile page.'
-                        }
-                      </p>
-                    </div>
-                  )}
-                </>
-              );
-            })()}
+            
+            {/* Help Message */}
+            {(filteredServices.length - mapMarkers.length) > 0 && (
+              <div className="p-4 bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                  {isRTL 
+                    ? '💡 بعض مقدمي الخدمات لم يضيفوا موقعهم بعد. يمكنهم إضافة الموقع من صفحة تحرير الملف الشخصي.'
+                    : '💡 Some service providers have not added their location yet. They can add it from their Edit Profile page.'
+                  }
+                </p>
+              </div>
+            )}
           </div>
         ) : (
           /* List View */
