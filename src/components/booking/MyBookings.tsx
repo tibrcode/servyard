@@ -9,14 +9,15 @@ import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Booking, BookingStatus } from '@/types/booking';
+import { Booking, BookingStatus, BookingSettings } from '@/types/booking';
 import { getCustomerBookings, cancelBooking, subscribeToCustomerBookings } from '@/lib/firebase/bookingFunctions';
 import { formatTimeDisplay, canCancelBooking } from '@/lib/bookingUtils';
 import { Calendar, Clock, MapPin, Phone, X, AlertCircle, CheckCircle2, Star, Edit, MessageSquare } from 'lucide-react';
 import { db } from '@/integrations/firebase/client';
-import { collection, addDoc, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
+import { collection, addDoc, query, where, getDocs, doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { format } from 'date-fns';
 import { ar, enUS } from 'date-fns/locale';
+import { ServiceBooking } from '@/components/booking/ServiceBooking';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -67,10 +68,7 @@ export function MyBookings({
   // Edit booking state
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedBookingForEdit, setSelectedBookingForEdit] = useState<Booking | null>(null);
-  const [editDate, setEditDate] = useState('');
-  const [editTime, setEditTime] = useState('');
-  const [editNotes, setEditNotes] = useState('');
-  const [isUpdatingBooking, setIsUpdatingBooking] = useState(false);
+  const [serviceDetails, setServiceDetails] = useState<any>(null);
   
   // Provider contact info
   const [providerContacts, setProviderContacts] = useState<Record<string, {phone?: string[], whatsapp?: string}>>({});
@@ -111,13 +109,7 @@ export function MyBookings({
     contactProvider: isRTL ? 'اتصل بمقدم الخدمة' : 'Contact Provider',
     edit: isRTL ? 'تعديل الحجز' : 'Edit Booking',
     editTitle: isRTL ? 'تعديل الحجز' : 'Edit Booking',
-    editDesc: isRTL ? 'يمكنك تعديل موعد الحجز أو إضافة ملاحظات' : 'You can modify the booking date/time or add notes',
-    newDate: isRTL ? 'التاريخ الجديد' : 'New Date',
-    newTime: isRTL ? 'الوقت الجديد' : 'New Time',
-    additionalNotes: isRTL ? 'ملاحظات إضافية' : 'Additional Notes',
-    notesPlaceholder: isRTL ? 'أضف أي ملاحظات أو متطلبات خاصة...' : 'Add any notes or special requirements...',
-    saveChanges: isRTL ? 'حفظ التعديلات' : 'Save Changes',
-    saving: isRTL ? 'جاري الحفظ...' : 'Saving...',
+    editDesc: isRTL ? 'اختر موعداً جديداً للحجز' : 'Choose a new appointment time',
     editSuccess: isRTL ? 'تم تحديث الحجز' : 'Booking Updated',
     editSuccessDesc: isRTL ? 'تم تحديث تفاصيل حجزك بنجاح' : 'Your booking has been updated successfully',
     editError: isRTL ? 'فشل تحديث الحجز' : 'Failed to update booking',
@@ -273,59 +265,64 @@ export function MyBookings({
     }
   };
 
-  // Handle open edit dialog
-  const handleOpenEditDialog = (booking: Booking) => {
+  // Handle open edit dialog - Load service details
+  const handleOpenEditDialog = async (booking: Booking) => {
     setSelectedBookingForEdit(booking);
-    setEditDate(booking.booking_date);
-    setEditTime(booking.start_time);
-    setEditNotes(booking.notes || '');
-    setEditDialogOpen(true);
+    
+    // Load service details including booking settings
+    try {
+      const serviceDoc = await getDoc(doc(db, 'services', booking.service_id));
+      if (serviceDoc.exists()) {
+        const serviceData = serviceDoc.data();
+        
+        // Build booking settings from service data
+        const bookingSettings: BookingSettings = {
+          booking_enabled: true,
+          duration_minutes: serviceData.duration_minutes || 60,
+          advance_booking_days: serviceData.advance_booking_days || 30,
+          cancellation_policy_hours: serviceData.cancellation_policy_hours || 24,
+          max_concurrent_bookings: serviceData.max_concurrent_bookings || 1,
+          require_confirmation: serviceData.require_confirmation || false,
+          allow_customer_cancellation: serviceData.allow_customer_cancellation || true,
+          buffer_time_minutes: serviceData.buffer_time_minutes || 0,
+        };
+        
+        setServiceDetails({
+          ...serviceData,
+          id: booking.service_id,
+          bookingSettings,
+        });
+        
+        setEditDialogOpen(true);
+      }
+    } catch (error) {
+      console.error('Error loading service details:', error);
+      toast({
+        title: t.editError,
+        description: isRTL ? 'فشل تحميل تفاصيل الخدمة' : 'Failed to load service details',
+        variant: 'destructive',
+      });
+    }
   };
 
-  // Handle update booking
-  const handleUpdateBooking = async () => {
-    if (!selectedBookingForEdit || !editDate || !editTime) {
-      toast({
-        title: t.editError,
-        description: isRTL ? 'الرجاء إدخال التاريخ والوقت' : 'Please enter date and time',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    setIsUpdatingBooking(true);
-
-    try {
-      const bookingRef = doc(db, 'bookings', selectedBookingForEdit.booking_id);
-      
-      // Update the booking with new data
-      const { updateDoc } = await import('firebase/firestore');
-      await updateDoc(bookingRef, {
-        booking_date: editDate,
-        start_time: editTime,
-        notes: editNotes.trim(),
-        updated_at: new Date(),
-      });
-
-      toast({
-        title: t.editSuccess,
-        description: t.editSuccessDesc,
-      });
-
-      setEditDialogOpen(false);
-      setSelectedBookingForEdit(null);
-      setEditDate('');
-      setEditTime('');
-      setEditNotes('');
-    } catch (error) {
-      console.error('Error updating booking:', error);
-      toast({
-        title: t.editError,
-        description: String(error),
-        variant: 'destructive',
-      });
-    } finally {
-      setIsUpdatingBooking(false);
+  // Handle booking complete (from ServiceBooking component)
+  const handleEditBookingComplete = async (newBookingId: string) => {
+    // Delete the old booking
+    if (selectedBookingForEdit) {
+      try {
+        await deleteDoc(doc(db, 'bookings', selectedBookingForEdit.booking_id));
+        
+        toast({
+          title: t.editSuccess,
+          description: t.editSuccessDesc,
+        });
+        
+        setEditDialogOpen(false);
+        setSelectedBookingForEdit(null);
+        setServiceDetails(null);
+      } catch (error) {
+        console.error('Error deleting old booking:', error);
+      }
     }
   };
 
@@ -692,66 +689,29 @@ export function MyBookings({
 
       {/* Edit Booking Dialog */}
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-        <DialogContent dir={isRTL ? 'rtl' : 'ltr'}>
+        <DialogContent dir={isRTL ? 'rtl' : 'ltr'} className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{t.editTitle}</DialogTitle>
             <DialogDescription>{t.editDesc}</DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4 py-4">
-            {/* Date Input */}
-            <div className="space-y-2">
-              <Label htmlFor="edit-date">{t.newDate}</Label>
-              <input
-                id="edit-date"
-                type="date"
-                value={editDate}
-                onChange={(e) => setEditDate(e.target.value)}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          <div className="py-4">
+            {selectedBookingForEdit && serviceDetails && (
+              <ServiceBooking
+                serviceId={selectedBookingForEdit.service_id}
+                providerId={selectedBookingForEdit.provider_id}
+                customerId={customerId}
+                customerName={selectedBookingForEdit.customer_name}
+                customerPhone={selectedBookingForEdit.customer_phone}
+                serviceTitle={selectedBookingForEdit.service_title}
+                price={selectedBookingForEdit.price}
+                currency={selectedBookingForEdit.currency}
+                bookingSettings={serviceDetails.bookingSettings}
+                language={language}
+                onBookingComplete={handleEditBookingComplete}
               />
-            </div>
-
-            {/* Time Input */}
-            <div className="space-y-2">
-              <Label htmlFor="edit-time">{t.newTime}</Label>
-              <input
-                id="edit-time"
-                type="time"
-                value={editTime}
-                onChange={(e) => setEditTime(e.target.value)}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-              />
-            </div>
-
-            {/* Notes Input */}
-            <div className="space-y-2">
-              <Label htmlFor="edit-notes">{t.additionalNotes}</Label>
-              <Textarea
-                id="edit-notes"
-                placeholder={t.notesPlaceholder}
-                value={editNotes}
-                onChange={(e) => setEditNotes(e.target.value)}
-                rows={4}
-                className="resize-none"
-              />
-            </div>
+            )}
           </div>
-
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setEditDialogOpen(false)}
-              disabled={isUpdatingBooking}
-            >
-              {isRTL ? 'إلغاء' : 'Cancel'}
-            </Button>
-            <Button
-              onClick={handleUpdateBooking}
-              disabled={isUpdatingBooking}
-            >
-              {isUpdatingBooking ? t.saving : t.saveChanges}
-            </Button>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
     </Card>
