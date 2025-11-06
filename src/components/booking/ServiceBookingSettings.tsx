@@ -194,16 +194,19 @@ export function ServiceBookingSettings({
               <p className="text-sm text-muted-foreground">{t.concurrentDesc}</p>
               <div className="flex items-center gap-2">
                 <Input
-                  type="number"
-                  min="1"
-                  max="10"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   value={settings.max_concurrent_bookings}
-                  onChange={(e) =>
-                    setSettings({
-                      ...settings,
-                      max_concurrent_bookings: parseInt(e.target.value) || 1,
-                    })
-                  }
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value.replace(/\D/g, '')) || 1;
+                    if (value >= 1 && value <= 10) {
+                      setSettings({
+                        ...settings,
+                        max_concurrent_bookings: value,
+                      });
+                    }
+                  }}
                   className="max-w-[100px]"
                 />
                 <span className="text-sm text-muted-foreground">{t.clients}</span>
@@ -216,16 +219,19 @@ export function ServiceBookingSettings({
               <p className="text-sm text-muted-foreground">{t.advanceDesc}</p>
               <div className="flex items-center gap-2">
                 <Input
-                  type="number"
-                  min="1"
-                  max="365"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   value={settings.advance_booking_days}
-                  onChange={(e) =>
-                    setSettings({
-                      ...settings,
-                      advance_booking_days: parseInt(e.target.value) || 30,
-                    })
-                  }
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value.replace(/\D/g, '')) || 30;
+                    if (value >= 1 && value <= 365) {
+                      setSettings({
+                        ...settings,
+                        advance_booking_days: value,
+                      });
+                    }
+                  }}
                   className="max-w-[100px]"
                 />
                 <span className="text-sm text-muted-foreground">{t.days}</span>
@@ -238,16 +244,19 @@ export function ServiceBookingSettings({
               <p className="text-sm text-muted-foreground">{t.bufferDesc}</p>
               <div className="flex items-center gap-2">
                 <Input
-                  type="number"
-                  min="0"
-                  max="60"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   value={settings.buffer_time_minutes || 0}
-                  onChange={(e) =>
-                    setSettings({
-                      ...settings,
-                      buffer_time_minutes: parseInt(e.target.value) || 0,
-                    })
-                  }
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value.replace(/\D/g, '')) || 0;
+                    if (value >= 0 && value <= 60) {
+                      setSettings({
+                        ...settings,
+                        buffer_time_minutes: value,
+                      });
+                    }
+                  }}
                   className="max-w-[100px]"
                 />
                 <span className="text-sm text-muted-foreground">{t.minutes}</span>
@@ -263,16 +272,19 @@ export function ServiceBookingSettings({
               <p className="text-sm text-muted-foreground">{t.cancellationDesc}</p>
               <div className="flex items-center gap-2">
                 <Input
-                  type="number"
-                  min="0"
-                  max="168"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   value={settings.cancellation_policy_hours}
-                  onChange={(e) =>
-                    setSettings({
-                      ...settings,
-                      cancellation_policy_hours: parseInt(e.target.value) || 24,
-                    })
-                  }
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value.replace(/\D/g, '')) || 24;
+                    if (value >= 0 && value <= 168) {
+                      setSettings({
+                        ...settings,
+                        cancellation_policy_hours: value,
+                      });
+                    }
+                  }}
                   className="max-w-[100px]"
                 />
                 <span className="text-sm text-muted-foreground">{t.hours}</span>

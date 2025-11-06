@@ -377,22 +377,40 @@ export function ServiceScheduleSetup({
                     <div className="space-y-2">
                       <Label className="text-sm text-muted-foreground">{t.startTime}</Label>
                       <Input
-                        type="time"
+                        type="text"
+                        placeholder="09:00"
                         value={currentSchedule.start_time}
-                        onChange={(e) =>
-                          updateDaySchedule(selectedDay, { start_time: e.target.value })
-                        }
+                        onChange={(e) => {
+                          // Format as HH:mm
+                          let value = e.target.value.replace(/[^\d:]/g, '');
+                          if (value.length === 2 && !value.includes(':')) {
+                            value = value + ':';
+                          }
+                          if (value.length <= 5) {
+                            updateDaySchedule(selectedDay, { start_time: value });
+                          }
+                        }}
+                        maxLength={5}
                       />
                     </div>
                     <div className="space-y-2">
                       <Label className="text-sm text-muted-foreground">{t.endTime}</Label>
                       <Input
-                        type="time"
+                        type="text"
+                        placeholder="21:00"
                         value={currentSchedule.end_time}
                         onChange={(e) => {
-                          console.log('⏰ End time changed:', e.target.value);
-                          updateDaySchedule(selectedDay, { end_time: e.target.value });
+                          // Format as HH:mm
+                          let value = e.target.value.replace(/[^\d:]/g, '');
+                          if (value.length === 2 && !value.includes(':')) {
+                            value = value + ':';
+                          }
+                          if (value.length <= 5) {
+                            console.log('⏰ End time changed:', value);
+                            updateDaySchedule(selectedDay, { end_time: value });
+                          }
                         }}
+                        maxLength={5}
                       />
                     </div>
                   </div>
@@ -423,20 +441,36 @@ export function ServiceScheduleSetup({
                       {currentSchedule.break_times.map((breakTime, index) => (
                         <div key={index} className="flex items-center gap-2">
                           <Input
-                            type="time"
+                            type="text"
+                            placeholder="13:00"
                             value={breakTime.start}
-                            onChange={(e) =>
-                              updateBreakTime(selectedDay, index, 'start', e.target.value)
-                            }
+                            onChange={(e) => {
+                              let value = e.target.value.replace(/[^\d:]/g, '');
+                              if (value.length === 2 && !value.includes(':')) {
+                                value = value + ':';
+                              }
+                              if (value.length <= 5) {
+                                updateBreakTime(selectedDay, index, 'start', value);
+                              }
+                            }}
+                            maxLength={5}
                             className="flex-1"
                           />
                           <span className="text-muted-foreground">-</span>
                           <Input
-                            type="time"
+                            type="text"
+                            placeholder="14:00"
                             value={breakTime.end}
-                            onChange={(e) =>
-                              updateBreakTime(selectedDay, index, 'end', e.target.value)
-                            }
+                            onChange={(e) => {
+                              let value = e.target.value.replace(/[^\d:]/g, '');
+                              if (value.length === 2 && !value.includes(':')) {
+                                value = value + ':';
+                              }
+                              if (value.length <= 5) {
+                                updateBreakTime(selectedDay, index, 'end', value);
+                              }
+                            }}
+                            maxLength={5}
                             className="flex-1"
                           />
                           <Button
