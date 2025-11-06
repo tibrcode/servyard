@@ -163,14 +163,8 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
 
   // تحديث العلامات على الخريطة
   useEffect(() => {
-    console.log('🗺️ Markers useEffect triggered');
-    console.log('  apiLoaded:', apiLoaded);
-    console.log('  mapInstanceRef.current:', !!mapInstanceRef.current);
-    console.log('  markers.length:', markers.length);
-    
     // انتظار تحميل API وإنشاء الخريطة
     if (!apiLoaded || !mapInstanceRef.current) {
-      console.log('❌ Waiting for map to be ready...');
       return;
     }
 
@@ -178,27 +172,18 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
     clearMarkers();
     
     // إضافة العلامات الجديدة
-    console.log('✅ Adding', markers.length, 'markers to map');
-    markers.forEach((marker, index) => {
-      console.log(`  Adding marker ${index + 1}:`, marker.label);
+    markers.forEach((marker) => {
       addMarker(marker, marker.label);
     });
   }, [apiLoaded, markers, currentLanguage]);
 
   // إضافة علامة محسّنة مع معلومات الخدمات
   const addMarker = (location: Location, label?: string, draggable = false) => {
-    console.log('📍 addMarker called:', { lat: location.latitude, lng: location.longitude, label });
-    console.log('  mapInstanceRef.current:', !!mapInstanceRef.current);
-    
-    if (!mapInstanceRef.current) {
-      console.log('❌ No map instance in addMarker');
-      return;
-    }
+    if (!mapInstanceRef.current) return;
 
     const isRTL = currentLanguage === 'ar';
 
     // استخدام Marker العادي (AdvancedMarker يحتاج Map ID من Google Console)
-    console.log('  Creating google.maps.Marker...');
     const marker = new google.maps.Marker({
       position: { lat: location.latitude, lng: location.longitude },
       map: mapInstanceRef.current,
@@ -206,7 +191,6 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
       draggable: draggable,
       animation: google.maps.Animation.DROP
     });
-    console.log('✅ Marker created:', marker);
 
     // إذا كانت العلامة قابلة للسحب
     if (draggable && onLocationSelect) {
@@ -356,8 +340,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
           mapInstanceRef.current.setZoom(15);
         }
         
-        // إضافة علامة
-        clearMarkers();
+        // إضافة علامة الموقع الحالي (بدون حذف علامات الخدمات)
         addMarker(location, t.getCurrentLocation, true);
         
         if (onLocationSelect) {
