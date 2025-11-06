@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sendScheduledReminders = exports.getLocationStats = exports.findNearbyProviders = exports.adminDeleteUser = exports.onAuthDeleteUser = void 0;
+exports.sendScheduledReminders = exports.notifyBookingStatusChange = exports.notifyNewBooking = exports.getLocationStats = exports.findNearbyProviders = exports.adminDeleteUser = exports.onAuthDeleteUser = void 0;
 const admin = __importStar(require("firebase-admin"));
 const https_1 = require("firebase-functions/v2/https");
 const scheduler_1 = require("firebase-functions/v2/scheduler");
@@ -573,10 +573,116 @@ async function createBookingReminders(bookingId, booking) {
         console.error('Error creating reminders:', error);
     }
 }
-// NOTE: Firestore triggers (onBookingCreated, onBookingUpdated) are temporarily
-// NOTE: Firestore triggers (onBookingCreated, onBookingUpdated) are temporarily
-// disabled due to region mismatch between Firestore (me-central2) and Cloud Functions (us-central1).
-// These will be re-enabled once the region issue is resolved.
+/**
+ * HTTP Function: Send notification when booking is created
+ * Call this from frontend after creating booking
+ */
+exports.notifyNewBooking = (0, https_1.onRequest)({ cors: true, invoker: 'public' }, async (req, res) => {
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Method not allowed' });
+    }
+    try {
+        const { bookingId, booking } = req.body;
+        if (!bookingId || !booking) {
+            return res.status(400).json({ error: 'Missing bookingId or booking data' });
+        }
+        // Get provider's FCM token
+        const providerToken = await getUserFCMToken(booking.provider_id);
+        if (!providerToken) {
+            console.log('Provider FCM token not found');
+            return res.status(200).json({ message: 'No FCM token for provider' });
+        }
+        // Get customer name
+        const customerDoc = await db.collection('profiles').doc(booking.customer_id).get();
+        const customerName = customerDoc.data()?.display_name || customerDoc.data()?.full_name || 'عميل جديد';
+        // Get service name
+        const serviceDoc = await db.collection('services').doc(booking.service_id).get();
+        const serviceName = serviceDoc.data()?.title || 'خدمة';
+        // Send notification to provider
+        await sendNotification(providerToken, '🔔 حجز جديد!', `${customerName} طلب حجز ${serviceName}`, {
+            type: 'new_booking',
+            booking_id: bookingId,
+            link: '/provider-dashboard',
+        });
+        console.log('✅ New booking notification sent to provider');
+        return res.status(200).json({ success: true });
+    }
+    catch (error) {
+        console.error('Error in notifyNewBooking:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+});
+/**
+ * HTTP Function: Send notification when booking status changes
+ * Call this from frontend after updating booking status
+ */
+exports.notifyBookingStatusChange = (0, https_1.onRequest)({ cors: true, invoker: 'public' }, async (req, res) => {
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Method not allowed' });
+    }
+    try {
+        const { bookingId, booking, oldStatus, newStatus } = req.body;
+        if (!bookingId || !booking || !newStatus) {
+            return res.status(400).json({ error: 'Missing required data' });
+        }
+        // Skip if status didn't change
+        if (oldStatus === newStatus) {
+            return res.status(200).json({ message: 'Status unchanged' });
+        }
+        // Get customer's FCM token
+        const customerToken = await getUserFCMToken(booking.customer_id);
+        if (!customerToken) {
+            console.log('Customer FCM token not found');
+            return res.status(200).json({ message: 'No FCM token for customer' });
+        }
+        // Get service name
+        const serviceDoc = await db.collection('services').doc(booking.service_id).get();
+        const serviceName = serviceDoc.data()?.title || 'الخدمة';
+        // Get provider name
+        const providerDoc = await db.collection('profiles').doc(booking.provider_id).get();
+        const providerName = providerDoc.data()?.display_name || providerDoc.data()?.full_name || 'المزود';
+        let title = '';
+        let body = '';
+        let notificationType = '';
+        switch (newStatus) {
+            case 'confirmed':
+                title = '✅ تم تأكيد حجزك!';
+                body = `تم تأكيد حجزك لـ ${serviceName} مع ${providerName}`;
+                notificationType = 'booking_confirmed';
+                // Create reminders when booking is confirmed
+                await createBookingReminders(bookingId, booking);
+                break;
+            case 'cancelled':
+                title = '❌ تم إلغاء الحجز';
+                body = `تم إلغاء حجزك لـ ${serviceName}`;
+                notificationType = 'booking_cancelled';
+                break;
+            case 'completed':
+                title = '🎉 تم إكمال الخدمة!';
+                body = `شكراً لاستخدامك ${serviceName}. يرجى تقييم الخدمة مع ${providerName}`;
+                notificationType = 'booking_completed';
+                break;
+            case 'no_show':
+                title = '⚠️ لم تحضر للموعد';
+                body = `لم تحضر لموعدك مع ${providerName}`;
+                notificationType = 'booking_no_show';
+                break;
+            default:
+                return res.status(200).json({ message: 'No notification for this status' });
+        }
+        await sendNotification(customerToken, title, body, {
+            type: notificationType,
+            booking_id: bookingId,
+            link: '/customer-dashboard',
+        });
+        console.log(`✅ Booking ${newStatus} notification sent to customer`);
+        return res.status(200).json({ success: true });
+    }
+    catch (error) {
+        console.error('Error in notifyBookingStatusChange:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+});
 /**
  * Scheduled function: Runs every 5 minutes to send pending reminders
  */
