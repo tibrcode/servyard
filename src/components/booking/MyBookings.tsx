@@ -508,18 +508,6 @@ export function MyBookings({
                   </span>
                 </div>
               )}
-              
-              {/* Debug: Show why distance not showing */}
-              {!customerLocation && (
-                <div className="text-xs text-muted-foreground">
-                  ⚠️ Customer location not available
-                </div>
-              )}
-              {customerLocation && !providerContacts[booking.provider_id]?.latitude && (
-                <div className="text-xs text-muted-foreground">
-                  ⚠️ Provider location not available
-                </div>
-              )}
             </div>
 
             {/* Actions */}

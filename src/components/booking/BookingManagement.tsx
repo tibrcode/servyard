@@ -381,18 +381,6 @@ export function BookingManagement({
                   </span>
                 </div>
               )}
-              
-              {/* Debug: Show why distance not showing */}
-              {!providerLocation && (
-                <div className="text-xs text-muted-foreground">
-                  ⚠️ Provider location not available
-                </div>
-              )}
-              {providerLocation && !customerLocations[booking.customer_id] && (
-                <div className="text-xs text-muted-foreground">
-                  ⚠️ Customer location not available
-                </div>
-              )}
             </div>
 
             {/* Notes */}

@@ -8,6 +8,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { AppSidebar } from "@/components/layout/AppSidebar";
+import { db } from "@/lib/firebase/config";
+import { doc, updateDoc } from "firebase/firestore";
 import { Header } from "@/components/layout/Header";
 import { requestNotificationPermission, onMessageListener } from "@/lib/firebase/notifications";
 import { useAuth } from "@/contexts/AuthContext";
@@ -157,7 +159,7 @@ const AppContent = () => {
 
     // محاولة الحصول على الموقع مع خيارات محسّنة
     navigator.geolocation.getCurrentPosition(
-      (position) => {
+      async (position) => {
         const { latitude, longitude, accuracy } = position.coords;
         
         // حفظ الموقع في State
@@ -169,6 +171,20 @@ const AppContent = () => {
           longitude,
           timestamp: Date.now()
         }));
+        
+        // حفظ في profile إذا كان المستخدم مسجل دخول
+        if (user?.uid) {
+          try {
+            await updateDoc(doc(db, 'profiles', user.uid), {
+              latitude,
+              longitude,
+              location_updated_at: new Date().toISOString()
+            });
+            console.log('✅ Location saved to profile:', { latitude, longitude });
+          } catch (error) {
+            console.error('Error saving location to profile:', error);
+          }
+        }
         
         const accuracyText = accuracy < 100 ? "دقيق" : accuracy < 500 ? "جيد" : "تقريبي";
         
