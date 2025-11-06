@@ -10,7 +10,10 @@ import { useToast } from '@/hooks/use-toast';
 import { Booking, BookingStatus, BookingStatistics } from '@/types/booking';
 import { getProviderBookings, updateBookingStatus, subscribeToProviderBookings } from '@/lib/firebase/bookingFunctions';
 import { formatTimeDisplay, formatDate } from '@/lib/bookingUtils';
-import { Calendar, Clock, User, Phone, CheckCircle2, X, AlertCircle, TrendingUp } from 'lucide-react';
+import { Calendar, Clock, User, Phone, CheckCircle2, X, AlertCircle, TrendingUp, Navigation } from 'lucide-react';
+import { calculateDistance, formatDistance } from '@/lib/geolocation';
+import { db } from '@/integrations/firebase/client';
+import { doc, getDoc } from 'firebase/firestore';
 import { format } from 'date-fns';
 import { ar, enUS } from 'date-fns/locale';
 import { Separator } from '@/components/ui/separator';
@@ -44,6 +47,8 @@ export function BookingManagement({
   const [viewMode, setViewMode] = useState<ViewMode>('today');
   const [statusFilter, setStatusFilter] = useState<BookingStatus | 'all'>(defaultStatusFilter);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [providerLocation, setProviderLocation] = useState<{latitude: number, longitude: number} | null>(null);
+  const [customerLocations, setCustomerLocations] = useState<Record<string, {latitude: number, longitude: number}>>({});
 
   const isRTL = language === 'ar';
   const dateLocale = language === 'ar' ? ar : enUS;
@@ -109,7 +114,13 @@ export function BookingManagement({
     const unsubscribe = subscribeToProviderBookings(providerId, (data) => {
       setBookings(data);
       setIsLoading(false);
+      
+      // Load customer locations for all bookings
+      loadCustomerLocations(data);
     });
+    
+    // Load provider location
+    loadProviderLocation();
     
     // Cleanup subscription on unmount
     return () => unsubscribe();
@@ -118,6 +129,47 @@ export function BookingManagement({
   useEffect(() => {
     filterBookings();
   }, [bookings, viewMode, statusFilter, showOnlyPending]);
+
+  const loadProviderLocation = async () => {
+    try {
+      const providerDoc = await getDoc(doc(db, 'profiles', providerId));
+      if (providerDoc.exists()) {
+        const data = providerDoc.data();
+        if (data.latitude && data.longitude) {
+          setProviderLocation({
+            latitude: data.latitude,
+            longitude: data.longitude
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error loading provider location:', error);
+    }
+  };
+
+  const loadCustomerLocations = async (bookingsData: Booking[]) => {
+    const customerIds = [...new Set(bookingsData.map(b => b.customer_id))];
+    const locations: Record<string, {latitude: number, longitude: number}> = {};
+    
+    for (const customerId of customerIds) {
+      try {
+        const customerDoc = await getDoc(doc(db, 'profiles', customerId));
+        if (customerDoc.exists()) {
+          const data = customerDoc.data();
+          if (data.latitude && data.longitude) {
+            locations[customerId] = {
+              latitude: data.latitude,
+              longitude: data.longitude
+            };
+          }
+        }
+      } catch (error) {
+        console.error(`Error loading customer ${customerId}:`, error);
+      }
+    }
+    
+    setCustomerLocations(locations);
+  };
 
   const loadBookings = async () => {
     // Kept for manual refresh if needed
@@ -313,6 +365,22 @@ export function BookingManagement({
                   {booking.price} {booking.currency}
                 </span>
               </div>
+
+              {/* Distance from provider to customer */}
+              {providerLocation && customerLocations[booking.customer_id] && (
+                <div className="flex items-center gap-2 text-sm text-primary font-medium">
+                  <Navigation className="h-4 w-4" />
+                  <span>
+                    {formatDistance(
+                      calculateDistance(
+                        providerLocation,
+                        customerLocations[booking.customer_id]
+                      ),
+                      language
+                    )}
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Notes */}

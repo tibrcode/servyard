@@ -12,7 +12,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Booking, BookingStatus, BookingSettings } from '@/types/booking';
 import { getCustomerBookings, cancelBooking, subscribeToCustomerBookings } from '@/lib/firebase/bookingFunctions';
 import { formatTimeDisplay, canCancelBooking } from '@/lib/bookingUtils';
-import { Calendar, Clock, MapPin, Phone, X, AlertCircle, CheckCircle2, Star, Edit, MessageSquare } from 'lucide-react';
+import { Calendar, Clock, MapPin, Phone, X, AlertCircle, CheckCircle2, Star, Edit, MessageSquare, Navigation } from 'lucide-react';
+import { calculateDistance, formatDistance } from '@/lib/geolocation';
 import { db } from '@/integrations/firebase/client';
 import { collection, addDoc, query, where, getDocs, doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { format } from 'date-fns';
@@ -70,8 +71,9 @@ export function MyBookings({
   const [selectedBookingForEdit, setSelectedBookingForEdit] = useState<Booking | null>(null);
   const [serviceDetails, setServiceDetails] = useState<any>(null);
   
-  // Provider contact info
-  const [providerContacts, setProviderContacts] = useState<Record<string, {phone?: string[], whatsapp?: string}>>({});
+  // Provider contact info + location
+  const [providerContacts, setProviderContacts] = useState<Record<string, {phone?: string[], whatsapp?: string, latitude?: number, longitude?: number}>>({});
+  const [customerLocation, setCustomerLocation] = useState<{latitude: number, longitude: number} | null>(null);
 
   const isRTL = language === 'ar';
   const dateLocale = language === 'ar' ? ar : enUS;
@@ -148,13 +150,33 @@ export function MyBookings({
     // Load existing reviews
     loadExistingReviews();
     
+    // Load customer location
+    loadCustomerLocation();
+    
     // Cleanup subscription on unmount
     return () => unsubscribe();
   }, [customerId]);
 
+  const loadCustomerLocation = async () => {
+    try {
+      const customerDoc = await getDoc(doc(db, 'profiles', customerId));
+      if (customerDoc.exists()) {
+        const data = customerDoc.data();
+        if (data.latitude && data.longitude) {
+          setCustomerLocation({
+            latitude: data.latitude,
+            longitude: data.longitude
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error loading customer location:', error);
+    }
+  };
+
   const loadProviderContacts = async (bookingsData: Booking[]) => {
     const providerIds = [...new Set(bookingsData.map(b => b.provider_id))];
-    const contacts: Record<string, {phone?: string[], whatsapp?: string}> = {};
+    const contacts: Record<string, {phone?: string[], whatsapp?: string, latitude?: number, longitude?: number}> = {};
     
     for (const providerId of providerIds) {
       try {
@@ -163,7 +185,9 @@ export function MyBookings({
           const data = providerDoc.data();
           contacts[providerId] = {
             phone: data.phone_numbers,
-            whatsapp: data.whatsapp_number
+            whatsapp: data.whatsapp_number,
+            latitude: data.latitude,
+            longitude: data.longitude
           };
         }
       } catch (error) {
@@ -446,6 +470,25 @@ export function MyBookings({
                   {booking.price} {booking.currency}
                 </span>
               </div>
+
+              {/* Distance to provider */}
+              {customerLocation && providerContacts[booking.provider_id]?.latitude && providerContacts[booking.provider_id]?.longitude && (
+                <div className="flex items-center gap-2 text-sm text-primary font-medium">
+                  <Navigation className="h-4 w-4" />
+                  <span>
+                    {formatDistance(
+                      calculateDistance(
+                        customerLocation,
+                        {
+                          latitude: providerContacts[booking.provider_id].latitude!,
+                          longitude: providerContacts[booking.provider_id].longitude!
+                        }
+                      ),
+                      language
+                    )}
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Actions */}
