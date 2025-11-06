@@ -389,9 +389,10 @@ export function ServiceScheduleSetup({
                       <Input
                         type="time"
                         value={currentSchedule.end_time}
-                        onChange={(e) =>
-                          updateDaySchedule(selectedDay, { end_time: e.target.value })
-                        }
+                        onChange={(e) => {
+                          console.log('⏰ End time changed:', e.target.value);
+                          updateDaySchedule(selectedDay, { end_time: e.target.value });
+                        }}
                       />
                     </div>
                   </div>

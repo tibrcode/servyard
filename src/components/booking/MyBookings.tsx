@@ -162,11 +162,21 @@ export function MyBookings({
       const customerDoc = await getDoc(doc(db, 'profiles', customerId));
       if (customerDoc.exists()) {
         const data = customerDoc.data();
+        console.log('📍 Customer location data:', {
+          customerId,
+          hasLatitude: !!data.latitude,
+          hasLongitude: !!data.longitude,
+          latitude: data.latitude,
+          longitude: data.longitude
+        });
         if (data.latitude && data.longitude) {
           setCustomerLocation({
             latitude: data.latitude,
             longitude: data.longitude
           });
+          console.log('✅ Customer location set:', { latitude: data.latitude, longitude: data.longitude });
+        } else {
+          console.warn('⚠️ Customer location not available in profile');
         }
       }
     } catch (error) {
@@ -178,11 +188,19 @@ export function MyBookings({
     const providerIds = [...new Set(bookingsData.map(b => b.provider_id))];
     const contacts: Record<string, {phone?: string[], whatsapp?: string, latitude?: number, longitude?: number}> = {};
     
+    console.log('📍 Loading provider locations for', providerIds.length, 'providers');
+    
     for (const providerId of providerIds) {
       try {
         const providerDoc = await getDoc(doc(db, 'profiles', providerId));
         if (providerDoc.exists()) {
           const data = providerDoc.data();
+          console.log(`📍 Provider ${providerId}:`, {
+            hasLatitude: !!data.latitude,
+            hasLongitude: !!data.longitude,
+            latitude: data.latitude,
+            longitude: data.longitude
+          });
           contacts[providerId] = {
             phone: data.phone_numbers,
             whatsapp: data.whatsapp_number,
@@ -195,6 +213,7 @@ export function MyBookings({
       }
     }
     
+    console.log('✅ Provider contacts loaded:', contacts);
     setProviderContacts(contacts);
   };
 
