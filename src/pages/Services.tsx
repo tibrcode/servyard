@@ -741,7 +741,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                 variant="outline"
                                 size="lg"
                                 onClick={() => {
-                                  window.location.href = `/provider-profile?id=${service.provider_id}`;
+                                  window.location.href = `/provider/${service.provider_id}`;
                                 }}
                                 className="flex-1 min-w-[200px]"
                               >
