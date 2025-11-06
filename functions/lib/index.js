@@ -33,10 +33,11 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sendReviewNotification = exports.sendBookingConfirmationNotification = exports.sendBookingNotification = exports.adminDeleteUser = exports.onAuthDeleteUser = void 0;
+exports.sendScheduledReminders = exports.onBookingUpdated = exports.onBookingCreated = exports.getLocationStats = exports.findNearbyProviders = exports.sendReviewNotification = exports.sendBookingConfirmationNotification = exports.sendBookingNotification = exports.adminDeleteUser = exports.onAuthDeleteUser = void 0;
 const admin = __importStar(require("firebase-admin"));
 const https_1 = require("firebase-functions/v2/https");
 const firestore_1 = require("firebase-functions/v2/firestore");
+const scheduler_1 = require("firebase-functions/v2/scheduler");
 const v1_1 = require("firebase-functions/v1");
 const params_1 = require("firebase-functions/params");
 admin.initializeApp();
@@ -273,5 +274,497 @@ exports.sendReviewNotification = (0, firestore_1.onDocumentCreated)('reviews/{re
     }
     catch (error) {
         console.error('Error sending review notification:', error);
+    }
+});
+// ═══════════════════════════════════════════════════════════════════════════
+// 🌍 Cloud Functions للبحث الجغرافي
+// Geographic Search Cloud Functions
+// ═══════════════════════════════════════════════════════════════════════════
+/**
+ * حساب المسافة بين نقطتين باستخدام Haversine formula
+ * Calculate distance between two points using Haversine formula
+ */
+function calculateDistance(point1, point2) {
+    // Support both formats: {latitude, longitude} and {lat, lon}
+    const lat1 = 'latitude' in point1 ? point1.latitude : point1.lat;
+    const lon1 = 'longitude' in point1 ? point1.longitude : point1.lon;
+    const lat2 = 'latitude' in point2 ? point2.latitude : point2.lat;
+    const lon2 = 'longitude' in point2 ? point2.longitude : point2.lon;
+    const R = 6371; // نصف قطر الأرض بالكيلومتر
+    const dLat = toRadians(lat2 - lat1);
+    const dLon = toRadians(lon2 - lon1);
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+}
+function toRadians(degrees) {
+    return degrees * (Math.PI / 180);
+}
+/**
+ * البحث عن المزودين القريبين
+ * Find nearby providers within radius
+ *
+ * استخدام:
+ * POST /findNearbyProviders
+ * Body: {
+ *   latitude: 31.9454,
+ *   longitude: 35.9284,
+ *   radiusKm: 25,
+ *   categoryId?: 'category_id', // اختياري
+ *   limit?: 50 // اختياري (افتراضي 50)
+ * }
+ */
+exports.findNearbyProviders = (0, https_1.onRequest)({ cors: true }, async (req, res) => {
+    try {
+        // التحقق من البيانات المطلوبة
+        const { latitude, longitude, radiusKm = 25, categoryId, limit = 50 } = req.body;
+        if (typeof latitude !== 'number' || typeof longitude !== 'number') {
+            res.status(400).json({
+                error: 'Invalid latitude or longitude'
+            });
+            return;
+        }
+        if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+            res.status(400).json({
+                error: 'Latitude/longitude out of range'
+            });
+            return;
+        }
+        // حساب bounding box للبحث السريع
+        const latDelta = radiusKm / 111; // تقريباً 111 كم لكل درجة
+        const lonDelta = radiusKm / (111 * Math.cos(toRadians(latitude)));
+        const minLat = latitude - latDelta;
+        const maxLat = latitude + latDelta;
+        const minLon = longitude - lonDelta;
+        const maxLon = longitude + lonDelta;
+        // جلب المزودين ضمن bounding box
+        let query = db.collection('profiles')
+            .where('user_type', '==', 'provider')
+            .where('latitude', '>=', minLat)
+            .where('latitude', '<=', maxLat);
+        const snapshot = await query.get();
+        // فلترة النتائج حسب المسافة الدقيقة
+        const providers = [];
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            // التحقق من وجود الإحداثيات
+            if (typeof data.latitude !== 'number' || typeof data.longitude !== 'number') {
+                return;
+            }
+            // التحقق من longitude ضمن النطاق
+            if (data.longitude < minLon || data.longitude > maxLon) {
+                return;
+            }
+            // حساب المسافة الدقيقة
+            const distance = calculateDistance({ latitude, longitude }, { latitude: data.latitude, longitude: data.longitude });
+            // فلترة حسب النطاق
+            if (distance <= radiusKm) {
+                providers.push({
+                    id: doc.id,
+                    full_name: data.full_name,
+                    city: data.city,
+                    country: data.country,
+                    latitude: data.latitude,
+                    longitude: data.longitude,
+                    profile_description: data.profile_description,
+                    distance: Math.round(distance * 100) / 100, // تقريب إلى منزلتين
+                });
+            }
+        });
+        // إذا كان هناك فلتر للفئة، جلب الخدمات
+        if (categoryId) {
+            const servicesSnapshot = await db.collection('services')
+                .where('category_id', '==', categoryId)
+                .where('is_active', '==', true)
+                .get();
+            const providerIds = new Set(servicesSnapshot.docs.map(doc => doc.data().provider_id));
+            // فلترة المزودين حسب الفئة
+            const filtered = providers.filter(p => providerIds.has(p.id));
+            // ترتيب حسب المسافة
+            filtered.sort((a, b) => a.distance - b.distance);
+            res.json({
+                success: true,
+                count: filtered.length,
+                providers: filtered.slice(0, limit),
+                filters: {
+                    latitude,
+                    longitude,
+                    radiusKm,
+                    categoryId,
+                    limit
+                }
+            });
+            return;
+        }
+        // ترتيب حسب المسافة
+        providers.sort((a, b) => a.distance - b.distance);
+        res.json({
+            success: true,
+            count: providers.length,
+            providers: providers.slice(0, limit),
+            filters: {
+                latitude,
+                longitude,
+                radiusKm,
+                limit
+            }
+        });
+        return;
+    }
+    catch (error) {
+        console.error('Error in findNearbyProviders:', error);
+        res.status(500).json({
+            error: 'Internal server error',
+            message: error.message
+        });
+        return;
+    }
+});
+/**
+ * الحصول على إحصائيات المزودين حسب المنطقة
+ * Get provider statistics by region
+ */
+exports.getLocationStats = (0, https_1.onRequest)({ cors: true }, async (req, res) => {
+    try {
+        const snapshot = await db.collection('profiles')
+            .where('user_type', '==', 'provider')
+            .get();
+        const stats = {};
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            const country = data.country || 'Unknown';
+            const city = data.city || 'Unknown';
+            const region = `${country} - ${city}`;
+            if (!stats[region]) {
+                stats[region] = { count: 0, providers: [] };
+            }
+            stats[region].count++;
+            stats[region].providers.push(doc.id);
+        });
+        // ترتيب حسب الأكثر
+        const sorted = Object.entries(stats)
+            .sort(([, a], [, b]) => b.count - a.count)
+            .map(([region, data]) => ({
+            region,
+            count: data.count,
+            // لا نرسل IDs للعملاء، فقط الإحصائيات
+        }));
+        res.json({
+            success: true,
+            totalRegions: sorted.length,
+            totalProviders: snapshot.size,
+            regions: sorted
+        });
+        return;
+    }
+    catch (error) {
+        console.error('Error in getLocationStats:', error);
+        res.status(500).json({
+            error: 'Internal server error',
+            message: error.message
+        });
+        return;
+    }
+});
+// =============================================================================
+// NOTIFICATION SYSTEM - نظام التنبيهات
+// =============================================================================
+/**
+ * Send notification to a user
+ */
+async function sendNotification(fcmToken, title, body, data) {
+    try {
+        await messaging.send({
+            token: fcmToken,
+            notification: {
+                title,
+                body,
+            },
+            data: data || {},
+            webpush: {
+                fcmOptions: {
+                    link: data?.link || 'https://servyard.com',
+                },
+            },
+        });
+        console.log('✅ Notification sent successfully');
+        return true;
+    }
+    catch (error) {
+        console.error('❌ Error sending notification:', error);
+        return false;
+    }
+}
+/**
+ * Get user's FCM token from their profile
+ */
+async function getUserFCMToken(userId) {
+    try {
+        const profileDoc = await db.collection('profiles').doc(userId).get();
+        if (!profileDoc.exists)
+            return null;
+        const data = profileDoc.data();
+        return data?.fcm_token || null;
+    }
+    catch (error) {
+        console.error('Error getting FCM token:', error);
+        return null;
+    }
+}
+/**
+ * Trigger: When a booking is created
+ * Send notification to provider about new booking request
+ */
+exports.onBookingCreated = (0, firestore_1.onDocumentCreated)('bookings/{bookingId}', async (event) => {
+    const booking = event.data?.data();
+    if (!booking)
+        return;
+    try {
+        // Get provider's FCM token
+        const providerToken = await getUserFCMToken(booking.provider_id);
+        if (!providerToken) {
+            console.log('Provider FCM token not found');
+            return;
+        }
+        // Get customer name
+        const customerDoc = await db.collection('profiles').doc(booking.customer_id).get();
+        const customerName = customerDoc.data()?.display_name || 'عميل جديد';
+        // Get service name
+        const serviceDoc = await db.collection('services').doc(booking.service_id).get();
+        const serviceName = serviceDoc.data()?.title || 'خدمة';
+        // Send notification to provider
+        await sendNotification(providerToken, '🔔 حجز جديد!', `${customerName} طلب حجز ${serviceName}`, {
+            type: 'new_booking',
+            booking_id: event.params.bookingId,
+            link: '/provider-dashboard',
+        });
+        console.log('✅ New booking notification sent to provider');
+    }
+    catch (error) {
+        console.error('Error in onBookingCreated:', error);
+    }
+});
+/**
+ * Trigger: When a booking status changes
+ * Send notifications to customer based on status
+ */
+exports.onBookingUpdated = (0, firestore_1.onDocumentUpdated)('bookings/{bookingId}', async (event) => {
+    const before = event.data?.before.data();
+    const after = event.data?.after.data();
+    if (!before || !after)
+        return;
+    // Check if status changed
+    if (before.status === after.status)
+        return;
+    try {
+        const bookingId = event.params.bookingId;
+        const customerId = after.customer_id;
+        const providerId = after.provider_id;
+        // Get customer's FCM token
+        const customerToken = await getUserFCMToken(customerId);
+        // Get service name
+        const serviceDoc = await db.collection('services').doc(after.service_id).get();
+        const serviceName = serviceDoc.data()?.title || 'الخدمة';
+        // Get provider name
+        const providerDoc = await db.collection('profiles').doc(providerId).get();
+        const providerName = providerDoc.data()?.display_name || 'المزود';
+        let title = '';
+        let body = '';
+        let notificationType = '';
+        switch (after.status) {
+            case 'confirmed':
+                title = '✅ تم تأكيد حجزك!';
+                body = `تم تأكيد حجزك لـ ${serviceName} مع ${providerName}`;
+                notificationType = 'booking_confirmed';
+                break;
+            case 'cancelled':
+                title = '❌ تم إلغاء الحجز';
+                body = `تم إلغاء حجزك لـ ${serviceName}`;
+                notificationType = 'booking_cancelled';
+                break;
+            case 'completed':
+                title = '🎉 تم إكمال الخدمة!';
+                body = `شكراً لاستخدامك ${serviceName}. يرجى تقييم الخدمة`;
+                notificationType = 'booking_completed';
+                break;
+            case 'no_show':
+                title = '⚠️ لم تحضر للموعد';
+                body = `لم تحضر لموعدك مع ${providerName}`;
+                notificationType = 'booking_no_show';
+                break;
+            default:
+                return; // No notification for other statuses
+        }
+        if (customerToken) {
+            await sendNotification(customerToken, title, body, {
+                type: notificationType,
+                booking_id: bookingId,
+                link: '/customer-dashboard',
+            });
+            console.log(`✅ Booking ${after.status} notification sent to customer`);
+        }
+        // If booking confirmed, create a reminder entry
+        if (after.status === 'confirmed' && after.booking_date) {
+            await createBookingReminders(bookingId, after);
+        }
+    }
+    catch (error) {
+        console.error('Error in onBookingUpdated:', error);
+    }
+});
+/**
+ * Create reminder entries for a confirmed booking
+ */
+async function createBookingReminders(bookingId, booking) {
+    try {
+        // Get customer's notification preferences
+        const customerDoc = await db.collection('profiles').doc(booking.customer_id).get();
+        const preferences = customerDoc.data()?.notification_settings || {
+            reminder_times: [60], // Default: 1 hour before
+        };
+        const bookingDate = new Date(booking.booking_date);
+        const reminders = [];
+        // Create reminder documents for each preferred time
+        for (const minutesBefore of preferences.reminder_times || [60]) {
+            const reminderTime = new Date(bookingDate.getTime() - minutesBefore * 60000);
+            reminders.push({
+                booking_id: bookingId,
+                customer_id: booking.customer_id,
+                provider_id: booking.provider_id,
+                service_id: booking.service_id,
+                reminder_time: reminderTime,
+                minutes_before: minutesBefore,
+                sent: false,
+                created_at: new Date(),
+            });
+        }
+        // Batch write reminders
+        const batch = db.batch();
+        reminders.forEach((reminder) => {
+            const ref = db.collection('booking_reminders').doc();
+            batch.set(ref, reminder);
+        });
+        await batch.commit();
+        console.log(`✅ Created ${reminders.length} reminders for booking ${bookingId}`);
+    }
+    catch (error) {
+        console.error('Error creating reminders:', error);
+    }
+}
+/**
+ * Scheduled function: Runs every 5 minutes to send pending reminders
+ */
+exports.sendScheduledReminders = (0, scheduler_1.onSchedule)({
+    schedule: 'every 5 minutes',
+    timeZone: 'Asia/Dubai', // UAE timezone
+}, async (event) => {
+    try {
+        const now = new Date();
+        const fiveMinutesLater = new Date(now.getTime() + 5 * 60000);
+        console.log(`🔍 Checking for reminders between ${now.toISOString()} and ${fiveMinutesLater.toISOString()}`);
+        // Get reminders that need to be sent in the next 5 minutes
+        const remindersSnapshot = await db
+            .collection('booking_reminders')
+            .where('sent', '==', false)
+            .where('reminder_time', '<=', fiveMinutesLater)
+            .get();
+        if (remindersSnapshot.empty) {
+            console.log('No pending reminders');
+            return;
+        }
+        console.log(`📬 Found ${remindersSnapshot.size} reminders to send`);
+        const batch = db.batch();
+        let sentCount = 0;
+        for (const reminderDoc of remindersSnapshot.docs) {
+            const reminder = reminderDoc.data();
+            try {
+                // Get booking details
+                const bookingDoc = await db.collection('bookings').doc(reminder.booking_id).get();
+                if (!bookingDoc.exists) {
+                    // Booking deleted, mark reminder as sent
+                    batch.update(reminderDoc.ref, { sent: true });
+                    continue;
+                }
+                const booking = bookingDoc.data();
+                // Skip if booking is cancelled or completed
+                if (booking?.status === 'cancelled' || booking?.status === 'completed') {
+                    batch.update(reminderDoc.ref, { sent: true });
+                    continue;
+                }
+                // Get customer's FCM token
+                const customerToken = await getUserFCMToken(reminder.customer_id);
+                if (!customerToken) {
+                    console.log(`No FCM token for customer ${reminder.customer_id}`);
+                    batch.update(reminderDoc.ref, { sent: true });
+                    continue;
+                }
+                // Get service name
+                const serviceDoc = await db.collection('services').doc(reminder.service_id).get();
+                const serviceName = serviceDoc.data()?.title || 'الخدمة';
+                // Get provider name
+                const providerDoc = await db.collection('profiles').doc(reminder.provider_id).get();
+                const providerName = providerDoc.data()?.display_name || 'المزود';
+                // Format time message
+                const minutesBefore = reminder.minutes_before;
+                let timeMessage = '';
+                if (minutesBefore < 60) {
+                    timeMessage = `بعد ${minutesBefore} دقيقة`;
+                }
+                else if (minutesBefore === 60) {
+                    timeMessage = 'بعد ساعة';
+                }
+                else if (minutesBefore === 120) {
+                    timeMessage = 'بعد ساعتين';
+                }
+                else if (minutesBefore >= 1440) {
+                    const days = Math.floor(minutesBefore / 1440);
+                    timeMessage = days === 1 ? 'غداً' : `بعد ${days} أيام`;
+                }
+                else {
+                    const hours = Math.floor(minutesBefore / 60);
+                    timeMessage = `بعد ${hours} ساعات`;
+                }
+                // Calculate distance if available
+                let distanceText = '';
+                const customerProfile = await db.collection('profiles').doc(reminder.customer_id).get();
+                const providerProfile = await db.collection('profiles').doc(reminder.provider_id).get();
+                const customerData = customerProfile.data();
+                const providerData = providerProfile.data();
+                if (customerData?.latitude && providerData?.latitude) {
+                    const distance = calculateDistance({ latitude: customerData.latitude, longitude: customerData.longitude }, { latitude: providerData.latitude, longitude: providerData.longitude });
+                    if (distance < 1) {
+                        distanceText = ` • ${Math.round(distance * 1000)} متر`;
+                    }
+                    else {
+                        distanceText = ` • ${distance.toFixed(1)} كم`;
+                    }
+                }
+                // Send notification
+                await sendNotification(customerToken, `⏰ تذكير: موعدك ${timeMessage}`, `${serviceName} مع ${providerName}${distanceText}`, {
+                    type: 'booking_reminder',
+                    booking_id: reminder.booking_id,
+                    minutes_before: minutesBefore.toString(),
+                    link: '/customer-dashboard',
+                });
+                // Mark as sent
+                batch.update(reminderDoc.ref, {
+                    sent: true,
+                    sent_at: new Date(),
+                });
+                sentCount++;
+                console.log(`✅ Reminder sent for booking ${reminder.booking_id}`);
+            }
+            catch (error) {
+                console.error(`Error sending reminder ${reminderDoc.id}:`, error);
+                // Don't mark as sent if there was an error
+            }
+        }
+        await batch.commit();
+        console.log(`📬 Sent ${sentCount} reminders successfully`);
+    }
+    catch (error) {
+        console.error('Error in sendScheduledReminders:', error);
     }
 });

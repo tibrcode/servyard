@@ -1,6 +1,7 @@
 import * as admin from 'firebase-admin';
 import { onRequest } from 'firebase-functions/v2/https';
 import { onDocumentCreated, onDocumentUpdated } from 'firebase-functions/v2/firestore';
+import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { auth } from 'firebase-functions/v1';
 import { defineSecret } from 'firebase-functions/params';
 
@@ -276,11 +277,15 @@ export const sendReviewNotification = onDocumentCreated(
  * Calculate distance between two points using Haversine formula
  */
 function calculateDistance(
-  lat1: number,
-  lon1: number,
-  lat2: number,
-  lon2: number
+  point1: { latitude: number; longitude: number } | { lat: number; lon: number },
+  point2: { latitude: number; longitude: number } | { lat: number; lon: number }
 ): number {
+  // Support both formats: {latitude, longitude} and {lat, lon}
+  const lat1 = 'latitude' in point1 ? point1.latitude : point1.lat;
+  const lon1 = 'longitude' in point1 ? point1.longitude : point1.lon;
+  const lat2 = 'latitude' in point2 ? point2.latitude : point2.lat;
+  const lon2 = 'longitude' in point2 ? point2.longitude : point2.lon;
+  
   const R = 6371; // نصف قطر الأرض بالكيلومتر
   const dLat = toRadians(lat2 - lat1);
   const dLon = toRadians(lon2 - lon1);
@@ -367,10 +372,8 @@ export const findNearbyProviders = onRequest(
 
         // حساب المسافة الدقيقة
         const distance = calculateDistance(
-          latitude,
-          longitude,
-          data.latitude,
-          data.longitude
+          { latitude, longitude },
+          { latitude: data.latitude, longitude: data.longitude }
         );
 
         // فلترة حسب النطاق
@@ -499,6 +502,373 @@ export const getLocationStats = onRequest(
         message: error.message 
       });
       return;
+    }
+  }
+);
+
+// =============================================================================
+// NOTIFICATION SYSTEM - نظام التنبيهات
+// =============================================================================
+
+/**
+ * Send notification to a user
+ */
+async function sendNotification(
+  fcmToken: string,
+  title: string,
+  body: string,
+  data?: Record<string, string>
+): Promise<boolean> {
+  try {
+    await messaging.send({
+      token: fcmToken,
+      notification: {
+        title,
+        body,
+      },
+      data: data || {},
+      webpush: {
+        fcmOptions: {
+          link: data?.link || 'https://servyard.com',
+        },
+      },
+    });
+    console.log('✅ Notification sent successfully');
+    return true;
+  } catch (error) {
+    console.error('❌ Error sending notification:', error);
+    return false;
+  }
+}
+
+/**
+ * Get user's FCM token from their profile
+ */
+async function getUserFCMToken(userId: string): Promise<string | null> {
+  try {
+    const profileDoc = await db.collection('profiles').doc(userId).get();
+    if (!profileDoc.exists) return null;
+    
+    const data = profileDoc.data();
+    return data?.fcm_token || null;
+  } catch (error) {
+    console.error('Error getting FCM token:', error);
+    return null;
+  }
+}
+
+/**
+ * Trigger: When a booking is created
+ * Send notification to provider about new booking request
+ */
+export const onBookingCreated = onDocumentCreated(
+  'bookings/{bookingId}',
+  async (event) => {
+    const booking = event.data?.data();
+    if (!booking) return;
+
+    try {
+      // Get provider's FCM token
+      const providerToken = await getUserFCMToken(booking.provider_id);
+      if (!providerToken) {
+        console.log('Provider FCM token not found');
+        return;
+      }
+
+      // Get customer name
+      const customerDoc = await db.collection('profiles').doc(booking.customer_id).get();
+      const customerName = customerDoc.data()?.display_name || 'عميل جديد';
+
+      // Get service name
+      const serviceDoc = await db.collection('services').doc(booking.service_id).get();
+      const serviceName = serviceDoc.data()?.title || 'خدمة';
+
+      // Send notification to provider
+      await sendNotification(
+        providerToken,
+        '🔔 حجز جديد!',
+        `${customerName} طلب حجز ${serviceName}`,
+        {
+          type: 'new_booking',
+          booking_id: event.params.bookingId,
+          link: '/provider-dashboard',
+        }
+      );
+
+      console.log('✅ New booking notification sent to provider');
+    } catch (error) {
+      console.error('Error in onBookingCreated:', error);
+    }
+  }
+);
+
+/**
+ * Trigger: When a booking status changes
+ * Send notifications to customer based on status
+ */
+export const onBookingUpdated = onDocumentUpdated(
+  'bookings/{bookingId}',
+  async (event) => {
+    const before = event.data?.before.data();
+    const after = event.data?.after.data();
+    
+    if (!before || !after) return;
+
+    // Check if status changed
+    if (before.status === after.status) return;
+
+    try {
+      const bookingId = event.params.bookingId;
+      const customerId = after.customer_id;
+      const providerId = after.provider_id;
+
+      // Get customer's FCM token
+      const customerToken = await getUserFCMToken(customerId);
+      
+      // Get service name
+      const serviceDoc = await db.collection('services').doc(after.service_id).get();
+      const serviceName = serviceDoc.data()?.title || 'الخدمة';
+
+      // Get provider name
+      const providerDoc = await db.collection('profiles').doc(providerId).get();
+      const providerName = providerDoc.data()?.display_name || 'المزود';
+
+      let title = '';
+      let body = '';
+      let notificationType = '';
+
+      switch (after.status) {
+        case 'confirmed':
+          title = '✅ تم تأكيد حجزك!';
+          body = `تم تأكيد حجزك لـ ${serviceName} مع ${providerName}`;
+          notificationType = 'booking_confirmed';
+          break;
+
+        case 'cancelled':
+          title = '❌ تم إلغاء الحجز';
+          body = `تم إلغاء حجزك لـ ${serviceName}`;
+          notificationType = 'booking_cancelled';
+          break;
+
+        case 'completed':
+          title = '🎉 تم إكمال الخدمة!';
+          body = `شكراً لاستخدامك ${serviceName}. يرجى تقييم الخدمة`;
+          notificationType = 'booking_completed';
+          break;
+
+        case 'no_show':
+          title = '⚠️ لم تحضر للموعد';
+          body = `لم تحضر لموعدك مع ${providerName}`;
+          notificationType = 'booking_no_show';
+          break;
+
+        default:
+          return; // No notification for other statuses
+      }
+
+      if (customerToken) {
+        await sendNotification(customerToken, title, body, {
+          type: notificationType,
+          booking_id: bookingId,
+          link: '/customer-dashboard',
+        });
+        console.log(`✅ Booking ${after.status} notification sent to customer`);
+      }
+
+      // If booking confirmed, create a reminder entry
+      if (after.status === 'confirmed' && after.booking_date) {
+        await createBookingReminders(bookingId, after);
+      }
+
+    } catch (error) {
+      console.error('Error in onBookingUpdated:', error);
+    }
+  }
+);
+
+/**
+ * Create reminder entries for a confirmed booking
+ */
+async function createBookingReminders(bookingId: string, booking: any) {
+  try {
+    // Get customer's notification preferences
+    const customerDoc = await db.collection('profiles').doc(booking.customer_id).get();
+    const preferences = customerDoc.data()?.notification_settings || {
+      reminder_times: [60], // Default: 1 hour before
+    };
+
+    const bookingDate = new Date(booking.booking_date);
+    const reminders = [];
+
+    // Create reminder documents for each preferred time
+    for (const minutesBefore of preferences.reminder_times || [60]) {
+      const reminderTime = new Date(bookingDate.getTime() - minutesBefore * 60000);
+      
+      reminders.push({
+        booking_id: bookingId,
+        customer_id: booking.customer_id,
+        provider_id: booking.provider_id,
+        service_id: booking.service_id,
+        reminder_time: reminderTime,
+        minutes_before: minutesBefore,
+        sent: false,
+        created_at: new Date(),
+      });
+    }
+
+    // Batch write reminders
+    const batch = db.batch();
+    reminders.forEach((reminder) => {
+      const ref = db.collection('booking_reminders').doc();
+      batch.set(ref, reminder);
+    });
+    await batch.commit();
+
+    console.log(`✅ Created ${reminders.length} reminders for booking ${bookingId}`);
+  } catch (error) {
+    console.error('Error creating reminders:', error);
+  }
+}
+
+/**
+ * Scheduled function: Runs every 5 minutes to send pending reminders
+ */
+export const sendScheduledReminders = onSchedule(
+  {
+    schedule: 'every 5 minutes',
+    timeZone: 'Asia/Dubai', // UAE timezone
+  },
+  async (event) => {
+    try {
+      const now = new Date();
+      const fiveMinutesLater = new Date(now.getTime() + 5 * 60000);
+
+      console.log(`🔍 Checking for reminders between ${now.toISOString()} and ${fiveMinutesLater.toISOString()}`);
+
+      // Get reminders that need to be sent in the next 5 minutes
+      const remindersSnapshot = await db
+        .collection('booking_reminders')
+        .where('sent', '==', false)
+        .where('reminder_time', '<=', fiveMinutesLater)
+        .get();
+
+      if (remindersSnapshot.empty) {
+        console.log('No pending reminders');
+        return;
+      }
+
+      console.log(`📬 Found ${remindersSnapshot.size} reminders to send`);
+
+      const batch = db.batch();
+      let sentCount = 0;
+
+      for (const reminderDoc of remindersSnapshot.docs) {
+        const reminder = reminderDoc.data();
+
+        try {
+          // Get booking details
+          const bookingDoc = await db.collection('bookings').doc(reminder.booking_id).get();
+          if (!bookingDoc.exists) {
+            // Booking deleted, mark reminder as sent
+            batch.update(reminderDoc.ref, { sent: true });
+            continue;
+          }
+
+          const booking = bookingDoc.data();
+          
+          // Skip if booking is cancelled or completed
+          if (booking?.status === 'cancelled' || booking?.status === 'completed') {
+            batch.update(reminderDoc.ref, { sent: true });
+            continue;
+          }
+
+          // Get customer's FCM token
+          const customerToken = await getUserFCMToken(reminder.customer_id);
+          if (!customerToken) {
+            console.log(`No FCM token for customer ${reminder.customer_id}`);
+            batch.update(reminderDoc.ref, { sent: true });
+            continue;
+          }
+
+          // Get service name
+          const serviceDoc = await db.collection('services').doc(reminder.service_id).get();
+          const serviceName = serviceDoc.data()?.title || 'الخدمة';
+
+          // Get provider name
+          const providerDoc = await db.collection('profiles').doc(reminder.provider_id).get();
+          const providerName = providerDoc.data()?.display_name || 'المزود';
+
+          // Format time message
+          const minutesBefore = reminder.minutes_before;
+          let timeMessage = '';
+          if (minutesBefore < 60) {
+            timeMessage = `بعد ${minutesBefore} دقيقة`;
+          } else if (minutesBefore === 60) {
+            timeMessage = 'بعد ساعة';
+          } else if (minutesBefore === 120) {
+            timeMessage = 'بعد ساعتين';
+          } else if (minutesBefore >= 1440) {
+            const days = Math.floor(minutesBefore / 1440);
+            timeMessage = days === 1 ? 'غداً' : `بعد ${days} أيام`;
+          } else {
+            const hours = Math.floor(minutesBefore / 60);
+            timeMessage = `بعد ${hours} ساعات`;
+          }
+
+          // Calculate distance if available
+          let distanceText = '';
+          const customerProfile = await db.collection('profiles').doc(reminder.customer_id).get();
+          const providerProfile = await db.collection('profiles').doc(reminder.provider_id).get();
+          
+          const customerData = customerProfile.data();
+          const providerData = providerProfile.data();
+          
+          if (customerData?.latitude && providerData?.latitude) {
+            const distance = calculateDistance(
+              { latitude: customerData.latitude, longitude: customerData.longitude },
+              { latitude: providerData.latitude, longitude: providerData.longitude }
+            );
+            
+            if (distance < 1) {
+              distanceText = ` • ${Math.round(distance * 1000)} متر`;
+            } else {
+              distanceText = ` • ${distance.toFixed(1)} كم`;
+            }
+          }
+
+          // Send notification
+          await sendNotification(
+            customerToken,
+            `⏰ تذكير: موعدك ${timeMessage}`,
+            `${serviceName} مع ${providerName}${distanceText}`,
+            {
+              type: 'booking_reminder',
+              booking_id: reminder.booking_id,
+              minutes_before: minutesBefore.toString(),
+              link: '/customer-dashboard',
+            }
+          );
+
+          // Mark as sent
+          batch.update(reminderDoc.ref, { 
+            sent: true,
+            sent_at: new Date(),
+          });
+
+          sentCount++;
+          console.log(`✅ Reminder sent for booking ${reminder.booking_id}`);
+
+        } catch (error) {
+          console.error(`Error sending reminder ${reminderDoc.id}:`, error);
+          // Don't mark as sent if there was an error
+        }
+      }
+
+      await batch.commit();
+      console.log(`📬 Sent ${sentCount} reminders successfully`);
+
+    } catch (error) {
+      console.error('Error in sendScheduledReminders:', error);
     }
   }
 );
