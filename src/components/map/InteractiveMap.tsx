@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -187,11 +187,18 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
 
   // إضافة علامة محسّنة مع معلومات الخدمات
   const addMarker = (location: Location, label?: string, draggable = false) => {
-    if (!mapInstanceRef.current) return;
+    console.log('📍 addMarker called:', { lat: location.latitude, lng: location.longitude, label });
+    console.log('  mapInstanceRef.current:', !!mapInstanceRef.current);
+    
+    if (!mapInstanceRef.current) {
+      console.log('❌ No map instance in addMarker');
+      return;
+    }
 
     const isRTL = currentLanguage === 'ar';
 
     // استخدام Marker العادي (AdvancedMarker يحتاج Map ID من Google Console)
+    console.log('  Creating google.maps.Marker...');
     const marker = new google.maps.Marker({
       position: { lat: location.latitude, lng: location.longitude },
       map: mapInstanceRef.current,
@@ -199,6 +206,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
       draggable: draggable,
       animation: google.maps.Animation.DROP
     });
+    console.log('✅ Marker created:', marker);
 
     // إذا كانت العلامة قابلة للسحب
     if (draggable && onLocationSelect) {
