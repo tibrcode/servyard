@@ -124,6 +124,9 @@ export const adminDeleteUser = onRequest({ cors: true, maxInstances: 1, secrets:
   return res.json({ ok: true });
 });
 
+// OLD FUNCTIONS - TEMPORARILY DISABLED DUE TO REGION MISMATCH
+// These are replaced by the new notification system below
+/*
 // 3) إرسال إشعار عند إنشاء حجز جديد
 export const sendBookingNotification = onDocumentCreated(
   'bookings/{bookingId}',
@@ -266,6 +269,8 @@ export const sendReviewNotification = onDocumentCreated(
     }
   }
 );
+*/
+// END OF OLD FUNCTIONS
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 🌍 Cloud Functions للبحث الجغرافي
@@ -511,7 +516,13 @@ export const getLocationStats = onRequest(
 // =============================================================================
 
 /**
- * Send notification to a user
+ * ═══════════════════════════════════════════════════════════════════════════
+ * 🔔 NOTIFICATION SYSTEM - Helper Functions
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+
+/**
+ * Send FCM notification to a user
  */
 async function sendNotification(
   fcmToken: string,
@@ -522,35 +533,28 @@ async function sendNotification(
   try {
     await messaging.send({
       token: fcmToken,
-      notification: {
-        title,
-        body,
-      },
+      notification: { title, body },
       data: data || {},
       webpush: {
         fcmOptions: {
-          link: data?.link || 'https://servyard.com',
+          link: data?.link || '/',
         },
       },
     });
-    console.log('✅ Notification sent successfully');
     return true;
   } catch (error) {
-    console.error('❌ Error sending notification:', error);
+    console.error('Error sending FCM notification:', error);
     return false;
   }
 }
 
 /**
- * Get user's FCM token from their profile
+ * Get user's FCM token from profile
  */
 async function getUserFCMToken(userId: string): Promise<string | null> {
   try {
-    const profileDoc = await db.collection('profiles').doc(userId).get();
-    if (!profileDoc.exists) return null;
-    
-    const data = profileDoc.data();
-    return data?.fcm_token || null;
+    const profile = await db.collection('profiles').doc(userId).get();
+    return profile.data()?.fcm_token || null;
   } catch (error) {
     console.error('Error getting FCM token:', error);
     return null;
@@ -558,136 +562,8 @@ async function getUserFCMToken(userId: string): Promise<string | null> {
 }
 
 /**
- * Trigger: When a booking is created
- * Send notification to provider about new booking request
- */
-export const onBookingCreated = onDocumentCreated(
-  'bookings/{bookingId}',
-  async (event) => {
-    const booking = event.data?.data();
-    if (!booking) return;
-
-    try {
-      // Get provider's FCM token
-      const providerToken = await getUserFCMToken(booking.provider_id);
-      if (!providerToken) {
-        console.log('Provider FCM token not found');
-        return;
-      }
-
-      // Get customer name
-      const customerDoc = await db.collection('profiles').doc(booking.customer_id).get();
-      const customerName = customerDoc.data()?.display_name || 'عميل جديد';
-
-      // Get service name
-      const serviceDoc = await db.collection('services').doc(booking.service_id).get();
-      const serviceName = serviceDoc.data()?.title || 'خدمة';
-
-      // Send notification to provider
-      await sendNotification(
-        providerToken,
-        '🔔 حجز جديد!',
-        `${customerName} طلب حجز ${serviceName}`,
-        {
-          type: 'new_booking',
-          booking_id: event.params.bookingId,
-          link: '/provider-dashboard',
-        }
-      );
-
-      console.log('✅ New booking notification sent to provider');
-    } catch (error) {
-      console.error('Error in onBookingCreated:', error);
-    }
-  }
-);
-
-/**
- * Trigger: When a booking status changes
- * Send notifications to customer based on status
- */
-export const onBookingUpdated = onDocumentUpdated(
-  'bookings/{bookingId}',
-  async (event) => {
-    const before = event.data?.before.data();
-    const after = event.data?.after.data();
-    
-    if (!before || !after) return;
-
-    // Check if status changed
-    if (before.status === after.status) return;
-
-    try {
-      const bookingId = event.params.bookingId;
-      const customerId = after.customer_id;
-      const providerId = after.provider_id;
-
-      // Get customer's FCM token
-      const customerToken = await getUserFCMToken(customerId);
-      
-      // Get service name
-      const serviceDoc = await db.collection('services').doc(after.service_id).get();
-      const serviceName = serviceDoc.data()?.title || 'الخدمة';
-
-      // Get provider name
-      const providerDoc = await db.collection('profiles').doc(providerId).get();
-      const providerName = providerDoc.data()?.display_name || 'المزود';
-
-      let title = '';
-      let body = '';
-      let notificationType = '';
-
-      switch (after.status) {
-        case 'confirmed':
-          title = '✅ تم تأكيد حجزك!';
-          body = `تم تأكيد حجزك لـ ${serviceName} مع ${providerName}`;
-          notificationType = 'booking_confirmed';
-          break;
-
-        case 'cancelled':
-          title = '❌ تم إلغاء الحجز';
-          body = `تم إلغاء حجزك لـ ${serviceName}`;
-          notificationType = 'booking_cancelled';
-          break;
-
-        case 'completed':
-          title = '🎉 تم إكمال الخدمة!';
-          body = `شكراً لاستخدامك ${serviceName}. يرجى تقييم الخدمة`;
-          notificationType = 'booking_completed';
-          break;
-
-        case 'no_show':
-          title = '⚠️ لم تحضر للموعد';
-          body = `لم تحضر لموعدك مع ${providerName}`;
-          notificationType = 'booking_no_show';
-          break;
-
-        default:
-          return; // No notification for other statuses
-      }
-
-      if (customerToken) {
-        await sendNotification(customerToken, title, body, {
-          type: notificationType,
-          booking_id: bookingId,
-          link: '/customer-dashboard',
-        });
-        console.log(`✅ Booking ${after.status} notification sent to customer`);
-      }
-
-      // If booking confirmed, create a reminder entry
-      if (after.status === 'confirmed' && after.booking_date) {
-        await createBookingReminders(bookingId, after);
-      }
-
-    } catch (error) {
-      console.error('Error in onBookingUpdated:', error);
-    }
-  }
-);
-
-/**
  * Create reminder entries for a confirmed booking
+ * This is used by the scheduled reminders system
  */
 async function createBookingReminders(bookingId: string, booking: any) {
   try {
@@ -716,7 +592,7 @@ async function createBookingReminders(bookingId: string, booking: any) {
       });
     }
 
-    // Batch write reminders
+    // Batch write all reminders
     const batch = db.batch();
     reminders.forEach((reminder) => {
       const ref = db.collection('booking_reminders').doc();
@@ -729,6 +605,11 @@ async function createBookingReminders(bookingId: string, booking: any) {
     console.error('Error creating reminders:', error);
   }
 }
+
+// NOTE: Firestore triggers (onBookingCreated, onBookingUpdated) are temporarily
+// NOTE: Firestore triggers (onBookingCreated, onBookingUpdated) are temporarily
+// disabled due to region mismatch between Firestore (me-central2) and Cloud Functions (us-central1).
+// These will be re-enabled once the region issue is resolved.
 
 /**
  * Scheduled function: Runs every 5 minutes to send pending reminders
