@@ -320,11 +320,17 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
 
   // فلترة أساسية (فئة + بحث فقط)
   const baseFilteredServices = useMemo(() => {
+    console.log('🔍 baseFilteredServices calculation:');
+    console.log('  Total services:', services.length);
+    console.log('  Selected category:', selectedCategory);
+    console.log('  Search query:', searchQuery);
+    
     let filtered = services;
 
     // فلترة حسب الفئة
     if (selectedCategory !== 'all') {
       filtered = filtered.filter(s => s.category_id === selectedCategory);
+      console.log('  After category filter:', filtered.length);
     }
 
     // فلترة حسب البحث
@@ -333,8 +339,10 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
         service.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         service.description?.toLowerCase().includes(searchQuery.toLowerCase())
       );
+      console.log('  After search filter:', filtered.length);
     }
 
+    console.log('  Final baseFilteredServices:', filtered.length);
     return filtered;
   }, [services, selectedCategory, searchQuery]);
 
@@ -370,12 +378,25 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
 
   // حساب mapMarkers من الفلترة الأساسية (بدون فلترة الموقع)
   const mapMarkers = useMemo(() => {
+    console.log('🗺️ mapMarkers calculation:');
+    console.log('  baseFilteredServices:', baseFilteredServices.length);
+    console.log('  Total providers:', Object.keys(providers).length);
+    console.log('  Providers with GPS:', Object.values(providers).filter(p => p?.latitude && p?.longitude).length);
+    
     // استخدام baseFilteredServices بدلاً من filteredServices
     // لتجنب تأثير فلترة الموقع على الخريطة
     const servicesByLocation = new Map<string, Service[]>();
     
-    baseFilteredServices.forEach(service => {
+    baseFilteredServices.forEach((service, index) => {
       const provider = providers[service.provider_id];
+      console.log(`  Service ${index + 1} (${service.name}):`, {
+        provider_id: service.provider_id,
+        provider_exists: !!provider,
+        has_gps: !!(provider?.latitude && provider?.longitude),
+        lat: provider?.latitude,
+        lng: provider?.longitude
+      });
+      
       if (!provider?.latitude || !provider?.longitude) return;
       
       const locationKey = `${provider.latitude},${provider.longitude}`;
