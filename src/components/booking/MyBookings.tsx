@@ -6,11 +6,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Booking, BookingStatus } from '@/types/booking';
 import { getCustomerBookings, cancelBooking, subscribeToCustomerBookings } from '@/lib/firebase/bookingFunctions';
 import { formatTimeDisplay, canCancelBooking } from '@/lib/bookingUtils';
-import { Calendar, Clock, MapPin, Phone, X, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Calendar, Clock, MapPin, Phone, X, AlertCircle, CheckCircle2, Star, Edit } from 'lucide-react';
+import { db } from '@/integrations/firebase/client';
+import { collection, addDoc, query, where, getDocs } from 'firebase/firestore';
 import { format } from 'date-fns';
 import { ar, enUS } from 'date-fns/locale';
 import {
@@ -25,6 +29,15 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 
 interface MyBookingsProps {
   customerId: string;
@@ -42,6 +55,14 @@ export function MyBookings({
   const [isLoading, setIsLoading] = useState(true);
   const [cancellingId, setCancellingId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
+  
+  // Review state
+  const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
+  const [selectedBookingForReview, setSelectedBookingForReview] = useState<Booking | null>(null);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState('');
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [existingReviews, setExistingReviews] = useState<Set<string>>(new Set());
 
   const isRTL = language === 'ar';
   const dateLocale = language === 'ar' ? ar : enUS;
@@ -77,6 +98,18 @@ export function MyBookings({
       ? `يجب إلغاء الحجز قبل ${cancellationPolicyHours} ساعة على الأقل`
       : `Booking must be cancelled at least ${cancellationPolicyHours} hours before`,
     contactProvider: isRTL ? 'اتصل بمقدم الخدمة' : 'Contact Provider',
+    edit: isRTL ? 'تعديل' : 'Edit',
+    review: isRTL ? 'تقييم الخدمة' : 'Review Service',
+    rateService: isRTL ? 'قيّم الخدمة' : 'Rate Service',
+    yourRating: isRTL ? 'تقييمك' : 'Your Rating',
+    writeReview: isRTL ? 'اكتب تقييمك (اختياري)' : 'Write your review (optional)',
+    reviewPlaceholder: isRTL ? 'شارك تجربتك مع الخدمة...' : 'Share your experience with the service...',
+    submitReview: isRTL ? 'إرسال التقييم' : 'Submit Review',
+    submitting: isRTL ? 'جاري الإرسال...' : 'Submitting...',
+    reviewSuccess: isRTL ? 'تم إرسال تقييمك' : 'Review Submitted',
+    reviewSuccessDesc: isRTL ? 'شكراً لك على تقييم الخدمة' : 'Thank you for rating the service',
+    reviewError: isRTL ? 'فشل إرسال التقييم' : 'Failed to submit review',
+    alreadyReviewed: isRTL ? 'تم التقييم' : 'Already Reviewed',
     statuses: {
       pending: isRTL ? 'قيد الانتظار' : 'Pending',
       confirmed: isRTL ? 'مؤكد' : 'Confirmed',
@@ -95,9 +128,28 @@ export function MyBookings({
       setIsLoading(false);
     });
     
+    // Load existing reviews
+    loadExistingReviews();
+    
     // Cleanup subscription on unmount
     return () => unsubscribe();
   }, [customerId]);
+
+  const loadExistingReviews = async () => {
+    try {
+      const reviewsQuery = query(
+        collection(db, 'reviews'),
+        where('customer_id', '==', customerId)
+      );
+      const reviewsSnapshot = await getDocs(reviewsQuery);
+      const reviewedBookingIds = new Set(
+        reviewsSnapshot.docs.map(doc => doc.data().booking_id).filter(Boolean)
+      );
+      setExistingReviews(reviewedBookingIds);
+    } catch (error) {
+      console.error('Error loading reviews:', error);
+    }
+  };
 
   const loadBookings = async () => {
     // Kept for manual refresh if needed
@@ -114,6 +166,56 @@ export function MyBookings({
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleOpenReviewDialog = (booking: Booking) => {
+    setSelectedBookingForReview(booking);
+    setReviewRating(5);
+    setReviewComment('');
+    setReviewDialogOpen(true);
+  };
+
+  const handleSubmitReview = async () => {
+    if (!selectedBookingForReview) return;
+
+    setIsSubmittingReview(true);
+    try {
+      const reviewData = {
+        customer_id: customerId,
+        provider_id: selectedBookingForReview.provider_id,
+        service_id: selectedBookingForReview.service_id,
+        booking_id: selectedBookingForReview.booking_id,
+        rating: reviewRating,
+        comment: reviewComment.trim(),
+        is_approved: true,
+        is_comment_enabled: true,
+        created_at: new Date(),
+      };
+
+      await addDoc(collection(db, 'reviews'), reviewData);
+
+      // Update existing reviews set
+      setExistingReviews(prev => new Set(prev).add(selectedBookingForReview.booking_id));
+
+      toast({
+        title: t.reviewSuccess,
+        description: t.reviewSuccessDesc,
+      });
+
+      setReviewDialogOpen(false);
+      setSelectedBookingForReview(null);
+      setReviewRating(5);
+      setReviewComment('');
+    } catch (error) {
+      console.error('Error submitting review:', error);
+      toast({
+        title: t.reviewError,
+        description: isRTL ? 'حدث خطأ أثناء إرسال التقييم' : 'An error occurred while submitting the review',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmittingReview(false);
     }
   };
 
@@ -243,14 +345,24 @@ export function MyBookings({
             {isUpcoming(booking) && booking.status !== 'cancelled' && (
               <>
                 <Separator />
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={true}
+                    className="flex-1 min-w-[120px]"
+                  >
+                    <Edit className="h-4 w-4 mr-1" />
+                    {t.edit}
+                  </Button>
+
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button
                         variant="outline"
                         size="sm"
                         disabled={!canCancel || cancellingId === booking.booking_id}
-                        className="flex-1"
+                        className="flex-1 min-w-[120px]"
                       >
                         {cancellingId === booking.booking_id ? (
                           t.cancelling
@@ -284,7 +396,7 @@ export function MyBookings({
                   </AlertDialog>
 
                   {booking.customer_phone && (
-                    <Button variant="default" size="sm" className="flex-1" asChild>
+                    <Button variant="default" size="sm" className="flex-1 min-w-[120px]" asChild>
                       <a href={`tel:${booking.customer_phone}`}>
                         <Phone className="h-4 w-4 mr-1" />
                         {t.contactProvider}
@@ -299,6 +411,31 @@ export function MyBookings({
                     <span>{t.cannotCancelDesc}</span>
                   </div>
                 )}
+              </>
+            )}
+
+            {/* Review Action for Completed Bookings */}
+            {!isUpcoming(booking) && booking.status === 'completed' && (
+              <>
+                <Separator />
+                <div className="flex gap-2">
+                  {existingReviews.has(booking.booking_id) ? (
+                    <Button variant="outline" size="sm" disabled className="flex-1">
+                      <CheckCircle2 className="h-4 w-4 mr-1 text-green-500" />
+                      {t.alreadyReviewed}
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => handleOpenReviewDialog(booking)}
+                    >
+                      <Star className="h-4 w-4 mr-1" />
+                      {t.review}
+                    </Button>
+                  )}
+                </div>
               </>
             )}
           </div>
@@ -360,6 +497,75 @@ export function MyBookings({
           </TabsContent>
         </Tabs>
       </CardContent>
+
+      {/* Review Dialog */}
+      <Dialog open={reviewDialogOpen} onOpenChange={setReviewDialogOpen}>
+        <DialogContent dir={isRTL ? 'rtl' : 'ltr'} className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>{t.rateService}</DialogTitle>
+            <DialogDescription>
+              {selectedBookingForReview?.service_title}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-6 py-4">
+            {/* Star Rating */}
+            <div className="space-y-2">
+              <Label>{t.yourRating}</Label>
+              <div className="flex gap-2 justify-center">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setReviewRating(star)}
+                    className="transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary rounded"
+                  >
+                    <Star
+                      className={`h-10 w-10 ${
+                        star <= reviewRating
+                          ? 'fill-yellow-400 text-yellow-400'
+                          : 'text-gray-300'
+                      }`}
+                    />
+                  </button>
+                ))}
+              </div>
+              <p className="text-center text-sm text-muted-foreground">
+                {reviewRating} {isRTL ? 'من 5 نجوم' : 'out of 5 stars'}
+              </p>
+            </div>
+
+            {/* Comment */}
+            <div className="space-y-2">
+              <Label htmlFor="review-comment">{t.writeReview}</Label>
+              <Textarea
+                id="review-comment"
+                placeholder={t.reviewPlaceholder}
+                value={reviewComment}
+                onChange={(e) => setReviewComment(e.target.value)}
+                rows={4}
+                className="resize-none"
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setReviewDialogOpen(false)}
+              disabled={isSubmittingReview}
+            >
+              {isRTL ? 'إلغاء' : 'Cancel'}
+            </Button>
+            <Button
+              onClick={handleSubmitReview}
+              disabled={isSubmittingReview}
+            >
+              {isSubmittingReview ? t.submitting : t.submitReview}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }
