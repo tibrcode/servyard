@@ -115,13 +115,12 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
     };
   }, []);
 
-  // إنشاء الخريطة (مرة واحدة فقط)
+  // إنشاء الخريطة
   useEffect(() => {
-    if (!apiLoaded || !mapRef.current || mapInstanceRef.current) return;
+    if (!apiLoaded || !mapRef.current) return;
 
     const defaultCenter = center || { latitude: 31.9454, longitude: 35.9284 }; // عمّان، الأردن
 
-    console.log('🗺️ Creating new Google Map instance...');
     const map = new google.maps.Map(mapRef.current, {
       center: { lat: defaultCenter.latitude, lng: defaultCenter.longitude },
       zoom: zoom,
@@ -132,7 +131,6 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
     });
 
     mapInstanceRef.current = map;
-    console.log('✅ Map instance created');
 
     // إضافة event listener للنقر
     if (onLocationSelect) {
@@ -150,51 +148,25 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
         }
       });
     }
-  }, [apiLoaded]);
 
-  // تحديث المركز والزوم عند تغييرهم
-  useEffect(() => {
-    if (!mapInstanceRef.current || !center) return;
-    
-    mapInstanceRef.current.setCenter({ lat: center.latitude, lng: center.longitude });
-    mapInstanceRef.current.setZoom(zoom);
-  }, [center, zoom]);
-
-  // تحديث العلامات عند تغييرها
-  useEffect(() => {
-    if (!mapInstanceRef.current) {
-      console.log('❌ Cannot update markers: mapInstanceRef is null');
-      return;
-    }
-
-    console.log('🗺️ Updating markers:', markers.length);
-    console.log('  Map instance exists:', !!mapInstanceRef.current);
-    
     // حذف العلامات القديمة
-    console.log('  Clearing old markers...');
     clearMarkers();
-    console.log('  Old markers cleared');
     
     // إضافة العلامات الجديدة
+    console.log('🗺️ Adding markers to map:', markers.length);
     markers.forEach((marker, index) => {
-      console.log(`  Adding Marker ${index + 1}:`, marker.label, `at (${marker.latitude}, ${marker.longitude})`);
+      console.log(`  Marker ${index + 1}:`, marker.label, `(${marker.latitude}, ${marker.longitude})`);
       addMarker(marker, marker.label);
     });
 
-    console.log('✅ Markers updated on map. Total markers now:', markersRef.current.length);
-  }, [markers, currentLanguage]);
+  }, [apiLoaded, center, zoom, markers]);
 
   // إضافة علامة محسّنة مع معلومات الخدمات
   const addMarker = (location: Location, label?: string, draggable = false) => {
-    if (!mapInstanceRef.current) {
-      console.log('❌ addMarker: mapInstanceRef is null');
-      return;
-    }
+    if (!mapInstanceRef.current) return;
 
     const isRTL = currentLanguage === 'ar';
 
-    console.log('  📍 Creating marker at:', location.latitude, location.longitude);
-    
     // استخدام Marker العادي (AdvancedMarker يحتاج Map ID من Google Console)
     const marker = new google.maps.Marker({
       position: { lat: location.latitude, lng: location.longitude },
@@ -203,8 +175,6 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
       draggable: draggable,
       animation: google.maps.Animation.DROP
     });
-    
-    console.log('  ✅ Marker created successfully');
 
     // إذا كانت العلامة قابلة للسحب
     if (draggable && onLocationSelect) {
