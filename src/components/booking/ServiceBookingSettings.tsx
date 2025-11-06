@@ -199,12 +199,15 @@ export function ServiceBookingSettings({
                   pattern="[0-9]*"
                   value={settings.max_concurrent_bookings}
                   onChange={(e) => {
-                    const value = parseInt(e.target.value.replace(/\D/g, '')) || 1;
-                    if (value >= 1 && value <= 10) {
-                      setSettings({
-                        ...settings,
-                        max_concurrent_bookings: value,
-                      });
+                    const input = e.target.value.replace(/\D/g, '');
+                    if (input !== '') {
+                      const value = parseInt(input);
+                      if (value >= 1 && value <= 10) {
+                        setSettings({
+                          ...settings,
+                          max_concurrent_bookings: value,
+                        });
+                      }
                     }
                   }}
                   className="max-w-[100px]"
@@ -224,12 +227,15 @@ export function ServiceBookingSettings({
                   pattern="[0-9]*"
                   value={settings.advance_booking_days}
                   onChange={(e) => {
-                    const value = parseInt(e.target.value.replace(/\D/g, '')) || 30;
-                    if (value >= 1 && value <= 365) {
-                      setSettings({
-                        ...settings,
-                        advance_booking_days: value,
-                      });
+                    const input = e.target.value.replace(/\D/g, '');
+                    if (input !== '') {
+                      const value = parseInt(input);
+                      if (value >= 1 && value <= 365) {
+                        setSettings({
+                          ...settings,
+                          advance_booking_days: value,
+                        });
+                      }
                     }
                   }}
                   className="max-w-[100px]"
@@ -249,7 +255,8 @@ export function ServiceBookingSettings({
                   pattern="[0-9]*"
                   value={settings.buffer_time_minutes || 0}
                   onChange={(e) => {
-                    const value = parseInt(e.target.value.replace(/\D/g, '')) || 0;
+                    const input = e.target.value.replace(/\D/g, '');
+                    const value = input === '' ? 0 : parseInt(input);
                     if (value >= 0 && value <= 60) {
                       setSettings({
                         ...settings,
@@ -277,12 +284,20 @@ export function ServiceBookingSettings({
                   pattern="[0-9]*"
                   value={settings.cancellation_policy_hours}
                   onChange={(e) => {
-                    const value = parseInt(e.target.value.replace(/\D/g, '')) || 24;
-                    if (value >= 0 && value <= 168) {
+                    const input = e.target.value.replace(/\D/g, '');
+                    if (input === '') {
                       setSettings({
                         ...settings,
-                        cancellation_policy_hours: value,
+                        cancellation_policy_hours: 0,
                       });
+                    } else {
+                      const value = parseInt(input);
+                      if (value >= 0 && value <= 168) {
+                        setSettings({
+                          ...settings,
+                          cancellation_policy_hours: value,
+                        });
+                      }
                     }
                   }}
                   className="max-w-[100px]"
