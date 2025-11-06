@@ -200,7 +200,12 @@ export function ServiceBookingSettings({
                   value={settings.max_concurrent_bookings}
                   onChange={(e) => {
                     const input = e.target.value.replace(/\D/g, '');
-                    if (input !== '') {
+                    if (input === '') {
+                      setSettings({
+                        ...settings,
+                        max_concurrent_bookings: 1,
+                      });
+                    } else {
                       const value = parseInt(input);
                       if (value >= 1 && value <= 10) {
                         setSettings({
@@ -228,7 +233,12 @@ export function ServiceBookingSettings({
                   value={settings.advance_booking_days}
                   onChange={(e) => {
                     const input = e.target.value.replace(/\D/g, '');
-                    if (input !== '') {
+                    if (input === '') {
+                      setSettings({
+                        ...settings,
+                        advance_booking_days: 1,
+                      });
+                    } else {
                       const value = parseInt(input);
                       if (value >= 1 && value <= 365) {
                         setSettings({

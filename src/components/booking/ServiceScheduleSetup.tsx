@@ -378,10 +378,10 @@ export function ServiceScheduleSetup({
                       <Label className="text-sm text-muted-foreground">{t.startTime}</Label>
                       <Input
                         type="text"
+                        inputMode="numeric"
                         placeholder="09:00"
-                        value={currentSchedule.start_time}
+                        value={currentSchedule.start_time || ''}
                         onChange={(e) => {
-                          // Format as HH:mm
                           let value = e.target.value.replace(/[^\d:]/g, '');
                           if (value.length === 2 && !value.includes(':')) {
                             value = value + ':';
@@ -397,16 +397,15 @@ export function ServiceScheduleSetup({
                       <Label className="text-sm text-muted-foreground">{t.endTime}</Label>
                       <Input
                         type="text"
+                        inputMode="numeric"
                         placeholder="21:00"
-                        value={currentSchedule.end_time}
+                        value={currentSchedule.end_time || ''}
                         onChange={(e) => {
-                          // Format as HH:mm
                           let value = e.target.value.replace(/[^\d:]/g, '');
                           if (value.length === 2 && !value.includes(':')) {
                             value = value + ':';
                           }
                           if (value.length <= 5) {
-                            console.log('⏰ End time changed:', value);
                             updateDaySchedule(selectedDay, { end_time: value });
                           }
                         }}
@@ -442,8 +441,9 @@ export function ServiceScheduleSetup({
                         <div key={index} className="flex items-center gap-2">
                           <Input
                             type="text"
+                            inputMode="numeric"
                             placeholder="13:00"
-                            value={breakTime.start}
+                            value={breakTime.start || ''}
                             onChange={(e) => {
                               let value = e.target.value.replace(/[^\d:]/g, '');
                               if (value.length === 2 && !value.includes(':')) {
@@ -459,8 +459,9 @@ export function ServiceScheduleSetup({
                           <span className="text-muted-foreground">-</span>
                           <Input
                             type="text"
+                            inputMode="numeric"
                             placeholder="14:00"
-                            value={breakTime.end}
+                            value={breakTime.end || ''}
                             onChange={(e) => {
                               let value = e.target.value.replace(/[^\d:]/g, '');
                               if (value.length === 2 && !value.includes(':')) {
