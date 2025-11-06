@@ -8,7 +8,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { AppSidebar } from "@/components/layout/AppSidebar";
-import { db } from "@/lib/firebase/config";
+import { db } from "@/integrations/firebase/client";
 import { doc, updateDoc } from "firebase/firestore";
 import { Header } from "@/components/layout/Header";
 import { requestNotificationPermission, onMessageListener } from "@/lib/firebase/notifications";
