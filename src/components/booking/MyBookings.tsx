@@ -12,9 +12,9 @@ import { useToast } from '@/hooks/use-toast';
 import { Booking, BookingStatus } from '@/types/booking';
 import { getCustomerBookings, cancelBooking, subscribeToCustomerBookings } from '@/lib/firebase/bookingFunctions';
 import { formatTimeDisplay, canCancelBooking } from '@/lib/bookingUtils';
-import { Calendar, Clock, MapPin, Phone, X, AlertCircle, CheckCircle2, Star, Edit } from 'lucide-react';
+import { Calendar, Clock, MapPin, Phone, X, AlertCircle, CheckCircle2, Star, Edit, MessageSquare } from 'lucide-react';
 import { db } from '@/integrations/firebase/client';
-import { collection, addDoc, query, where, getDocs } from 'firebase/firestore';
+import { collection, addDoc, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { format } from 'date-fns';
 import { ar, enUS } from 'date-fns/locale';
 import {
@@ -63,6 +63,9 @@ export function MyBookings({
   const [reviewComment, setReviewComment] = useState('');
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const [existingReviews, setExistingReviews] = useState<Set<string>>(new Set());
+  
+  // Provider contact info
+  const [providerContacts, setProviderContacts] = useState<Record<string, {phone?: string[], whatsapp?: string}>>({});
 
   const isRTL = language === 'ar';
   const dateLocale = language === 'ar' ? ar : enUS;
@@ -126,6 +129,9 @@ export function MyBookings({
     const unsubscribe = subscribeToCustomerBookings(customerId, (data) => {
       setBookings(data);
       setIsLoading(false);
+      
+      // Load provider contacts for all bookings
+      loadProviderContacts(data);
     });
     
     // Load existing reviews
@@ -134,6 +140,28 @@ export function MyBookings({
     // Cleanup subscription on unmount
     return () => unsubscribe();
   }, [customerId]);
+
+  const loadProviderContacts = async (bookingsData: Booking[]) => {
+    const providerIds = [...new Set(bookingsData.map(b => b.provider_id))];
+    const contacts: Record<string, {phone?: string[], whatsapp?: string}> = {};
+    
+    for (const providerId of providerIds) {
+      try {
+        const providerDoc = await getDoc(doc(db, 'profiles', providerId));
+        if (providerDoc.exists()) {
+          const data = providerDoc.data();
+          contacts[providerId] = {
+            phone: data.phone_numbers,
+            whatsapp: data.whatsapp_number
+          };
+        }
+      } catch (error) {
+        console.error(`Error loading provider ${providerId}:`, error);
+      }
+    }
+    
+    setProviderContacts(contacts);
+  };
 
   const loadExistingReviews = async () => {
     try {
@@ -196,7 +224,11 @@ export function MyBookings({
       await addDoc(collection(db, 'reviews'), reviewData);
 
       // Update existing reviews set
-      setExistingReviews(prev => new Set(prev).add(selectedBookingForReview.booking_id));
+      setExistingReviews(prev => {
+        const newSet = new Set(prev);
+        newSet.add(selectedBookingForReview.booking_id);
+        return newSet;
+      });
 
       toast({
         title: t.reviewSuccess,
@@ -207,6 +239,9 @@ export function MyBookings({
       setSelectedBookingForReview(null);
       setReviewRating(5);
       setReviewComment('');
+
+      // Reload reviews to update CustomerDashboard
+      await loadExistingReviews();
     } catch (error) {
       console.error('Error submitting review:', error);
       toast({
@@ -346,20 +381,10 @@ export function MyBookings({
               <>
                 <Separator />
                 <div className="flex gap-2 flex-wrap">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={true}
-                    className="flex-1 min-w-[120px]"
-                  >
-                    <Edit className="h-4 w-4 mr-1" />
-                    {t.edit}
-                  </Button>
-
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button
-                        variant="outline"
+                        variant="destructive"
                         size="sm"
                         disabled={!canCancel || cancellingId === booking.booking_id}
                         className="flex-1 min-w-[120px]"
@@ -395,11 +420,20 @@ export function MyBookings({
                     </AlertDialogContent>
                   </AlertDialog>
 
-                  {booking.customer_phone && (
-                    <Button variant="default" size="sm" className="flex-1 min-w-[120px]" asChild>
-                      <a href={`tel:${booking.customer_phone}`}>
+                  {providerContacts[booking.provider_id]?.phone && providerContacts[booking.provider_id]?.phone.length > 0 && (
+                    <Button variant="outline" size="sm" className="flex-1 min-w-[120px]" asChild>
+                      <a href={`tel:${providerContacts[booking.provider_id].phone[0]}`}>
                         <Phone className="h-4 w-4 mr-1" />
                         {t.contactProvider}
+                      </a>
+                    </Button>
+                  )}
+
+                  {providerContacts[booking.provider_id]?.whatsapp && (
+                    <Button variant="outline" size="sm" className="flex-1 min-w-[120px]" asChild>
+                      <a href={`https://wa.me/${providerContacts[booking.provider_id].whatsapp.replace(/[^\d]/g, '')}`} target="_blank" rel="noopener noreferrer">
+                        <MessageSquare className="h-4 w-4 mr-1" />
+                        {isRTL ? 'واتساب' : 'WhatsApp'}
                       </a>
                     </Button>
                   )}

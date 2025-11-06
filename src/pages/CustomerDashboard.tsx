@@ -19,7 +19,7 @@ import { useTranslation } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { auth, db } from "@/integrations/firebase/client";
-import { collection, query, where, getDocs, doc, getDoc, updateDoc, addDoc } from "firebase/firestore";
+import { collection, query, where, getDocs, doc, getDoc, updateDoc, addDoc, onSnapshot } from "firebase/firestore";
 import { Review } from "@/lib/firebase/collections";
 import { MyBookings } from "@/components/booking/MyBookings";
 
@@ -66,6 +66,7 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
     } else if (!authLoading && (!user || role !== 'customer')) {
       navigate('/auth');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, role, authLoading, navigate]);
 
   const loadCustomerData = async () => {
@@ -79,52 +80,50 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
         setProfile({ id: profileDoc.id, ...profileDoc.data() } as Profile);
       }
 
-      // Load customer reviews (remove orderBy to avoid index requirement)
+      // Real-time listener for customer reviews
       const reviewsQuery = query(
         collection(db, 'reviews'),
         where('customer_id', '==', user_uid)
       );
-      const reviewsSnapshot = await getDocs(reviewsQuery);
-      const reviewsData = reviewsSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as Review[];
+      
+      onSnapshot(reviewsQuery, async (snapshot) => {
+        const reviewsData = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        })) as Review[];
 
-      // Sort reviews by created_at in JavaScript
-      reviewsData.sort((a, b) => {
-        const aDate = a.created_at?.toDate?.() || new Date(a.created_at);
-        const bDate = b.created_at?.toDate?.() || new Date(b.created_at);
-        return bDate.getTime() - aDate.getTime();
-      });
-      setReviews(reviewsData);
+        // Sort reviews by created_at in JavaScript
+        reviewsData.sort((a, b) => {
+          const aDate = a.created_at?.toDate?.() || new Date(a.created_at);
+          const bDate = b.created_at?.toDate?.() || new Date(b.created_at);
+          return bDate.getTime() - aDate.getTime();
+        });
+        setReviews(reviewsData);
 
-      // Load related services and providers from reviews
-      const serviceIds = [...new Set(reviewsData.map(r => r.service_id))];
-      const providerIds = [...new Set(reviewsData.map(r => r.provider_id))];
+        // Load related services and providers from reviews
+        const serviceIds = [...new Set(reviewsData.map((r: any) => r.service_id).filter(Boolean))];
+        const providerIds = [...new Set(reviewsData.map((r: any) => r.provider_id).filter(Boolean))];
 
-      // Load services
-      const servicesData: { [key: string]: Service } = {};
-      for (const serviceId of serviceIds) {
-        if (serviceId) {
-          const serviceDoc = await getDoc(doc(db, 'services', serviceId));
+        // Load services
+        const servicesData: { [key: string]: Service } = {};
+        for (const serviceId of serviceIds) {
+          const serviceDoc = await getDoc(doc(db, 'services', serviceId as string));
           if (serviceDoc.exists()) {
-            servicesData[serviceId] = { id: serviceDoc.id, ...serviceDoc.data() } as Service;
+            servicesData[serviceId as string] = { id: serviceDoc.id, ...serviceDoc.data() } as Service;
           }
         }
-      }
-      setServices(servicesData);
+        setServices(servicesData);
 
-      // Load providers
-      const providersData: { [key: string]: Profile } = {};
-      for (const providerId of providerIds) {
-        if (providerId) {
-          const providerDoc = await getDoc(doc(db, 'profiles', providerId));
+        // Load providers
+        const providersData: { [key: string]: Profile } = {};
+        for (const providerId of providerIds) {
+          const providerDoc = await getDoc(doc(db, 'profiles', providerId as string));
           if (providerDoc.exists()) {
-            providersData[providerId] = { id: providerDoc.id, ...providerDoc.data() } as Profile;
+            providersData[providerId as string] = { id: providerDoc.id, ...providerDoc.data() } as Profile;
           }
         }
-      }
-      setProviders(providersData);
+        setProviders(providersData);
+      });
 
     } catch (error) {
       console.error('Error loading customer data:', error);
