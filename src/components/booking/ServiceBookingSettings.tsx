@@ -197,22 +197,23 @@ export function ServiceBookingSettings({
                   type="text"
                   inputMode="numeric"
                   pattern="[0-9]*"
-                  value={settings.max_concurrent_bookings}
+                  value={settings.max_concurrent_bookings?.toString() || ''}
                   onChange={(e) => {
                     const input = e.target.value.replace(/\D/g, '');
-                    if (input === '') {
+                    const value = parseInt(input) || 1;
+                    if (value >= 1 && value <= 10) {
+                      setSettings({
+                        ...settings,
+                        max_concurrent_bookings: value,
+                      });
+                    }
+                  }}
+                  onBlur={(e) => {
+                    if (!e.target.value) {
                       setSettings({
                         ...settings,
                         max_concurrent_bookings: 1,
                       });
-                    } else {
-                      const value = parseInt(input);
-                      if (value >= 1 && value <= 10) {
-                        setSettings({
-                          ...settings,
-                          max_concurrent_bookings: value,
-                        });
-                      }
                     }
                   }}
                   className="max-w-[100px]"
@@ -230,22 +231,23 @@ export function ServiceBookingSettings({
                   type="text"
                   inputMode="numeric"
                   pattern="[0-9]*"
-                  value={settings.advance_booking_days}
+                  value={settings.advance_booking_days?.toString() || ''}
                   onChange={(e) => {
                     const input = e.target.value.replace(/\D/g, '');
-                    if (input === '') {
+                    const value = parseInt(input) || 1;
+                    if (value >= 1 && value <= 365) {
                       setSettings({
                         ...settings,
-                        advance_booking_days: 1,
+                        advance_booking_days: value,
                       });
-                    } else {
-                      const value = parseInt(input);
-                      if (value >= 1 && value <= 365) {
-                        setSettings({
-                          ...settings,
-                          advance_booking_days: value,
-                        });
-                      }
+                    }
+                  }}
+                  onBlur={(e) => {
+                    if (!e.target.value) {
+                      setSettings({
+                        ...settings,
+                        advance_booking_days: 30,
+                      });
                     }
                   }}
                   className="max-w-[100px]"
@@ -263,14 +265,22 @@ export function ServiceBookingSettings({
                   type="text"
                   inputMode="numeric"
                   pattern="[0-9]*"
-                  value={settings.buffer_time_minutes || 0}
+                  value={settings.buffer_time_minutes?.toString() || ''}
                   onChange={(e) => {
                     const input = e.target.value.replace(/\D/g, '');
-                    const value = input === '' ? 0 : parseInt(input);
+                    const value = parseInt(input) || 0;
                     if (value >= 0 && value <= 60) {
                       setSettings({
                         ...settings,
                         buffer_time_minutes: value,
+                      });
+                    }
+                  }}
+                  onBlur={(e) => {
+                    if (!e.target.value) {
+                      setSettings({
+                        ...settings,
+                        buffer_time_minutes: 0,
                       });
                     }
                   }}
@@ -292,22 +302,23 @@ export function ServiceBookingSettings({
                   type="text"
                   inputMode="numeric"
                   pattern="[0-9]*"
-                  value={settings.cancellation_policy_hours}
+                  value={settings.cancellation_policy_hours?.toString() || ''}
                   onChange={(e) => {
                     const input = e.target.value.replace(/\D/g, '');
-                    if (input === '') {
+                    const value = parseInt(input) || 0;
+                    if (value >= 0 && value <= 168) {
                       setSettings({
                         ...settings,
-                        cancellation_policy_hours: 0,
+                        cancellation_policy_hours: value,
                       });
-                    } else {
-                      const value = parseInt(input);
-                      if (value >= 0 && value <= 168) {
-                        setSettings({
-                          ...settings,
-                          cancellation_policy_hours: value,
-                        });
-                      }
+                    }
+                  }}
+                  onBlur={(e) => {
+                    if (!e.target.value) {
+                      setSettings({
+                        ...settings,
+                        cancellation_policy_hours: 24,
+                      });
                     }
                   }}
                   className="max-w-[100px]"
