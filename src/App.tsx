@@ -175,15 +175,22 @@ const AppContent = () => {
         // حفظ في profile إذا كان المستخدم مسجل دخول
         if (user?.uid) {
           try {
+            console.log('🔄 Saving location to profile for user:', user.uid);
             await updateDoc(doc(db, 'profiles', user.uid), {
               latitude,
               longitude,
               location_updated_at: new Date().toISOString()
             });
-            console.log('✅ Location saved to profile:', { latitude, longitude });
+            console.log('✅ Location saved to profile successfully!', { 
+              userId: user.uid,
+              latitude, 
+              longitude 
+            });
           } catch (error) {
-            console.error('Error saving location to profile:', error);
+            console.error('❌ Error saving location to profile:', error);
           }
+        } else {
+          console.warn('⚠️ User not logged in - location not saved to profile');
         }
         
         const accuracyText = accuracy < 100 ? "دقيق" : accuracy < 500 ? "جيد" : "تقريبي";
