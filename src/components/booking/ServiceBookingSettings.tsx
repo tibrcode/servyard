@@ -194,22 +194,18 @@ export function ServiceBookingSettings({
               <p className="text-sm text-muted-foreground">{t.concurrentDesc}</p>
               <div className="flex items-center gap-2">
                 <Input
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  value={settings.max_concurrent_bookings?.toString() || ''}
+                  type="number"
+                  min={1}
+                  max={10}
+                  value={settings.max_concurrent_bookings}
                   onChange={(e) => {
-                    const input = e.target.value.replace(/\D/g, '');
-                    const value = parseInt(input) || 1;
-                    if (value >= 1 && value <= 10) {
+                    const value = parseInt(e.target.value);
+                    if (!isNaN(value) && value >= 1 && value <= 10) {
                       setSettings({
                         ...settings,
                         max_concurrent_bookings: value,
                       });
-                    }
-                  }}
-                  onBlur={(e) => {
-                    if (!e.target.value) {
+                    } else if (e.target.value === '') {
                       setSettings({
                         ...settings,
                         max_concurrent_bookings: 1,
@@ -228,22 +224,18 @@ export function ServiceBookingSettings({
               <p className="text-sm text-muted-foreground">{t.advanceDesc}</p>
               <div className="flex items-center gap-2">
                 <Input
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  value={settings.advance_booking_days?.toString() || ''}
+                  type="number"
+                  min={1}
+                  max={365}
+                  value={settings.advance_booking_days}
                   onChange={(e) => {
-                    const input = e.target.value.replace(/\D/g, '');
-                    const value = parseInt(input) || 1;
-                    if (value >= 1 && value <= 365) {
+                    const value = parseInt(e.target.value);
+                    if (!isNaN(value) && value >= 1 && value <= 365) {
                       setSettings({
                         ...settings,
                         advance_booking_days: value,
                       });
-                    }
-                  }}
-                  onBlur={(e) => {
-                    if (!e.target.value) {
+                    } else if (e.target.value === '') {
                       setSettings({
                         ...settings,
                         advance_booking_days: 30,
@@ -262,22 +254,18 @@ export function ServiceBookingSettings({
               <p className="text-sm text-muted-foreground">{t.bufferDesc}</p>
               <div className="flex items-center gap-2">
                 <Input
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  value={settings.buffer_time_minutes?.toString() || ''}
+                  type="number"
+                  min={0}
+                  max={60}
+                  value={settings.buffer_time_minutes || 0}
                   onChange={(e) => {
-                    const input = e.target.value.replace(/\D/g, '');
-                    const value = parseInt(input) || 0;
-                    if (value >= 0 && value <= 60) {
+                    const value = parseInt(e.target.value);
+                    if (!isNaN(value) && value >= 0 && value <= 60) {
                       setSettings({
                         ...settings,
                         buffer_time_minutes: value,
                       });
-                    }
-                  }}
-                  onBlur={(e) => {
-                    if (!e.target.value) {
+                    } else if (e.target.value === '') {
                       setSettings({
                         ...settings,
                         buffer_time_minutes: 0,
@@ -299,22 +287,18 @@ export function ServiceBookingSettings({
               <p className="text-sm text-muted-foreground">{t.cancellationDesc}</p>
               <div className="flex items-center gap-2">
                 <Input
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  value={settings.cancellation_policy_hours?.toString() || ''}
+                  type="number"
+                  min={0}
+                  max={168}
+                  value={settings.cancellation_policy_hours}
                   onChange={(e) => {
-                    const input = e.target.value.replace(/\D/g, '');
-                    const value = parseInt(input) || 0;
-                    if (value >= 0 && value <= 168) {
+                    const value = parseInt(e.target.value);
+                    if (!isNaN(value) && value >= 0 && value <= 168) {
                       setSettings({
                         ...settings,
                         cancellation_policy_hours: value,
                       });
-                    }
-                  }}
-                  onBlur={(e) => {
-                    if (!e.target.value) {
+                    } else if (e.target.value === '') {
                       setSettings({
                         ...settings,
                         cancellation_policy_hours: 24,
