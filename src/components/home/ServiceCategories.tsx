@@ -127,25 +127,52 @@ export const ServiceCategories = ({
           orderBy('display_order')
         );
         const categoriesSnapshot = await getDocs(categoriesQuery);
-        const categoriesData = categoriesSnapshot.docs.map(doc => ({
+        let categoriesData = categoriesSnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         })) as ServiceCategory[];
 
-        console.log('Fetched categories:', categoriesData.length);
-        setCategories(categoriesData);
+        // Deduplicate categories by English name (or Arabic fallback) to avoid double rendering
+        const seen = new Set<string>();
+        const deduped: ServiceCategory[] = [];
+        for (const cat of categoriesData) {
+          const key = (cat.name_en || cat.name_ar || cat.id).trim();
+          if (!seen.has(key)) {
+            seen.add(key);
+            deduped.push(cat);
+          } else {
+            console.warn('[ServiceCategories] Duplicate category suppressed:', key, cat.id);
+          }
+        }
+
+        // Sort again by display_order after dedup just in case duplicates affected order
+        deduped.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
+
+        console.log('Fetched categories:', categoriesData.length, '→ after dedup:', deduped.length);
+        setCategories(deduped);
       } catch (error) {
         console.error('Error fetching categories:', error);
         // Try to fetch without the orderBy if there's an error
         try {
           console.log('Trying fallback fetch...');
           const categoriesSnapshot = await getDocs(collection(db, 'service_categories'));
-          const categoriesData = categoriesSnapshot.docs.map(doc => ({
+          let categoriesData = categoriesSnapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
           })) as ServiceCategory[];
-          console.log('Fallback fetch got:', categoriesData.length);
-          setCategories(categoriesData.filter(cat => cat.is_active));
+          categoriesData = categoriesData.filter(cat => cat.is_active);
+          const seenFallback = new Set<string>();
+          const dedupFallback: ServiceCategory[] = [];
+          for (const cat of categoriesData) {
+            const key = (cat.name_en || cat.name_ar || cat.id).trim();
+            if (!seenFallback.has(key)) {
+              seenFallback.add(key);
+              dedupFallback.push(cat);
+            }
+          }
+          dedupFallback.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
+          console.log('Fallback fetch got:', categoriesData.length, '→ after dedup:', dedupFallback.length);
+          setCategories(dedupFallback);
         } catch (fallbackError) {
           console.error('Fallback fetch also failed:', fallbackError);
         }
