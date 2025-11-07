@@ -141,7 +141,9 @@ export const ServiceCategories = ({
             seen.add(key);
             deduped.push(cat);
           } else {
-            console.warn('[ServiceCategories] Duplicate category suppressed:', key, cat.id);
+            if (import.meta.env.DEV) {
+              console.warn('[ServiceCategories] Duplicate category suppressed:', key, cat.id);
+            }
           }
         }
 

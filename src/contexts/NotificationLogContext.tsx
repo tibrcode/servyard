@@ -1,7 +1,7 @@
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { db } from '@/integrations/firebase/client';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, onSnapshot } from 'firebase/firestore';
 import type { BookingStatus } from '@/types/booking';
 
 export interface LoggedNotification {
@@ -144,25 +144,24 @@ export const NotificationLogProvider: React.FC<{ children: React.ReactNode }> = 
   }, [user?.uid]);
 
   // Realtime unread listener: reflect remote changes live
+  const lastViewedRef = useRef<string | null>(lastViewedAt);
+  useEffect(() => { lastViewedRef.current = lastViewedAt; }, [lastViewedAt]);
   useEffect(() => {
     if (!user?.uid) return;
     const ref = doc(db, 'profiles', user.uid);
-    let unsub: (() => void) | undefined;
-    import('firebase/firestore').then(({ onSnapshot }) => {
-      unsub = onSnapshot(ref as any, (snap: any) => {
-        const remoteLast = snap.get('notifications_last_viewed_at');
-        if (remoteLast) {
-          const localTs = lastViewedAt ? new Date(lastViewedAt).getTime() : 0;
-          const remoteTs = new Date(remoteLast).getTime();
-          if (remoteTs > localTs) {
-            setLastViewedAt(remoteLast);
-            try { localStorage.setItem(LAST_VIEWED_KEY, remoteLast); } catch {}
-          }
+    const unsub = onSnapshot(ref, (snap) => {
+      const remoteLast = snap.get('notifications_last_viewed_at') as string | undefined;
+      if (remoteLast) {
+        const localTs = lastViewedRef.current ? new Date(lastViewedRef.current).getTime() : 0;
+        const remoteTs = new Date(remoteLast).getTime();
+        if (remoteTs > localTs) {
+          setLastViewedAt(remoteLast);
+          try { localStorage.setItem(LAST_VIEWED_KEY, remoteLast); } catch {}
         }
-      });
+      }
     });
-    return () => { if (unsub) unsub(); };
-  }, [user?.uid, lastViewedAt]);
+    return () => unsub();
+  }, [user?.uid]);
 
   return (
     <NotificationLogContext.Provider value={{ notifications, addNotification, clear, unreadCount, markAllRead, lastViewedAt }}>
