@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState, useCallback } fr
 import { useAuth } from '@/contexts/AuthContext';
 import { db } from '@/integrations/firebase/client';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import type { BookingStatus } from '@/types/booking';
 
 export interface LoggedNotification {
   id: string;
@@ -12,6 +13,7 @@ export interface LoggedNotification {
   raw?: any;
   type?: string;
   category?: 'booking' | 'reminder' | 'system' | 'other';
+  bookingStatus?: BookingStatus;
 }
 
 interface NotificationLogContextValue {
@@ -56,14 +58,24 @@ export const NotificationLogProvider: React.FC<{ children: React.ReactNode }> = 
       via: n.via,
       raw: n.raw,
       type: n.type,
+      category: n.category ?? deriveCategory(n.type),
+      bookingStatus: n.bookingStatus ?? deriveBookingStatus(n.type),
       receivedAt: n.receivedAt || new Date().toISOString(),
     };
     setNotifications((prev) => {
       const updated = [entry, ...prev].slice(0, MAX_ENTRIES);
       persist(updated);
+      // Update unread counter in Firestore if signed-in
+      try {
+        if (user?.uid) {
+          const last = lastViewedAt ? new Date(lastViewedAt).getTime() : 0;
+          const unread = updated.filter(x => new Date(x.receivedAt).getTime() > last).length;
+          updateDoc(doc(db, 'profiles', user.uid), { notifications_unread_count: unread }).catch(() => {});
+        }
+      } catch {}
       return updated;
     });
-  }, [persist]);
+  }, [persist, user?.uid, lastViewedAt]);
 
   const clear = useCallback(() => {
     setNotifications([]);
@@ -77,7 +89,7 @@ export const NotificationLogProvider: React.FC<{ children: React.ReactNode }> = 
     // Sync to Firestore if signed in
     try {
       if (user?.uid) {
-        updateDoc(doc(db, 'profiles', user.uid), { notifications_last_viewed_at: now }).catch(() => {});
+        updateDoc(doc(db, 'profiles', user.uid), { notifications_last_viewed_at: now, notifications_unread_count: 0 }).catch(() => {});
       }
     } catch {}
   }, []);
@@ -144,6 +156,24 @@ function deriveCategory(type?: string): LoggedNotification['category'] {
   if (type.includes('reminder')) return 'reminder';
   if (type.includes('system')) return 'system';
   return 'other';
+}
+
+function deriveBookingStatus(type?: string): BookingStatus | undefined {
+  if (!type) return undefined;
+  switch (type) {
+    case 'new_booking':
+      return 'pending';
+    case 'booking_confirmed':
+      return 'confirmed';
+    case 'booking_cancelled':
+      return 'cancelled';
+    case 'booking_completed':
+      return 'completed';
+    case 'booking_no_show':
+      return 'no-show';
+    default:
+      return undefined;
+  }
 }
 
 export function useNotificationLog() {

@@ -158,6 +158,13 @@ export interface Translation {
     categoryReminder?: string;
     categorySystem?: string;
     categoryOther?: string;
+    // Booking status sub-filters (only shown when categoryBooking active)
+    bookingStatusAll?: string;
+    bookingStatusPending?: string;
+    bookingStatusConfirmed?: string;
+    bookingStatusCancelled?: string;
+    bookingStatusCompleted?: string;
+    bookingStatusNoShow?: string;
   };
 
   // User interface text
@@ -778,6 +785,12 @@ export const translations: Record<string, Translation> = {
       categoryReminder: "Reminders",
       categorySystem: "System",
       categoryOther: "Other",
+      bookingStatusAll: "All statuses",
+      bookingStatusPending: "Pending",
+      bookingStatusConfirmed: "Confirmed",
+      bookingStatusCancelled: "Cancelled",
+      bookingStatusCompleted: "Completed",
+      bookingStatusNoShow: "No Show",
     },
     auth: {
       welcome: 'Welcome to ServYard',
@@ -1495,6 +1508,12 @@ export const translations: Record<string, Translation> = {
       categoryReminder: "التذكيرات",
       categorySystem: "النظام",
       categoryOther: "أخرى",
+      bookingStatusAll: "كل الحالات",
+      bookingStatusPending: "معلق",
+      bookingStatusConfirmed: "مؤكد",
+      bookingStatusCancelled: "ملغي",
+      bookingStatusCompleted: "مكتمل",
+      bookingStatusNoShow: "لم يحضر",
     },
     auth: {
       welcome: "مرحباً بك في سيرف يارد",

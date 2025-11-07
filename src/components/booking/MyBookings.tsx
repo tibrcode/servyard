@@ -454,7 +454,7 @@ export function MyBookings({
     const bookingDate = new Date(booking.booking_date);
 
     return (
-      <Card key={booking.booking_id}>
+      <Card key={booking.booking_id} data-booking-id={booking.booking_id} id={`booking-${booking.booking_id}`}>
         <CardContent className="pt-6">
           <div className="space-y-4">
             {/* Service Title */}

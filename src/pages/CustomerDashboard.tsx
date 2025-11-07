@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -51,6 +51,7 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
   const { user, role, loading: authLoading } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [profile, setProfile] = useState<Profile | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -61,6 +62,7 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
   const [reviewRating, setReviewRating] = useState(5);
   const [isEditingReview, setIsEditingReview] = useState(false);
   const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
+  const [highlightedId, setHighlightedId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!authLoading && user && role === 'customer') {
@@ -138,6 +140,28 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
       setLoading(false);
     }
   };
+
+  // Highlight booking if bookingId query param present
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const bookingId = params.get('bookingId');
+    if (!bookingId) return;
+    // Delay to allow list render
+    const t = setTimeout(() => {
+      const el = document.querySelector(`[data-booking-id="${bookingId}"]`) as HTMLElement | null;
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.classList.add('ring-2', 'ring-primary', 'animate-pulse');
+        setHighlightedId(bookingId);
+        setTimeout(() => {
+          el.classList.remove('animate-pulse');
+          el.classList.remove('ring-2');
+          el.classList.remove('ring-primary');
+        }, 2200);
+      }
+    }, 500);
+    return () => clearTimeout(t);
+  }, [location.search]);
 
   const handleLogout = async () => {
     try {

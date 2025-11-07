@@ -13,10 +13,14 @@ export default function NotificationsHistory() {
   const [filter, setFilter] = React.useState<'all' | 'foreground' | 'background'>('all');
   const [cat, setCat] = React.useState<'all' | 'booking' | 'reminder' | 'system' | 'other'>('all');
   const [search, setSearch] = React.useState('');
+  const [bookingStatus, setBookingStatus] = React.useState<'all' | 'pending' | 'confirmed' | 'cancelled' | 'completed' | 'no-show'>('all');
 
   const filtered = notifications.filter(n => {
     if (filter !== 'all' && n.via !== filter) return false;
     if (cat !== 'all' && (n.category || 'other') !== cat) return false;
+    if (cat === 'booking' && bookingStatus !== 'all') {
+      if ((n as any).bookingStatus !== bookingStatus) return false;
+    }
     if (search) {
       const t = (n.title + ' ' + (n.body || '')).toLowerCase();
       if (!t.includes(search.toLowerCase())) return false;
@@ -59,6 +63,16 @@ export default function NotificationsHistory() {
             <Button variant={cat === 'system' ? 'default' : 'outline'} onClick={() => setCat('system')}>{t.notificationsUI?.categorySystem || 'System'}</Button>
             <Button variant={cat === 'other' ? 'default' : 'outline'} onClick={() => setCat('other')}>{t.notificationsUI?.categoryOther || 'Other'}</Button>
           </div>
+          {cat === 'booking' && (
+            <div className="flex flex-wrap gap-2">
+              <Button variant={bookingStatus === 'all' ? 'default' : 'outline'} onClick={() => setBookingStatus('all')}>{t.notificationsUI?.bookingStatusAll || 'All statuses'}</Button>
+              <Button variant={bookingStatus === 'pending' ? 'default' : 'outline'} onClick={() => setBookingStatus('pending')}>{t.notificationsUI?.bookingStatusPending || 'Pending'}</Button>
+              <Button variant={bookingStatus === 'confirmed' ? 'default' : 'outline'} onClick={() => setBookingStatus('confirmed')}>{t.notificationsUI?.bookingStatusConfirmed || 'Confirmed'}</Button>
+              <Button variant={bookingStatus === 'cancelled' ? 'default' : 'outline'} onClick={() => setBookingStatus('cancelled')}>{t.notificationsUI?.bookingStatusCancelled || 'Cancelled'}</Button>
+              <Button variant={bookingStatus === 'completed' ? 'default' : 'outline'} onClick={() => setBookingStatus('completed')}>{t.notificationsUI?.bookingStatusCompleted || 'Completed'}</Button>
+              <Button variant={bookingStatus === 'no-show' ? 'default' : 'outline'} onClick={() => setBookingStatus('no-show')}>{t.notificationsUI?.bookingStatusNoShow || 'No Show'}</Button>
+            </div>
+          )}
           <Separator />
           <div className="space-y-3 max-h-[600px] overflow-auto pr-1">
             {filtered.length === 0 && (

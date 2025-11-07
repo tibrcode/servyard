@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Footer } from "@/components/layout/Footer";
 import { ProviderLogo } from "@/components/provider/ProviderLogo";
 import { StatsOverview } from "@/components/provider/StatsOverview";
@@ -90,6 +90,7 @@ interface Review {
 const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
   const navigate = useNavigate();
   const { t, isRTL } = useTranslation(currentLanguage);
+  const location = useLocation();
 
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [providerProfile, setProviderProfile] = useState<Profile | null>(null);
@@ -204,6 +205,26 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
       console.error('Error signing out:', error);
     }
   };
+
+  // Highlight booking if bookingId query param present (for provider)
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const bookingId = params.get('bookingId');
+    if (!bookingId) return;
+    const t = setTimeout(() => {
+      const el = document.querySelector(`#provider-booking-${bookingId}`) as HTMLElement | null;
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.classList.add('ring-2', 'ring-primary', 'animate-pulse');
+        setTimeout(() => {
+          el.classList.remove('animate-pulse');
+          el.classList.remove('ring-2');
+          el.classList.remove('ring-primary');
+        }, 2200);
+      }
+    }, 600);
+    return () => clearTimeout(t);
+  }, [location.search]);
 
   const handleOnlineStatusChange = async (isOnline: boolean) => {
     if (!currentUser) return;

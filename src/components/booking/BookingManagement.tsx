@@ -310,7 +310,7 @@ export function BookingManagement({
     const isUpdating = updatingId === booking.booking_id;
 
     return (
-      <Card key={booking.booking_id}>
+      <Card key={booking.booking_id} data-booking-id={booking.booking_id} id={`provider-booking-${booking.booking_id}`}>
         <CardContent className="pt-6">
           <div className="space-y-4">
             {/* Header */}
