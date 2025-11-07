@@ -11,10 +11,12 @@ export default function NotificationsHistory() {
   const { t } = useTranslation(lang);
   const { notifications, clear, markAllRead } = useNotificationLog();
   const [filter, setFilter] = React.useState<'all' | 'foreground' | 'background'>('all');
+  const [cat, setCat] = React.useState<'all' | 'booking' | 'reminder' | 'system' | 'other'>('all');
   const [search, setSearch] = React.useState('');
 
   const filtered = notifications.filter(n => {
     if (filter !== 'all' && n.via !== filter) return false;
+    if (cat !== 'all' && (n.category || 'other') !== cat) return false;
     if (search) {
       const t = (n.title + ' ' + (n.body || '')).toLowerCase();
       if (!t.includes(search.toLowerCase())) return false;
@@ -49,6 +51,14 @@ export default function NotificationsHistory() {
             onChange={(e) => setSearch(e.target.value)}
             className="w-full rounded-md border px-3 py-2 text-sm bg-background"
           />
+          <Separator />
+          <div className="flex flex-wrap gap-2">
+            <Button variant={cat === 'all' ? 'default' : 'outline'} onClick={() => setCat('all')}>{t.notificationsUI?.categoryAll || 'All types'}</Button>
+            <Button variant={cat === 'booking' ? 'default' : 'outline'} onClick={() => setCat('booking')}>{t.notificationsUI?.categoryBooking || 'Bookings'}</Button>
+            <Button variant={cat === 'reminder' ? 'default' : 'outline'} onClick={() => setCat('reminder')}>{t.notificationsUI?.categoryReminder || 'Reminders'}</Button>
+            <Button variant={cat === 'system' ? 'default' : 'outline'} onClick={() => setCat('system')}>{t.notificationsUI?.categorySystem || 'System'}</Button>
+            <Button variant={cat === 'other' ? 'default' : 'outline'} onClick={() => setCat('other')}>{t.notificationsUI?.categoryOther || 'Other'}</Button>
+          </div>
           <Separator />
           <div className="space-y-3 max-h-[600px] overflow-auto pr-1">
             {filtered.length === 0 && (

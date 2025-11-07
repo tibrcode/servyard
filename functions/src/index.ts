@@ -599,15 +599,22 @@ async function createBookingReminders(bookingId: string, booking: any) {
   try {
     // Get customer's notification preferences
     const customerDoc = await db.collection('profiles').doc(booking.customer_id).get();
-    const preferences = customerDoc.data()?.notification_settings || {
-      reminder_times: [60], // Default: 1 hour before
-    };
+    const prefs = (customerDoc.data()?.notification_settings as any) || {};
+    const enabled = prefs.enabled !== false; // default true
+    const remindersCfg = prefs.booking_reminders || {};
+    const remindersEnabled = remindersCfg.enabled !== false; // default true
+    const times: number[] = Array.isArray(remindersCfg.reminder_times) ? remindersCfg.reminder_times : [60];
+
+    if (!enabled || !remindersEnabled || times.length === 0) {
+      console.log('⏭️ Reminders disabled by user preferences');
+      return;
+    }
 
     const bookingDate = new Date(booking.booking_date);
     const reminders = [];
 
     // Create reminder documents for each preferred time
-    for (const minutesBefore of preferences.reminder_times || [60]) {
+    for (const minutesBefore of times) {
       const reminderTime = new Date(bookingDate.getTime() - minutesBefore * 60000);
       
       reminders.push({
@@ -653,9 +660,17 @@ export const notifyNewBooking = onRequest({ cors: true, invoker: 'public' }, asy
 
     // Get provider's FCM token
     const providerToken = await getUserFCMToken(booking.provider_id);
+    // Check provider notification prefs (if exist)
+    const providerProfile = await db.collection('profiles').doc(booking.provider_id).get();
+    const providerPrefs = (providerProfile.data()?.notification_settings as any) || {};
+    const providerEnabled = providerPrefs.enabled !== false;
     if (!providerToken) {
       console.log('Provider FCM token not found');
       return res.status(200).json({ message: 'No FCM token for provider' });
+    }
+    if (!providerEnabled) {
+      console.log('Provider notifications disabled by preferences');
+      return res.status(200).json({ message: 'Provider notifications disabled' });
     }
 
     // Get customer name
@@ -674,7 +689,7 @@ export const notifyNewBooking = onRequest({ cors: true, invoker: 'public' }, asy
       {
         type: 'new_booking',
         booking_id: bookingId,
-        link: '/provider-dashboard',
+        link: `/provider-dashboard?bookingId=${bookingId}`,
       }
     );
 
@@ -708,6 +723,14 @@ export const notifyBookingStatusChange = onRequest({ cors: true, invoker: 'publi
 
     // Get customer's FCM token
     const customerToken = await getUserFCMToken(booking.customer_id);
+    const customerProfile = await db.collection('profiles').doc(booking.customer_id).get();
+    const prefs = (customerProfile.data()?.notification_settings as any) || {};
+    const enabled = prefs.enabled !== false;
+    const updates = prefs.booking_updates || {};
+    const quiet = prefs.quiet_hours || {};
+    if (!enabled) {
+      return res.status(200).json({ message: 'Notifications disabled by user preferences' });
+    }
     
     if (!customerToken) {
       console.log('Customer FCM token not found');
@@ -733,18 +756,27 @@ export const notifyBookingStatusChange = onRequest({ cors: true, invoker: 'publi
         notificationType = 'booking_confirmed';
         // Create reminders when booking is confirmed
         await createBookingReminders(bookingId, booking);
+        if (updates.confirmations === false) {
+          return res.status(200).json({ message: 'Confirmations disabled by preferences' });
+        }
         break;
 
       case 'cancelled':
         title = '❌ تم إلغاء الحجز';
         body = `تم إلغاء حجزك لـ ${serviceName}`;
         notificationType = 'booking_cancelled';
+        if (updates.cancellations === false) {
+          return res.status(200).json({ message: 'Cancellations disabled by preferences' });
+        }
         break;
 
       case 'completed':
         title = '🎉 تم إكمال الخدمة!';
         body = `شكراً لاستخدامك ${serviceName}. يرجى تقييم الخدمة مع ${providerName}`;
         notificationType = 'booking_completed';
+        if (updates.completions === false) {
+          return res.status(200).json({ message: 'Completions disabled by preferences' });
+        }
         break;
 
       case 'no_show':
@@ -757,10 +789,27 @@ export const notifyBookingStatusChange = onRequest({ cors: true, invoker: 'publi
         return res.status(200).json({ message: 'No notification for this status' });
     }
 
+    // Respect quiet hours if configured (Asia/Dubai by default)
+    if (quiet.enabled) {
+      const currentHM = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Asia/Dubai' });
+      const [ch, cm] = currentHM.split(':').map(Number);
+      const nowMin = ch * 60 + cm;
+      const parseHM = (s: string) => {
+        const [h, m] = (s || '00:00').split(':').map((n) => parseInt(n, 10) || 0);
+        return h * 60 + m;
+      };
+      const start = parseHM(quiet.start || '22:00');
+      const end = parseHM(quiet.end || '08:00');
+      const inQuiet = start <= end ? (nowMin >= start && nowMin < end) : (nowMin >= start || nowMin < end);
+      if (inQuiet) {
+        return res.status(200).json({ message: 'Suppressed due to quiet hours' });
+      }
+    }
+
     await sendNotification(customerToken, title, body, {
       type: notificationType,
       booking_id: bookingId,
-      link: '/customer-dashboard',
+      link: `/customer-dashboard?bookingId=${bookingId}`,
     });
 
     console.log(`✅ Booking ${newStatus} notification sent to customer`);
@@ -823,12 +872,43 @@ export const sendScheduledReminders = onSchedule(
             continue;
           }
 
-          // Get customer's FCM token
+          // Get customer's FCM token and prefs
           const customerToken = await getUserFCMToken(reminder.customer_id);
           if (!customerToken) {
             console.log(`No FCM token for customer ${reminder.customer_id}`);
             batch.update(reminderDoc.ref, { sent: true });
             continue;
+          }
+
+          const customerProfile2 = await db.collection('profiles').doc(reminder.customer_id).get();
+          const prefs2 = (customerProfile2.data()?.notification_settings as any) || {};
+          const enabled2 = prefs2.enabled !== false;
+          const remindersCfg2 = prefs2.booking_reminders || {};
+          const remindersEnabled2 = remindersCfg2.enabled !== false;
+          const quiet2 = prefs2.quiet_hours || {};
+          if (!enabled2 || !remindersEnabled2) {
+            console.log('⏭️ Reminder suppressed by user preferences');
+            batch.update(reminderDoc.ref, { sent: true });
+            continue;
+          }
+
+          // Quiet hours suppression
+          if (quiet2.enabled) {
+            const currentHM = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Asia/Dubai' });
+            const [ch, cm] = currentHM.split(':').map(Number);
+            const nowMin = ch * 60 + cm;
+            const parseHM = (s: string) => {
+              const [h, m] = (s || '00:00').split(':').map((n) => parseInt(n, 10) || 0);
+              return h * 60 + m;
+            };
+            const start = parseHM(quiet2.start || '22:00');
+            const end = parseHM(quiet2.end || '08:00');
+            const inQuiet = start <= end ? (nowMin >= start && nowMin < end) : (nowMin >= start || nowMin < end);
+            if (inQuiet) {
+              console.log('🔕 Reminder suppressed due to quiet hours');
+              // Do not mark as sent; allow sending later outside quiet window
+              continue;
+            }
           }
 
           // Get service name
@@ -886,7 +966,7 @@ export const sendScheduledReminders = onSchedule(
               type: 'booking_reminder',
               booking_id: reminder.booking_id,
               minutes_before: minutesBefore.toString(),
-              link: '/customer-dashboard',
+              link: `/customer-dashboard?bookingId=${reminder.booking_id}`,
             }
           );
 

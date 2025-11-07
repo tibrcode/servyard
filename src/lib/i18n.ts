@@ -153,6 +153,11 @@ export interface Translation {
     background: string;
     clear: string;
     markAllRead: string;
+    categoryAll?: string;
+    categoryBooking?: string;
+    categoryReminder?: string;
+    categorySystem?: string;
+    categoryOther?: string;
   };
 
   // User interface text
@@ -768,6 +773,11 @@ export const translations: Record<string, Translation> = {
       background: "Background",
       clear: "Clear",
       markAllRead: "Mark all as read",
+      categoryAll: "All types",
+      categoryBooking: "Bookings",
+      categoryReminder: "Reminders",
+      categorySystem: "System",
+      categoryOther: "Other",
     },
     auth: {
       welcome: 'Welcome to ServYard',
@@ -1480,6 +1490,11 @@ export const translations: Record<string, Translation> = {
       background: "خلفية",
       clear: "مسح",
       markAllRead: "تعليم الكل كمقروء",
+      categoryAll: "كل الأنواع",
+      categoryBooking: "الحجوزات",
+      categoryReminder: "التذكيرات",
+      categorySystem: "النظام",
+      categoryOther: "أخرى",
     },
     auth: {
       welcome: "مرحباً بك في سيرف يارد",
