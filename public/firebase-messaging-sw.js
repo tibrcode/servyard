@@ -19,23 +19,33 @@ const messaging = firebase.messaging();
 
 // معالجة الإشعارات في الخلفية
 messaging.onBackgroundMessage((payload) => {
-  console.log('Background Message:', payload);
-  // بث إلى كل العملاء المفتوحين لتسجيله في سجل الإشعارات
+  console.log('[SW] Background Message:', payload);
+  const normalized = {
+    notification: {
+      title: payload.notification?.title || 'إشعار جديد',
+      body: payload.notification?.body || ''
+    },
+    data: payload.data || {},
+    receivedAt: new Date().toISOString(),
+    via: 'background'
+  };
+
+  // بث إلى كل العملاء المفتوحين لتسجيله في سجل الإشعارات بصيغة موحدة
   try {
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
       clientList.forEach((client) => {
-        client.postMessage({ __SERVYARD_PUSH: true, source: 'sw-background', payload });
+        client.postMessage({ __SERVYARD_PUSH: true, source: 'sw-background', payload: normalized });
       });
     });
   } catch (e) { /* noop */ }
-  
-  const notificationTitle = payload.notification?.title || 'إشعار جديد';
+
+  const notificationTitle = normalized.notification.title;
   const notificationOptions = {
-    body: payload.notification?.body,
+    body: normalized.notification.body,
     icon: '/icons/icon-192.png',
     badge: '/icons/icon-192.png',
-    tag: payload.data?.type || 'default',
-    data: payload.data
+    tag: normalized.data?.type || 'default',
+    data: normalized.data
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);

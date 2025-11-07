@@ -17,6 +17,7 @@ import {
 import { Bell } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { Globe, MapPin } from "lucide-react";
+import { useNotificationLog } from "@/contexts/NotificationLogContext";
 import {
   Sidebar,
   SidebarContent,
@@ -45,6 +46,7 @@ export function AppSidebar({ currentLanguage = 'en', onLanguageChange, onLocatio
   const location = useLocation();
   const { t, isRTL } = useTranslation(currentLanguage);
   const { user, role, signOut, displayName } = useAuth();
+  const { unreadCount } = useNotificationLog();
   const currentPath = location.pathname;
   const languages = supportedLanguages;
   const [langOpen, setLangOpen] = React.useState(false);
@@ -69,7 +71,7 @@ export function AppSidebar({ currentLanguage = 'en', onLanguageChange, onLocatio
   const mainNavItems = [
     { title: t.nav.home, url: "/", icon: Home },
     { title: t.nav.services, url: "/services", icon: Search },
-    { title: t.nav.notifications || 'Notifications', url: "/notifications", icon: Bell },
+    { title: t.nav.notifications || 'Notifications', url: "/notifications", icon: Bell, badge: unreadCount },
   ];
 
   const authNavItems = user ? [] : [
@@ -124,8 +126,15 @@ export function AppSidebar({ currentLanguage = 'en', onLanguageChange, onLocatio
                       className={({ isActive }) => getNavCls({ isActive })}
                       onClick={handleNavigation}
                     >
-                      <item.icon className="h-4 w-4 mr-2" />
-                      <span>{item.title}</span>
+                      <span className="relative inline-flex items-center">
+                        <item.icon className="h-4 w-4 mr-2" />
+                        <span>{item.title}</span>
+                        {item.badge ? (
+                          <span className="ml-2 inline-flex items-center justify-center rounded-full bg-red-600 text-white text-[10px] leading-none h-4 min-w-[16px] px-1">
+                            {item.badge > 99 ? '99+' : item.badge}
+                          </span>
+                        ) : null}
+                      </span>
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

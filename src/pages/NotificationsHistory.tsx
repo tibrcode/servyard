@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 
 export default function NotificationsHistory() {
-  const { notifications, clear } = useNotificationLog();
+  const { notifications, clear, markAllRead } = useNotificationLog();
   const [filter, setFilter] = React.useState<'all' | 'foreground' | 'background'>('all');
   const [search, setSearch] = React.useState('');
 
@@ -18,6 +18,12 @@ export default function NotificationsHistory() {
     return true;
   });
 
+  React.useEffect(() => {
+    // Mark all as read on first view
+    markAllRead();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <div className="container mx-auto p-4 space-y-4">
       <Card>
@@ -27,6 +33,7 @@ export default function NotificationsHistory() {
             <Button variant={filter === 'all' ? 'default' : 'outline'} onClick={() => setFilter('all')}>الكل</Button>
             <Button variant={filter === 'foreground' ? 'default' : 'outline'} onClick={() => setFilter('foreground')}>أمام</Button>
             <Button variant={filter === 'background' ? 'default' : 'outline'} onClick={() => setFilter('background')}>خلفية</Button>
+            <Button variant="secondary" onClick={markAllRead}>تعليم الكل كمقروء</Button>
             <Button variant="destructive" onClick={clear}>مسح</Button>
           </div>
         </CardHeader>

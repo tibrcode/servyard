@@ -14,11 +14,15 @@ interface NotificationLogContextValue {
   notifications: LoggedNotification[];
   addNotification: (n: Omit<LoggedNotification, 'id' | 'receivedAt'> & { receivedAt?: string }) => void;
   clear: () => void;
+  unreadCount: number;
+  markAllRead: () => void;
+  lastViewedAt: string | null;
 }
 
 const NotificationLogContext = createContext<NotificationLogContextValue | undefined>(undefined);
 
 const STORAGE_KEY = 'servyard_notification_log_v1';
+const LAST_VIEWED_KEY = 'servyard_notification_last_viewed_at';
 const MAX_ENTRIES = 200;
 
 export const NotificationLogProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -30,6 +34,9 @@ export const NotificationLogProvider: React.FC<{ children: React.ReactNode }> = 
       if (Array.isArray(parsed)) return parsed.slice(0, MAX_ENTRIES);
     } catch {}
     return [];
+  });
+  const [lastViewedAt, setLastViewedAt] = useState<string | null>(() => {
+    try { return localStorage.getItem(LAST_VIEWED_KEY); } catch { return null; }
   });
 
   const persist = useCallback((list: LoggedNotification[]) => {
@@ -58,6 +65,18 @@ export const NotificationLogProvider: React.FC<{ children: React.ReactNode }> = 
     try { localStorage.removeItem(STORAGE_KEY); } catch {}
   }, []);
 
+  const markAllRead = useCallback(() => {
+    const now = new Date().toISOString();
+    setLastViewedAt(now);
+    try { localStorage.setItem(LAST_VIEWED_KEY, now); } catch {}
+  }, []);
+
+  const unreadCount = React.useMemo(() => {
+    if (!lastViewedAt) return notifications.length;
+    const last = new Date(lastViewedAt).getTime();
+    return notifications.filter(n => new Date(n.receivedAt).getTime() > last).length;
+  }, [notifications, lastViewedAt]);
+
   // Listen to service worker postMessage for background notifications
   useEffect(() => {
     const handler = (event: MessageEvent) => {
@@ -67,9 +86,10 @@ export const NotificationLogProvider: React.FC<{ children: React.ReactNode }> = 
         addNotification({
           title: p.notification?.title || 'Notification',
           body: p.notification?.body,
-          via: 'background',
+          via: p.via === 'background' ? 'background' : 'background',
           raw: p,
           type: p.data?.type,
+          receivedAt: p.receivedAt,
         });
       }
     };
@@ -78,7 +98,7 @@ export const NotificationLogProvider: React.FC<{ children: React.ReactNode }> = 
   }, [addNotification]);
 
   return (
-    <NotificationLogContext.Provider value={{ notifications, addNotification, clear }}>
+    <NotificationLogContext.Provider value={{ notifications, addNotification, clear, unreadCount, markAllRead, lastViewedAt }}>
       {children}
     </NotificationLogContext.Provider>
   );
