@@ -65,25 +65,47 @@ const AddService = ({ currentLanguage }: AddServiceProps) => {
           orderBy('display_order')
         );
         const categoriesSnapshot = await getDocs(categoriesQuery);
-        const categoriesData = categoriesSnapshot.docs.map(doc => ({
+        let categoriesData = categoriesSnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         }));
 
-        console.log(`Fetched ${categoriesData.length} categories for AddService`);
-        setCategories(categoriesData);
+        // Deduplicate by name_en/name_ar
+        const seen = new Set<string>();
+        const deduped: any[] = [];
+        for (const cat of categoriesData) {
+          const key = ((cat.name_en || cat.name_ar || cat.id) + '').trim().toLowerCase();
+          if (!seen.has(key)) {
+            seen.add(key);
+            deduped.push(cat);
+          }
+        }
+        deduped.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
+        console.log(`Fetched ${categoriesData.length} categories for AddService → after dedup ${deduped.length}`);
+        setCategories(deduped);
       } catch (error) {
         console.error('Error fetching categories:', error);
         // Fallback: try without orderBy
         try {
           console.log('Trying fallback fetch for AddService...');
           const categoriesSnapshot = await getDocs(collection(db, 'service_categories'));
-          const categoriesData = categoriesSnapshot.docs.map(doc => ({
+          let categoriesData = categoriesSnapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
           }));
-          console.log(`Fallback fetch got ${categoriesData.length} categories`);
-          setCategories(categoriesData.filter((cat: any) => cat.is_active));
+          categoriesData = categoriesData.filter((cat: any) => cat.is_active);
+          const seenF = new Set<string>();
+          const dedupF: any[] = [];
+          for (const cat of categoriesData) {
+            const key = ((cat.name_en || cat.name_ar || cat.id) + '').trim().toLowerCase();
+            if (!seenF.has(key)) {
+              seenF.add(key);
+              dedupF.push(cat);
+            }
+          }
+            dedupF.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
+          console.log(`Fallback fetch got ${categoriesData.length} categories → after dedup ${dedupF.length}`);
+          setCategories(dedupF);
         } catch (fallbackError) {
           console.error('Fallback fetch also failed:', fallbackError);
         }

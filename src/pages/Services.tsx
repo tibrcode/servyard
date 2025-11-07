@@ -122,11 +122,22 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
         // Load categories
         const categoriesRef = collection(db, 'service_categories');
         const categoriesSnapshot = await getDocs(categoriesRef);
-        const categoriesData = categoriesSnapshot.docs.map(doc => ({
+        let categoriesData = categoriesSnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         })) as ServiceCategory[];
-        setCategories(categoriesData);
+        // De-duplicate by normalized name
+        const seen = new Set<string>();
+        const deduped: ServiceCategory[] = [];
+        for (const c of categoriesData) {
+          const key = ((c.name_en || c.name_ar || c.id) + '').trim().toLowerCase();
+          if (!seen.has(key)) {
+            seen.add(key);
+            deduped.push(c);
+          }
+        }
+        deduped.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
+        setCategories(deduped);
 
         // Load services  
         const servicesRef = collection(db, 'services');

@@ -99,16 +99,24 @@ const EditService: React.FC<EditServiceProps> = ({ currentLanguage }) => {
           where('is_active', '==', true)
         );
         const categoriesSnapshot = await getDocs(categoriesQuery);
-        const categoriesData = categoriesSnapshot.docs.map(doc => ({
+        let categoriesData = categoriesSnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         })) as ServiceCategory[];
 
-        // Sort categories by display_order in JavaScript
-        categoriesData.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
-
-        console.log(`Fetched ${categoriesData.length} categories for EditService`);
-        setCategories(categoriesData);
+        // Deduplicate
+        const seen = new Set<string>();
+        const deduped: ServiceCategory[] = [];
+        for (const cat of categoriesData) {
+          const key = ((cat.name_en || cat.name_ar || cat.id) + '').trim().toLowerCase();
+          if (!seen.has(key)) {
+            seen.add(key);
+            deduped.push(cat);
+          }
+        }
+        deduped.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
+        console.log(`Fetched ${categoriesData.length} categories for EditService → after dedup ${deduped.length}`);
+        setCategories(deduped);
 
         // Fetch service data
         console.log('Fetching service data for editing...');
