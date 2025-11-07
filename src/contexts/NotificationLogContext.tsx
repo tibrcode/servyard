@@ -143,6 +143,27 @@ export const NotificationLogProvider: React.FC<{ children: React.ReactNode }> = 
     return () => { cancelled = true; };
   }, [user?.uid]);
 
+  // Realtime unread listener: reflect remote changes live
+  useEffect(() => {
+    if (!user?.uid) return;
+    const ref = doc(db, 'profiles', user.uid);
+    let unsub: (() => void) | undefined;
+    import('firebase/firestore').then(({ onSnapshot }) => {
+      unsub = onSnapshot(ref as any, (snap: any) => {
+        const remoteLast = snap.get('notifications_last_viewed_at');
+        if (remoteLast) {
+          const localTs = lastViewedAt ? new Date(lastViewedAt).getTime() : 0;
+          const remoteTs = new Date(remoteLast).getTime();
+          if (remoteTs > localTs) {
+            setLastViewedAt(remoteLast);
+            try { localStorage.setItem(LAST_VIEWED_KEY, remoteLast); } catch {}
+          }
+        }
+      });
+    });
+    return () => { if (unsub) unsub(); };
+  }, [user?.uid, lastViewedAt]);
+
   return (
     <NotificationLogContext.Provider value={{ notifications, addNotification, clear, unreadCount, markAllRead, lastViewedAt }}>
       {children}

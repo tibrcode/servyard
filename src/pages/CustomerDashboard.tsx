@@ -141,7 +141,7 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
     }
   };
 
-  // Highlight booking if bookingId query param present
+  // Highlight booking if bookingId query param present (persistent until interaction)
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const bookingId = params.get('bookingId');
@@ -151,13 +151,19 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
       const el = document.querySelector(`[data-booking-id="${bookingId}"]`) as HTMLElement | null;
       if (el) {
         el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        el.classList.add('ring-2', 'ring-primary', 'animate-pulse');
+        el.classList.add('ring-2', 'ring-primary');
         setHighlightedId(bookingId);
-        setTimeout(() => {
-          el.classList.remove('animate-pulse');
+        const clear = () => {
           el.classList.remove('ring-2');
           el.classList.remove('ring-primary');
-        }, 2200);
+          el.removeEventListener('click', clear);
+          el.removeEventListener('keydown', clear);
+          el.removeEventListener('touchstart', clear);
+        };
+        el.addEventListener('click', clear, { once: true });
+        el.addEventListener('keydown', clear, { once: true });
+        el.addEventListener('touchstart', clear, { once: true });
+        setTimeout(clear, 30000);
       }
     }, 500);
     return () => clearTimeout(t);

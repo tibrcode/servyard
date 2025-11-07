@@ -215,12 +215,18 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
       const el = document.querySelector(`#provider-booking-${bookingId}`) as HTMLElement | null;
       if (el) {
         el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        el.classList.add('ring-2', 'ring-primary', 'animate-pulse');
-        setTimeout(() => {
-          el.classList.remove('animate-pulse');
+        el.classList.add('ring-2', 'ring-primary');
+        const clear = () => {
           el.classList.remove('ring-2');
           el.classList.remove('ring-primary');
-        }, 2200);
+          el.removeEventListener('click', clear);
+          el.removeEventListener('keydown', clear);
+          el.removeEventListener('touchstart', clear);
+        };
+        el.addEventListener('click', clear, { once: true });
+        el.addEventListener('keydown', clear, { once: true });
+        el.addEventListener('touchstart', clear, { once: true });
+        setTimeout(clear, 30000);
       }
     }, 600);
     return () => clearTimeout(t);

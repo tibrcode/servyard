@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNotificationLog } from '@/contexts/NotificationLogContext';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '@/lib/i18n';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,6 +11,7 @@ export default function NotificationsHistory() {
   const lang = typeof document !== 'undefined' ? document.documentElement.lang || 'en' : 'en';
   const { t } = useTranslation(lang);
   const { notifications, clear, markAllRead } = useNotificationLog();
+  const navigate = useNavigate();
   const [filter, setFilter] = React.useState<'all' | 'foreground' | 'background'>('all');
   const [cat, setCat] = React.useState<'all' | 'booking' | 'reminder' | 'system' | 'other'>('all');
   const [search, setSearch] = React.useState('');
@@ -96,6 +98,26 @@ export default function NotificationsHistory() {
                   {n.category && n.category !== 'other' && (
                     <span className="inline-flex items-center rounded bg-blue-600/10 text-blue-700 dark:text-blue-300 px-1.5 py-0.5">
                       {n.category}
+                    </span>
+                  )}
+                  {n.category === 'booking' && (n as any).raw?.data?.bookingId && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const bookingId = (n as any).raw.data.bookingId;
+                        // Decide which dashboard to route to based on presence of customer/provider hints.
+                        // Default to customer dashboard; provider notifications may carry provider flag.
+                        const isProvider = (n as any).raw?.data?.provider === 'true';
+                        navigate(isProvider ? `/provider-dashboard?bookingId=${bookingId}` : `/customer-dashboard?bookingId=${bookingId}`);
+                      }}
+                      className="inline-flex items-center rounded bg-green-600/10 text-green-700 dark:text-green-300 px-1.5 py-0.5 hover:bg-green-600/20 transition-colors"
+                    >
+                      {lang === 'ar' ? 'فتح الحجز' : 'Open Booking'}
+                    </button>
+                  )}
+                  {n.category === 'booking' && (n as any).bookingStatus && (
+                    <span className="inline-flex items-center rounded bg-amber-600/10 text-amber-700 dark:text-amber-300 px-1.5 py-0.5">
+                      {(n as any).bookingStatus}
                     </span>
                   )}
                 </div>

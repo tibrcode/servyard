@@ -39,6 +39,12 @@ messaging.onBackgroundMessage((payload) => {
     });
   } catch (e) { /* noop */ }
 
+  // Support silent sync notifications: skip showing system notification if type === 'silent_sync'
+  if (normalized.data?.type === 'silent_sync') {
+    console.log('[SW] Silent sync payload received; skipping system notification display');
+    return; // still broadcast via postMessage above
+  }
+
   const notificationTitle = normalized.notification.title;
   const notificationOptions = {
     body: normalized.notification.body,

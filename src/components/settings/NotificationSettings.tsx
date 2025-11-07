@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
-import { Bell, BellOff, Clock, CheckCircle2, XCircle, Moon, Save, BellRing } from 'lucide-react';
+import { Bell, BellOff, Clock, CheckCircle2, XCircle, Moon, Save, BellRing, Info } from 'lucide-react';
 import { db } from '@/integrations/firebase/client';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { requestNotificationPermission } from '@/lib/firebase/notifications';
@@ -87,6 +87,7 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
     completions: isRTL ? 'إكمال الخدمات' : 'Service Completions',
     quietHours: isRTL ? 'ساعات الهدوء' : 'Quiet Hours',
     quietHoursDesc: isRTL ? 'لن تتلقى تنبيهات خلال هذه الأوقات' : 'You won\'t receive notifications during these hours',
+  quietHoursTooltip: isRTL ? 'لن يتم إرسال إشعارات (عدا التذكيرات الحرجة) خلال هذه الفترة. يتم تأجيل التذكيرات لتُرسل بعد انتهائها.' : 'Notifications (except critical reminders) are suppressed in this window. Reminders are deferred until it ends.',
     startTime: isRTL ? 'من' : 'From',
     endTime: isRTL ? 'إلى' : 'To',
     save: isRTL ? 'حفظ الإعدادات' : 'Save Settings',
@@ -96,6 +97,8 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
     permissionDenied: isRTL ? 'صلاحية التنبيهات محظورة' : 'Notification Permission Denied',
     permissionDeniedDesc: isRTL ? 'يرجى تفعيل التنبيهات في إعدادات المتصفح' : 'Please enable notifications in browser settings',
     requestPermission: isRTL ? 'طلب الصلاحية' : 'Request Permission',
+    reminderSummaryLabel: isRTL ? 'ملخص التذكيرات' : 'Reminder Summary',
+    noneSelected: isRTL ? 'لا يوجد أوقات محددة' : 'No times selected',
   };
 
   const reminderOptions = [
@@ -336,6 +339,21 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
                   </Badge>
                 ))}
               </div>
+              {/* Reminder summary */}
+              <div className="mt-3 text-xs text-muted-foreground">
+                <span className="font-medium">{t.reminderSummaryLabel}: </span>
+                {preferences.booking_reminders.reminder_times.length === 0
+                  ? t.noneSelected
+                  : preferences.booking_reminders.reminder_times.map(m => {
+                      if (m < 60) return (isRTL ? `${m} دقيقة` : `${m} min`);
+                      if (m === 60) return isRTL ? 'ساعة واحدة' : '1h';
+                      if (m < 180) return isRTL ? `${Math.round(m/60)} ساعات` : `${Math.round(m/60)}h`;
+                      if (m < 1440) return isRTL ? `${Math.round(m/60)} ساعة` : `${Math.round(m/60)}h`;
+                      if (m === 1440) return isRTL ? 'يوم واحد' : '1d';
+                      return `${m}m`;
+                    }).join(isRTL ? '، ' : ', ')
+                }
+              </div>
             </div>
           )}
         </div>
@@ -467,6 +485,10 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
                   }
                   className="w-full px-3 py-2 border rounded-md bg-background"
                 />
+              </div>
+              <div className="col-span-2 flex items-start gap-2 text-xs text-muted-foreground mt-1">
+                <Info className="h-3 w-3 mt-0.5" />
+                <span>{t.quietHoursTooltip}</span>
               </div>
             </div>
           )}
