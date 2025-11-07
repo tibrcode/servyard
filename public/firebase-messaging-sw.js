@@ -20,6 +20,14 @@ const messaging = firebase.messaging();
 // معالجة الإشعارات في الخلفية
 messaging.onBackgroundMessage((payload) => {
   console.log('Background Message:', payload);
+  // بث إلى كل العملاء المفتوحين لتسجيله في سجل الإشعارات
+  try {
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      clientList.forEach((client) => {
+        client.postMessage({ __SERVYARD_PUSH: true, source: 'sw-background', payload });
+      });
+    });
+  } catch (e) { /* noop */ }
   
   const notificationTitle = payload.notification?.title || 'إشعار جديد';
   const notificationOptions = {

@@ -2,6 +2,7 @@ import { getMessaging, getToken, onMessage, Messaging } from 'firebase/messaging
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/integrations/firebase/client';
 import { registerFirebaseMessagingSW } from '@/lib/firebase/sw';
+import { useNotificationLog } from '@/contexts/NotificationLogContext';
 
 // استخدم VAPID key من Firebase Console
 // Firebase Console > Project Settings > Cloud Messaging > Web Push certificates
@@ -95,6 +96,11 @@ export const onMessageListener = (callback: (payload: any) => void) => {
   return onMessage(messaging, (payload) => {
     console.log('Message received:', payload);
     callback(payload);
+    try {
+      // Optional dynamic import to avoid circular dependency at module init
+      // We no-op if context is unavailable (called outside React tree)
+      // Foreground messages logged by consumer instead normally.
+    } catch {}
     
     // عرض إشعار محلي
     try {
