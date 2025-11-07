@@ -35,7 +35,7 @@ import ContactUs from "@/pages/ContactUs";
 import NotFound from "@/pages/NotFound";
 import DebugNotifications from "@/pages/DebugNotifications";
 import NotificationsHistory from "@/pages/NotificationsHistory";
-import { NotificationLogProvider } from "@/contexts/NotificationLogContext";
+import { NotificationLogProvider, useNotificationLog } from "@/contexts/NotificationLogContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import EnsureProfile from "@/components/auth/EnsureProfile";
@@ -73,17 +73,27 @@ const AppContent = () => {
   }, [user?.uid]);
 
   // الاستماع للإشعارات عندما يكون التطبيق مفتوحاً
+  const { addNotification } = useNotificationLog();
   React.useEffect(() => {
     const unsubscribe = onMessageListener((payload) => {
       toast({
         title: payload.notification?.title || 'إشعار جديد',
         description: payload.notification?.body,
       });
+      try {
+        addNotification({
+          title: payload.notification?.title || 'Notification',
+          body: payload.notification?.body,
+          via: 'foreground',
+          raw: payload,
+          type: payload.data?.type,
+        });
+      } catch {}
     });
     return () => {
       if (unsubscribe) unsubscribe();
     };
-  }, [toast]);
+  }, [toast, addNotification]);
 
   const closeAllOverlays = () => {
     try {
