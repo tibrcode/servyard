@@ -1,7 +1,7 @@
 // Notification Settings Component
 // مكون إعدادات التنبيهات
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
-import { Bell, BellOff, Clock, CheckCircle2, XCircle, Moon, Save } from 'lucide-react';
+import { Bell, BellOff, Clock, CheckCircle2, XCircle, Moon, Save, BellRing } from 'lucide-react';
 import { db } from '@/integrations/firebase/client';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { requestNotificationPermission } from '@/lib/firebase/notifications';
@@ -107,18 +107,13 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
     { value: 1440, label: t.day1 },
   ];
 
-  useEffect(() => {
-    loadPreferences();
-    checkNotificationPermission();
-  }, [userId]);
-
-  const checkNotificationPermission = () => {
-    if ('Notification' in window) {
+  const checkNotificationPermission = useCallback(() => {
+    if (typeof Notification !== 'undefined') {
       setNotificationPermission(Notification.permission);
     }
-  };
+  }, []);
 
-  const loadPreferences = async () => {
+  const loadPreferences = useCallback(async () => {
     setIsLoading(true);
     try {
       const profileDoc = await getDoc(doc(db, 'profiles', userId));
@@ -136,7 +131,12 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    loadPreferences();
+    checkNotificationPermission();
+  }, [loadPreferences, checkNotificationPermission]);
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -176,6 +176,37 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
       }
     } catch (error) {
       console.error('Error requesting permission:', error);
+    }
+  };
+
+  const handleSendTest = async () => {
+    try {
+      if (!userId) return;
+      const url = import.meta.env.VITE_TEST_NOTIFICATION_URL || '/sendTestNotification';
+      const resp = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
+      });
+      if (resp.ok) {
+        toast({
+          title: isRTL ? 'تم إرسال إشعار تجريبي' : 'Test notification sent',
+          description: isRTL ? 'تحقق من مركز الإشعارات' : 'Check your notification center',
+        });
+      } else {
+        const text = await resp.text();
+        toast({
+          title: isRTL ? 'فشل الإرسال' : 'Failed to send',
+          description: text.slice(0, 160),
+          variant: 'destructive',
+        });
+      }
+    } catch (e: any) {
+      toast({
+        title: isRTL ? 'خطأ في الطلب' : 'Request error',
+        description: e?.message || String(e),
+        variant: 'destructive',
+      });
     }
   };
 
@@ -449,6 +480,18 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
         >
           <Save className="h-4 w-4 mr-2" />
           {isSaving ? t.saving : t.save}
+        </Button>
+
+        {/* Test Push Button */}
+        <Button
+          type="button"
+          variant="outline"
+          onClick={handleSendTest}
+          disabled={!preferences.enabled}
+          className="w-full mt-2"
+        >
+          <BellRing className="h-4 w-4 mr-2" />
+          {isRTL ? 'إرسال إشعار تجريبي' : 'Send Test Notification'}
         </Button>
       </CardContent>
     </Card>

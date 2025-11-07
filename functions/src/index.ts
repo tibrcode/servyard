@@ -278,6 +278,36 @@ export const sendReviewNotification = onDocumentCreated(
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
+ * Simple test push endpoint
+ * Body: { userId?: string, token?: string, title?: string, body?: string }
+ */
+export const sendTestNotification = onRequest({ cors: true, invoker: 'public' }, async (req: any, res: any) => {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+  try {
+    const { userId, token, title, body } = req.body || {};
+    let targetToken: string | null = token || null;
+    if (!targetToken && userId) {
+      targetToken = await getUserFCMToken(userId);
+    }
+    if (!targetToken) {
+      return res.status(400).json({ error: 'Missing token and userId or no token found' });
+    }
+    const ok = await sendNotification(
+      targetToken,
+      title || '🔔 Test Notification',
+      body || 'Hello from ServYard test endpoint',
+      { type: 'test', link: '/' },
+    );
+    return res.json({ success: ok });
+  } catch (e: any) {
+    console.error('Error in sendTestNotification:', e);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
  * حساب المسافة بين نقطتين باستخدام Haversine formula
  * Calculate distance between two points using Haversine formula
  */
@@ -352,7 +382,7 @@ export const findNearbyProviders = onRequest(
       const maxLon = longitude + lonDelta;
 
       // جلب المزودين ضمن bounding box
-      let query = db.collection('profiles')
+      const query = db.collection('profiles')
         .where('user_type', '==', 'provider')
         .where('latitude', '>=', minLat)
         .where('latitude', '<=', maxLat);

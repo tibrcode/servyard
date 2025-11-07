@@ -33,6 +33,7 @@ import ContentPolicy from "@/pages/ContentPolicy";
 import AboutUs from "@/pages/AboutUs";
 import ContactUs from "@/pages/ContactUs";
 import NotFound from "@/pages/NotFound";
+import DebugNotifications from "@/pages/DebugNotifications";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import EnsureProfile from "@/components/auth/EnsureProfile";
@@ -327,6 +328,7 @@ const AppContent = () => {
                       <Route path="/complete-profile" element={<CompleteProfile currentLanguage={currentLanguage} />} />
                       <Route path="/about" element={<AboutUs currentLanguage={currentLanguage} />} />
                       <Route path="/contact" element={<ContactUs currentLanguage={currentLanguage} />} />
+                      <Route path="/debug/notifications" element={<DebugNotifications />} />
                       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                       <Route path="*" element={<NotFound currentLanguage={currentLanguage} />} />
                     </Routes>
