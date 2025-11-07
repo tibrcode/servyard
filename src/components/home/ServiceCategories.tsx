@@ -135,14 +135,21 @@ export const ServiceCategories = ({
         // Deduplicate categories by English name (or Arabic fallback) to avoid double rendering
         const seen = new Set<string>();
         const deduped: ServiceCategory[] = [];
+        // Allow opt-in duplicate logging only when localStorage flag set to avoid noisy consoles
+        let duplicateLogCount = 0;
+        const debugDuplicates = (() => {
+          try { return localStorage.getItem('debug-duplicates') === '1'; } catch { return false; }
+        })();
         for (const cat of categoriesData) {
           const key = (cat.name_en || cat.name_ar || cat.id).trim();
           if (!seen.has(key)) {
             seen.add(key);
             deduped.push(cat);
-          } else {
-            if (import.meta.env.DEV) {
+          } else if (debugDuplicates) {
+            // Only log a limited number to prevent potential performance issues
+            if (duplicateLogCount < 20) {
               console.warn('[ServiceCategories] Duplicate category suppressed:', key, cat.id);
+              duplicateLogCount++;
             }
           }
         }
@@ -165,11 +172,20 @@ export const ServiceCategories = ({
           categoriesData = categoriesData.filter(cat => cat.is_active);
           const seenFallback = new Set<string>();
           const dedupFallback: ServiceCategory[] = [];
+          const debugDuplicatesFallback = (() => {
+            try { return localStorage.getItem('debug-duplicates') === '1'; } catch { return false; }
+          })();
+          let duplicateLogCountFallback = 0;
           for (const cat of categoriesData) {
             const key = (cat.name_en || cat.name_ar || cat.id).trim();
             if (!seenFallback.has(key)) {
               seenFallback.add(key);
               dedupFallback.push(cat);
+            } else if (debugDuplicatesFallback) {
+              if (duplicateLogCountFallback < 20) {
+                console.warn('[ServiceCategories] [fallback] Duplicate category suppressed:', key, cat.id);
+                duplicateLogCountFallback++;
+              }
             }
           }
           dedupFallback.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
