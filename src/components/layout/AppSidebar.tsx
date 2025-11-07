@@ -14,6 +14,7 @@ import {
   Moon,
   Sun
 } from "lucide-react";
+import { Bell } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { Globe, MapPin } from "lucide-react";
 import {
@@ -68,6 +69,7 @@ export function AppSidebar({ currentLanguage = 'en', onLanguageChange, onLocatio
   const mainNavItems = [
     { title: t.nav.home, url: "/", icon: Home },
     { title: t.nav.services, url: "/services", icon: Search },
+    { title: t.nav.notifications || 'Notifications', url: "/notifications", icon: Bell },
   ];
 
   const authNavItems = user ? [] : [

@@ -15,6 +15,7 @@ export interface Translation {
     language: string;
     location: string;
     theme?: string;
+    notifications?: string;
   };
 
   // Homepage
@@ -696,6 +697,7 @@ export const translations: Record<string, Translation> = {
       language: "Language",
       location: "Location",
       theme: "Theme",
+      notifications: "Notifications",
     },
     home: {
       title: "ServYard - Premium Service Marketplace",
@@ -1399,6 +1401,7 @@ export const translations: Record<string, Translation> = {
       language: "اللغة",
       location: "الموقع",
       theme: "المظهر",
+      notifications: "الإشعارات",
     },
     home: {
       title: "سيرف يارد - منصة الخدمات المتميزة",
