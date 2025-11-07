@@ -55,7 +55,7 @@ export function BookingManagement({
 
   // Translation - Different titles based on mode
   const titleText = showOnlyPending 
-    ? (isRTL ? 'المواعيد المعلقة' : 'Pending Appointments')
+    ? (isRTL ? 'الحجوزات المعلقة' : 'Pending Bookings')
     : (isRTL ? 'إدارة الحجوزات' : 'Booking Management');
   
   const subtitleText = showOnlyPending
