@@ -99,6 +99,33 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Highlight booking if bookingId query param present (for provider)
+  // IMPORTANT: Hooks must run before any early returns to avoid React error #310.
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const bookingId = params.get('bookingId');
+    if (!bookingId) return;
+    const t = setTimeout(() => {
+      const el = document.querySelector(`#provider-booking-${bookingId}`) as HTMLElement | null;
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.classList.add('ring-2', 'ring-primary');
+        const clear = () => {
+          el.classList.remove('ring-2');
+          el.classList.remove('ring-primary');
+          el.removeEventListener('click', clear);
+          el.removeEventListener('keydown', clear);
+          el.removeEventListener('touchstart', clear);
+        };
+        el.addEventListener('click', clear, { once: true });
+        el.addEventListener('keydown', clear, { once: true });
+        el.addEventListener('touchstart', clear, { once: true });
+        setTimeout(clear, 30000);
+      }
+    }, 600);
+    return () => clearTimeout(t);
+  }, [location.search]);
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -205,32 +232,6 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
       console.error('Error signing out:', error);
     }
   };
-
-  // Highlight booking if bookingId query param present (for provider)
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const bookingId = params.get('bookingId');
-    if (!bookingId) return;
-    const t = setTimeout(() => {
-      const el = document.querySelector(`#provider-booking-${bookingId}`) as HTMLElement | null;
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        el.classList.add('ring-2', 'ring-primary');
-        const clear = () => {
-          el.classList.remove('ring-2');
-          el.classList.remove('ring-primary');
-          el.removeEventListener('click', clear);
-          el.removeEventListener('keydown', clear);
-          el.removeEventListener('touchstart', clear);
-        };
-        el.addEventListener('click', clear, { once: true });
-        el.addEventListener('keydown', clear, { once: true });
-        el.addEventListener('touchstart', clear, { once: true });
-        setTimeout(clear, 30000);
-      }
-    }, 600);
-    return () => clearTimeout(t);
-  }, [location.search]);
 
   const handleOnlineStatusChange = async (isOnline: boolean) => {
     if (!currentUser) return;
