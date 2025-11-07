@@ -5,6 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { registerFirebaseMessagingSW } from '@/lib/firebase/sw';
 import { requestNotificationPermission } from '@/lib/firebase/notifications';
+import { Link } from 'react-router-dom';
 
 export default function DebugNotifications() {
   const { toast } = useToast();
@@ -130,6 +131,9 @@ export default function DebugNotifications() {
             <Button variant="secondary" onClick={testToast}>Test Toast</Button>
             <Button variant="secondary" onClick={testNotificationAPI}>Test Notification API</Button>
             <Button variant="default" onClick={testBackendPush} disabled={busy}>Send Test Push (Backend)</Button>
+            <Link to="/notifications" className="inline-flex">
+              <Button variant="ghost">Open History</Button>
+            </Link>
           </div>
         </CardContent>
       </Card>
