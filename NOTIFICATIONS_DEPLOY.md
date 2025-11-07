@@ -45,6 +45,7 @@ No build step needed for this file; it's copied as-is from `public/`.
 - Routes:
   - `/debug/notifications`: diagnostics
   - `/notifications`: history page (also added to sidebar)
+  - Unread badge: the sidebar shows an unread counter from `NotificationLogContext`; it resets when opening `/notifications` (mark all read)
 
 ## 4) Deploy Cloud Functions
 From the repo root:
