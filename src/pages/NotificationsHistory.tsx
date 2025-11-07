@@ -63,7 +63,18 @@ export default function NotificationsHistory() {
                   </span>
                 </div>
                 {n.body && <div className="text-muted-foreground whitespace-pre-wrap">{n.body}</div>}
-                {n.type && <div className="text-xs">نوع / type: <span className="font-mono">{n.type}</span></div>}
+                <div className="flex flex-wrap gap-2 text-xs mt-1">
+                  {n.type && (
+                    <span className="inline-flex items-center rounded bg-muted px-1.5 py-0.5 font-mono">
+                      {n.type}
+                    </span>
+                  )}
+                  {n.category && n.category !== 'other' && (
+                    <span className="inline-flex items-center rounded bg-blue-600/10 text-blue-700 dark:text-blue-300 px-1.5 py-0.5">
+                      {n.category}
+                    </span>
+                  )}
+                </div>
               </div>
             ))}
           </div>

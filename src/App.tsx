@@ -87,6 +87,7 @@ const AppContent = () => {
           via: 'foreground',
           raw: payload,
           type: payload.data?.type,
+          // category derivation happens in context for SW, but here we can pass type only
         });
       } catch {}
     });
