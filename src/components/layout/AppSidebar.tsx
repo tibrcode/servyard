@@ -71,7 +71,7 @@ export function AppSidebar({ currentLanguage = 'en', onLanguageChange, onLocatio
   const mainNavItems = [
     { title: t.nav.home, url: "/", icon: Home },
     { title: t.nav.services, url: "/services", icon: Search },
-    { title: t.nav.notifications || 'Notifications', url: "/notifications", icon: Bell, badge: unreadCount },
+  { title: t.nav.notifications || 'Notifications', url: "/notifications", icon: Bell, badge: unreadCount },
   ];
 
   const authNavItems = user ? [] : [
@@ -126,7 +126,7 @@ export function AppSidebar({ currentLanguage = 'en', onLanguageChange, onLocatio
                       className={({ isActive }) => getNavCls({ isActive })}
                       onClick={handleNavigation}
                     >
-                      <span className="relative inline-flex items-center">
+                      <span className="relative inline-flex items-center" aria-label={item.badge ? `${item.title} (${item.badge} unread)` : item.title} title={item.badge ? `${item.badge} unread` : item.title}>
                         <item.icon className="h-4 w-4 mr-2" />
                         <span>{item.title}</span>
                         {item.badge ? (

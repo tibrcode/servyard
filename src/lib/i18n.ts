@@ -145,6 +145,16 @@ export interface Translation {
     customerDashboard: string;
   };
 
+  // Notifications UI
+  notificationsUI?: {
+    historyTitle: string;
+    all: string;
+    foreground: string;
+    background: string;
+    clear: string;
+    markAllRead: string;
+  };
+
   // User interface text
   ui: {
     languageChanged: string;
@@ -750,6 +760,14 @@ export const translations: Record<string, Translation> = {
       dashboards: "Dashboards",
       providerDashboard: "Provider Dashboard",
       customerDashboard: "Customer Dashboard",
+    },
+    notificationsUI: {
+      historyTitle: "Notification History",
+      all: "All",
+      foreground: "Foreground",
+      background: "Background",
+      clear: "Clear",
+      markAllRead: "Mark all as read",
     },
     auth: {
       welcome: 'Welcome to ServYard',
@@ -1454,6 +1472,14 @@ export const translations: Record<string, Translation> = {
       dashboards: "لوحات التحكم",
       providerDashboard: "لوحة تحكم مقدم الخدمة",
       customerDashboard: "لوحة تحكم العميل",
+    },
+    notificationsUI: {
+      historyTitle: "سجل الإشعارات",
+      all: "الكل",
+      foreground: "أمام",
+      background: "خلفية",
+      clear: "مسح",
+      markAllRead: "تعليم الكل كمقروء",
     },
     auth: {
       welcome: "مرحباً بك في سيرف يارد",

@@ -7,7 +7,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Globe, MapPin, User, UserPlus, LogOut, Sun, Moon, Shield } from "lucide-react";
+import { Globe, MapPin, User, UserPlus, LogOut, Sun, Moon, Shield, Bell } from "lucide-react";
+import { useNotificationLog } from "@/contexts/NotificationLogContext";
 import { useTranslation, supportedLanguages } from "@/lib/i18n";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Link, useNavigate } from "react-router-dom";
@@ -29,6 +30,7 @@ export const Header = ({
   const { t, isRTL } = useTranslation(currentLanguage);
   const { user, displayName, role, signOut: doSignOut, loading } = useAuth();
   const navigate = useNavigate();
+  const { unreadCount } = useNotificationLog();
   const [langOpen, setLangOpen] = React.useState(false);
   // Reduce heavy effects when scrolled to avoid Android WebView repaint bugs
   const [isScrolled, setIsScrolled] = React.useState(false);
@@ -127,6 +129,21 @@ export const Header = ({
 
           {/* Navigation Actions */}
           <div className={`ml-auto flex items-center gap-2 sm:gap-3 md:gap-4 flex-shrink-0 isolate whitespace-nowrap flex-nowrap max-w-full ${isRTL ? 'flex-row-reverse' : ''}`}>
+            {/* Notifications (header quick link) */}
+            <Link to="/notifications" aria-label={t.nav.notifications || 'Notifications'} className="relative inline-flex">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="inline-flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 p-0 transition-transform active:scale-95"
+              >
+                <Bell className="block h-8 w-8 sm:h-10 sm:w-10" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 rounded-full bg-red-600 text-white text-[10px] leading-none h-4 min-w-[16px] px-1 flex items-center justify-center">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </span>
+                )}
+              </Button>
+            </Link>
             {/* Location (icon-only with tooltip) */}
             {isTouch ? (
               <Button

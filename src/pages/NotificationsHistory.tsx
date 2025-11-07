@@ -1,10 +1,14 @@
 import React from 'react';
 import { useNotificationLog } from '@/contexts/NotificationLogContext';
+import { useTranslation } from '@/lib/i18n';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 
 export default function NotificationsHistory() {
+  // Detect language from document or fallback
+  const lang = typeof document !== 'undefined' ? document.documentElement.lang || 'en' : 'en';
+  const { t } = useTranslation(lang);
   const { notifications, clear, markAllRead } = useNotificationLog();
   const [filter, setFilter] = React.useState<'all' | 'foreground' | 'background'>('all');
   const [search, setSearch] = React.useState('');
@@ -28,13 +32,13 @@ export default function NotificationsHistory() {
     <div className="container mx-auto p-4 space-y-4">
       <Card>
         <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <CardTitle className="text-lg">سجل الإشعارات / Notification History</CardTitle>
+          <CardTitle className="text-lg">{t.notificationsUI?.historyTitle || 'Notification History'}</CardTitle>
           <div className="flex flex-wrap gap-2">
-            <Button variant={filter === 'all' ? 'default' : 'outline'} onClick={() => setFilter('all')}>الكل</Button>
-            <Button variant={filter === 'foreground' ? 'default' : 'outline'} onClick={() => setFilter('foreground')}>أمام</Button>
-            <Button variant={filter === 'background' ? 'default' : 'outline'} onClick={() => setFilter('background')}>خلفية</Button>
-            <Button variant="secondary" onClick={markAllRead}>تعليم الكل كمقروء</Button>
-            <Button variant="destructive" onClick={clear}>مسح</Button>
+            <Button variant={filter === 'all' ? 'default' : 'outline'} onClick={() => setFilter('all')}>{t.notificationsUI?.all || 'All'}</Button>
+            <Button variant={filter === 'foreground' ? 'default' : 'outline'} onClick={() => setFilter('foreground')}>{t.notificationsUI?.foreground || 'Foreground'}</Button>
+            <Button variant={filter === 'background' ? 'default' : 'outline'} onClick={() => setFilter('background')}>{t.notificationsUI?.background || 'Background'}</Button>
+            <Button variant="secondary" onClick={markAllRead}>{t.notificationsUI?.markAllRead || 'Mark all as read'}</Button>
+            <Button variant="destructive" onClick={clear}>{t.notificationsUI?.clear || 'Clear'}</Button>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -48,7 +52,7 @@ export default function NotificationsHistory() {
           <Separator />
           <div className="space-y-3 max-h-[600px] overflow-auto pr-1">
             {filtered.length === 0 && (
-              <div className="text-sm text-muted-foreground">لا يوجد إشعارات مطابقة / No notifications</div>
+              <div className="text-sm text-muted-foreground">{lang === 'ar' ? 'لا يوجد إشعارات' : 'No notifications'}</div>
             )}
             {filtered.map(n => (
               <div key={n.id} className="border rounded-md p-3 text-sm space-y-1 bg-card">
