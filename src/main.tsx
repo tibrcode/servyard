@@ -2,6 +2,7 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 import { rtlLanguages as rtlBase } from "@/lib/languages";
+import { registerFirebaseMessagingSW } from "@/lib/firebase/sw";
 
 // Lightweight boot diagnostics for Android WebView
 try {
@@ -26,11 +27,9 @@ try {
     } catch { /* noop */ }
     // Global error hooks to surface issues in logcat (chromium CONSOLE)
     window.addEventListener("error", (e) => {
-        // eslint-disable-next-line no-console
         console.error("[BOOT] window.error:", e.error || e.message || e);
     });
     window.addEventListener("unhandledrejection", (e: PromiseRejectionEvent) => {
-        // eslint-disable-next-line no-console
         console.error("[BOOT] unhandledrejection:", e.reason);
     });
 
@@ -39,11 +38,22 @@ try {
         // Visual heartbeat in case React fails to mount
         rootEl.textContent = "Booting…";
     }
-    // eslint-disable-next-line no-console
     console.log("[BOOT] main.tsx loaded at", new Date().toISOString());
+
+    // Proactively register the Firebase Messaging service worker so background notifications work
+    try {
+        registerFirebaseMessagingSW().then((reg) => {
+            if (reg) {
+                console.log("[BOOT] FCM Service Worker registered:", reg.scope);
+            } else {
+                console.warn("[BOOT] FCM Service Worker not registered (unsupported or failed)");
+            }
+        });
+    } catch (e) {
+        console.warn("[BOOT] SW registration error:", e);
+    }
 
     createRoot(rootEl!).render(<App />);
 } catch (err) {
-    // eslint-disable-next-line no-console
     console.error("[BOOT] render failed:", err);
 }

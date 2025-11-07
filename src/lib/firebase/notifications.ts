@@ -1,6 +1,7 @@
 import { getMessaging, getToken, onMessage, Messaging } from 'firebase/messaging';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/integrations/firebase/client';
+import { registerFirebaseMessagingSW } from '@/lib/firebase/sw';
 
 // استخدم VAPID key من Firebase Console
 // Firebase Console > Project Settings > Cloud Messaging > Web Push certificates
@@ -50,9 +51,16 @@ export const requestNotificationPermission = async (userId: string, skipPrompt =
       return null;
     }
 
+    // Ensure the messaging service worker is registered before requesting a token
+    const swReg = await registerFirebaseMessagingSW();
+    if (!swReg) {
+      console.warn('[FCM] Service worker registration unavailable. Foreground messages only.');
+    }
+
     // الحصول على التوكن
     const token = await getToken(messaging, {
-      vapidKey: VAPID_KEY
+      vapidKey: VAPID_KEY,
+      serviceWorkerRegistration: swReg ?? undefined,
     });
 
     if (token) {
@@ -89,12 +97,16 @@ export const onMessageListener = (callback: (payload: any) => void) => {
     callback(payload);
     
     // عرض إشعار محلي
-    if (payload.notification) {
-      new Notification(payload.notification.title || 'إشعار جديد', {
-        body: payload.notification.body,
-        icon: '/icons/icon-192.png',
-        badge: '/icons/icon-192.png'
-      });
+    try {
+      if (payload.notification && Notification.permission === 'granted') {
+        new Notification(payload.notification.title || 'إشعار جديد', {
+          body: payload.notification.body,
+          icon: '/icons/icon-192.png',
+          badge: '/icons/icon-192.png'
+        });
+      }
+    } catch (e) {
+      // Non-fatal: some environments disallow Notification from page context
     }
   });
 };
