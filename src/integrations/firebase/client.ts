@@ -20,7 +20,12 @@ const app = initializeApp(firebaseConfig);
 
 // Initialize Firebase services
 export const auth = getAuth(app);
-export const db = initializeFirestore(app, { experimentalForceLongPolling: true });
+// Safari/iOS WebView can be noisy with WebChannel/streamed fetch.
+// Auto-detect long polling and disable fetch streams to reduce red console noise.
+export const db = initializeFirestore(app, {
+  experimentalAutoDetectLongPolling: true,
+  useFetchStreams: false,
+});
 export const analytics = typeof window !== 'undefined' ? getAnalytics(app) : (null as any);
 export const storage = getStorage(app);
 
