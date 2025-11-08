@@ -258,6 +258,8 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
           : null
       };
       
+      const url = functionUrls.custom || functionUrls.sendTestNotification;
+      
       console.log('[Test Notification] Sending to:', url);
       console.log('[Test Notification] userId:', userId);
       console.log('[Test Notification] fcmToken:', fcmToken ? fcmToken.substring(0, 20) + '...' : 'none');
