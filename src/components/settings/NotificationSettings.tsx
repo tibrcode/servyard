@@ -145,8 +145,30 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
   const handleSave = async () => {
     setIsSaving(true);
     try {
+      // Validate preferences before saving
+      const validatedPreferences = {
+        ...preferences,
+        quiet_hours: {
+          enabled: preferences.quiet_hours?.enabled || false,
+          start: preferences.quiet_hours?.start || '22:00',
+          end: preferences.quiet_hours?.end || '08:00',
+        },
+        booking_reminders: {
+          enabled: preferences.booking_reminders?.enabled || false,
+          reminder_times: Array.isArray(preferences.booking_reminders?.reminder_times) 
+            ? preferences.booking_reminders.reminder_times 
+            : [],
+        },
+        booking_updates: {
+          confirmations: preferences.booking_updates?.confirmations !== false,
+          cancellations: preferences.booking_updates?.cancellations !== false,
+          completions: preferences.booking_updates?.completions !== false,
+        },
+      };
+
       await updateDoc(doc(db, 'profiles', userId), {
-        notification_settings: preferences,
+        notification_settings: validatedPreferences,
+        updated_at: new Date(),
       });
 
       toast({
@@ -185,37 +207,50 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
 
   const handleSendTest = async () => {
     try {
-      if (!userId) return;
+      if (!userId) {
+        toast({
+          title: isRTL ? 'خطأ' : 'Error',
+          description: isRTL ? 'المستخدم غير معرف' : 'User ID not found',
+          variant: 'destructive',
+        });
+        return;
+      }
       
-      // Use Firebase Functions URL - must be full URL, not relative path
-      // For production: https://YOUR-REGION-YOUR-PROJECT.cloudfunctions.net/sendTestNotification
-      // For emulator: http://127.0.0.1:5001/YOUR-PROJECT/REGION/sendTestNotification
+      // Get the Cloud Functions base URL from environment or construct it
+      const projectId = import.meta.env.VITE_FIREBASE_PROJECT_ID || 'servyard-de527';
+      const region = 'us-central1'; // Your Cloud Functions region
       const functionsUrl = import.meta.env.VITE_FIREBASE_FUNCTIONS_URL || 
-                          `https://us-central1-${import.meta.env.VITE_FIREBASE_PROJECT_ID}.cloudfunctions.net`;
+                          `https://${region}-${projectId}.cloudfunctions.net`;
       const url = `${functionsUrl}/sendTestNotification`;
+      
+      console.log('[Test Notification] Sending to:', url);
       
       const resp = await fetch(url, withTrace({
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({ userId }),
       }));
       
       if (resp.ok) {
+        const data = await resp.json().catch(() => null);
+        console.log('[Test Notification] Success:', data);
         toast({
           title: isRTL ? 'تم إرسال إشعار تجريبي' : 'Test notification sent',
           description: isRTL ? 'تحقق من مركز الإشعارات' : 'Check your notification center',
         });
       } else {
         const text = await resp.text();
-        console.error('Test notification failed:', resp.status, text);
+        console.error('[Test Notification] Failed:', resp.status, text);
         toast({
           title: isRTL ? 'فشل الإرسال' : 'Failed to send',
-          description: text.slice(0, 160),
+          description: `Status: ${resp.status}${text ? ` - ${text.slice(0, 100)}` : ''}`,
           variant: 'destructive',
         });
       }
     } catch (e: any) {
-      console.error('Test notification request error:', e);
+      console.error('[Test Notification] Request error:', e);
       toast({
         title: isRTL ? 'خطأ في الطلب' : 'Request error',
         description: e?.message || String(e),

@@ -107,19 +107,30 @@ export default function DebugNotifications() {
     }
     setBusy(true);
     try {
-      // Use Firebase Functions URL - must be full URL, not relative path
+      // Get the Cloud Functions base URL from environment or construct it
+      const projectId = import.meta.env.VITE_FIREBASE_PROJECT_ID || 'servyard-de527';
+      const region = 'us-central1';
       const functionsUrl = import.meta.env.VITE_FIREBASE_FUNCTIONS_URL || 
-                          `https://us-central1-${import.meta.env.VITE_FIREBASE_PROJECT_ID}.cloudfunctions.net`;
+                          `https://${region}-${projectId}.cloudfunctions.net`;
       const url = `${functionsUrl}/sendTestNotification`;
+      
+      console.log('[Debug] Testing notification to:', url);
       
       const resp = await fetch(url, withTrace({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: user.uid }),
       }));
-      const json = await resp.json().catch(() => ({}));
-      toast({ title: resp.ok ? 'Test push requested' : 'Test push failed', description: JSON.stringify(json).slice(0, 200) });
+      
+      const json = await resp.json().catch(() => ({ error: 'Failed to parse response' }));
+      console.log('[Debug] Response:', resp.status, json);
+      
+      toast({ 
+        title: resp.ok ? 'Test push requested' : 'Test push failed', 
+        description: JSON.stringify(json).slice(0, 200) 
+      });
     } catch (e: any) {
+      console.error('[Debug] Request error:', e);
       toast({ title: 'Request error', description: e?.message || String(e), variant: 'destructive' });
     } finally {
       setBusy(false);
