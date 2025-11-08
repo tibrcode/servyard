@@ -352,7 +352,7 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
         <CardDescription>{t.subtitle}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Permission Warning */}
+        {/* Permission Status Banner */}
         {notificationPermission === 'denied' && (
           <div className="bg-destructive/10 border border-destructive rounded-lg p-4">
             <div className="flex items-start gap-2">
@@ -367,7 +367,7 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
 
         {notificationPermission === 'default' && (
           <div className="bg-primary/10 border border-primary rounded-lg p-4">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex items-start gap-2">
                 <Bell className="h-5 w-5 text-primary mt-0.5" />
                 <div>
@@ -375,9 +375,25 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
                   <p className="text-sm text-muted-foreground mt-1">{t.enableDesc}</p>
                 </div>
               </div>
-              <Button onClick={handleRequestPermission} className="shrink-0">
+              <Button onClick={handleRequestPermission} className="shrink-0 w-full sm:w-auto">
                 {t.requestPermission}
               </Button>
+            </div>
+          </div>
+        )}
+
+        {notificationPermission === 'granted' && (
+          <div className="bg-green-500/10 border border-green-500 rounded-lg p-4">
+            <div className="flex items-start gap-2">
+              <CheckCircle2 className="h-5 w-5 text-green-500 mt-0.5" />
+              <div className="flex-1">
+                <h4 className="font-semibold text-green-700 dark:text-green-400">
+                  {isRTL ? 'التنبيهات مفعلة ✓' : 'Notifications Enabled ✓'}
+                </h4>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {isRTL ? 'يمكنك الآن تلقي الإشعارات' : 'You can now receive notifications'}
+                </p>
+              </div>
             </div>
           </div>
         )}
@@ -596,27 +612,43 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
           )}
         </div>
 
-        {/* Save Button */}
-        <Button
-          onClick={handleSave}
-          disabled={isSaving || !preferences.enabled}
-          className="w-full"
-        >
-          <Save className="h-4 w-4 mr-2" />
-          {isSaving ? t.saving : t.save}
-        </Button>
+        {/* Action Buttons */}
+        <div className="space-y-2">
+          {/* Request Permission Button - Always visible if not granted */}
+          {notificationPermission !== 'granted' && (
+            <Button
+              onClick={handleRequestPermission}
+              variant="default"
+              className="w-full"
+            >
+              <Bell className="h-4 w-4 mr-2" />
+              {t.requestPermission}
+            </Button>
+          )}
 
-        {/* Test Push Button */}
-        <Button
-          type="button"
-          variant="outline"
-          onClick={handleSendTest}
-          disabled={!preferences.enabled}
-          className="w-full mt-2"
-        >
-          <BellRing className="h-4 w-4 mr-2" />
-          {isRTL ? 'إرسال إشعار تجريبي' : 'Send Test Notification'}
-        </Button>
+          {/* Save Button */}
+          <Button
+            onClick={handleSave}
+            disabled={isSaving || !preferences.enabled}
+            variant={notificationPermission === 'granted' ? 'default' : 'outline'}
+            className="w-full"
+          >
+            <Save className="h-4 w-4 mr-2" />
+            {isSaving ? t.saving : t.save}
+          </Button>
+
+          {/* Test Push Button */}
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleSendTest}
+            disabled={!preferences.enabled || notificationPermission !== 'granted'}
+            className="w-full"
+          >
+            <BellRing className="h-4 w-4 mr-2" />
+            {isRTL ? 'إرسال إشعار تجريبي' : 'Send Test Notification'}
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );
