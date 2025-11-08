@@ -79,6 +79,12 @@ export const requestNotificationPermission = async (userId: string, skipPrompt =
       console.warn('[FCM] Service worker registration unavailable. Foreground messages only.');
     }
 
+    // Check if VAPID key is configured
+    if (!VAPID_KEY) {
+      console.error('[FCM] VAPID key not configured. Set VITE_FIREBASE_VAPID_KEY in environment variables.');
+      return null;
+    }
+
     // الحصول على التوكن
     const token = await getToken(messaging, {
       vapidKey: VAPID_KEY,
@@ -91,8 +97,23 @@ export const requestNotificationPermission = async (userId: string, skipPrompt =
       try {
         const snap = await getDoc(doc(db, 'profiles', userId));
         const d = snap.data();
-        if (d?.fcm_verified_at) verifiedAt = new Date(d.fcm_verified_at);
-      } catch {}
+        if (d?.fcm_verified_at) {
+          // Handle Firestore Timestamp object
+          const timestamp = d.fcm_verified_at;
+          if (timestamp && typeof timestamp === 'object' && 'toDate' in timestamp) {
+            verifiedAt = timestamp.toDate();
+          } else if (timestamp) {
+            // Try parsing as string/number
+            const parsed = new Date(timestamp);
+            if (!isNaN(parsed.getTime())) {
+              verifiedAt = parsed;
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('[FCM] Could not read existing fcm_verified_at:', err);
+      }
+      
       await updateDoc(doc(db, 'profiles', userId), {
         fcm_token: token,
         notifications_enabled: true,
