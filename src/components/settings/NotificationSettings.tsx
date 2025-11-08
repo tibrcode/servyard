@@ -216,14 +216,44 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
         return;
       }
       
-      // Get the Cloud Functions base URL from environment or construct it
-      const projectId = import.meta.env.VITE_FIREBASE_PROJECT_ID || 'servyard-de527';
-      const region = 'us-central1'; // Your Cloud Functions region
-      const functionsUrl = import.meta.env.VITE_FIREBASE_FUNCTIONS_URL || 
-                          `https://${region}-${projectId}.cloudfunctions.net`;
-      const url = `${functionsUrl}/sendTestNotification`;
+      // Check if notification permission is granted first
+      if (notificationPermission !== 'granted') {
+        toast({
+          title: isRTL ? 'تفعيل الإشعارات مطلوب' : 'Notifications Required',
+          description: isRTL 
+            ? 'يرجى تفعيل الإشعارات أولاً عن طريق زر "طلب الصلاحية" في الأعلى'
+            : 'Please enable notifications first by clicking "Request Permission" button above',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      // Check if user has FCM token saved
+      const profileDoc = await getDoc(doc(db, 'profiles', userId));
+      const fcmToken = profileDoc.data()?.fcm_token;
       
-      console.log('[Test Notification] Sending to:', url);
+      if (!fcmToken) {
+        toast({
+          title: isRTL ? 'لم يتم حفظ رمز الإشعارات' : 'No FCM Token Saved',
+          description: isRTL 
+            ? 'يرجى الضغط على "طلب الصلاحية" أولاً لحفظ رمز الإشعارات'
+            : 'Please click "Request Permission" first to save your FCM token',
+          variant: 'destructive',
+        });
+        return;
+      }
+      
+      // Use the new Cloud Run URLs from the deployment
+      const functionUrls = {
+        sendTestNotification: 'https://us-central1-servyard-de527.cloudfunctions.net/sendTestNotification',
+        custom: import.meta.env.VITE_FIREBASE_FUNCTIONS_URL 
+          ? `${import.meta.env.VITE_FIREBASE_FUNCTIONS_URL}/sendTestNotification`
+          : null
+      };
+      
+      const url = functionUrls.custom || functionUrls.sendTestNotification;
+      
+      console.log('[Test Notification] Sending to:', url, 'with userId:', userId);
       
       const resp = await fetch(url, withTrace({
         method: 'POST',
@@ -237,17 +267,43 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
         const data = await resp.json().catch(() => null);
         console.log('[Test Notification] Success:', data);
         toast({
-          title: isRTL ? 'تم إرسال إشعار تجريبي' : 'Test notification sent',
-          description: isRTL ? 'تحقق من مركز الإشعارات' : 'Check your notification center',
+          title: isRTL ? '✅ تم إرسال إشعار تجريبي' : '✅ Test notification sent',
+          description: isRTL ? 'تحقق من مركز الإشعارات في الأعلى' : 'Check your notification center at the top',
         });
       } else {
         const text = await resp.text();
         console.error('[Test Notification] Failed:', resp.status, text);
-        toast({
-          title: isRTL ? 'فشل الإرسال' : 'Failed to send',
-          description: `Status: ${resp.status}${text ? ` - ${text.slice(0, 100)}` : ''}`,
-          variant: 'destructive',
-        });
+        
+        // Parse error response
+        let errorData: any = {};
+        try {
+          errorData = JSON.parse(text);
+        } catch {}
+        
+        // Better error messages based on error code
+        if (errorData?.error?.code === 'missing_token') {
+          toast({
+            title: isRTL ? 'رمز الإشعارات مفقود' : 'FCM Token Missing',
+            description: isRTL 
+              ? 'يرجى إعادة طلب صلاحية الإشعارات عن طريق زر "طلب الصلاحية"'
+              : 'Please re-request notification permission using "Request Permission" button',
+            variant: 'destructive',
+          });
+        } else if (resp.status === 403) {
+          toast({
+            title: isRTL ? 'خطأ في الصلاحيات' : 'Permission Error',
+            description: isRTL 
+              ? 'الوظيفة محمية. تم حل المشكلة، حاول مرة أخرى.' 
+              : 'Function permissions issue. Try again in a moment.',
+            variant: 'destructive',
+          });
+        } else {
+          toast({
+            title: isRTL ? 'فشل الإرسال' : 'Failed to send',
+            description: `Status: ${resp.status}${errorData?.error?.message ? ` - ${errorData.error.message}` : ''}`,
+            variant: 'destructive',
+          });
+        }
       }
     } catch (e: any) {
       console.error('[Test Notification] Request error:', e);
