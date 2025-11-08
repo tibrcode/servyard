@@ -260,14 +260,20 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
       
       const url = functionUrls.custom || functionUrls.sendTestNotification;
       
-      console.log('[Test Notification] Sending to:', url, 'with userId:', userId);
+      console.log('[Test Notification] Sending to:', url);
+      console.log('[Test Notification] userId:', userId);
+      console.log('[Test Notification] userId length:', userId.length);
+      console.log('[Test Notification] userId chars:', userId.split('').map((c, i) => `${i}:${c}(${c.charCodeAt(0)})`).join(', '));
+      
+      const payload = { userId };
+      console.log('[Test Notification] Payload:', JSON.stringify(payload));
       
       const resp = await fetch(url, withTrace({
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userId }),
+        body: JSON.stringify(payload),
       }));
       
       if (resp.ok) {

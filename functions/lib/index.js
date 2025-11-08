@@ -507,6 +507,13 @@ exports.sendTestNotification = (0, https_1.onRequest)({ cors: true, invoker: 'pu
         const started = Date.now();
         logTrace(trace, 'sendTestNotification:start');
         const { userId, token, title, body } = req.body || {};
+        console.log('[sendTestNotification] Raw request body:', JSON.stringify(req.body));
+        console.log('[sendTestNotification] userId value:', userId);
+        console.log('[sendTestNotification] userId type:', typeof userId);
+        console.log('[sendTestNotification] userId length:', userId?.length);
+        if (userId) {
+            console.log('[sendTestNotification] userId chars:', userId.split('').map((c, i) => `${i}:${c}(${c.charCodeAt(0)})`).join(', '));
+        }
         console.log('[sendTestNotification] Request body:', { userId: userId ? 'present' : 'missing', hasToken: !!token });
         let targetToken = token || null;
         if (!targetToken && userId) {

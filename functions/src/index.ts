@@ -485,6 +485,13 @@ export const sendTestNotification = onRequest({ cors: true, invoker: 'public' },
     const started = Date.now();
     logTrace(trace, 'sendTestNotification:start');
     const { userId, token, title, body } = req.body || {};
+    console.log('[sendTestNotification] Raw request body:', JSON.stringify(req.body));
+    console.log('[sendTestNotification] userId value:', userId);
+    console.log('[sendTestNotification] userId type:', typeof userId);
+    console.log('[sendTestNotification] userId length:', userId?.length);
+    if (userId) {
+      console.log('[sendTestNotification] userId chars:', userId.split('').map((c: string, i: number) => `${i}:${c}(${c.charCodeAt(0)})`).join(', '));
+    }
     console.log('[sendTestNotification] Request body:', { userId: userId ? 'present' : 'missing', hasToken: !!token });
     
     let targetToken: string | null = token || null;
