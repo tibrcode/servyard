@@ -249,9 +249,10 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
         return;
       }
       
-      // Use the new Cloud Run URLs from the deployment
+      // Use the new Cloud Run URL from Gen 2 deployment
       const functionUrls = {
-        sendTestNotification: 'https://us-central1-servyard-de527.cloudfunctions.net/sendTestNotification',
+        sendTestNotification: 'https://sendtestnotification-btfczcxdyq-uc.a.run.app',
+        fallback: 'https://us-central1-servyard-de527.cloudfunctions.net/sendTestNotification',
         custom: import.meta.env.VITE_FIREBASE_FUNCTIONS_URL 
           ? `${import.meta.env.VITE_FIREBASE_FUNCTIONS_URL}/sendTestNotification`
           : null
