@@ -258,15 +258,13 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
           : null
       };
       
-      const url = functionUrls.custom || functionUrls.sendTestNotification;
-      
       console.log('[Test Notification] Sending to:', url);
       console.log('[Test Notification] userId:', userId);
-      console.log('[Test Notification] userId length:', userId.length);
-      console.log('[Test Notification] userId chars:', userId.split('').map((c, i) => `${i}:${c}(${c.charCodeAt(0)})`).join(', '));
+      console.log('[Test Notification] fcmToken:', fcmToken ? fcmToken.substring(0, 20) + '...' : 'none');
       
-      const payload = { userId };
-      console.log('[Test Notification] Payload:', JSON.stringify(payload));
+      // Send the FCM token directly instead of userId to avoid any ID mismatch issues
+      const payload = { token: fcmToken, userId };
+      console.log('[Test Notification] Payload with token:', JSON.stringify({ ...payload, token: payload.token?.substring(0, 20) + '...' }));
       
       const resp = await fetch(url, withTrace({
         method: 'POST',
