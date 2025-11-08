@@ -485,11 +485,16 @@ export const sendTestNotification = onRequest({ cors: true, invoker: 'public' },
     const started = Date.now();
     logTrace(trace, 'sendTestNotification:start');
     const { userId, token, title, body } = req.body || {};
+    console.log('[sendTestNotification] Request body:', { userId: userId ? 'present' : 'missing', hasToken: !!token });
+    
     let targetToken: string | null = token || null;
     if (!targetToken && userId) {
+      console.log('[sendTestNotification] Looking up token for userId:', userId);
       targetToken = await getUserFCMToken(userId);
+      console.log('[sendTestNotification] Token lookup result:', targetToken ? 'found' : 'not found');
     }
     if (!targetToken) {
+      console.error('[sendTestNotification] No token available. userId:', userId, 'token provided:', !!token);
       return errorResponse(res, 400, 'missing_token', 'Missing token and userId or no token found', trace);
     }
     const ok = await sendNotification(
@@ -784,10 +789,20 @@ async function sendNotification(
  */
 async function getUserFCMToken(userId: string): Promise<string | null> {
   try {
+    console.log('[getUserFCMToken] Looking up token for userId:', userId);
     const profile = await db.collection('profiles').doc(userId).get();
-    return profile.data()?.fcm_token || null;
+    const data = profile.data();
+    const token = data?.fcm_token || null;
+    console.log('[getUserFCMToken] Profile exists:', profile.exists);
+    console.log('[getUserFCMToken] Has fcm_token:', !!token);
+    if (token) {
+      console.log('[getUserFCMToken] Token preview:', token.substring(0, 20) + '...');
+    } else {
+      console.log('[getUserFCMToken] Profile data keys:', Object.keys(data || {}));
+    }
+    return token;
   } catch (error) {
-    console.error('Error getting FCM token:', error);
+    console.error('[getUserFCMToken] Error getting FCM token:', error);
     return null;
   }
 }

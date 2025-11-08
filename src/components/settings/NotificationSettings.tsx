@@ -229,10 +229,16 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
       }
 
       // Check if user has FCM token saved
+      console.log('[handleSendTest] Checking FCM token for userId:', userId);
       const profileDoc = await getDoc(doc(db, 'profiles', userId));
-      const fcmToken = profileDoc.data()?.fcm_token;
+      console.log('[handleSendTest] Profile exists:', profileDoc.exists());
+      const profileData = profileDoc.data();
+      console.log('[handleSendTest] Profile data keys:', profileData ? Object.keys(profileData) : 'no data');
+      const fcmToken = profileData?.fcm_token;
+      console.log('[handleSendTest] FCM token present:', !!fcmToken);
       
       if (!fcmToken) {
+        console.error('[handleSendTest] No FCM token found in profile');
         toast({
           title: isRTL ? 'لم يتم حفظ رمز الإشعارات' : 'No FCM Token Saved',
           description: isRTL 
