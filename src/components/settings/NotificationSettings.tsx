@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Bell, BellOff, Clock, CheckCircle2, XCircle, Moon, Save, BellRing, Info } from 'lucide-react';
 import { db } from '@/integrations/firebase/client';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { withTrace } from '@/lib/trace';
 import { requestNotificationPermission } from '@/lib/firebase/notifications';
 
 interface NotificationSettingsProps {
@@ -186,11 +187,11 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
     try {
       if (!userId) return;
       const url = import.meta.env.VITE_TEST_NOTIFICATION_URL || '/sendTestNotification';
-      const resp = await fetch(url, {
+      const resp = await fetch(url, withTrace({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId }),
-      });
+      }));
       if (resp.ok) {
         toast({
           title: isRTL ? 'تم إرسال إشعار تجريبي' : 'Test notification sent',

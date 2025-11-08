@@ -3,6 +3,8 @@ import App from "./App.tsx";
 import "./index.css";
 import { rtlLanguages as rtlBase } from "@/lib/languages";
 import { registerFirebaseMessagingSW } from "@/lib/firebase/sw";
+import { collectWebVitals, logVital } from "@/lib/monitoring/vitals";
+import ErrorBoundary from './components/common/ErrorBoundary';
 
 // Lightweight boot diagnostics for Android WebView
 try {
@@ -53,7 +55,26 @@ try {
         console.warn("[BOOT] SW registration error:", e);
     }
 
-    createRoot(rootEl!).render(<App />);
+    createRoot(rootEl!).render(
+        <ErrorBoundary>
+            <App />
+        </ErrorBoundary>
+    );
+
+    // Start collecting Web Vitals with sampling (10%) to limit write costs
+    try {
+        const sample = Math.random() < 0.1;
+        if (sample) {
+            collectWebVitals((m) => {
+                // Console for local insight
+                console.log('[Vitals]', m.name, m.value);
+                // Non-blocking async log
+                logVital(m);
+            });
+        }
+    } catch (e) {
+        console.warn('[BOOT] Web Vitals init failed', e);
+    }
 } catch (err) {
     console.error("[BOOT] render failed:", err);
 }

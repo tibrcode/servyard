@@ -18,6 +18,7 @@ import {
   Unsubscribe
 } from 'firebase/firestore';
 import { db } from '@/integrations/firebase/client';
+import { withTrace } from '@/lib/trace';
 import { 
   Booking, 
   ServiceSchedule, 
@@ -177,7 +178,7 @@ export async function updateBookingStatus(
   if (oldStatus !== status) {
     try {
       const updatedBooking = { ...oldBooking, ...updateData };
-      await fetch('https://notifybookingstatuschange-btfczcxdyq-uc.a.run.app', {
+      await fetch('https://notifybookingstatuschange-btfczcxdyq-uc.a.run.app', withTrace({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -186,7 +187,7 @@ export async function updateBookingStatus(
           oldStatus: oldStatus,
           newStatus: status
         })
-      });
+      }));
     } catch (notifError) {
       console.error('Error sending status change notification:', notifError);
       // Don't fail the update if notification fails

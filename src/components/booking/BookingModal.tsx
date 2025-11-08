@@ -15,6 +15,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "@/lib/i18n";
 import { trackBookingCreated, trackPhoneClick } from "@/lib/firebase/analytics";
 import { ServiceBooking } from "@/components/booking/ServiceBooking";
+import { withTrace } from '@/lib/trace';
 import { BookingSettings } from "@/types/booking";
 
 interface Service {
@@ -127,14 +128,14 @@ export const BookingModal = ({ service, provider, isOpen, onClose, currentLangua
 
       // Send notification to provider
       try {
-        await fetch('https://notifynewbooking-btfczcxdyq-uc.a.run.app', {
+          await fetch('https://notifynewbooking-btfczcxdyq-uc.a.run.app', withTrace({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             bookingId: bookingDoc.id,
             booking: booking
           })
-        });
+          }));
       } catch (notifError) {
         console.error('Error sending booking notification:', notifError);
         // Don't fail the booking if notification fails

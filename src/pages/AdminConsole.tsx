@@ -26,6 +26,7 @@ import { upsertCategoryTranslations } from "@/lib/firebase/migrations/upsertCate
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { isAdminEmail } from "@/lib/adminAccess";
+import { withTrace } from "@/lib/trace";
 
 interface AdminConsoleProps {
   currentLanguage: string;
@@ -622,24 +623,24 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
                               const primaryUrl = 'https://us-central1-servyard-de527.cloudfunctions.net/adminDeleteUser';
                               const fallbackUrl = 'https://admindeleteuser-btfczcxdyq-uc.a.run.app';
                               try {
-                                resp = await fetch(primaryUrl, {
+                                resp = await fetch(primaryUrl, withTrace({
                                   method: 'POST',
                                   headers: {
                                     'Content-Type': 'application/json',
                                     'Authorization': `Bearer ${idToken}`,
                                   },
                                   body: JSON.stringify(body),
-                                });
+                                }));
                               } catch (e) {
                                 // Network/CORS error: try Cloud Run direct URL
-                                resp = await fetch(fallbackUrl, {
+                                resp = await fetch(fallbackUrl, withTrace({
                                   method: 'POST',
                                   headers: {
                                     'Content-Type': 'application/json',
                                     'Authorization': `Bearer ${idToken}`,
                                   },
                                   body: JSON.stringify(body),
-                                });
+                                }));
                               }
                               if (!resp.ok) {
                                 const text = await resp.text();

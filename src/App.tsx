@@ -18,13 +18,14 @@ import Auth from "@/pages/Auth";
 import ProviderSignup from "@/pages/ProviderSignup";
 import CustomerSignup from "@/pages/CustomerSignup";
 import Services from "@/pages/Services";
-import ProviderDashboard from "@/pages/ProviderDashboard";
-import CustomerDashboard from "@/pages/CustomerDashboard";
+// Lazy load heavy dashboard pages for code-splitting
+const ProviderDashboard = React.lazy(() => import('@/pages/ProviderDashboard'));
+const CustomerDashboard = React.lazy(() => import('@/pages/CustomerDashboard'));
 import AddService from "@/pages/AddService";
 import EditService from "@/pages/EditService";
 import EditProfile from "@/pages/EditProfile";
 import ProviderProfile from "@/pages/ProviderProfile";
-import AdminConsole from "@/pages/AdminConsole";
+const AdminConsole = React.lazy(() => import('@/pages/AdminConsole'));
 import Terms from "@/pages/Terms";
 import CompleteProfile from "@/pages/CompleteProfile";
 import Privacy from "@/pages/Privacy";
@@ -90,11 +91,11 @@ const AppContent = () => {
           // category derivation happens in context for SW, but here we can pass type only
         });
       } catch {}
-    });
+    }, { userId: user?.uid });
     return () => {
       if (unsubscribe) unsubscribe();
     };
-  }, [toast, addNotification]);
+  }, [toast, addNotification, user?.uid]);
 
   const closeAllOverlays = () => {
     try {
@@ -321,19 +322,23 @@ const AppContent = () => {
                       <Route path="/services" element={<Services currentLanguage={currentLanguage} />} />
                       <Route path="/provider-dashboard" element={
                         <ProtectedRoute requireRole="provider">
-                          <ProviderDashboard currentLanguage={currentLanguage} />
+                          <React.Suspense fallback={<div className="p-6 text-center text-sm text-muted-foreground">Loading dashboard…</div>}>
+                            <ProviderDashboard currentLanguage={currentLanguage} />
+                          </React.Suspense>
                         </ProtectedRoute>
                       } />
                       <Route path="/customer-dashboard" element={
                         <ProtectedRoute requireRole="customer">
-                          <CustomerDashboard currentLanguage={currentLanguage} />
+                          <React.Suspense fallback={<div className="p-6 text-center text-sm text-muted-foreground">Loading dashboard…</div>}>
+                            <CustomerDashboard currentLanguage={currentLanguage} />
+                          </React.Suspense>
                         </ProtectedRoute>
                       } />
                       <Route path="/add-service" element={<AddService currentLanguage={currentLanguage} />} />
                       <Route path="/edit-service/:serviceId" element={<EditService currentLanguage={currentLanguage} />} />
                       <Route path="/edit-profile" element={<EditProfile currentLanguage={currentLanguage} />} />
                       <Route path="/provider/:providerId" element={<ProviderProfile currentLanguage={currentLanguage} onLanguageChange={handleLanguageChange} />} />
-                      <Route path="/console" element={<AdminConsole currentLanguage={currentLanguage} />} />
+                      <Route path="/console" element={<React.Suspense fallback={<div className="p-6 text-center text-sm text-muted-foreground">Loading console…</div>}><AdminConsole currentLanguage={currentLanguage} /></React.Suspense>} />
                       <Route path="/terms" element={<Terms currentLanguage={currentLanguage} />} />
                       <Route path="/privacy" element={<Privacy currentLanguage={currentLanguage} />} />
                       <Route path="/disclaimer" element={<Disclaimer currentLanguage={currentLanguage} />} />

@@ -9,6 +9,28 @@ admin.initializeApp();
 const db = admin.firestore();
 const messaging = admin.messaging();
 
+// Deployment/version tag for tracing (update per deploy if desired)
+const DEPLOYMENT_VERSION = '2025-11-08.1';
+
+// Simple structured trace logger with sampling + optional Firestore persistence.
+// Sampling keeps cost low while enabling later analytics (default 5%).
+const TRACE_SAMPLING_RATE = 0.05; // 5%
+function logTrace(trace: string | undefined, event: string, extra?: Record<string, any>) {
+  if (!trace) return;
+  const payload = { trace, event, ts: new Date().toISOString(), v: DEPLOYMENT_VERSION, ...(extra || {}) };
+  console.log('[TRACE]', JSON.stringify(payload));
+  try {
+    if (Math.random() < TRACE_SAMPLING_RATE) {
+      // Fire-and-forget persistence (no await to avoid latency impact)
+      db.collection('request_traces').add(payload).catch(() => {});
+    }
+  } catch {}
+}
+
+function syntheticTrace(event: string) {
+  return `${event}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
 // Secret to protect the admin HTTP endpoint
 const ADMIN_DELETE_TOKEN = defineSecret('ADMIN_DELETE_TOKEN');
 
@@ -20,15 +42,179 @@ async function deleteByQuery(col: string, field: string, value: string) {
   await bw.close();
 }
 
+// Standardized error response helper
+function errorResponse(res: any, status: number, code: string, message: string, trace?: string) {
+  const body: any = { error: { code, message } };
+  if (trace) body.trace = trace;
+  return res.status(status).json(body);
+}
+
 async function deleteByServiceIds(col: string, serviceIds: string[]) {
   if (serviceIds.length === 0) return;
   const bw = db.bulkWriter();
   for (const id of serviceIds) {
     const snap = await db.collection(col).where('service_id', '==', id).get();
-  snap.docs.forEach((d: admin.firestore.QueryDocumentSnapshot) => bw.delete(d.ref));
+    snap.docs.forEach((d: admin.firestore.QueryDocumentSnapshot) => bw.delete(d.ref));
   }
   await bw.close();
 }
+
+// =============================================================================
+// DATA HYGIENE: Deduplicate service_categories
+// =============================================================================
+// This endpoint finds duplicate categories by a normalized key (Arabic or English title)
+// and (in execute mode) merges them by updating all referencing services to point to
+// the chosen primary category, then deleting the redundant documents.
+// Usage:
+//   POST /dedupeServiceCategories?mode=dryRun  (or body { mode: 'dryRun' })
+//   POST /dedupeServiceCategories?mode=execute (requires admin secret / auth)
+// Authorization: same logic as adminDeleteUser (Bearer admin token OR x-admin-key header matching ADMIN_DELETE_TOKEN)
+// Safety:
+//  - Hard cap of 25 duplicate groups per invocation
+//  - Dry run returns a plan without modifying data
+//  - Execute returns detailed summary of operations performed
+export const dedupeServiceCategories = onRequest({ cors: true, maxInstances: 1, secrets: [ADMIN_DELETE_TOKEN] }, async (req: any, res: any) => {
+  if (req.method !== 'POST') return errorResponse(res, 405, 'method_not_allowed', 'POST required', req.get('x-trace-id'));
+  const mode = (req.query.mode || req.body?.mode || 'dryRun') as 'dryRun' | 'execute';
+  const trace = req.get('x-trace-id');
+  logTrace(trace, 'dedupeServiceCategories:start', { mode });
+
+  // Auth check (only required for execute)
+  const ensureAuthorized = async () => {
+    if (mode === 'dryRun') return true; // allow anonymous dry runs for inspection
+    let isAuthorized = false;
+    const bearer = (req.get('Authorization') || '').replace(/^Bearer\s+/i, '').trim();
+    if (bearer) {
+      try {
+        const decoded = await admin.auth().verifyIdToken(bearer);
+        const email: string | undefined = (decoded as any)?.email;
+        const hasAdminClaim = (decoded as any)?.admin === true;
+        const emailDomainOk = typeof email === 'string' && /@(tibrcode\.com|servyard\.com|serv-yard\.com)$/i.test(email || '');
+        const specificAdmin = typeof email === 'string' && email.toLowerCase() === 'admin@servyard.com';
+        if (hasAdminClaim || emailDomainOk || specificAdmin) isAuthorized = true;
+      } catch {}
+    }
+    if (!isAuthorized) {
+      const headerKey = (req.get('x-admin-key') || req.query.key) as string | undefined;
+      const secretValue = ADMIN_DELETE_TOKEN.value();
+      if (!secretValue) return false;
+      if (headerKey && headerKey === secretValue) isAuthorized = true;
+    }
+    return isAuthorized;
+  };
+
+  if (!(await ensureAuthorized())) {
+    return errorResponse(res, 401, 'unauthorized', 'Not authorized for this operation', trace);
+  }
+
+  try {
+    const snap = await db.collection('service_categories').get();
+    const all: Array<{ id: string; data: any }> = snap.docs.map((d: admin.firestore.QueryDocumentSnapshot) => ({ id: d.id, data: d.data() }));
+    const groups: Record<string, Array<{ id: string; data: any }>> = {};
+
+    function normalize(cat: any) {
+      const ar = (cat.title_ar || cat.name_ar || '').trim().toLowerCase();
+      const en = (cat.title_en || cat.name_en || cat.title || cat.name || '').trim().toLowerCase();
+      const base = ar || en;
+      // remove duplicate whitespace + unify certain punctuation
+      return base.replace(/[\s]+/g, ' ').replace(/[ـ]/g, '').trim();
+    }
+
+    for (const c of all) {
+      const key = normalize(c.data);
+      if (!key) continue;
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(c);
+    }
+
+    const duplicateGroups = Object.entries(groups).filter(([, arr]) => arr.length > 1);
+    duplicateGroups.sort((a, b) => b[1].length - a[1].length); // largest first
+
+    const limitedGroups = duplicateGroups.slice(0, 25); // safety cap
+
+    if (mode === 'dryRun') {
+      const started = Date.now();
+      const payload = {
+        mode,
+        totalCategories: all.length,
+        duplicateGroupCount: duplicateGroups.length,
+        processedGroups: limitedGroups.length,
+        groups: limitedGroups.map(([key, arr]) => ({
+          key,
+          count: arr.length,
+          ids: arr.map((x) => x.id),
+          sample: arr[0].data,
+        })),
+        note: 'Execute will re-point services.category_id to primary and delete other category docs.'
+      };
+      logTrace(trace, 'dedupeServiceCategories:done', { mode, duration_ms: Date.now() - started, groups: limitedGroups.length, dryRun: true });
+      return res.json(payload);
+    }
+
+    // EXECUTE MODE
+    const results: any[] = [];
+    let totalServiceUpdates = 0;
+    let totalCategoryDeletes = 0;
+
+    for (const [key, arr] of limitedGroups) {
+      // Choose primary: earliest created_at, else lexicographic id
+      const withMeta = arr.map((x) => ({
+        id: x.id,
+        created: x.data.created_at ? new Date(x.data.created_at) : null,
+        data: x.data,
+      }));
+      withMeta.sort((a, b) => {
+        if (a.created && b.created) return a.created.getTime() - b.created.getTime();
+        if (a.created && !b.created) return -1;
+        if (!a.created && b.created) return 1;
+        return a.id.localeCompare(b.id);
+      });
+      const primary = withMeta[0];
+      const duplicates = withMeta.slice(1);
+      const duplicateIds = duplicates.map((d) => d.id);
+
+      // Update referencing services
+      const bw = db.bulkWriter();
+      for (const dupId of duplicateIds) {
+        const svcSnap = await db.collection('services').where('category_id', '==', dupId).get();
+        for (const doc of svcSnap.docs) {
+          bw.update(doc.ref, { category_id: primary.id });
+          totalServiceUpdates++;
+        }
+      }
+      await bw.close();
+
+      // Delete duplicate category docs
+      const bw2 = db.bulkWriter();
+      for (const dupId of duplicateIds) {
+        bw2.delete(db.collection('service_categories').doc(dupId));
+        totalCategoryDeletes++;
+      }
+      await bw2.close();
+
+      results.push({
+        key,
+        primary: primary.id,
+        removed: duplicateIds,
+        serviceUpdates: totalServiceUpdates,
+      });
+    }
+
+    const _started = Date.now();
+    const response = {
+      mode,
+      processedGroups: limitedGroups.length,
+      totalServiceUpdates,
+      totalCategoryDeletes,
+      details: results,
+    };
+    logTrace(trace, 'dedupeServiceCategories:done', { mode, duration_ms: Date.now() - _started, groups: limitedGroups.length });
+    return res.json(response);
+  } catch (e: any) {
+    console.error('Error in dedupeServiceCategories:', e);
+    return errorResponse(res, 500, 'internal_error', e?.message || 'Internal server error', trace);
+  }
+});
 
 async function deleteUserData(uid: string) {
   // Try to read role
@@ -74,7 +260,10 @@ export const onAuthDeleteUser = auth.user().onDelete(async (userRecord) => {
 
 // 2) Admin HTTP endpoint: POST /adminDeleteUser with header x-admin-key and body { uid }
 export const adminDeleteUser = onRequest({ cors: true, maxInstances: 1, secrets: [ADMIN_DELETE_TOKEN] }, async (req: any, res: any) => {
-  if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
+  if (req.method !== 'POST') return errorResponse(res, 405, 'method_not_allowed', 'POST required', req.get('x-trace-id'));
+  const trace = req.get('x-trace-id');
+  const started = Date.now();
+  logTrace(trace, 'adminDeleteUser:start');
 
   // AuthN: either Bearer ID token with admin rights OR x-admin-key secret
   const bearer = (req.get('Authorization') || '').replace(/^Bearer\s+/i, '').trim();
@@ -95,8 +284,8 @@ export const adminDeleteUser = onRequest({ cors: true, maxInstances: 1, secrets:
     } catch {}
   }
   if (!isAuthorized) {
-    if (!secretValue) return res.status(500).send('Server not configured');
-    if (!headerKey || headerKey !== secretValue) return res.status(401).send('Unauthorized');
+    if (!secretValue) return errorResponse(res, 500, 'server_not_configured', 'Server not configured', trace);
+    if (!headerKey || headerKey !== secretValue) return errorResponse(res, 401, 'unauthorized', 'Unauthorized', trace);
     isAuthorized = true;
   }
 
@@ -109,9 +298,9 @@ export const adminDeleteUser = onRequest({ cors: true, maxInstances: 1, secrets:
       uid = userRecord.uid;
     }
   } catch (e: any) {
-    return res.status(404).send('User not found for email');
+    return errorResponse(res, 404, 'user_not_found', 'User not found for email', trace);
   }
-  if (!uid) return res.status(400).send('Missing uid or email');
+  if (!uid) return errorResponse(res, 400, 'missing_parameters', 'Missing uid or email', trace);
 
   // Try to delete Auth user first (ignore if not found)
   try {
@@ -120,8 +309,14 @@ export const adminDeleteUser = onRequest({ cors: true, maxInstances: 1, secrets:
     if (e?.code !== 'auth/user-not-found') throw e;
   }
 
-  await deleteUserData(uid);
-  return res.json({ ok: true });
+  try {
+    await deleteUserData(uid);
+    logTrace(trace, 'adminDeleteUser:done', { duration_ms: Date.now() - started });
+    return res.json({ ok: true });
+  } catch (e: any) {
+    logTrace(trace, 'adminDeleteUser:error', { duration_ms: Date.now() - started, message: e?.message });
+    return errorResponse(res, 500, 'delete_failed', 'Failed to delete user data', trace);
+  }
 });
 
 // OLD FUNCTIONS - TEMPORARILY DISABLED DUE TO REGION MISMATCH
@@ -283,16 +478,19 @@ export const sendReviewNotification = onDocumentCreated(
  */
 export const sendTestNotification = onRequest({ cors: true, invoker: 'public' }, async (req: any, res: any) => {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return errorResponse(res, 405, 'method_not_allowed', 'POST required', req.get('x-trace-id'));
   }
   try {
+    const trace = req.get('x-trace-id');
+    const started = Date.now();
+    logTrace(trace, 'sendTestNotification:start');
     const { userId, token, title, body } = req.body || {};
     let targetToken: string | null = token || null;
     if (!targetToken && userId) {
       targetToken = await getUserFCMToken(userId);
     }
     if (!targetToken) {
-      return res.status(400).json({ error: 'Missing token and userId or no token found' });
+      return errorResponse(res, 400, 'missing_token', 'Missing token and userId or no token found', trace);
     }
     const ok = await sendNotification(
       targetToken,
@@ -300,10 +498,13 @@ export const sendTestNotification = onRequest({ cors: true, invoker: 'public' },
       body || 'Hello from ServYard test endpoint',
       { type: 'test', link: '/' },
     );
+    logTrace(trace, 'sendTestNotification:done', { duration_ms: Date.now() - started, success: ok });
     return res.json({ success: ok });
   } catch (e: any) {
     console.error('Error in sendTestNotification:', e);
-    return res.status(500).json({ error: 'Internal server error' });
+    const trace = req.get('x-trace-id');
+    logTrace(trace, 'sendTestNotification:error', { message: e?.message });
+    return errorResponse(res, 500, 'internal_error', 'Internal server error', trace);
   }
 });
 
@@ -649,13 +850,16 @@ async function createBookingReminders(bookingId: string, booking: any) {
  */
 export const notifyNewBooking = onRequest({ cors: true, invoker: 'public' }, async (req: any, res: any) => {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return errorResponse(res, 405, 'method_not_allowed', 'POST required', req.get('x-trace-id'));
   }
 
   try {
+    const trace = req.get('x-trace-id');
+    const started = Date.now();
+    logTrace(trace, 'notifyNewBooking:start');
     const { bookingId, booking } = req.body;
     if (!bookingId || !booking) {
-      return res.status(400).json({ error: 'Missing bookingId or booking data' });
+      return errorResponse(res, 400, 'missing_parameters', 'Missing bookingId or booking data', trace);
     }
 
     // Get provider's FCM token
@@ -666,11 +870,11 @@ export const notifyNewBooking = onRequest({ cors: true, invoker: 'public' }, asy
     const providerEnabled = providerPrefs.enabled !== false;
     if (!providerToken) {
       console.log('Provider FCM token not found');
-      return res.status(200).json({ message: 'No FCM token for provider' });
+      return errorResponse(res, 200, 'no_provider_token', 'No FCM token for provider', trace);
     }
     if (!providerEnabled) {
       console.log('Provider notifications disabled by preferences');
-      return res.status(200).json({ message: 'Provider notifications disabled' });
+      return errorResponse(res, 200, 'provider_notifications_disabled', 'Provider notifications disabled', trace);
     }
 
     // Get customer name
@@ -694,10 +898,13 @@ export const notifyNewBooking = onRequest({ cors: true, invoker: 'public' }, asy
     );
 
     console.log('✅ New booking notification sent to provider');
+    logTrace(trace, 'notifyNewBooking:done', { duration_ms: Date.now() - started });
     return res.status(200).json({ success: true });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error in notifyNewBooking:', error);
-    return res.status(500).json({ error: 'Internal server error' });
+    const trace = req.get('x-trace-id');
+    logTrace(trace, 'notifyNewBooking:error', { message: error?.message });
+    return errorResponse(res, 500, 'internal_error', 'Internal server error', trace);
   }
 });
 
@@ -707,18 +914,23 @@ export const notifyNewBooking = onRequest({ cors: true, invoker: 'public' }, asy
  */
 export const notifyBookingStatusChange = onRequest({ cors: true, invoker: 'public' }, async (req: any, res: any) => {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return errorResponse(res, 405, 'method_not_allowed', 'POST required', req.get('x-trace-id'));
   }
 
   try {
+    const trace = req.get('x-trace-id');
+    const started = Date.now();
+    logTrace(trace, 'notifyBookingStatusChange:start');
     const { bookingId, booking, oldStatus, newStatus } = req.body;
     if (!bookingId || !booking || !newStatus) {
-      return res.status(400).json({ error: 'Missing required data' });
+      logTrace(trace, 'notifyBookingStatusChange:skip', { reason: 'missing_data' });
+      return errorResponse(res, 400, 'missing_parameters', 'Missing bookingId, booking or newStatus', trace);
     }
 
     // Skip if status didn't change
     if (oldStatus === newStatus) {
-      return res.status(200).json({ message: 'Status unchanged' });
+      logTrace(trace, 'notifyBookingStatusChange:skip', { reason: 'unchanged' });
+      return errorResponse(res, 200, 'unchanged_status', 'Status unchanged', trace);
     }
 
     // Get customer's FCM token
@@ -729,12 +941,14 @@ export const notifyBookingStatusChange = onRequest({ cors: true, invoker: 'publi
     const updates = prefs.booking_updates || {};
     const quiet = prefs.quiet_hours || {};
     if (!enabled) {
-      return res.status(200).json({ message: 'Notifications disabled by user preferences' });
+      logTrace(trace, 'notifyBookingStatusChange:skip', { reason: 'user_prefs_disabled' });
+      return errorResponse(res, 200, 'user_prefs_disabled', 'Notifications disabled by user preferences', trace);
     }
     
     if (!customerToken) {
       console.log('Customer FCM token not found');
-      return res.status(200).json({ message: 'No FCM token for customer' });
+      logTrace(trace, 'notifyBookingStatusChange:skip', { reason: 'no_customer_token' });
+      return errorResponse(res, 200, 'no_customer_token', 'No FCM token for customer', trace);
     }
 
     // Get service name
@@ -757,7 +971,8 @@ export const notifyBookingStatusChange = onRequest({ cors: true, invoker: 'publi
         // Create reminders when booking is confirmed
         await createBookingReminders(bookingId, booking);
         if (updates.confirmations === false) {
-          return res.status(200).json({ message: 'Confirmations disabled by preferences' });
+          logTrace(trace, 'notifyBookingStatusChange:skip', { reason: 'confirmations_pref_off' });
+          return errorResponse(res, 200, 'confirmations_pref_off', 'Confirmations disabled by preferences', trace);
         }
         break;
 
@@ -766,7 +981,8 @@ export const notifyBookingStatusChange = onRequest({ cors: true, invoker: 'publi
         body = `تم إلغاء حجزك لـ ${serviceName}`;
         notificationType = 'booking_cancelled';
         if (updates.cancellations === false) {
-          return res.status(200).json({ message: 'Cancellations disabled by preferences' });
+          logTrace(trace, 'notifyBookingStatusChange:skip', { reason: 'cancellations_pref_off' });
+          return errorResponse(res, 200, 'cancellations_pref_off', 'Cancellations disabled by preferences', trace);
         }
         break;
 
@@ -775,7 +991,8 @@ export const notifyBookingStatusChange = onRequest({ cors: true, invoker: 'publi
         body = `شكراً لاستخدامك ${serviceName}. يرجى تقييم الخدمة مع ${providerName}`;
         notificationType = 'booking_completed';
         if (updates.completions === false) {
-          return res.status(200).json({ message: 'Completions disabled by preferences' });
+          logTrace(trace, 'notifyBookingStatusChange:skip', { reason: 'completions_pref_off' });
+          return errorResponse(res, 200, 'completions_pref_off', 'Completions disabled by preferences', trace);
         }
         break;
 
@@ -786,7 +1003,8 @@ export const notifyBookingStatusChange = onRequest({ cors: true, invoker: 'publi
         break;
 
       default:
-        return res.status(200).json({ message: 'No notification for this status' });
+        logTrace(trace, 'notifyBookingStatusChange:skip', { reason: 'no_notification_for_status' });
+        return errorResponse(res, 200, 'no_notification_for_status', 'No notification for this status', trace);
     }
 
     // Respect quiet hours if configured (Asia/Dubai by default)
@@ -802,7 +1020,8 @@ export const notifyBookingStatusChange = onRequest({ cors: true, invoker: 'publi
       const end = parseHM(quiet.end || '08:00');
       const inQuiet = start <= end ? (nowMin >= start && nowMin < end) : (nowMin >= start || nowMin < end);
       if (inQuiet) {
-        return res.status(200).json({ message: 'Suppressed due to quiet hours' });
+        logTrace(trace, 'notifyBookingStatusChange:skip', { reason: 'quiet_hours' });
+        return errorResponse(res, 200, 'quiet_hours', 'Suppressed due to quiet hours', trace);
       }
     }
 
@@ -813,10 +1032,13 @@ export const notifyBookingStatusChange = onRequest({ cors: true, invoker: 'publi
     });
 
     console.log(`✅ Booking ${newStatus} notification sent to customer`);
+    logTrace(trace, 'notifyBookingStatusChange:done', { duration_ms: Date.now() - started, status: newStatus });
     return res.status(200).json({ success: true });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error in notifyBookingStatusChange:', error);
-    return res.status(500).json({ error: 'Internal server error' });
+    const trace = req.get('x-trace-id');
+    logTrace(trace, 'notifyBookingStatusChange:error', { message: error?.message });
+    return errorResponse(res, 500, 'internal_error', 'Internal server error', trace);
   }
 });
 
@@ -990,6 +1212,191 @@ export const sendScheduledReminders = onSchedule(
 
     } catch (error) {
       console.error('Error in sendScheduledReminders:', error);
+    }
+  }
+);
+
+// =============================================================================
+// Scheduled system stats snapshot: counts of key collections for capacity planning
+// =============================================================================
+export const snapshotSystemStats = onSchedule(
+  { schedule: 'every 24 hours', timeZone: 'Asia/Dubai' },
+  async () => {
+    const trace = syntheticTrace('snapshotSystemStats');
+    const started = Date.now();
+    logTrace(trace, 'snapshotSystemStats:start');
+    try {
+      // Load previous snapshot (if any) to compute deltas
+      let prevCounts: {
+        profiles: number;
+        providers: number;
+        customers: number;
+        services: number;
+        bookings: number;
+      } | null = null;
+      let prevDocId: string | null = null;
+      try {
+        const prevSnap = await db
+          .collection('system_stats')
+          .orderBy('captured_at', 'desc')
+          .limit(1)
+          .get();
+        if (!prevSnap.empty) {
+          const prevData = prevSnap.docs[0].data() as any;
+          prevDocId = prevSnap.docs[0].id;
+          if (prevData?.counts) {
+            prevCounts = {
+              profiles: Number(prevData.counts.profiles || 0),
+              providers: Number(prevData.counts.providers || 0),
+              customers: Number(prevData.counts.customers || 0),
+              services: Number(prevData.counts.services || 0),
+              bookings: Number(prevData.counts.bookings || 0),
+            };
+          }
+        }
+      } catch (e) {
+        // If this fails (no index yet), proceed without deltas
+        console.warn('[snapshotSystemStats] Previous snapshot lookup failed (continuing):', e);
+      }
+      const profilesSnap = await db.collection('profiles').get();
+      let providers = 0;
+      let customers = 0;
+      profilesSnap.forEach((d) => {
+        const ut = (d.data() as any)?.user_type;
+        if (ut === 'provider') providers++;
+        else if (ut === 'customer') customers++;
+      });
+
+      const servicesSnap = await db.collection('services').get();
+      const bookingsSnap = await db.collection('bookings').get();
+
+      // Aggregate booking statuses
+      const bookingStatusCounts: Record<string, number> = {};
+      bookingsSnap.forEach((d) => {
+        const st = (d.data() as any)?.status || 'unknown';
+        bookingStatusCounts[st] = (bookingStatusCounts[st] || 0) + 1;
+      });
+
+      const currentCounts = {
+        profiles: profilesSnap.size,
+        providers,
+        customers,
+        services: servicesSnap.size,
+        bookings: bookingsSnap.size,
+      };
+
+      const deltas = prevCounts
+        ? {
+            profiles: currentCounts.profiles - prevCounts.profiles,
+            providers: currentCounts.providers - prevCounts.providers,
+            customers: currentCounts.customers - prevCounts.customers,
+            services: currentCounts.services - prevCounts.services,
+            bookings: currentCounts.bookings - prevCounts.bookings,
+          }
+        : null;
+
+      const growthPct = prevCounts
+        ? {
+            profiles: prevCounts.profiles ? ((currentCounts.profiles - prevCounts.profiles) / prevCounts.profiles) * 100 : null,
+            providers: prevCounts.providers ? ((currentCounts.providers - prevCounts.providers) / prevCounts.providers) * 100 : null,
+            customers: prevCounts.customers ? ((currentCounts.customers - prevCounts.customers) / prevCounts.customers) * 100 : null,
+            services: prevCounts.services ? ((currentCounts.services - prevCounts.services) / prevCounts.services) * 100 : null,
+            bookings: prevCounts.bookings ? ((currentCounts.bookings - prevCounts.bookings) / prevCounts.bookings) * 100 : null,
+          }
+        : null;
+
+      const docRef = db.collection('system_stats').doc();
+      await docRef.set({
+        captured_at: new Date(),
+        counts: {
+          ...currentCounts,
+          booking_statuses: bookingStatusCounts,
+        },
+        previous: prevDocId ? { ref: prevDocId, counts: prevCounts } : null,
+        deltas,
+        growth_pct: growthPct,
+      });
+      console.log('[snapshotSystemStats] Snapshot written:', docRef.id);
+      logTrace(trace, 'snapshotSystemStats:done', { duration_ms: Date.now() - started });
+    } catch (e) {
+      console.error('[snapshotSystemStats] Error:', e);
+      logTrace(trace, 'snapshotSystemStats:error', { message: (e as any)?.message });
+    }
+  }
+);
+
+// =============================================================================
+// Scheduled duplicate monitor: run daily and log duplicate category groups
+// =============================================================================
+export const monitorDuplicateCategories = onSchedule(
+  { schedule: 'every 24 hours', timeZone: 'Asia/Dubai' },
+  async () => {
+    const trace = syntheticTrace('monitorDuplicateCategories');
+    const started = Date.now();
+    logTrace(trace, 'monitorDuplicateCategories:start');
+    try {
+      const snap = await db.collection('service_categories').get();
+      const all: Array<{ id: string; data: any }> = snap.docs.map((d: admin.firestore.QueryDocumentSnapshot) => ({ id: d.id, data: d.data() }));
+      const groups: Record<string, string[]> = {};
+
+      const normalize = (cat: any) => {
+        const ar = (cat.title_ar || cat.name_ar || '').trim().toLowerCase();
+        const en = (cat.title_en || cat.name_en || cat.title || cat.name || '').trim().toLowerCase();
+        const base = ar || en;
+        return base.replace(/[\s]+/g, ' ').replace(/[ـ]/g, '').trim();
+      };
+
+      for (const c of all) {
+        const key = normalize(c.data);
+        if (!key) continue;
+        if (!groups[key]) groups[key] = [];
+        groups[key].push(c.id);
+      }
+
+      const duplicateGroups = Object.entries(groups).filter(([, ids]) => ids.length > 1);
+      if (duplicateGroups.length > 0) {
+        console.warn(`[monitorDuplicateCategories] Found ${duplicateGroups.length} duplicate groups`);
+        const sample = duplicateGroups.slice(0, 5).map(([k, ids]) => ({ key: k, count: ids.length, ids: ids.slice(0, 10) }));
+        console.warn('[monitorDuplicateCategories] Sample:', JSON.stringify(sample));
+      } else {
+        console.log('[monitorDuplicateCategories] No duplicates found');
+      }
+    } catch (e) {
+      console.error('[monitorDuplicateCategories] Error:', e);
+      logTrace(trace, 'monitorDuplicateCategories:error', { message: (e as any)?.message });
+    } finally {
+      logTrace(trace, 'monitorDuplicateCategories:done', { duration_ms: Date.now() - started });
+    }
+  }
+);
+
+// =============================================================================
+// Scheduled pruning: delete request_traces older than 30 days
+// =============================================================================
+export const pruneOldRequestTraces = onSchedule(
+  { schedule: 'every 24 hours', timeZone: 'Asia/Dubai' },
+  async () => {
+    const trace = syntheticTrace('pruneOldRequestTraces');
+    const started = Date.now();
+    logTrace(trace, 'pruneOldRequestTraces:start');
+    try {
+      const cutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+      const cutoffIso = cutoff.toISOString();
+      // ts is stored as ISO string, so lexicographical comparison works
+      const snap = await db.collection('request_traces').where('ts', '<', cutoffIso).limit(500).get();
+      if (snap.empty) {
+        console.log('[pruneOldRequestTraces] No old traces to delete');
+        return;
+      }
+      const bw = db.bulkWriter();
+      let count = 0;
+      snap.docs.forEach((d) => { bw.delete(d.ref); count++; });
+      await bw.close();
+      console.log(`[pruneOldRequestTraces] Deleted ${count} old trace docs`);
+      logTrace(trace, 'pruneOldRequestTraces:done', { duration_ms: Date.now() - started, deleted: count });
+    } catch (e) {
+      console.error('[pruneOldRequestTraces] Error:', e);
+      logTrace(trace, 'pruneOldRequestTraces:error', { message: (e as any)?.message });
     }
   }
 );

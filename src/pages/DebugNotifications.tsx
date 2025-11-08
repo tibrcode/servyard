@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { registerFirebaseMessagingSW } from '@/lib/firebase/sw';
 import { requestNotificationPermission } from '@/lib/firebase/notifications';
 import { Link } from 'react-router-dom';
+import { withTrace } from '@/lib/trace';
 
 export default function DebugNotifications() {
   const { toast } = useToast();
@@ -19,6 +20,7 @@ export default function DebugNotifications() {
   });
   const [token, setToken] = React.useState<string | null>(null);
   const [busy, setBusy] = React.useState(false);
+  const [pongTs, setPongTs] = React.useState<number | null>(null);
 
   const refreshSW = async () => {
     if (!('serviceWorker' in navigator)) {
@@ -63,6 +65,25 @@ export default function DebugNotifications() {
     }
   };
 
+  const pingSW = async () => {
+    if (!('serviceWorker' in navigator)) return;
+    const ctrl = navigator.serviceWorker.controller;
+    if (!ctrl) {
+      toast({ title: 'No controller', description: 'Reload the page to let SW take control', variant: 'destructive' });
+      return;
+    }
+    const id = Math.random().toString(36).slice(2);
+    const onMsg = (ev: MessageEvent) => {
+      if ((ev.data as any)?.__SERVYARD_PONG && (ev.data as any)?.id === id) {
+        setPongTs((ev.data as any).ts);
+        window.removeEventListener('message', onMsg as any);
+      }
+    };
+    window.addEventListener('message', onMsg as any);
+    ctrl.postMessage({ __SERVYARD_PING: true, id });
+    setTimeout(() => window.removeEventListener('message', onMsg as any), 3000);
+  };
+
   const testToast = () => {
     toast({ title: 'Test toast', description: 'This is a UI toast (foreground only)' });
   };
@@ -88,11 +109,11 @@ export default function DebugNotifications() {
     try {
       // Prefer env-configured URL (production)
       const url = import.meta.env.VITE_TEST_NOTIFICATION_URL || '/sendTestNotification';
-      const resp = await fetch(url, {
+      const resp = await fetch(url, withTrace({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: user.uid }),
-      });
+      }));
       const json = await resp.json().catch(() => ({}));
       toast({ title: resp.ok ? 'Test push requested' : 'Test push failed', description: JSON.stringify(json).slice(0, 200) });
     } catch (e: any) {
@@ -128,6 +149,7 @@ export default function DebugNotifications() {
           <div className="flex flex-wrap gap-2 pt-2">
             <Button onClick={doRequestPermission} disabled={busy}>Request Permission & Token</Button>
             <Button variant="outline" onClick={doRegisterSW} disabled={busy}>Register SW</Button>
+            <Button variant="outline" onClick={pingSW} disabled={busy}>Ping SW</Button>
             <Button variant="secondary" onClick={testToast}>Test Toast</Button>
             <Button variant="secondary" onClick={testNotificationAPI}>Test Notification API</Button>
             <Button variant="default" onClick={testBackendPush} disabled={busy}>Send Test Push (Backend)</Button>
@@ -135,6 +157,9 @@ export default function DebugNotifications() {
               <Button variant="ghost">Open History</Button>
             </Link>
           </div>
+          {pongTs && (
+            <div className="text-xs text-muted-foreground">SW pong at: {new Date(pongTs).toLocaleString()}</div>
+          )}
         </CardContent>
       </Card>
     </div>

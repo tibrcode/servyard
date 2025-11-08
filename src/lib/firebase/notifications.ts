@@ -1,5 +1,5 @@
 import { getMessaging, getToken, onMessage, Messaging } from 'firebase/messaging';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import { db } from '@/integrations/firebase/client';
 import { registerFirebaseMessagingSW } from '@/lib/firebase/sw';
 import { useNotificationLog } from '@/contexts/NotificationLogContext';
@@ -10,19 +10,25 @@ const VAPID_KEY = import.meta.env.VITE_FIREBASE_VAPID_KEY || '';
 
 let messaging: Messaging | null = null;
 
-// تهيئة Firebase Cloud Messaging
-export const initializeMessaging = () => {
-  try {
-    if ('serviceWorker' in navigator && 'PushManager' in window) {
-      messaging = getMessaging();
-      return messaging;
+// تهيئة Firebase Cloud Messaging مع إعادة محاولة خفيفة
+export const initializeMessaging = async () => {
+  const maxAttempts = 2;
+  for (let i = 0; i < maxAttempts; i++) {
+    try {
+      if ('serviceWorker' in navigator && 'PushManager' in window) {
+        messaging = getMessaging();
+        return messaging;
+      }
+      console.warn('Push notifications not supported');
+      return null;
+    } catch (error) {
+      console.error('Error initializing messaging attempt', i + 1, error);
+      if (i === maxAttempts - 1) return null;
+      const backoff = 400 * Math.pow(2, i) * (0.8 + Math.random() * 0.4);
+      await new Promise((r) => setTimeout(r, backoff));
     }
-    console.warn('Push notifications not supported');
-    return null;
-  } catch (error) {
-    console.error('Error initializing messaging:', error);
-    return null;
   }
+  return null;
 };
 
 // طلب إذن الإشعارات وحفظ التوكن
@@ -34,7 +40,7 @@ export const requestNotificationPermission = async (userId: string, skipPrompt =
     }
 
     if (!messaging) {
-      messaging = initializeMessaging();
+      messaging = await initializeMessaging();
     }
 
     if (!messaging) {
@@ -65,13 +71,19 @@ export const requestNotificationPermission = async (userId: string, skipPrompt =
     });
 
     if (token) {
-      // حفظ التوكن في profile المستخدم
+      // Check existing profile for prior verification timestamp
+      let verifiedAt: Date | null = null;
+      try {
+        const snap = await getDoc(doc(db, 'profiles', userId));
+        const d = snap.data();
+        if (d?.fcm_verified_at) verifiedAt = new Date(d.fcm_verified_at);
+      } catch {}
       await updateDoc(doc(db, 'profiles', userId), {
         fcm_token: token,
         notifications_enabled: true,
-        updated_at: new Date()
+        fcm_verified_at: verifiedAt || new Date(), // set once on first successful token
+        updated_at: new Date(),
       });
-
       console.log('FCM Token saved:', token);
       return token;
     }
@@ -84,16 +96,17 @@ export const requestNotificationPermission = async (userId: string, skipPrompt =
 };
 
 // الاستماع للإشعارات عندما يكون التطبيق مفتوحاً
-export const onMessageListener = (callback: (payload: any) => void) => {
+export const onMessageListener = (callback: (payload: any) => void, options?: { userId?: string }) => {
   if (!messaging) {
-    messaging = initializeMessaging();
+    // allow async init but we don't await inside listener registration context
+    initializeMessaging().then((m) => { messaging = m; });
   }
 
   if (!messaging) {
     return () => {};
   }
 
-  return onMessage(messaging, (payload) => {
+  return onMessage(messaging, async (payload) => {
     console.log('Message received:', payload);
     callback(payload);
     try {
@@ -111,9 +124,19 @@ export const onMessageListener = (callback: (payload: any) => void) => {
           badge: '/icons/icon-192.png'
         });
       }
-    } catch (e) {
-      // Non-fatal: some environments disallow Notification from page context
-    }
+    } catch {}
+
+    // Mark verification if we have userId and not yet verified
+    try {
+      if (options?.userId) {
+        const ref = doc(db, 'profiles', options.userId);
+        const snap = await getDoc(ref);
+        const data = snap.data();
+        if (!data?.fcm_verified_at) {
+          await updateDoc(ref, { fcm_verified_at: new Date(), updated_at: new Date() });
+        }
+      }
+    } catch {}
   });
 };
 

@@ -1,8 +1,28 @@
 // Service Worker لمعالجة الإشعارات في الخلفية
 // يجب أن يكون في المجلد public/
 
-importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js');
+// Lightweight guarded import (retry once if CDN hiccups) + version pin
+const firebaseVersion = '10.7.1';
+try {
+  importScripts(`https://www.gstatic.com/firebasejs/${firebaseVersion}/firebase-app-compat.js`);
+  importScripts(`https://www.gstatic.com/firebasejs/${firebaseVersion}/firebase-messaging-compat.js`);
+} catch (e) {
+  // Retry with exponential backoff (single retry)
+  console.warn('[SW] Initial importScripts failed, retrying...', e);
+  try {
+    const delay = 600 + Math.random() * 400; // jitter
+    const start = Date.now();
+    // Busy wait is not ideal; use setTimeout via Promise (Service Worker env supports it)
+    const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+    wait(delay).then(() => {
+      importScripts(`https://www.gstatic.com/firebasejs/${firebaseVersion}/firebase-app-compat.js`);
+      importScripts(`https://www.gstatic.com/firebasejs/${firebaseVersion}/firebase-messaging-compat.js`);
+      console.log('[SW] importScripts retry succeeded after', Date.now() - start, 'ms');
+    });
+  } catch (e2) {
+    console.error('[SW] importScripts retry failed; FCM background messages may not work', e2);
+  }
+}
 
 // Firebase Configuration
 firebase.initializeApp({
@@ -15,10 +35,15 @@ firebase.initializeApp({
   measurementId: "G-GDCET0K1NN"
 });
 
-const messaging = firebase.messaging();
+let messaging = null;
+try {
+  messaging = firebase.messaging();
+} catch (e) {
+  console.error('[SW] Failed to init messaging()', e);
+}
 
 // معالجة الإشعارات في الخلفية
-messaging.onBackgroundMessage((payload) => {
+if (messaging) messaging.onBackgroundMessage((payload) => {
   console.log('[SW] Background Message:', payload);
   const normalized = {
     notification: {
@@ -57,7 +82,19 @@ messaging.onBackgroundMessage((payload) => {
   self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
+// Simple ping handler for health checks
+self.addEventListener('message', (event) => {
+  try {
+    const data = event.data;
+    if (data && data.__SERVYARD_PING) {
+      event.source?.postMessage({ __SERVYARD_PONG: true, id: data.id, ts: Date.now() });
+    }
+  } catch (e) {
+    // silent
+  }
+});
 // معالجة النقر على الإشعار
+// Robust notification click handling with retry for clients list race
 self.addEventListener('notificationclick', (event) => {
   console.log('Notification click:', event);
   event.notification.close();
@@ -65,18 +102,23 @@ self.addEventListener('notificationclick', (event) => {
   // فتح التطبيق أو الانتقال للصفحة المناسبة
   const urlToOpen = event.notification.data?.url || '/';
   
-  event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-      // إذا كان التطبيق مفتوح، انتقل للصفحة
+  const openOrFocus = async () => {
+    const maxTries = 2;
+    for (let i = 0; i < maxTries; i++) {
+      const clientList = await clients.matchAll({ type: 'window', includeUncontrolled: true });
       for (const client of clientList) {
         if (client.url === urlToOpen && 'focus' in client) {
-          return client.focus();
+          await client.focus();
+          return;
         }
       }
-      // وإلا افتح نافذة جديدة
       if (clients.openWindow) {
-        return clients.openWindow(urlToOpen);
+        await clients.openWindow(urlToOpen);
+        return;
       }
-    })
-  );
+      // small backoff before retrying clients.matchAll
+      await new Promise((r) => setTimeout(r, 300 * (i + 1)));
+    }
+  };
+  event.waitUntil(openOrFocus());
 });

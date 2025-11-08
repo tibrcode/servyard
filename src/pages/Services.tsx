@@ -17,6 +17,8 @@ import { db } from "@/integrations/firebase/client";
 import InteractiveMap from "@/components/map/InteractiveMap";
 import { collection, getDocs, doc, getDoc, query as fsQuery, where } from "firebase/firestore";
 import { ServiceCategory, initializeServiceCategories } from "@/lib/firebase/collections";
+import { getServiceCategoriesCached } from "@/lib/categoriesCache";
+import { getServicesCached, invalidateServicesCache } from "@/lib/servicesCache";
 import { upsertDefaultServiceCategories } from "@/lib/firebase/defaultCategories";
 import { getCategoryLabel } from "@/lib/categoriesLocale";
 import { filterByRadius, formatDistance, calculateDistance, RADIUS_OPTIONS, DEFAULT_RADIUS_KM, Coordinates } from "@/lib/geolocation";
@@ -119,34 +121,12 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
         const inserted = await upsertDefaultServiceCategories();
         console.log(`Inserted ${inserted} new categories for Services page`);
 
-        // Load categories
-        const categoriesRef = collection(db, 'service_categories');
-        const categoriesSnapshot = await getDocs(categoriesRef);
-        let categoriesData = categoriesSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        })) as ServiceCategory[];
-        // De-duplicate by normalized name
-        const seen = new Set<string>();
-        const deduped: ServiceCategory[] = [];
-        for (const c of categoriesData) {
-          const key = ((c.name_en || c.name_ar || c.id) + '').trim().toLowerCase();
-          if (!seen.has(key)) {
-            seen.add(key);
-            deduped.push(c);
-          }
-        }
-        deduped.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
-        setCategories(deduped);
+        // Load categories (cached)
+        const cats = await getServiceCategoriesCached();
+        setCategories(cats);
 
-        // Load services  
-        const servicesRef = collection(db, 'services');
-        const servicesSnapshot = await getDocs(servicesRef);
-        const servicesData = servicesSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        })) as Service[];
-
+        // Load services (cached)
+        const servicesData = await getServicesCached();
         setServices(servicesData);
 
         // Load providers for services
