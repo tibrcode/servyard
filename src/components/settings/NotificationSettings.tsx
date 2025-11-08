@@ -186,12 +186,20 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
   const handleSendTest = async () => {
     try {
       if (!userId) return;
-      const url = import.meta.env.VITE_TEST_NOTIFICATION_URL || '/sendTestNotification';
+      
+      // Use Firebase Functions URL - must be full URL, not relative path
+      // For production: https://YOUR-REGION-YOUR-PROJECT.cloudfunctions.net/sendTestNotification
+      // For emulator: http://127.0.0.1:5001/YOUR-PROJECT/REGION/sendTestNotification
+      const functionsUrl = import.meta.env.VITE_FIREBASE_FUNCTIONS_URL || 
+                          `https://us-central1-${import.meta.env.VITE_FIREBASE_PROJECT_ID}.cloudfunctions.net`;
+      const url = `${functionsUrl}/sendTestNotification`;
+      
       const resp = await fetch(url, withTrace({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId }),
       }));
+      
       if (resp.ok) {
         toast({
           title: isRTL ? 'تم إرسال إشعار تجريبي' : 'Test notification sent',
@@ -199,6 +207,7 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
         });
       } else {
         const text = await resp.text();
+        console.error('Test notification failed:', resp.status, text);
         toast({
           title: isRTL ? 'فشل الإرسال' : 'Failed to send',
           description: text.slice(0, 160),
@@ -206,6 +215,7 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
         });
       }
     } catch (e: any) {
+      console.error('Test notification request error:', e);
       toast({
         title: isRTL ? 'خطأ في الطلب' : 'Request error',
         description: e?.message || String(e),

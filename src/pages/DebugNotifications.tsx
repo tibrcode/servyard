@@ -107,8 +107,11 @@ export default function DebugNotifications() {
     }
     setBusy(true);
     try {
-      // Prefer env-configured URL (production)
-      const url = import.meta.env.VITE_TEST_NOTIFICATION_URL || '/sendTestNotification';
+      // Use Firebase Functions URL - must be full URL, not relative path
+      const functionsUrl = import.meta.env.VITE_FIREBASE_FUNCTIONS_URL || 
+                          `https://us-central1-${import.meta.env.VITE_FIREBASE_PROJECT_ID}.cloudfunctions.net`;
+      const url = `${functionsUrl}/sendTestNotification`;
+      
       const resp = await fetch(url, withTrace({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

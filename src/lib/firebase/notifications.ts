@@ -36,6 +36,7 @@ export const requestNotificationPermission = async (userId: string, skipPrompt =
   try {
     // تحقق من دعم Notification API
     if (!('Notification' in window)) {
+      console.warn('[FCM] Notifications not supported in this browser');
       return null;
     }
 
@@ -44,17 +45,31 @@ export const requestNotificationPermission = async (userId: string, skipPrompt =
     }
 
     if (!messaging) {
+      console.warn('[FCM] Messaging initialization failed');
       return null;
     }
 
     let permission = Notification.permission;
 
+    // إذا كان الإذن مرفوضاً، أخبر المستخدم
+    if (permission === 'denied') {
+      console.warn('[FCM] Notification permission denied by user. Must enable in browser settings.');
+      return null;
+    }
+
     // طلب الإذن فقط إذا لم يتم منحه مسبقاً ولم يُطلب تخطيه
     if (permission === 'default' && !skipPrompt) {
-      permission = await Notification.requestPermission();
+      try {
+        permission = await Notification.requestPermission();
+      } catch (err: any) {
+        // Safari and some browsers throw if called without user gesture
+        console.error('[FCM] Permission request failed (may need user gesture):', err);
+        return null;
+      }
     }
     
     if (permission !== 'granted') {
+      console.warn('[FCM] Notification permission not granted:', permission);
       return null;
     }
 

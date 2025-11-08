@@ -116,7 +116,18 @@ export function OffersManagement({ currentLanguage }: OffersManagementProps) {
 
   const handleOpenDialog = (offer?: Offer) => {
     if (offer) {
-      // Editing existing offer
+      // Editing existing offer - safe date conversion
+      const safeToISODate = (dateField: any): string => {
+        try {
+          if (!dateField) return '';
+          const date = dateField.seconds ? dateField.toDate() : new Date(dateField);
+          if (isNaN(date.getTime())) return '';
+          return date.toISOString().split('T')[0];
+        } catch {
+          return '';
+        }
+      };
+
       setEditingOffer(offer);
       setFormData({
         title: offer.title,
@@ -124,8 +135,8 @@ export function OffersManagement({ currentLanguage }: OffersManagementProps) {
         discount_type: offer.discount_percentage ? "percentage" : "amount",
         discount_percentage: offer.discount_percentage?.toString() || "",
         discount_amount: offer.discount_amount?.toString() || "",
-        valid_from: offer.valid_from ? new Date(offer.valid_from.seconds ? offer.valid_from.toDate() : offer.valid_from).toISOString().split('T')[0] : "",
-        valid_until: offer.valid_until ? new Date(offer.valid_until.seconds ? offer.valid_until.toDate() : offer.valid_until).toISOString().split('T')[0] : "",
+        valid_from: safeToISODate(offer.valid_from),
+        valid_until: safeToISODate(offer.valid_until),
         is_active: offer.is_active
       });
     } else {
