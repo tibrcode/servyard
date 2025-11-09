@@ -157,8 +157,8 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
         setNotificationPermission('granted');
         setPreferences({ ...preferences, enabled: true });
         toast({
-          title: isRTL ? 'تم تفعيل التنبيهات' : 'Notifications Enabled',
-          description: isRTL ? 'يمكنك الآن تلقي التنبيهات' : 'You can now receive notifications',
+          title: t.notificationSettings.notificationsEnabled,
+          description: t.notificationSettings.notificationsEnabledDesc,
         });
       } else {
         setNotificationPermission('denied');
@@ -364,10 +364,10 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
               <CheckCircle2 className="h-5 w-5 text-green-500 mt-0.5" />
               <div className="flex-1">
                 <h4 className="font-semibold text-green-700 dark:text-green-400">
-                  {isRTL ? 'التنبيهات مفعلة ✓' : 'Notifications Enabled ✓'}
+                  {t.notificationSettings.notificationsEnabled}
                 </h4>
                 <p className="text-sm text-muted-foreground mt-1">
-                  {isRTL ? 'يمكنك الآن تلقي الإشعارات' : 'You can now receive notifications'}
+                  {t.notificationSettings.notificationsEnabledDesc}
                 </p>
               </div>
             </div>
