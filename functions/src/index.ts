@@ -5,7 +5,11 @@ import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { auth } from 'firebase-functions/v1';
 import { defineSecret } from 'firebase-functions/params';
 
-admin.initializeApp();
+// Initialize with Application Default Credentials
+// This ensures proper permissions in Cloud Functions Gen 2
+admin.initializeApp({
+  credential: admin.credential.applicationDefault(),
+});
 const db = admin.firestore();
 const messaging = admin.messaging();
 

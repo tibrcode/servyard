@@ -39,7 +39,11 @@ const https_1 = require("firebase-functions/v2/https");
 const scheduler_1 = require("firebase-functions/v2/scheduler");
 const v1_1 = require("firebase-functions/v1");
 const params_1 = require("firebase-functions/params");
-admin.initializeApp();
+// Initialize with Application Default Credentials
+// This ensures proper permissions in Cloud Functions Gen 2
+admin.initializeApp({
+    credential: admin.credential.applicationDefault(),
+});
 const db = admin.firestore();
 const messaging = admin.messaging();
 // Deployment/version tag for tracing (update per deploy if desired)
