@@ -110,7 +110,6 @@ export function MyBookings({
     editSuccess: isRTL ? 'تم تحديث الحجز' : 'Booking Updated',
     editSuccessDesc: isRTL ? 'تم تحديث تفاصيل حجزك بنجاح' : 'Your booking has been updated successfully',
     editError: isRTL ? 'فشل تحديث الحجز' : 'Failed to update booking',
-    review: isRTL ? 'تقييم الخدمة' : 'Review Service',
     rateService: isRTL ? 'قيّم الخدمة' : 'Rate Service',
     yourRating: isRTL ? 'تقييمك' : 'Your Rating',
     writeReview: isRTL ? 'اكتب تقييمك (اختياري)' : 'Write your review (optional)',
@@ -617,7 +616,7 @@ export function MyBookings({
                       onClick={() => handleOpenReviewDialog(booking)}
                     >
                       <Star className="h-4 w-4 mr-1" />
-                      {localT.review}
+                      {t.customer.reviewService || 'Review Service'}
                     </Button>
                   )}
                 </div>

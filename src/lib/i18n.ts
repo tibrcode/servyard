@@ -308,6 +308,7 @@ export interface Translation {
     statusConfirmed?: string;
     statusCompleted?: string;
     alreadyReviewed?: string;
+    reviewService?: string;
   };
 
   booking: {
@@ -1042,6 +1043,7 @@ export const translations: Record<string, Translation> = {
       statusConfirmed: "Confirmed",
       statusCompleted: "Completed",
       alreadyReviewed: "Already Reviewed",
+      reviewService: "Review Service",
     },
     booking: {
       selectService: "Select Service",
