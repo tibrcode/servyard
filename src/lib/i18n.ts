@@ -16,6 +16,7 @@ export interface Translation {
     location: string;
     theme?: string;
     notifications?: string;
+    settings?: string;
   };
 
   // Homepage
@@ -300,6 +301,10 @@ export interface Translation {
     };
     // Optional suffix/label for rating display (e.g., "out of 5")
     outOf5?: string;
+    viewManageBookings?: string;
+    upcoming?: string;
+    past?: string;
+    noUpcomingBookings?: string;
   };
 
   booking: {
@@ -335,6 +340,8 @@ export interface Translation {
     subtitle: string;
     enableNotifications: string;
     enableDesc: string;
+    notificationsEnabled?: string;
+    notificationsEnabledDesc?: string;
     bookingReminders: string;
     bookingRemindersDesc: string;
     reminderTimes: string;
@@ -764,6 +771,7 @@ export const translations: Record<string, Translation> = {
       location: "Location",
       theme: "Theme",
       notifications: "Notifications",
+      settings: "Settings",
     },
     home: {
       title: "ServYard - Premium Service Marketplace",
@@ -1024,6 +1032,10 @@ export const translations: Record<string, Translation> = {
         ratingLabels: ["Poor", "Fair", "Good", "Very Good", "Excellent"],
       },
       outOf5: "out of 5",
+      viewManageBookings: "View and manage your bookings",
+      upcoming: "Upcoming",
+      past: "Past",
+      noUpcomingBookings: "You don't have any upcoming bookings",
     },
     booking: {
       selectService: "Select Service",
@@ -1057,6 +1069,8 @@ export const translations: Record<string, Translation> = {
       subtitle: "Manage how you receive notifications",
       enableNotifications: "Enable Notifications",
       enableDesc: "Receive all notifications from the app",
+      notificationsEnabled: "Notifications Enabled ✓",
+      notificationsEnabledDesc: "You can now receive notifications",
       bookingReminders: "Booking Reminders",
       bookingRemindersDesc: "Remind you of upcoming appointments",
       reminderTimes: "Reminder Times",
