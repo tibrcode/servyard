@@ -136,7 +136,7 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
 
       toast({
         title: t.notificationSettings.saved,
-        description: isRTL ? 'تم تحديث إعدادات التنبيهات بنجاح' : 'Notification settings updated successfully',
+        description: t.notificationSettings.savedDesc,
       });
     } catch (error) {
       console.error('Error saving preferences:', error);

@@ -500,6 +500,7 @@ export const additionalLanguages = {
       testNotificationSent: "✅ تم إرسال إشعار تجريبي",
       testNotificationFailed: "❌ فشل إرسال الإشعار التجريبي",
       checkNotificationCenter: "تحقق من مركز الإشعارات في الأعلى",
+      savedDesc: "تم تحديث إعدادات التنبيهات بنجاح",
     },
     forms: {
       name: "الاسم",

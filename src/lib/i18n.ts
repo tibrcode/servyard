@@ -358,6 +358,7 @@ export interface Translation {
     save: string;
     saving: string;
     saved: string;
+    savedDesc: string;
     saveFailed: string;
     permissionDenied: string;
     permissionDeniedDesc: string;
@@ -1079,6 +1080,7 @@ export const translations: Record<string, Translation> = {
       save: "Save Settings",
       saving: "Saving...",
       saved: "Settings saved",
+      savedDesc: "Notification settings updated successfully",
       saveFailed: "Failed to save settings",
       permissionDenied: "Notification Permission Denied",
       permissionDeniedDesc: "Please enable notifications in browser settings",
