@@ -19,6 +19,7 @@ import { collection, addDoc, query, where, getDocs, doc, getDoc, updateDoc, dele
 import { format } from 'date-fns';
 import { ar, enUS } from 'date-fns/locale';
 import { ServiceBooking } from '@/components/booking/ServiceBooking';
+import { useTranslation } from '@/lib/i18n';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -53,6 +54,7 @@ export function MyBookings({
   cancellationPolicyHours = 24,
 }: MyBookingsProps) {
   const { toast } = useToast();
+  const { t, isRTL: isRTLFromHook } = useTranslation(language);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [cancellingId, setCancellingId] = useState<string | null>(null);
@@ -75,18 +77,11 @@ export function MyBookings({
   const [providerContacts, setProviderContacts] = useState<Record<string, {phone?: string[], whatsapp?: string, latitude?: number, longitude?: number}>>({});
   const [customerLocation, setCustomerLocation] = useState<{latitude: number, longitude: number} | null>(null);
 
-  const isRTL = language === 'ar';
+  const isRTL = isRTLFromHook;
   const dateLocale = language === 'ar' ? ar : enUS;
 
-  // Translation
-  const t = {
-    title: isRTL ? 'حجوزاتي' : 'My Bookings',
-    subtitle: isRTL ? 'عرض وإدارة حجوزاتك' : 'View and manage your bookings',
-    upcoming: isRTL ? 'القادمة' : 'Upcoming',
-    past: isRTL ? 'السابقة' : 'Past',
-    noBookings: isRTL ? 'لا توجد حجوزات' : 'No bookings',
-    noUpcoming: isRTL ? 'ليس لديك حجوزات قادمة' : "You don't have any upcoming bookings",
-    noPast: isRTL ? 'ليس لديك حجوزات سابقة' : "You don't have any past bookings",
+  // Local translations for parts not yet in i18n
+  const localT = {
     loading: isRTL ? 'جاري التحميل...' : 'Loading...',
     service: isRTL ? 'الخدمة' : 'Service',
     date: isRTL ? 'التاريخ' : 'Date',
@@ -126,6 +121,7 @@ export function MyBookings({
     reviewSuccessDesc: isRTL ? 'شكراً لك على تقييم الخدمة' : 'Thank you for rating the service',
     reviewError: isRTL ? 'فشل إرسال التقييم' : 'Failed to submit review',
     alreadyReviewed: isRTL ? 'تم التقييم' : 'Already Reviewed',
+    noPast: isRTL ? 'ليس لديك حجوزات سابقة' : "You don't have any past bookings",
     statuses: {
       pending: isRTL ? 'قيد الانتظار' : 'Pending',
       confirmed: isRTL ? 'مؤكد' : 'Confirmed',
@@ -285,8 +281,8 @@ export function MyBookings({
       });
 
       toast({
-        title: t.reviewSuccess,
-        description: t.reviewSuccessDesc,
+        title: localT.reviewSuccess,
+        description: localT.reviewSuccessDesc,
       });
 
       setReviewDialogOpen(false);
@@ -299,7 +295,7 @@ export function MyBookings({
     } catch (error) {
       console.error('Error submitting review:', error);
       toast({
-        title: t.reviewError,
+        title: localT.reviewError,
         description: isRTL ? 'حدث خطأ أثناء إرسال التقييم' : 'An error occurred while submitting the review',
         variant: 'destructive',
       });
@@ -341,7 +337,7 @@ export function MyBookings({
     } catch (error) {
       console.error('Error loading service details:', error);
       toast({
-        title: t.editError,
+        title: localT.editError,
         description: isRTL ? 'فشل تحميل تفاصيل الخدمة' : 'Failed to load service details',
         variant: 'destructive',
       });
@@ -356,8 +352,8 @@ export function MyBookings({
         await deleteDoc(doc(db, 'bookings', selectedBookingForEdit.booking_id));
         
         toast({
-          title: t.editSuccess,
-          description: t.editSuccessDesc,
+          title: localT.editSuccess,
+          description: localT.editSuccessDesc,
         });
         
         setEditDialogOpen(false);
@@ -372,8 +368,8 @@ export function MyBookings({
   const handleCancelBooking = async (booking: Booking) => {
     if (!canCancelBooking(booking, cancellationPolicyHours)) {
       toast({
-        title: t.cannotCancel,
-        description: t.cannotCancelDesc,
+        title: localT.cannotCancel,
+        description: localT.cannotCancelDesc,
         variant: 'destructive',
       });
       return;
@@ -384,8 +380,8 @@ export function MyBookings({
       await cancelBooking(booking.booking_id, isRTL ? 'تم الإلغاء من قبل العميل' : 'Cancelled by customer');
       
       toast({
-        title: t.cancelled,
-        description: t.cancelSuccess,
+        title: localT.cancelled,
+        description: localT.cancelSuccess,
       });
 
       // Reload bookings
@@ -393,7 +389,7 @@ export function MyBookings({
     } catch (error) {
       console.error('Error cancelling booking:', error);
       toast({
-        title: t.cancelFailed,
+        title: localT.cancelFailed,
         description: isRTL ? 'حدث خطأ أثناء الإلغاء' : 'An error occurred while cancelling',
         variant: 'destructive',
       });
@@ -413,7 +409,7 @@ export function MyBookings({
 
     return (
       <Badge variant={variants[status]}>
-        {t.statuses[status]}
+        {localT.statuses[status]}
       </Badge>
     );
   };
@@ -523,7 +519,7 @@ export function MyBookings({
                     className="flex-1 min-w-[120px]"
                   >
                     <Edit className="h-4 w-4 mr-1" />
-                    {t.edit}
+                    {localT.edit}
                   </Button>
 
                   {/* Cancel Button */}
@@ -536,31 +532,31 @@ export function MyBookings({
                         className="flex-1 min-w-[120px]"
                       >
                         {cancellingId === booking.booking_id ? (
-                          t.cancelling
+                          localT.cancelling
                         ) : (
                           <>
                             <X className="h-4 w-4 mr-1" />
-                            {t.cancel}
+                            {localT.cancel}
                           </>
                         )}
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent dir={isRTL ? 'rtl' : 'ltr'}>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>{t.cancelTitle}</AlertDialogTitle>
+                        <AlertDialogTitle>{localT.cancelTitle}</AlertDialogTitle>
                         <AlertDialogDescription>
-                          {t.cancelDesc}
+                          {localT.cancelDesc}
                           <br />
-                          <span className="text-destructive">{t.cancelWarning}</span>
+                          <span className="text-destructive">{localT.cancelWarning}</span>
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel>{t.keepBooking}</AlertDialogCancel>
+                        <AlertDialogCancel>{localT.keepBooking}</AlertDialogCancel>
                         <AlertDialogAction
                           onClick={() => handleCancelBooking(booking)}
                           className="bg-destructive hover:bg-destructive/90"
                         >
-                          {t.confirmCancel}
+                          {localT.confirmCancel}
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
@@ -571,7 +567,7 @@ export function MyBookings({
                     <Button variant="outline" size="sm" className="flex-1 min-w-[120px]" asChild>
                       <a href={`tel:${providerContacts[booking.provider_id].phone[0]}`}>
                         <Phone className="h-4 w-4 mr-1" />
-                        {t.contactProvider}
+                        {localT.contactProvider}
                       </a>
                     </Button>
                   )}
@@ -590,7 +586,7 @@ export function MyBookings({
                 {!canCancel && (
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <AlertCircle className="h-3 w-3" />
-                    <span>{t.cannotCancelDesc}</span>
+                    <span>{localT.cannotCancelDesc}</span>
                   </div>
                 )}
               </>
@@ -604,7 +600,7 @@ export function MyBookings({
                   {existingReviews.has(booking.booking_id) ? (
                     <Button variant="outline" size="sm" disabled className="flex-1">
                       <CheckCircle2 className="h-4 w-4 mr-1 text-green-500" />
-                      {t.alreadyReviewed}
+                      {localT.alreadyReviewed}
                     </Button>
                   ) : (
                     <Button
@@ -614,7 +610,7 @@ export function MyBookings({
                       onClick={() => handleOpenReviewDialog(booking)}
                     >
                       <Star className="h-4 w-4 mr-1" />
-                      {t.review}
+                      {localT.review}
                     </Button>
                   )}
                 </div>
@@ -631,7 +627,7 @@ export function MyBookings({
       <Card dir={isRTL ? 'rtl' : 'ltr'}>
         <CardContent className="py-8">
           <div className="flex items-center justify-center">
-            <p className="text-muted-foreground">{t.loading}</p>
+            <p className="text-muted-foreground">{localT.loading}</p>
           </div>
         </CardContent>
       </Card>
@@ -643,25 +639,25 @@ export function MyBookings({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Calendar className="h-5 w-5" />
-          {t.title}
+          {t.customer.myBookings}
         </CardTitle>
-        <CardDescription>{t.subtitle}</CardDescription>
+        <CardDescription>{t.customer.viewManageBookings}</CardDescription>
       </CardHeader>
       <CardContent>
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'upcoming' | 'past')}>
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="upcoming">
-              {t.upcoming} ({upcomingBookings.length})
+              {t.customer.upcoming} ({upcomingBookings.length})
             </TabsTrigger>
             <TabsTrigger value="past">
-              {t.past} ({pastBookings.length})
+              {t.customer.past} ({pastBookings.length})
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="upcoming" className="space-y-4 mt-6">
             {upcomingBookings.length === 0 ? (
               <div className="py-8 text-center">
-                <p className="text-muted-foreground">{t.noUpcoming}</p>
+                <p className="text-muted-foreground">{t.customer.noUpcomingBookings}</p>
               </div>
             ) : (
               upcomingBookings.map(renderBookingCard)
@@ -671,7 +667,7 @@ export function MyBookings({
           <TabsContent value="past" className="space-y-4 mt-6">
             {pastBookings.length === 0 ? (
               <div className="py-8 text-center">
-                <p className="text-muted-foreground">{t.noPast}</p>
+                <p className="text-muted-foreground">{localT.noPast}</p>
               </div>
             ) : (
               pastBookings.map(renderBookingCard)
@@ -684,7 +680,7 @@ export function MyBookings({
       <Dialog open={reviewDialogOpen} onOpenChange={setReviewDialogOpen}>
         <DialogContent dir={isRTL ? 'rtl' : 'ltr'} className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>{t.rateService}</DialogTitle>
+            <DialogTitle>{localT.rateService}</DialogTitle>
             <DialogDescription>
               {selectedBookingForReview?.service_title}
             </DialogDescription>
@@ -693,7 +689,7 @@ export function MyBookings({
           <div className="space-y-6 py-4">
             {/* Star Rating */}
             <div className="space-y-2">
-              <Label>{t.yourRating}</Label>
+              <Label>{localT.yourRating}</Label>
               <div className="flex gap-2 justify-center">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
@@ -719,10 +715,10 @@ export function MyBookings({
 
             {/* Comment */}
             <div className="space-y-2">
-              <Label htmlFor="review-comment">{t.writeReview}</Label>
+              <Label htmlFor="review-comment">{localT.writeReview}</Label>
               <Textarea
                 id="review-comment"
-                placeholder={t.reviewPlaceholder}
+                placeholder={localT.reviewPlaceholder}
                 value={reviewComment}
                 onChange={(e) => setReviewComment(e.target.value)}
                 rows={4}
@@ -743,7 +739,7 @@ export function MyBookings({
               onClick={handleSubmitReview}
               disabled={isSubmittingReview}
             >
-              {isSubmittingReview ? t.submitting : t.submitReview}
+              {isSubmittingReview ? localT.submitting : localT.submitReview}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -753,8 +749,8 @@ export function MyBookings({
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
         <DialogContent dir={isRTL ? 'rtl' : 'ltr'} className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{t.editTitle}</DialogTitle>
-            <DialogDescription>{t.editDesc}</DialogDescription>
+            <DialogTitle>{localT.editTitle}</DialogTitle>
+            <DialogDescription>{localT.editDesc}</DialogDescription>
           </DialogHeader>
 
           <div className="py-4">
