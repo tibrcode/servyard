@@ -529,9 +529,20 @@ exports.sendTestNotification = (0, https_1.onRequest)({ cors: true, invoker: 'pu
             console.error('[sendTestNotification] No token available. userId:', userId, 'token provided:', !!token);
             return errorResponse(res, 400, 'missing_token', 'Missing token and userId or no token found', trace);
         }
-        const ok = await sendNotification(targetToken, title || '🔔 Test Notification', body || 'Hello from ServYard test endpoint', { type: 'test', link: '/' });
-        logTrace(trace, 'sendTestNotification:done', { duration_ms: Date.now() - started, success: ok });
-        return res.json({ success: ok });
+        try {
+            const ok = await sendNotification(targetToken, title || '🔔 Test Notification', body || 'Hello from ServYard test endpoint', { type: 'test', link: '/' });
+            logTrace(trace, 'sendTestNotification:done', { duration_ms: Date.now() - started, success: ok });
+            return res.json({ success: ok });
+        }
+        catch (sendError) {
+            console.error('[sendTestNotification] FCM send error:', sendError);
+            logTrace(trace, 'sendTestNotification:fcm_error', { error: sendError?.message, code: sendError?.code });
+            return res.json({
+                success: false,
+                error: sendError?.message || 'Unknown FCM error',
+                code: sendError?.errorInfo?.code || sendError?.code || 'unknown'
+            });
+        }
     }
     catch (e) {
         console.error('Error in sendTestNotification:', e);
@@ -740,33 +751,25 @@ exports.getLocationStats = (0, https_1.onRequest)({ cors: true }, async (req, re
  * Send FCM notification to a user
  */
 async function sendNotification(fcmToken, title, body, data) {
-    try {
-        console.log('[sendNotification] Attempting to send notification');
-        console.log('[sendNotification] Token preview:', fcmToken?.substring(0, 30) + '...');
-        console.log('[sendNotification] Title:', title);
-        console.log('[sendNotification] Body:', body);
-        const message = {
-            token: fcmToken,
-            notification: { title, body },
-            data: data || {},
-            webpush: {
-                fcmOptions: {
-                    link: data?.link || '/',
-                },
+    console.log('[sendNotification] Attempting to send notification');
+    console.log('[sendNotification] Token preview:', fcmToken?.substring(0, 30) + '...');
+    console.log('[sendNotification] Title:', title);
+    console.log('[sendNotification] Body:', body);
+    const message = {
+        token: fcmToken,
+        notification: { title, body },
+        data: data || {},
+        webpush: {
+            fcmOptions: {
+                link: data?.link || '/',
             },
-        };
-        console.log('[sendNotification] Message prepared:', JSON.stringify({ ...message, token: message.token?.substring(0, 30) + '...' }));
-        const result = await messaging.send(message);
-        console.log('[sendNotification] ✅ Success! Message ID:', result);
-        return true;
-    }
-    catch (error) {
-        console.error('[sendNotification] ❌ Error sending FCM notification:', error);
-        console.error('[sendNotification] Error code:', error?.code);
-        console.error('[sendNotification] Error message:', error?.message);
-        console.error('[sendNotification] Full error:', JSON.stringify(error, null, 2));
-        return false;
-    }
+        },
+    };
+    console.log('[sendNotification] Message prepared:', JSON.stringify({ ...message, token: message.token?.substring(0, 30) + '...' }));
+    // Let the error bubble up to the caller
+    const result = await messaging.send(message);
+    console.log('[sendNotification] ✅ Success! Message ID:', result);
+    return true;
 }
 /**
  * Get user's FCM token from profile
@@ -875,12 +878,18 @@ exports.notifyNewBooking = (0, https_1.onRequest)({ cors: true, invoker: 'public
         const serviceDoc = await db.collection('services').doc(booking.service_id).get();
         const serviceName = serviceDoc.data()?.title || 'خدمة';
         // Send notification to provider
-        await sendNotification(providerToken, '🔔 حجز جديد!', `${customerName} طلب حجز ${serviceName}`, {
-            type: 'new_booking',
-            booking_id: bookingId,
-            link: `/provider-dashboard?bookingId=${bookingId}`,
-        });
-        console.log('✅ New booking notification sent to provider');
+        try {
+            await sendNotification(providerToken, '🔔 حجز جديد!', `${customerName} طلب حجز ${serviceName}`, {
+                type: 'new_booking',
+                booking_id: bookingId,
+                link: `/provider-dashboard?bookingId=${bookingId}`,
+            });
+            console.log('✅ New booking notification sent to provider');
+        }
+        catch (fcmError) {
+            console.error('❌ Failed to send FCM notification:', fcmError.message);
+            // Continue execution even if notification fails
+        }
         logTrace(trace, 'notifyNewBooking:done', { duration_ms: Date.now() - started });
         return res.status(200).json({ success: true });
     }
@@ -994,12 +1003,18 @@ exports.notifyBookingStatusChange = (0, https_1.onRequest)({ cors: true, invoker
                 return errorResponse(res, 200, 'quiet_hours', 'Suppressed due to quiet hours', trace);
             }
         }
-        await sendNotification(customerToken, title, body, {
-            type: notificationType,
-            booking_id: bookingId,
-            link: `/customer-dashboard?bookingId=${bookingId}`,
-        });
-        console.log(`✅ Booking ${newStatus} notification sent to customer`);
+        try {
+            await sendNotification(customerToken, title, body, {
+                type: notificationType,
+                booking_id: bookingId,
+                link: `/customer-dashboard?bookingId=${bookingId}`,
+            });
+            console.log(`✅ Booking ${newStatus} notification sent to customer`);
+        }
+        catch (fcmError) {
+            console.error('❌ Failed to send FCM notification:', fcmError.message);
+            // Continue execution even if notification fails
+        }
         logTrace(trace, 'notifyBookingStatusChange:done', { duration_ms: Date.now() - started, status: newStatus });
         return res.status(200).json({ success: true });
     }
@@ -1128,17 +1143,29 @@ exports.sendScheduledReminders = (0, scheduler_1.onSchedule)({
                     }
                 }
                 // Send notification
-                await sendNotification(customerToken, `⏰ تذكير: موعدك ${timeMessage}`, `${serviceName} مع ${providerName}${distanceText}`, {
-                    type: 'booking_reminder',
-                    booking_id: reminder.booking_id,
-                    minutes_before: minutesBefore.toString(),
-                    link: `/customer-dashboard?bookingId=${reminder.booking_id}`,
-                });
-                // Mark as sent
-                batch.update(reminderDoc.ref, {
-                    sent: true,
-                    sent_at: new Date(),
-                });
+                try {
+                    await sendNotification(customerToken, `⏰ تذكير: موعدك ${timeMessage}`, `${serviceName} مع ${providerName}${distanceText}`, {
+                        type: 'booking_reminder',
+                        booking_id: reminder.booking_id,
+                        minutes_before: minutesBefore.toString(),
+                        link: `/customer-dashboard?bookingId=${reminder.booking_id}`,
+                    });
+                    // Mark as sent
+                    batch.update(reminderDoc.ref, {
+                        sent: true,
+                        sent_at: new Date(),
+                    });
+                }
+                catch (fcmError) {
+                    console.error(`❌ Failed to send reminder for ${reminder.booking_id}:`, fcmError.message);
+                    // Mark as failed
+                    batch.update(reminderDoc.ref, {
+                        sent: false,
+                        failed: true,
+                        failed_at: new Date(),
+                        error: fcmError.message
+                    });
+                }
                 sentCount++;
                 console.log(`✅ Reminder sent for booking ${reminder.booking_id}`);
             }
