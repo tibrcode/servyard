@@ -52,7 +52,7 @@ export default function NotificationsHistory() {
         <CardContent className="space-y-4">
           <input
             type="text"
-            placeholder="بحث..."
+            placeholder={t.notificationsUI?.searchPlaceholder || "Search..."}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full rounded-md border px-3 py-2 text-sm bg-background"
@@ -78,7 +78,7 @@ export default function NotificationsHistory() {
           <Separator />
           <div className="space-y-3 max-h-[600px] overflow-auto pr-1">
             {filtered.length === 0 && (
-              <div className="text-sm text-muted-foreground">{lang === 'ar' ? 'لا يوجد إشعارات' : 'No notifications'}</div>
+              <div className="text-sm text-muted-foreground">{t.notificationsUI?.noNotifications || "No notifications"}</div>
             )}
             {filtered.map(n => (
               <div key={n.id} className="border rounded-md p-3 text-sm space-y-1 bg-card">
@@ -112,7 +112,7 @@ export default function NotificationsHistory() {
                       }}
                       className="inline-flex items-center rounded bg-green-600/10 text-green-700 dark:text-green-300 px-1.5 py-0.5 hover:bg-green-600/20 transition-colors"
                     >
-                      {lang === 'ar' ? 'فتح الحجز' : 'Open Booking'}
+                      {t.notificationsUI?.openBooking || "Open Booking"}
                     </button>
                   )}
                   {n.category === 'booking' && (n as any).bookingStatus && (

@@ -153,6 +153,9 @@ export interface Translation {
     background: string;
     clear: string;
     markAllRead: string;
+    searchPlaceholder: string;
+    noNotifications: string;
+    openBooking: string;
     categoryAll?: string;
     categoryBooking?: string;
     categoryReminder?: string;
@@ -327,7 +330,7 @@ export interface Translation {
     };
   };
 
-  notificationSettings: {
+  notificationSettings?: {
     title: string;
     subtitle: string;
     enableNotifications: string;
@@ -820,6 +823,9 @@ export const translations: Record<string, Translation> = {
       background: "Background",
       clear: "Clear",
       markAllRead: "Mark all as read",
+      searchPlaceholder: "Search...",
+      noNotifications: "No notifications",
+      openBooking: "Open Booking",
       categoryAll: "All types",
       categoryBooking: "Bookings",
       categoryReminder: "Reminders",
@@ -1582,6 +1588,9 @@ export const translations: Record<string, Translation> = {
       background: "خلفية",
       clear: "مسح",
       markAllRead: "تعليم الكل كمقروء",
+      searchPlaceholder: "بحث...",
+      noNotifications: "لا يوجد إشعارات",
+      openBooking: "فتح الحجز",
       categoryAll: "كل الأنواع",
       categoryBooking: "الحجوزات",
       categoryReminder: "التذكيرات",
