@@ -14,6 +14,7 @@ import { db } from '@/integrations/firebase/client';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { withTrace } from '@/lib/trace';
 import { requestNotificationPermission } from '@/lib/firebase/notifications';
+import { useTranslation } from '@/lib/i18n';
 
 interface NotificationSettingsProps {
   userId: string;
@@ -58,57 +59,19 @@ const DEFAULT_PREFERENCES: NotificationPreferences = {
 
 export function NotificationSettings({ userId, language = 'ar' }: NotificationSettingsProps) {
   const { toast } = useToast();
+  const { t, isRTL } = useTranslation(language);
   const [preferences, setPreferences] = useState<NotificationPreferences>(DEFAULT_PREFERENCES);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
 
-  const isRTL = language === 'ar';
-
-  // Translation
-  const t = {
-    title: isRTL ? 'إعدادات التنبيهات' : 'Notification Settings',
-    subtitle: isRTL ? 'إدارة كيفية تلقيك للتنبيهات' : 'Manage how you receive notifications',
-    enableNotifications: isRTL ? 'تفعيل التنبيهات' : 'Enable Notifications',
-    enableDesc: isRTL ? 'تلقي جميع التنبيهات من التطبيق' : 'Receive all notifications from the app',
-    bookingReminders: isRTL ? 'تذكيرات الحجز' : 'Booking Reminders',
-    bookingRemindersDesc: isRTL ? 'تذكيرك بمواعيدك القادمة' : 'Remind you of upcoming appointments',
-    reminderTimes: isRTL ? 'أوقات التذكير' : 'Reminder Times',
-    reminderTimesDesc: isRTL ? 'اختر متى تريد أن تتلقى التذكيرات قبل موعدك' : 'Choose when to receive reminders before your appointment',
-    min15: isRTL ? '15 دقيقة قبل' : '15 minutes before',
-    min30: isRTL ? '30 دقيقة قبل' : '30 minutes before',
-    hour1: isRTL ? 'ساعة قبل' : '1 hour before',
-    hour2: isRTL ? 'ساعتين قبل' : '2 hours before',
-    hour3: isRTL ? '3 ساعات قبل' : '3 hours before',
-    day1: isRTL ? 'يوم قبل' : '1 day before',
-    bookingUpdates: isRTL ? 'تحديثات الحجز' : 'Booking Updates',
-    bookingUpdatesDesc: isRTL ? 'تنبيهات حول تغييرات حالة حجزك' : 'Notifications about booking status changes',
-    confirmations: isRTL ? 'تأكيدات الحجز' : 'Booking Confirmations',
-    cancellations: isRTL ? 'إلغاء الحجوزات' : 'Booking Cancellations',
-    completions: isRTL ? 'إكمال الخدمات' : 'Service Completions',
-    quietHours: isRTL ? 'ساعات الهدوء' : 'Quiet Hours',
-    quietHoursDesc: isRTL ? 'لن تتلقى تنبيهات خلال هذه الأوقات' : 'You won\'t receive notifications during these hours',
-  quietHoursTooltip: isRTL ? 'لن يتم إرسال إشعارات (عدا التذكيرات الحرجة) خلال هذه الفترة. يتم تأجيل التذكيرات لتُرسل بعد انتهائها.' : 'Notifications (except critical reminders) are suppressed in this window. Reminders are deferred until it ends.',
-    startTime: isRTL ? 'من' : 'From',
-    endTime: isRTL ? 'إلى' : 'To',
-    save: isRTL ? 'حفظ الإعدادات' : 'Save Settings',
-    saving: isRTL ? 'جاري الحفظ...' : 'Saving...',
-    saved: isRTL ? 'تم حفظ الإعدادات' : 'Settings saved',
-    saveFailed: isRTL ? 'فشل حفظ الإعدادات' : 'Failed to save settings',
-    permissionDenied: isRTL ? 'صلاحية التنبيهات محظورة' : 'Notification Permission Denied',
-    permissionDeniedDesc: isRTL ? 'يرجى تفعيل التنبيهات في إعدادات المتصفح' : 'Please enable notifications in browser settings',
-    requestPermission: isRTL ? 'طلب الصلاحية' : 'Request Permission',
-    reminderSummaryLabel: isRTL ? 'ملخص التذكيرات' : 'Reminder Summary',
-    noneSelected: isRTL ? 'لا يوجد أوقات محددة' : 'No times selected',
-  };
-
   const reminderOptions = [
-    { value: 15, label: t.min15 },
-    { value: 30, label: t.min30 },
-    { value: 60, label: t.hour1 },
-    { value: 120, label: t.hour2 },
-    { value: 180, label: t.hour3 },
-    { value: 1440, label: t.day1 },
+    { value: 15, label: t.notificationSettings.min15 },
+    { value: 30, label: t.notificationSettings.min30 },
+    { value: 60, label: t.notificationSettings.hour1 },
+    { value: 120, label: t.notificationSettings.hour2 },
+    { value: 180, label: t.notificationSettings.hour3 },
+    { value: 1440, label: t.notificationSettings.day1 },
   ];
 
   const checkNotificationPermission = useCallback(() => {
@@ -172,13 +135,13 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
       });
 
       toast({
-        title: t.saved,
+        title: t.notificationSettings.saved,
         description: isRTL ? 'تم تحديث إعدادات التنبيهات بنجاح' : 'Notification settings updated successfully',
       });
     } catch (error) {
       console.error('Error saving preferences:', error);
       toast({
-        title: t.saveFailed,
+        title: t.notificationSettings.saveFailed,
         description: isRTL ? 'حدث خطأ أثناء حفظ الإعدادات' : 'An error occurred while saving settings',
         variant: 'destructive',
       });
@@ -360,9 +323,9 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Bell className="h-5 w-5" />
-          {t.title}
+          {t.notificationSettings.title}
         </CardTitle>
-        <CardDescription>{t.subtitle}</CardDescription>
+        <CardDescription>{t.notificationSettings.subtitle}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Permission Status Banner */}
@@ -371,8 +334,8 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
             <div className="flex items-start gap-2">
               <BellOff className="h-5 w-5 text-destructive mt-0.5" />
               <div className="flex-1">
-                <h4 className="font-semibold text-destructive">{t.permissionDenied}</h4>
-                <p className="text-sm text-muted-foreground mt-1">{t.permissionDeniedDesc}</p>
+                <h4 className="font-semibold text-destructive">{t.notificationSettings.permissionDenied}</h4>
+                <p className="text-sm text-muted-foreground mt-1">{t.notificationSettings.permissionDeniedDesc}</p>
               </div>
             </div>
           </div>
@@ -384,12 +347,12 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
               <div className="flex items-start gap-2">
                 <Bell className="h-5 w-5 text-primary mt-0.5" />
                 <div>
-                  <h4 className="font-semibold">{t.enableNotifications}</h4>
-                  <p className="text-sm text-muted-foreground mt-1">{t.enableDesc}</p>
+                  <h4 className="font-semibold">{t.notificationSettings.enableNotifications}</h4>
+                  <p className="text-sm text-muted-foreground mt-1">{t.notificationSettings.enableDesc}</p>
                 </div>
               </div>
               <Button onClick={handleRequestPermission} className="shrink-0 w-full sm:w-auto">
-                {t.requestPermission}
+                {t.notificationSettings.requestPermission}
               </Button>
             </div>
           </div>
@@ -414,8 +377,8 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
         {/* Enable All Notifications */}
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
-            <Label htmlFor="enable-all">{t.enableNotifications}</Label>
-            <p className="text-sm text-muted-foreground">{t.enableDesc}</p>
+            <Label htmlFor="enable-all">{t.notificationSettings.enableNotifications}</Label>
+            <p className="text-sm text-muted-foreground">{t.notificationSettings.enableDesc}</p>
           </div>
           <Switch
             id="enable-all"
@@ -433,9 +396,9 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
             <div className="space-y-0.5">
               <Label htmlFor="booking-reminders" className="flex items-center gap-2">
                 <Clock className="h-4 w-4" />
-                {t.bookingReminders}
+                {t.notificationSettings.bookingReminders}
               </Label>
-              <p className="text-sm text-muted-foreground">{t.bookingRemindersDesc}</p>
+              <p className="text-sm text-muted-foreground">{t.notificationSettings.bookingRemindersDesc}</p>
             </div>
             <Switch
               id="booking-reminders"
@@ -452,8 +415,8 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
 
           {preferences.booking_reminders.enabled && (
             <div className="space-y-2 pl-6">
-              <Label className="text-sm">{t.reminderTimes}</Label>
-              <p className="text-xs text-muted-foreground">{t.reminderTimesDesc}</p>
+              <Label className="text-sm">{t.notificationSettings.reminderTimes}</Label>
+              <p className="text-xs text-muted-foreground">{t.notificationSettings.reminderTimesDesc}</p>
               <div className="flex flex-wrap gap-2 pt-2">
                 {reminderOptions.map((option) => (
                   <Badge
@@ -472,9 +435,9 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
               </div>
               {/* Reminder summary */}
               <div className="mt-3 text-xs text-muted-foreground">
-                <span className="font-medium">{t.reminderSummaryLabel}: </span>
+                <span className="font-medium">{t.notificationSettings.reminderSummaryLabel}: </span>
                 {preferences.booking_reminders.reminder_times.length === 0
-                  ? t.noneSelected
+                  ? t.notificationSettings.noneSelected
                   : preferences.booking_reminders.reminder_times.map(m => {
                       if (m < 60) return (isRTL ? `${m} دقيقة` : `${m} min`);
                       if (m === 60) return isRTL ? 'ساعة واحدة' : '1h';
@@ -496,15 +459,15 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
           <div>
             <Label className="flex items-center gap-2">
               <CheckCircle2 className="h-4 w-4" />
-              {t.bookingUpdates}
+              {t.notificationSettings.bookingUpdates}
             </Label>
-            <p className="text-sm text-muted-foreground mt-1">{t.bookingUpdatesDesc}</p>
+            <p className="text-sm text-muted-foreground mt-1">{t.notificationSettings.bookingUpdatesDesc}</p>
           </div>
 
           <div className="space-y-3 pl-6">
             <div className="flex items-center justify-between">
               <Label htmlFor="confirmations" className="text-sm">
-                {t.confirmations}
+                {t.notificationSettings.confirmations}
               </Label>
               <Switch
                 id="confirmations"
@@ -521,7 +484,7 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
 
             <div className="flex items-center justify-between">
               <Label htmlFor="cancellations" className="text-sm">
-                {t.cancellations}
+                {t.notificationSettings.cancellations}
               </Label>
               <Switch
                 id="cancellations"
@@ -538,7 +501,7 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
 
             <div className="flex items-center justify-between">
               <Label htmlFor="completions" className="text-sm">
-                {t.completions}
+                {t.notificationSettings.completions}
               </Label>
               <Switch
                 id="completions"
@@ -563,9 +526,9 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
             <div className="space-y-0.5">
               <Label htmlFor="quiet-hours" className="flex items-center gap-2">
                 <Moon className="h-4 w-4" />
-                {t.quietHours}
+                {t.notificationSettings.quietHours}
               </Label>
-              <p className="text-sm text-muted-foreground">{t.quietHoursDesc}</p>
+              <p className="text-sm text-muted-foreground">{t.notificationSettings.quietHoursDesc}</p>
             </div>
             <Switch
               id="quiet-hours"
@@ -584,7 +547,7 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
             <div className="grid grid-cols-2 gap-4 pl-6">
               <div className="space-y-2">
                 <Label htmlFor="start-time" className="text-sm">
-                  {t.startTime}
+                  {t.notificationSettings.startTime}
                 </Label>
                 <input
                   id="start-time"
@@ -602,7 +565,7 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
 
               <div className="space-y-2">
                 <Label htmlFor="end-time" className="text-sm">
-                  {t.endTime}
+                  {t.notificationSettings.endTime}
                 </Label>
                 <input
                   id="end-time"
@@ -619,7 +582,7 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
               </div>
               <div className="col-span-2 flex items-start gap-2 text-xs text-muted-foreground mt-1">
                 <Info className="h-3 w-3 mt-0.5" />
-                <span>{t.quietHoursTooltip}</span>
+                <span>{t.notificationSettings.quietHoursTooltip}</span>
               </div>
             </div>
           )}
@@ -635,7 +598,7 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
               className="w-full"
             >
               <Bell className="h-4 w-4 mr-2" />
-              {t.requestPermission}
+              {t.notificationSettings.requestPermission}
             </Button>
           )}
 
@@ -647,7 +610,7 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
             className="w-full"
           >
             <Save className="h-4 w-4 mr-2" />
-            {isSaving ? t.saving : t.save}
+            {isSaving ? t.notificationSettings.saving : t.notificationSettings.save}
           </Button>
 
           {/* Test Push Button */}
