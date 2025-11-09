@@ -424,7 +424,7 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
             <TabsContent value="settings" className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>{isRTL ? 'إعدادات الإشعارات' : 'Notification Settings'}</CardTitle>
+                  <CardTitle>{t.notificationSettings.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   {providerProfile && (

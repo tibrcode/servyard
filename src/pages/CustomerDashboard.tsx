@@ -309,7 +309,7 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
             <TabsList className="grid w-full grid-cols-4 mb-6">
               <TabsTrigger value="appointments">
                 <Calendar className="w-3 h-3 sm:w-4 sm:h-4 mr-2 flex-shrink-0" />
-                <span className="break-words text-xs sm:text-sm">{isRTL ? 'حجوزاتي' : 'My Bookings'}</span>
+                <span className="break-words text-xs sm:text-sm">{t.customer.myBookings}</span>
               </TabsTrigger>
               <TabsTrigger value="reviews">
                 <Star className="w-3 h-3 sm:w-4 sm:h-4 mr-2 flex-shrink-0" />
@@ -321,7 +321,7 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
               </TabsTrigger>
               <TabsTrigger value="settings">
                 <Bell className="w-3 h-3 sm:w-4 sm:h-4 mr-2 flex-shrink-0" />
-                <span className="break-words text-xs sm:text-sm">{isRTL ? 'الإعدادات' : 'Settings'}</span>
+                <span className="break-words text-xs sm:text-sm">{t.nav.settings}</span>
               </TabsTrigger>
             </TabsList>
 
@@ -329,7 +329,7 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
             <TabsContent value="appointments" className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>{isRTL ? 'حجوزاتي' : 'My Bookings'}</CardTitle>
+                  <CardTitle>{t.customer.myBookings}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   {user && (
@@ -457,7 +457,7 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
             <TabsContent value="settings" className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>{isRTL ? 'إعدادات الإشعارات' : 'Notification Settings'}</CardTitle>
+                  <CardTitle>{t.notificationSettings.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   {user && (
