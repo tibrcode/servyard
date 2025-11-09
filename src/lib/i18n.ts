@@ -327,6 +327,46 @@ export interface Translation {
     };
   };
 
+  notificationSettings: {
+    title: string;
+    subtitle: string;
+    enableNotifications: string;
+    enableDesc: string;
+    bookingReminders: string;
+    bookingRemindersDesc: string;
+    reminderTimes: string;
+    reminderTimesDesc: string;
+    min15: string;
+    min30: string;
+    hour1: string;
+    hour2: string;
+    hour3: string;
+    day1: string;
+    bookingUpdates: string;
+    bookingUpdatesDesc: string;
+    confirmations: string;
+    cancellations: string;
+    completions: string;
+    quietHours: string;
+    quietHoursDesc: string;
+    quietHoursTooltip: string;
+    startTime: string;
+    endTime: string;
+    save: string;
+    saving: string;
+    saved: string;
+    saveFailed: string;
+    permissionDenied: string;
+    permissionDeniedDesc: string;
+    requestPermission: string;
+    reminderSummaryLabel: string;
+    noneSelected: string;
+    sendTestNotification: string;
+    testNotificationSent: string;
+    testNotificationFailed: string;
+    checkNotificationCenter: string;
+  };
+
   // Forms
   forms: {
     name: string;
@@ -1004,6 +1044,45 @@ export const translations: Record<string, Translation> = {
         confirmed_completed: "Completed",
         cancelled: "Cancelled",
       },
+    },
+    notificationSettings: {
+      title: "Notification Settings",
+      subtitle: "Manage how you receive notifications",
+      enableNotifications: "Enable Notifications",
+      enableDesc: "Receive all notifications from the app",
+      bookingReminders: "Booking Reminders",
+      bookingRemindersDesc: "Remind you of upcoming appointments",
+      reminderTimes: "Reminder Times",
+      reminderTimesDesc: "Choose when to receive reminders before your appointment",
+      min15: "15 minutes before",
+      min30: "30 minutes before",
+      hour1: "1 hour before",
+      hour2: "2 hours before",
+      hour3: "3 hours before",
+      day1: "1 day before",
+      bookingUpdates: "Booking Updates",
+      bookingUpdatesDesc: "Notifications about booking status changes",
+      confirmations: "Booking Confirmations",
+      cancellations: "Booking Cancellations",
+      completions: "Service Completions",
+      quietHours: "Quiet Hours",
+      quietHoursDesc: "You won't receive notifications during these hours",
+      quietHoursTooltip: "Notifications (except critical reminders) are suppressed in this window. Reminders are deferred until it ends.",
+      startTime: "From",
+      endTime: "To",
+      save: "Save Settings",
+      saving: "Saving...",
+      saved: "Settings saved",
+      saveFailed: "Failed to save settings",
+      permissionDenied: "Notification Permission Denied",
+      permissionDeniedDesc: "Please enable notifications in browser settings",
+      requestPermission: "Request Permission",
+      reminderSummaryLabel: "Reminder Summary",
+      noneSelected: "No times selected",
+      sendTestNotification: "Send Test Notification",
+      testNotificationSent: "✅ Test notification sent successfully",
+      testNotificationFailed: "❌ Failed to send test notification",
+      checkNotificationCenter: "Check the notification center at the top",
     },
     forms: {
       name: "Name",
