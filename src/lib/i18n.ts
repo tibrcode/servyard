@@ -305,6 +305,9 @@ export interface Translation {
     upcoming?: string;
     past?: string;
     noUpcomingBookings?: string;
+    statusConfirmed?: string;
+    statusCompleted?: string;
+    alreadyReviewed?: string;
   };
 
   booking: {
@@ -1036,6 +1039,9 @@ export const translations: Record<string, Translation> = {
       upcoming: "Upcoming",
       past: "Past",
       noUpcomingBookings: "You don't have any upcoming bookings",
+      statusConfirmed: "Confirmed",
+      statusCompleted: "Completed",
+      alreadyReviewed: "Already Reviewed",
     },
     booking: {
       selectService: "Select Service",

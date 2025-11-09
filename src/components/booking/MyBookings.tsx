@@ -120,13 +120,10 @@ export function MyBookings({
     reviewSuccess: isRTL ? 'تم إرسال تقييمك' : 'Review Submitted',
     reviewSuccessDesc: isRTL ? 'شكراً لك على تقييم الخدمة' : 'Thank you for rating the service',
     reviewError: isRTL ? 'فشل إرسال التقييم' : 'Failed to submit review',
-    alreadyReviewed: isRTL ? 'تم التقييم' : 'Already Reviewed',
     noPast: isRTL ? 'ليس لديك حجوزات سابقة' : "You don't have any past bookings",
     statuses: {
       pending: isRTL ? 'قيد الانتظار' : 'Pending',
-      confirmed: isRTL ? 'مؤكد' : 'Confirmed',
       cancelled: isRTL ? 'ملغي' : 'Cancelled',
-      completed: isRTL ? 'مكتمل' : 'Completed',
       'no-show': isRTL ? 'لم يحضر' : 'No Show',
     },
   };
@@ -407,9 +404,19 @@ export function MyBookings({
       'no-show': 'destructive',
     };
 
+    // Use i18n translations for confirmed and completed, localT for others
+    let statusText = '';
+    if (status === 'confirmed') {
+      statusText = t.customer.statusConfirmed || 'Confirmed';
+    } else if (status === 'completed') {
+      statusText = t.customer.statusCompleted || 'Completed';
+    } else {
+      statusText = localT.statuses[status];
+    }
+
     return (
       <Badge variant={variants[status]}>
-        {localT.statuses[status]}
+        {statusText}
       </Badge>
     );
   };
@@ -600,7 +607,7 @@ export function MyBookings({
                   {existingReviews.has(booking.booking_id) ? (
                     <Button variant="outline" size="sm" disabled className="flex-1">
                       <CheckCircle2 className="h-4 w-4 mr-1 text-green-500" />
-                      {localT.alreadyReviewed}
+                      {t.customer.alreadyReviewed || 'Already Reviewed'}
                     </Button>
                   ) : (
                     <Button
