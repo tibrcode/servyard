@@ -737,7 +737,11 @@ exports.getLocationStats = (0, https_1.onRequest)({ cors: true }, async (req, re
  */
 async function sendNotification(fcmToken, title, body, data) {
     try {
-        await messaging.send({
+        console.log('[sendNotification] Attempting to send notification');
+        console.log('[sendNotification] Token preview:', fcmToken?.substring(0, 30) + '...');
+        console.log('[sendNotification] Title:', title);
+        console.log('[sendNotification] Body:', body);
+        const message = {
             token: fcmToken,
             notification: { title, body },
             data: data || {},
@@ -746,11 +750,17 @@ async function sendNotification(fcmToken, title, body, data) {
                     link: data?.link || '/',
                 },
             },
-        });
+        };
+        console.log('[sendNotification] Message prepared:', JSON.stringify({ ...message, token: message.token?.substring(0, 30) + '...' }));
+        const result = await messaging.send(message);
+        console.log('[sendNotification] ✅ Success! Message ID:', result);
         return true;
     }
     catch (error) {
-        console.error('Error sending FCM notification:', error);
+        console.error('[sendNotification] ❌ Error sending FCM notification:', error);
+        console.error('[sendNotification] Error code:', error?.code);
+        console.error('[sendNotification] Error message:', error?.message);
+        console.error('[sendNotification] Full error:', JSON.stringify(error, null, 2));
         return false;
     }
 }
