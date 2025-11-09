@@ -3495,7 +3495,7 @@ export const additionalLanguages = {
 
   // Hindi
   hi: {
-    nav: { home: "होम", services: "सेवाएँ", providerLogin: "प्रोवाइडर लॉगिन", customerLogin: "कस्टमर लॉगिन", register: "रजिस्टर", language: "भाषा", location: "स्थान", theme: "थीम" },
+    nav: { home: "होम", services: "सेवाएँ", providerLogin: "प्रोवाइडर लॉगिन", customerLogin: "कस्टमर लॉगिन", register: "रजिस्टर", language: "भाषा", location: "स्थान", theme: "थीम", notifications: "सूचनाएं", settings: "सेटिंग्स" },
     home: {
       title: "ServYard - प्रीमियम सेवा मार्केटप्लेस",
       subtitle: "अपने क्षेत्र में सत्यापित सेवा प्रदाताओं से जुड़ें",
@@ -3662,7 +3662,11 @@ export const additionalLanguages = {
         editDescription: "आप यहाँ अपने रेटिंग को अपडेट कर सकते हैं",
         createDescription: "सेवा की गुणवत्ता को रेट करने के लिए सितारे चुनें",
         ratingLabels: ["खराब", "ठीक-ठाक", "अच्छा", "बहुत अच्छा", "उत्कृष्ट"]
-      }
+      },
+      viewManageBookings: "अपनी बुकिंग देखें और प्रबंधित करें",
+      upcoming: "आगामी",
+      past: "पिछला",
+      noUpcomingBookings: "आपकी कोई आगामी बुकिंग नहीं है",
     },
     // Booking statuses used in badges
     booking: {
@@ -3814,6 +3818,8 @@ export const additionalLanguages = {
       testNotificationSent: "✅ टेस्ट सूचना सफलतापूर्वक भेजी गई",
       testNotificationFailed: "❌ टेस्ट सूचना भेजने में विफल",
       checkNotificationCenter: "ऊपर सूचना केंद्र जाँचें",
+      notificationsEnabled: "सूचनाएं सक्षम हैं ✓",
+      notificationsEnabledDesc: "अब आप सूचनाएं प्राप्त कर सकते हैं",
     },
     legal: {
       terms: {
@@ -3991,7 +3997,7 @@ export const additionalLanguages = {
 
   // Portuguese
   pt: {
-    nav: { home: "Início", services: "Serviços", providerLogin: "Login do Prestador", customerLogin: "Login do Cliente", register: "Registrar", language: "Idioma", location: "Localização", theme: "Tema" },
+    nav: { home: "Início", services: "Serviços", providerLogin: "Login do Prestador", customerLogin: "Login do Cliente", register: "Registrar", language: "Idioma", location: "Localização", theme: "Tema", notifications: "Notificações", settings: "Configurações" },
     home: {
       title: "ServYard - Marketplace de Serviços Premium",
       subtitle: "Conecte-se a prestadores verificados na sua região",
@@ -4097,7 +4103,11 @@ export const additionalLanguages = {
         editDescription: "Você pode atualizar sua avaliação aqui",
         createDescription: "Escolha as estrelas para avaliar a qualidade do serviço",
         ratingLabels: ["Ruim", "Regular", "Bom", "Muito bom", "Excelente"]
-      }
+      },
+      viewManageBookings: "Ver e gerenciar suas reservas",
+      upcoming: "Próximas",
+      past: "Anteriores",
+      noUpcomingBookings: "Você não tem reservas próximas",
     },
     booking: {
       confirm: "Confirmar",
@@ -4298,6 +4308,8 @@ export const additionalLanguages = {
       testNotificationSent: "✅ Notificação de teste enviada com sucesso",
       testNotificationFailed: "❌ Falha ao enviar notificação de teste",
       checkNotificationCenter: "Verifique a central de notificações acima",
+      notificationsEnabled: "Notificações ativadas ✓",
+      notificationsEnabledDesc: "Agora você pode receber notificações",
     },
     legal: {
       terms: {
@@ -4375,7 +4387,7 @@ export const additionalLanguages = {
 
   // Italian
   it: {
-    nav: { home: "Home", services: "Servizi", providerLogin: "Accesso Fornitore", customerLogin: "Accesso Cliente", register: "Registrati", language: "Lingua", location: "Posizione", theme: "Tema" },
+    nav: { home: "Home", services: "Servizi", providerLogin: "Accesso Fornitore", customerLogin: "Accesso Cliente", register: "Registrati", language: "Lingua", location: "Posizione", theme: "Tema", notifications: "Notifiche", settings: "Impostazioni" },
     home: {
       title: "ServYard - Marketplace di servizi premium",
       subtitle: "Connettiti con fornitori verificati nella tua zona",
@@ -4481,7 +4493,11 @@ export const additionalLanguages = {
         editDescription: "Puoi aggiornare qui la tua recensione",
         createDescription: "Scegli le stelle per valutare la qualità del servizio",
         ratingLabels: ["Scarso", "Discreto", "Buono", "Molto buono", "Eccellente"]
-      }
+      },
+      viewManageBookings: "Visualizza e gestisci le tue prenotazioni",
+      upcoming: "Prossime",
+      past: "Passate",
+      noUpcomingBookings: "Non hai prenotazioni imminenti",
     },
     booking: {
       confirm: "Conferma",
@@ -4682,6 +4698,8 @@ export const additionalLanguages = {
       testNotificationSent: "✅ Notifica di test inviata con successo",
       testNotificationFailed: "❌ Invio notifica di test fallito",
       checkNotificationCenter: "Controlla il centro notifiche in alto",
+      notificationsEnabled: "Notifiche attivate ✓",
+      notificationsEnabledDesc: "Ora puoi ricevere notifiche",
     },
     legal: {
       terms: {
@@ -4733,7 +4751,7 @@ export const additionalLanguages = {
 
   // German
   de: {
-    nav: { home: "Startseite", services: "Dienstleistungen", providerLogin: "Anbieter-Login", customerLogin: "Kunden-Login", register: "Registrieren", language: "Sprache", location: "Standort", theme: "Thema" },
+    nav: { home: "Startseite", services: "Dienstleistungen", providerLogin: "Anbieter-Login", customerLogin: "Kunden-Login", register: "Registrieren", language: "Sprache", location: "Standort", theme: "Thema", notifications: "Benachrichtigungen", settings: "Einstellungen" },
     home: {
       title: "ServYard - Premium-Service-Marktplatz",
       subtitle: "Verbinden Sie sich mit verifizierten Anbietern in Ihrer Nähe",
@@ -4839,7 +4857,11 @@ export const additionalLanguages = {
         editDescription: "Sie können Ihre Bewertung hier aktualisieren",
         createDescription: "Wählen Sie Sterne, um die Dienstqualität zu bewerten",
         ratingLabels: ["Schlecht", "Ausreichend", "Gut", "Sehr gut", "Ausgezeichnet"]
-      }
+      },
+      viewManageBookings: "Sehen Sie sich Ihre Buchungen an und verwalten Sie sie",
+      upcoming: "Bevorstehend",
+      past: "Vergangene",
+      noUpcomingBookings: "Sie haben keine bevorstehenden Buchungen"
     },
     booking: {
       confirm: "Bestätigen",
@@ -5040,6 +5062,8 @@ export const additionalLanguages = {
       testNotificationSent: "✅ Testbenachrichtigung erfolgreich gesendet",
       testNotificationFailed: "❌ Senden der Testbenachrichtigung fehlgeschlagen",
       checkNotificationCenter: "Überprüfen Sie das Benachrichtigungscenter oben",
+      notificationsEnabled: "Benachrichtigungen aktiviert ✓",
+      notificationsEnabledDesc: "Sie können jetzt Benachrichtigungen erhalten"
     },
     legal: {
       terms: {
@@ -5080,7 +5104,7 @@ export const additionalLanguages = {
 
   // Turkish
   tr: {
-    nav: { home: "Ana Sayfa", services: "Hizmetler", providerLogin: "Sağlayıcı Girişi", customerLogin: "Müşteri Girişi", register: "Kayıt Ol", language: "Dil", location: "Konum", theme: "Tema" },
+    nav: { home: "Ana Sayfa", services: "Hizmetler", providerLogin: "Sağlayıcı Girişi", customerLogin: "Müşteri Girişi", register: "Kayıt Ol", language: "Dil", location: "Konum", theme: "Tema", notifications: "Bildirimler", settings: "Ayarlar" },
     home: {
       title: "ServYard - Premium Hizmet Pazaryeri",
       subtitle: "Bölgenizdeki doğrulanmış sağlayıcılarla bağlantı kurun",
@@ -5186,7 +5210,11 @@ export const additionalLanguages = {
         editDescription: "Değerlendirmenizi burada güncelleyebilirsiniz",
         createDescription: "Hizmet kalitesini değerlendirmek için yıldızları seçin",
         ratingLabels: ["Kötü", "Vasat", "İyi", "Çok iyi", "Mükemmel"]
-      }
+      },
+      viewManageBookings: "Rezervasyonlarınızı görüntüleyin ve yönetin",
+      upcoming: "Yaklaşan",
+      past: "Geçmiş",
+      noUpcomingBookings: "Yaklaşan rezervasyonunuz yok"
     },
     booking: {
       confirm: "Onayla",
@@ -5387,6 +5415,8 @@ export const additionalLanguages = {
       testNotificationSent: "✅ Test bildirimi başarıyla gönderildi",
       testNotificationFailed: "❌ Test bildirimi gönderilemedi",
       checkNotificationCenter: "Yukarıdaki bildirim merkezini kontrol edin",
+      notificationsEnabled: "Bildirimler etkinleştirildi ✓",
+      notificationsEnabledDesc: "Artık bildirim alabilirsiniz"
     },
     legal: {
       terms: {
@@ -5416,7 +5446,7 @@ export const additionalLanguages = {
 
   // Urdu
   ur: {
-    nav: { home: "ہوم", services: "خدمات", providerLogin: "فراہم کنندہ لاگ اِن", customerLogin: "صارف لاگ اِن", register: "رجسٹر کریں", language: "زبان", location: "مقام", theme: "تھیم" },
+    nav: { home: "ہوم", services: "خدمات", providerLogin: "فراہم کنندہ لاگ اِن", customerLogin: "صارف لاگ اِن", register: "رجسٹر کریں", language: "زبان", location: "مقام", theme: "تھیم", notifications: "اطلاعات", settings: "ترتیبات" },
     home: {
       title: "ServYard - اعلیٰ معیار کی خدمات کا مارکیٹ پلیس",
       subtitle: "اپنے علاقے میں تصدیق شدہ فراہم کنندگان سے رابطہ کریں",
@@ -5503,6 +5533,10 @@ export const additionalLanguages = {
         createDescription: "سروس کے معیار کی درجہ بندی کے لیے ستاروں کا انتخاب کریں",
         ratingLabels: ["خراب", "درمیانہ", "اچھا", "بہت اچھا", "عمدہ"],
       },
+      viewManageBookings: "اپنی بکنگز دیکھیں اور منظم کریں",
+      upcoming: "آنے والی",
+      past: "ماضی کی",
+      noUpcomingBookings: "آپ کی کوئی آنے والی بکنگ نہیں ہے"
     },
     booking: {
       selectService: "سروس منتخب کریں",
@@ -5787,6 +5821,8 @@ export const additionalLanguages = {
       testNotificationSent: "✅ ٹیسٹ اطلاع کامیابی سے بھیجی گئی",
       testNotificationFailed: "❌ ٹیسٹ اطلاع بھیجنے میں ناکام",
       checkNotificationCenter: "اوپر اطلاعات کا مرکز چیک کریں",
+      notificationsEnabled: "اطلاعات فعال ہیں ✓",
+      notificationsEnabledDesc: "اب آپ اطلاعات وصول کر سکتے ہیں"
     },
   },
 
