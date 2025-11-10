@@ -57,21 +57,21 @@ export function BookingManagement({
   // Translation - Different titles based on mode
   const titleText = showOnlyPending 
     ? (t.provider.pendingBookingsTitle || 'Pending Bookings')
-    : (isRTL ? 'إدارة الحجوزات' : 'Booking Management');
+    : (t.provider.bookingManagementTitle || 'Booking Management');
   
   const subtitleText = showOnlyPending
     ? (t.provider.bookingsAwaitingApproval || 'Bookings awaiting your approval')
-    : (isRTL ? 'عرض وإدارة جميع حجوزات خدماتك' : 'View and manage all your service bookings');
+    : (t.provider.bookingManagementSubtitle || 'View and manage all your service bookings');
 
   const translations = {
     title: titleText,
     subtitle: subtitleText,
-    today: isRTL ? 'اليوم' : 'Today',
-    week: isRTL ? 'هذا الأسبوع' : 'This Week',
-    month: isRTL ? 'هذا الشهر' : 'This Month',
-    all: isRTL ? 'الكل' : 'All',
-    filterByStatus: isRTL ? 'تصفية حسب الحالة' : 'Filter by Status',
-    noBookings: t.provider.noBookingsFound || (isRTL ? 'لا توجد حجوزات' : 'No bookings found'),
+    today: t.provider.today || 'Today',
+    week: t.provider.thisWeek || 'This Week',
+    month: t.provider.thisMonth || 'This Month',
+    all: t.provider.allTime || 'All',
+    filterByStatus: t.provider.filterByStatus || 'Filter by Status',
+    noBookings: t.provider.noBookingsFound || 'No bookings found',
     loading: isRTL ? 'جاري التحميل...' : 'Loading...',
     customer: isRTL ? 'العميل' : 'Customer',
     service: isRTL ? 'الخدمة' : 'Service',

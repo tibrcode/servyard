@@ -236,6 +236,12 @@ export interface Translation {
     pendingBookingsTitle?: string;
     bookingsAwaitingApproval?: string;
     noBookingsFound?: string;
+    bookingManagementTitle?: string;
+    bookingManagementSubtitle?: string;
+    today?: string;
+    thisWeek?: string;
+    allTime?: string;
+    filterByStatus?: string;
     activeServices: string;
     recentBookings: string;
     manageBookings: string;
@@ -978,6 +984,12 @@ export const translations: Record<string, Translation> = {
       pendingBookingsTitle: "Pending Bookings",
       bookingsAwaitingApproval: "Bookings awaiting your approval",
       noBookingsFound: "No bookings found",
+      bookingManagementTitle: "Booking Management",
+      bookingManagementSubtitle: "View and manage all your service bookings",
+      today: "Today",
+      thisWeek: "This Week",
+      allTime: "All",
+      filterByStatus: "Filter by Status",
       activeServices: "Active Services",
       recentBookings: "Recent Bookings",
       manageBookings: "Manage your upcoming bookings",
@@ -1749,6 +1761,12 @@ export const translations: Record<string, Translation> = {
       pendingBookingsTitle: "الحجوزات المعلقة",
       bookingsAwaitingApproval: "الحجوزات التي تحتاج موافقتك",
       noBookingsFound: "لا توجد حجوزات",
+      bookingManagementTitle: "إدارة الحجوزات",
+      bookingManagementSubtitle: "عرض وإدارة جميع حجوزات خدماتك",
+      today: "اليوم",
+      thisWeek: "هذا الأسبوع",
+      allTime: "الكل",
+      filterByStatus: "تصفية حسب الحالة",
       activeServices: "الخدمات النشطة",
       recentBookings: "الحجوزات الأخيرة",
       manageBookings: "إدارة حجوزاتك القادمة",
