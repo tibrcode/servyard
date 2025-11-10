@@ -233,6 +233,9 @@ export interface Translation {
     revenue: string;
     thisMonth: string;
     pendingBookings: string;
+    pendingBookingsTitle?: string;
+    bookingsAwaitingApproval?: string;
+    noBookingsFound?: string;
     activeServices: string;
     recentBookings: string;
     manageBookings: string;
@@ -972,6 +975,9 @@ export const translations: Record<string, Translation> = {
       revenue: "Revenue",
       thisMonth: "This Month",
       pendingBookings: "Pending Bookings",
+      pendingBookingsTitle: "Pending Bookings",
+      bookingsAwaitingApproval: "Bookings awaiting your approval",
+      noBookingsFound: "No bookings found",
       activeServices: "Active Services",
       recentBookings: "Recent Bookings",
       manageBookings: "Manage your upcoming bookings",
@@ -1740,6 +1746,9 @@ export const translations: Record<string, Translation> = {
       revenue: "الإيرادات",
       thisMonth: "هذا الشهر",
       pendingBookings: "الحجوزات المعلقة",
+      pendingBookingsTitle: "الحجوزات المعلقة",
+      bookingsAwaitingApproval: "الحجوزات التي تحتاج موافقتك",
+      noBookingsFound: "لا توجد حجوزات",
       activeServices: "الخدمات النشطة",
       recentBookings: "الحجوزات الأخيرة",
       manageBookings: "إدارة حجوزاتك القادمة",

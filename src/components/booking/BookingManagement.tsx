@@ -17,6 +17,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { format } from 'date-fns';
 import { ar, enUS } from 'date-fns/locale';
 import { Separator } from '@/components/ui/separator';
+import { useTranslation } from '@/lib/i18n';
 import {
   Select,
   SelectContent,
@@ -41,6 +42,7 @@ export function BookingManagement({
   showOnlyPending = false,
 }: BookingManagementProps) {
   const { toast } = useToast();
+  const { t, isRTL } = useTranslation(language);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [filteredBookings, setFilteredBookings] = useState<Booking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -50,19 +52,18 @@ export function BookingManagement({
   const [providerLocation, setProviderLocation] = useState<{latitude: number, longitude: number} | null>(null);
   const [customerLocations, setCustomerLocations] = useState<Record<string, {latitude: number, longitude: number}>>({});
 
-  const isRTL = language === 'ar';
   const dateLocale = language === 'ar' ? ar : enUS;
 
   // Translation - Different titles based on mode
   const titleText = showOnlyPending 
-    ? (isRTL ? 'الحجوزات المعلقة' : 'Pending Bookings')
+    ? (t.provider.pendingBookingsTitle || 'Pending Bookings')
     : (isRTL ? 'إدارة الحجوزات' : 'Booking Management');
   
   const subtitleText = showOnlyPending
-    ? (isRTL ? 'الحجوزات التي تحتاج موافقتك' : 'Bookings awaiting your approval')
+    ? (t.provider.bookingsAwaitingApproval || 'Bookings awaiting your approval')
     : (isRTL ? 'عرض وإدارة جميع حجوزات خدماتك' : 'View and manage all your service bookings');
 
-  const t = {
+  const translations = {
     title: titleText,
     subtitle: subtitleText,
     today: isRTL ? 'اليوم' : 'Today',
@@ -70,7 +71,7 @@ export function BookingManagement({
     month: isRTL ? 'هذا الشهر' : 'This Month',
     all: isRTL ? 'الكل' : 'All',
     filterByStatus: isRTL ? 'تصفية حسب الحالة' : 'Filter by Status',
-    noBookings: isRTL ? 'لا توجد حجوزات' : 'No bookings found',
+    noBookings: t.provider.noBookingsFound || (isRTL ? 'لا توجد حجوزات' : 'No bookings found'),
     loading: isRTL ? 'جاري التحميل...' : 'Loading...',
     customer: isRTL ? 'العميل' : 'Customer',
     service: isRTL ? 'الخدمة' : 'Service',
@@ -255,13 +256,13 @@ export function BookingManagement({
       );
 
       toast({
-        title: t.updateSuccess,
+        title: translations.updateSuccess,
         description: isRTL ? 'تم تحديث حالة الحجز بنجاح' : 'Booking status updated successfully',
       });
     } catch (error) {
       console.error('Error updating booking:', error);
       toast({
-        title: t.updateFailed,
+        title: translations.updateFailed,
         description: isRTL ? 'حدث خطأ أثناء التحديث' : 'An error occurred while updating',
         variant: 'destructive',
       });
@@ -281,7 +282,7 @@ export function BookingManagement({
 
     return (
       <Badge variant={variants[status]}>
-        {t.statuses[status]}
+        {translations.statuses[status]}
       </Badge>
     );
   };
@@ -388,7 +389,7 @@ export function BookingManagement({
               <>
                 <Separator />
                 <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground">{t.notes}:</p>
+                  <p className="text-xs text-muted-foreground">{translations.notes}:</p>
                   <p className="text-sm">{booking.notes}</p>
                 </div>
               </>
@@ -407,7 +408,7 @@ export function BookingManagement({
                         disabled={isUpdating}
                       >
                         <CheckCircle2 className="h-4 w-4 mr-1" />
-                        {t.confirm}
+                        {translations.confirm}
                       </Button>
                       <Button
                         size="sm"
@@ -416,7 +417,7 @@ export function BookingManagement({
                         disabled={isUpdating}
                       >
                         <X className="h-4 w-4 mr-1" />
-                        {t.reject}
+                        {translations.reject}
                       </Button>
                     </>
                   )}
@@ -428,7 +429,7 @@ export function BookingManagement({
                         disabled={isUpdating}
                       >
                         <CheckCircle2 className="h-4 w-4 mr-1" />
-                        {t.complete}
+                        {translations.complete}
                       </Button>
                       <Button
                         size="sm"
@@ -437,7 +438,7 @@ export function BookingManagement({
                         disabled={isUpdating}
                       >
                         <AlertCircle className="h-4 w-4 mr-1" />
-                        {t.markNoShow}
+                        {translations.markNoShow}
                       </Button>
                     </>
                   )}
@@ -455,7 +456,7 @@ export function BookingManagement({
       <Card dir={isRTL ? 'rtl' : 'ltr'}>
         <CardContent className="py-8">
           <div className="flex items-center justify-center">
-            <p className="text-muted-foreground">{t.loading}</p>
+            <p className="text-muted-foreground">{translations.loading}</p>
           </div>
         </CardContent>
       </Card>
@@ -469,8 +470,8 @@ export function BookingManagement({
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>{t.title}</CardTitle>
-              <CardDescription>{t.subtitle}</CardDescription>
+              <CardTitle>{translations.title}</CardTitle>
+              <CardDescription>{translations.subtitle}</CardDescription>
             </div>
           </div>
         </CardHeader>
@@ -480,24 +481,24 @@ export function BookingManagement({
             <div className="flex flex-col sm:flex-row gap-4">
               <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as ViewMode)} className="flex-1">
                 <TabsList className="grid w-full grid-cols-4">
-                  <TabsTrigger value="today">{t.today}</TabsTrigger>
-                  <TabsTrigger value="week">{t.week}</TabsTrigger>
-                  <TabsTrigger value="month">{t.month}</TabsTrigger>
-                  <TabsTrigger value="all">{t.all}</TabsTrigger>
+                  <TabsTrigger value="today">{translations.today}</TabsTrigger>
+                  <TabsTrigger value="week">{translations.week}</TabsTrigger>
+                  <TabsTrigger value="month">{translations.month}</TabsTrigger>
+                  <TabsTrigger value="all">{translations.all}</TabsTrigger>
                 </TabsList>
               </Tabs>
 
               <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as BookingStatus | 'all')}>
                 <SelectTrigger className="w-full sm:w-[180px]">
-                  <SelectValue placeholder={t.filterByStatus} />
+                  <SelectValue placeholder={translations.filterByStatus} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">{t.statuses.all}</SelectItem>
-                <SelectItem value="pending">{t.statuses.pending}</SelectItem>
-                <SelectItem value="confirmed">{t.statuses.confirmed}</SelectItem>
-                <SelectItem value="cancelled">{t.statuses.cancelled}</SelectItem>
-                <SelectItem value="completed">{t.statuses.completed}</SelectItem>
-                <SelectItem value="no-show">{t.statuses['no-show']}</SelectItem>
+                <SelectItem value="all">{translations.statuses.all}</SelectItem>
+                <SelectItem value="pending">{translations.statuses.pending}</SelectItem>
+                <SelectItem value="confirmed">{translations.statuses.confirmed}</SelectItem>
+                <SelectItem value="cancelled">{translations.statuses.cancelled}</SelectItem>
+                <SelectItem value="completed">{translations.statuses.completed}</SelectItem>
+                <SelectItem value="no-show">{translations.statuses['no-show']}</SelectItem>
               </SelectContent>
             </Select>
             </div>
@@ -507,7 +508,7 @@ export function BookingManagement({
           <div className="space-y-4">
             {filteredBookings.length === 0 ? (
               <div className="py-8 text-center">
-                <p className="text-muted-foreground">{t.noBookings}</p>
+                <p className="text-muted-foreground">{translations.noBookings}</p>
               </div>
             ) : (
               filteredBookings.map(renderBookingCard)
@@ -521,7 +522,7 @@ export function BookingManagement({
         <div className="grid gap-4 md:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t.totalBookings}</CardTitle>
+              <CardTitle className="text-sm font-medium">{translations.totalBookings}</CardTitle>
               <Calendar className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -531,7 +532,7 @@ export function BookingManagement({
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t.pendingBookings}</CardTitle>
+              <CardTitle className="text-sm font-medium">{translations.pendingBookings}</CardTitle>
               <AlertCircle className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -541,7 +542,7 @@ export function BookingManagement({
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t.confirmedBookings}</CardTitle>
+              <CardTitle className="text-sm font-medium">{translations.confirmedBookings}</CardTitle>
               <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -551,7 +552,7 @@ export function BookingManagement({
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t.revenue}</CardTitle>
+              <CardTitle className="text-sm font-medium">{translations.revenue}</CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
