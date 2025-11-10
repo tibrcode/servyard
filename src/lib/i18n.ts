@@ -2313,7 +2313,10 @@ function deepMerge<T>(base: T, patch: Partial<T>): T {
 const baseline = translations.en;
 const mergedTranslations: Record<string, Translation> = { ...translations } as any;
 for (const [code, pack] of Object.entries(additionalLanguages)) {
-  mergedTranslations[code] = deepMerge(baseline, pack as any);
+  // Only merge from additionalLanguages if not already in base translations
+  if (!mergedTranslations[code]) {
+    mergedTranslations[code] = deepMerge(baseline, pack as any);
+  }
 }
 
 // Normalize language codes (e.g., zh-CN -> zh)
