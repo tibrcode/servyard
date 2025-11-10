@@ -130,6 +130,7 @@ const AppContent = () => {
 
   // Set initial direction and language on component mount
   React.useEffect(() => {
+    console.log('App - currentLanguage:', currentLanguage);
     const isRTL = i18nRtl.includes(currentLanguage);
     document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
     document.documentElement.lang = currentLanguage;

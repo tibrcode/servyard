@@ -43,6 +43,12 @@ export function BookingManagement({
 }: BookingManagementProps) {
   const { toast } = useToast();
   const { t, isRTL } = useTranslation(language);
+  
+  // Debug: Log language and translations
+  console.log('BookingManagement - language:', language);
+  console.log('BookingManagement - t.provider:', t.provider);
+  console.log('BookingManagement - today translation:', t.provider?.today);
+  
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [filteredBookings, setFilteredBookings] = useState<Booking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
