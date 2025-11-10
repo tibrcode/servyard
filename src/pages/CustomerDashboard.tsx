@@ -294,7 +294,7 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
             <CardContent className="p-4">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs sm:text-sm font-medium text-muted-foreground break-words leading-tight hyphens-auto">{isRTL ? 'الملف الشخصي' : 'Profile'}</p>
+                  <p className="text-xs sm:text-sm font-medium text-muted-foreground break-words leading-tight hyphens-auto">{t.customer.profile}</p>
                   <p className="text-lg sm:text-xl lg:text-2xl font-bold leading-tight break-words mt-1">{profile?.full_name || t.ui.noData}</p>
                 </div>
                 <User className="w-6 h-6 sm:w-8 sm:h-8 text-blue-500 flex-shrink-0" />

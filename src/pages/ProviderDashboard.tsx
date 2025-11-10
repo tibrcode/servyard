@@ -365,7 +365,7 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
               <TabsTrigger value="share">{t.provider.shareProfile}</TabsTrigger>
               <TabsTrigger value="settings">
                 <Bell className="w-3 h-3 sm:w-4 sm:h-4 mr-2 flex-shrink-0" />
-                <span className="break-words text-xs sm:text-sm">{isRTL ? 'الإعدادات' : 'Settings'}</span>
+                <span className="break-words text-xs sm:text-sm">{t.provider.settings}</span>
               </TabsTrigger>
             </TabsList>
 
