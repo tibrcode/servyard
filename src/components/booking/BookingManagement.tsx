@@ -1,5 +1,6 @@
 // Booking Management Component for Providers
 // مكون إدارة الحجوزات لمزود الخدمة
+// Updated: 2025-11-10 - Fixed translation loading
 
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';

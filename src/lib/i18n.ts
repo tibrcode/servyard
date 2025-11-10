@@ -3,6 +3,7 @@ import { supportedLanguages as defaultSupported, rtlLanguages as rtlDefault } fr
 
 // ServYard Internationalization System
 // Supporting 20+ languages with RTL support
+// Updated: 2025-11-10 - Added booking management translations
 
 export interface Translation {
   // Navigation
