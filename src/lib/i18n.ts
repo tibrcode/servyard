@@ -1830,6 +1830,11 @@ export const translations: Record<string, Translation> = {
       noReviewsYet: "لا توجد تقييمات بعد",
       startReviewing: "احجز خدمة وشارك تجربتك",
       providerLabel: "مقدم الخدمة:",
+      upcoming: "القادمة",
+      past: "الماضية",
+      noUpcomingBookings: "ليس لديك أي حجوزات قادمة",
+      noPastBookings: "لا توجد حجوزات سابقة",
+      viewDetails: "عرض التفاصيل",
       reviewsModal: {
         editTitle: "تعديل التقييم",
         createTitle: "تقييم الخدمة",
