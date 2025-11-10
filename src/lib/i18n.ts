@@ -242,6 +242,8 @@ export interface Translation {
     thisWeek?: string;
     allTime?: string;
     filterByStatus?: string;
+    bookingStatusAll?: string;
+    bookingStatusNoShow?: string;
     activeServices: string;
     recentBookings: string;
     manageBookings: string;
@@ -990,6 +992,8 @@ export const translations: Record<string, Translation> = {
       thisWeek: "This Week",
       allTime: "All",
       filterByStatus: "Filter by Status",
+      bookingStatusAll: "All",
+      bookingStatusNoShow: "No Show",
       activeServices: "Active Services",
       recentBookings: "Recent Bookings",
       manageBookings: "Manage your upcoming bookings",
@@ -1767,6 +1771,8 @@ export const translations: Record<string, Translation> = {
       thisWeek: "هذا الأسبوع",
       allTime: "الكل",
       filterByStatus: "تصفية حسب الحالة",
+      bookingStatusAll: "الكل",
+      bookingStatusNoShow: "لم يحضر",
       activeServices: "الخدمات النشطة",
       recentBookings: "الحجوزات الأخيرة",
       manageBookings: "إدارة حجوزاتك القادمة",

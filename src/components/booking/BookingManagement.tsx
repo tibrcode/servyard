@@ -99,12 +99,12 @@ export function BookingManagement({
     confirmedBookings: isRTL ? 'مؤكدة' : 'Confirmed',
     revenue: isRTL ? 'الإيرادات' : 'Revenue',
     statuses: {
-      all: isRTL ? 'الكل' : 'All',
-      pending: isRTL ? 'معلق' : 'Pending',
-      confirmed: isRTL ? 'مؤكد' : 'Confirmed',
-      cancelled: isRTL ? 'ملغي' : 'Cancelled',
-      completed: isRTL ? 'مكتمل' : 'Completed',
-      'no-show': isRTL ? 'لم يحضر' : 'No Show',
+      all: t.provider.bookingStatusAll || (isRTL ? 'الكل' : 'All'),
+      pending: t.booking.statuses.pending,
+      confirmed: t.booking.statuses.confirmed,
+      cancelled: t.booking.statuses.cancelled,
+      completed: t.booking.statuses.confirmed_completed,
+      'no-show': t.provider.bookingStatusNoShow || (isRTL ? 'لم يحضر' : 'No Show'),
     },
   };
 
