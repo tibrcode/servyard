@@ -137,8 +137,21 @@ export function calculateAvailableSlots(
     settings.buffer_time_minutes || 0
   );
 
+  // Get current date and time for comparison
+  const now = new Date();
+  const today = formatDate(now);
+  const isToday = date === today;
+
   // Count bookings for each slot
   const slots: TimeSlot[] = timeStrings.map(time => {
+    // Create full datetime
+    const [hours, minutes] = time.split(':').map(Number);
+    const datetime = new Date(date);
+    datetime.setHours(hours, minutes, 0, 0);
+
+    // Check if this time slot has already passed (only for today)
+    const hasPassed = isToday && datetime < now;
+
     // Filter bookings that overlap with this slot
     const overlappingBookings = bookings.filter(booking => {
       // Only count confirmed/pending bookings
@@ -150,12 +163,8 @@ export function calculateAvailableSlots(
     });
 
     const booked = overlappingBookings.length;
-    const available = booked < settings.max_concurrent_bookings;
-
-    // Create full datetime
-    const [hours, minutes] = time.split(':').map(Number);
-    const datetime = new Date(date);
-    datetime.setHours(hours, minutes, 0, 0);
+    // Slot is unavailable if: it has passed OR it's fully booked
+    const available = !hasPassed && booked < settings.max_concurrent_bookings;
 
     return {
       time,
