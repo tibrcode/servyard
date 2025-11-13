@@ -127,7 +127,7 @@ export const Header = ({
           </div>
 
           {/* Bottom row: Navigation Actions - centered */}
-          <div className={`flex items-center justify-center gap-1.5 sm:gap-2 md:gap-3 flex-shrink-0 isolate whitespace-nowrap flex-wrap ${isRTL ? 'flex-row-reverse' : ''}`}>
+          <div className={`flex items-center justify-center gap-2 sm:gap-3 md:gap-4 flex-shrink-0 isolate whitespace-nowrap flex-wrap ${isRTL ? 'flex-row-reverse' : ''}`}>
             {/* Notifications (header quick link) */}
             <Link to="/notifications" aria-label={t.nav.notifications || 'Notifications'} className="relative inline-flex">
               <Button
