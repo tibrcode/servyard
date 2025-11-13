@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { StarRating } from "@/components/ui/star-rating";
-import { Plus, Edit2, Trash2, Eye } from "lucide-react";
+import { Plus, Edit2, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { db, auth } from "@/integrations/firebase/client";
 import { collection, query, where, getDocs, doc, updateDoc, deleteDoc, getDoc } from "firebase/firestore";
@@ -176,10 +176,6 @@ export const ServiceManagement = ({ currentLanguage, currencyCode }: ServiceMana
     }
   };
 
-  const viewServiceDetails = (serviceId: string) => {
-    navigate(`/service/${serviceId}`);
-  };
-
   const editService = (serviceId: string) => {
     navigate(`/edit-service/${serviceId}`);
   };
@@ -278,16 +274,6 @@ export const ServiceManagement = ({ currentLanguage, currencyCode }: ServiceMana
                     </span>
 
                     <div className="flex flex-wrap gap-2 ml-auto">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => viewServiceDetails(service.id)}
-                        className="flex-shrink-0 text-xs px-2 py-1"
-                      >
-                        <Eye className="w-3 h-3 flex-shrink-0" />
-                        <span className="sr-only">View</span>
-                      </Button>
-
                       <Button
                         variant="outline"
                         size="sm"
