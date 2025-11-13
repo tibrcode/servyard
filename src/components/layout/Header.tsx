@@ -126,23 +126,45 @@ export const Header = ({
             </Link>
           </div>
 
-          {/* Bottom row: Navigation Actions - centered, logical order */}
-          <div className={`flex items-center justify-center gap-2 sm:gap-3 md:gap-4 flex-shrink-0 isolate whitespace-nowrap flex-wrap ${isRTL ? 'flex-row-reverse' : ''}`}>
+          {/* Bottom row: Navigation Actions - perfectly aligned with consistent spacing */}
+          <div className={`flex items-center justify-center gap-3 flex-shrink-0 isolate ${isRTL ? 'flex-row-reverse' : ''}`}>
             {/* 1. Notifications */}
-            <Link to="/notifications" aria-label={t.nav.notifications || 'Notifications'} className="relative inline-flex">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="inline-flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 p-0 transition-transform active:scale-95"
-              >
-                <Bell className="block h-5 w-5 sm:h-6 sm:w-6" />
-                {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 rounded-full bg-red-600 text-white text-[10px] leading-none h-4 min-w-[16px] px-1 flex items-center justify-center">
-                    {unreadCount > 99 ? '99+' : unreadCount}
-                  </span>
-                )}
-              </Button>
-            </Link>
+            {isTouch ? (
+              <Link to="/notifications" aria-label={t.nav.notifications || 'Notifications'} className="relative">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-10 w-10 p-0"
+                >
+                  <Bell className="h-5 w-5" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 rounded-full bg-red-600 text-white text-[10px] leading-none h-4 min-w-[16px] px-1 flex items-center justify-center">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
+                </Button>
+              </Link>
+            ) : (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link to="/notifications" aria-label={t.nav.notifications || 'Notifications'} className="relative">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-10 w-10 p-0"
+                    >
+                      <Bell className="h-5 w-5" />
+                      {unreadCount > 0 && (
+                        <span className="absolute -top-1 -right-1 rounded-full bg-red-600 text-white text-[10px] leading-none h-4 min-w-[16px] px-1 flex items-center justify-center">
+                          {unreadCount > 99 ? '99+' : unreadCount}
+                        </span>
+                      )}
+                    </Button>
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent>{t.nav.notifications || 'Notifications'}</TooltipContent>
+              </Tooltip>
+            )}
 
             {/* 2. Location */}
             {isTouch ? (
@@ -151,9 +173,9 @@ export const Header = ({
                 variant="ghost"
                 size="icon"
                 onClick={onLocationChange}
-                className="inline-flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 p-0 transition-transform active:scale-95"
+                className="h-10 w-10 p-0"
               >
-                <MapPin className="block h-5 w-5 sm:h-6 sm:w-6" />
+                <MapPin className="h-5 w-5" />
               </Button>
             ) : (
               <Tooltip>
@@ -163,9 +185,9 @@ export const Header = ({
                     variant="ghost"
                     size="icon"
                     onClick={onLocationChange}
-                    className="inline-flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 p-0 transition-transform active:scale-95"
+                    className="h-10 w-10 p-0"
                   >
-                    <MapPin className="block h-5 w-5 sm:h-6 sm:w-6" />
+                    <MapPin className="h-5 w-5" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>{t.nav.location}</TooltipContent>
@@ -173,45 +195,57 @@ export const Header = ({
             )}
 
             {/* 3. Timezone */}
-            <Link to="/timezone" aria-label={isRTL ? 'المنطقة الزمنية' : 'Timezone'}>
-              {isTouch ? (
+            {isTouch ? (
+              <Link to="/timezone" aria-label={isRTL ? 'المنطقة الزمنية' : 'Timezone'}>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="inline-flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 p-0 transition-transform active:scale-95"
+                  className="h-10 w-10 p-0"
                 >
-                  <Clock className="block h-5 w-5 sm:h-6 sm:w-6" />
+                  <Clock className="h-5 w-5" />
                 </Button>
-              ) : (
-                <Tooltip>
-                  <TooltipTrigger asChild>
+              </Link>
+            ) : (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link to="/timezone" aria-label={isRTL ? 'المنطقة الزمنية' : 'Timezone'}>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="inline-flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 p-0 transition-transform active:scale-95"
+                      className="h-10 w-10 p-0"
                     >
-                      <Clock className="block h-5 w-5 sm:h-6 sm:w-6" />
+                      <Clock className="h-5 w-5" />
                     </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>{isRTL ? 'المنطقة الزمنية' : 'Timezone'}</TooltipContent>
-                </Tooltip>
-              )}
-            </Link>
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent>{isRTL ? 'المنطقة الزمنية' : 'Timezone'}</TooltipContent>
+              </Tooltip>
+            )}
 
             {/* 4. Language */}
             <DropdownMenu open={langOpen} onOpenChange={setLangOpen}>
               {isTouch ? (
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="inline-flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 p-0 transition-transform active:scale-95" aria-label={t.nav.language}>
-                    <Globe className="block h-5 w-5 sm:h-6 sm:w-6" />
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-10 w-10 p-0" 
+                    aria-label={t.nav.language}
+                  >
+                    <Globe className="h-5 w-5" />
                   </Button>
                 </DropdownMenuTrigger>
               ) : (
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="inline-flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 p-0 transition-transform active:scale-95" aria-label={t.nav.language}>
-                        <Globe className="block h-5 w-5 sm:h-6 sm:w-6" />
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-10 w-10 p-0" 
+                        aria-label={t.nav.language}
+                      >
+                        <Globe className="h-5 w-5" />
                       </Button>
                     </DropdownMenuTrigger>
                   </TooltipTrigger>
@@ -249,10 +283,10 @@ export const Header = ({
               aria-label={t.nav.theme || 'Theme'}
               variant="ghost"
               size="icon"
-              className="inline-flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 p-0 transition-transform active:scale-95"
+              className="h-10 w-10 p-0"
             >
-              <Sun className="block h-5 w-5 sm:h-6 sm:w-6 dark:hidden" strokeWidth={2} />
-              <Moon className="hidden h-5 w-5 sm:h-6 sm:w-6 dark:block" strokeWidth={2} />
+              <Sun className="h-5 w-5 dark:hidden" />
+              <Moon className="hidden h-5 w-5 dark:block" />
               <span className="sr-only">{t.nav.theme || 'Theme'}</span>
             </Button>
 
@@ -260,16 +294,26 @@ export const Header = ({
             <DropdownMenu>
               {isTouch ? (
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="inline-flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 p-0 transition-transform active:scale-95" aria-label={user ? (role === 'provider' ? t.dashboard.providerDashboard : t.dashboard.customerDashboard) : t.nav.providerLogin}>
-                    <User className="block h-5 w-5 sm:h-6 sm:w-6" />
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-10 w-10 p-0" 
+                    aria-label={user ? (role === 'provider' ? t.dashboard.providerDashboard : t.dashboard.customerDashboard) : t.nav.providerLogin}
+                  >
+                    <User className="h-5 w-5" />
                   </Button>
                 </DropdownMenuTrigger>
               ) : (
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="inline-flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 p-0 transition-transform active:scale-95" aria-label={user ? (role === 'provider' ? t.dashboard.providerDashboard : t.dashboard.customerDashboard) : t.nav.providerLogin}>
-                        <User className="block h-5 w-5 sm:h-6 sm:w-6" />
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-10 w-10 p-0" 
+                        aria-label={user ? (role === 'provider' ? t.dashboard.providerDashboard : t.dashboard.customerDashboard) : t.nav.providerLogin}
+                      >
+                        <User className="h-5 w-5" />
                       </Button>
                     </DropdownMenuTrigger>
                   </TooltipTrigger>
