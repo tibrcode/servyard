@@ -126,9 +126,9 @@ export const Header = ({
             </Link>
           </div>
 
-          {/* Bottom row: Navigation Actions - centered */}
+          {/* Bottom row: Navigation Actions - centered, logical order */}
           <div className={`flex items-center justify-center gap-2 sm:gap-3 md:gap-4 flex-shrink-0 isolate whitespace-nowrap flex-wrap ${isRTL ? 'flex-row-reverse' : ''}`}>
-            {/* Notifications (header quick link) */}
+            {/* 1. Notifications */}
             <Link to="/notifications" aria-label={t.nav.notifications || 'Notifications'} className="relative inline-flex">
               <Button
                 variant="ghost"
@@ -143,7 +143,8 @@ export const Header = ({
                 )}
               </Button>
             </Link>
-            {/* Location (icon-only with tooltip) */}
+
+            {/* 2. Location */}
             {isTouch ? (
               <Button
                 aria-label={t.nav.location}
@@ -171,7 +172,7 @@ export const Header = ({
               </Tooltip>
             )}
 
-            {/* Timezone Settings */}
+            {/* 3. Timezone */}
             <Link to="/timezone" aria-label={isRTL ? 'المنطقة الزمنية' : 'Timezone'}>
               {isTouch ? (
                 <Button
@@ -197,7 +198,7 @@ export const Header = ({
               )}
             </Link>
 
-            {/* Language Selector */}
+            {/* 4. Language */}
             <DropdownMenu open={langOpen} onOpenChange={setLangOpen}>
               {isTouch ? (
                 <DropdownMenuTrigger asChild>
@@ -242,7 +243,7 @@ export const Header = ({
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* Theme Toggle (Button structure unified with other icons for perfect alignment) */}
+            {/* 5. Theme */}
             <Button
               id="header-theme-toggle"
               aria-label={t.nav.theme || 'Theme'}
@@ -250,14 +251,12 @@ export const Header = ({
               size="icon"
               className="inline-flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 p-0 transition-transform active:scale-95"
             >
-              {/* Match icon box sizing to others */}
               <Sun className="block h-5 w-5 sm:h-6 sm:w-6 dark:hidden" strokeWidth={2} />
               <Moon className="hidden h-5 w-5 sm:h-6 sm:w-6 dark:block" strokeWidth={2} />
               <span className="sr-only">{t.nav.theme || 'Theme'}</span>
             </Button>
 
-            {/* Auth / User Area */}
-            {/* Unified User Menu (all breakpoints) */}
+            {/* 6. User Menu */}
             <DropdownMenu>
               {isTouch ? (
                 <DropdownMenuTrigger asChild>
