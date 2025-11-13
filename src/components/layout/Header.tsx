@@ -111,18 +111,18 @@ export const Header = ({
       }
       dir={isRTL ? 'rtl' : 'ltr'}
     >
-      <div className="container mx-auto px-2 sm:px-4 py-2">
+      <div className="container mx-auto px-2 sm:px-4 py-1">
         {/* Stack layout: Logo on top, buttons below */}
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-1">
           {/* Top row: Menu Trigger & Logo */}
           <div className="flex items-center gap-2 sm:gap-4 min-w-0">
             <SidebarTrigger 
               aria-label="Toggle sidebar" 
-              className="ml-0 sm:ml-2 h-10 w-10 sm:h-12 sm:w-12 p-2 flex-shrink-0 border border-border/50 rounded-md hover:bg-accent [&>svg]:h-6 [&>svg]:w-6 sm:[&>svg]:h-8 sm:[&>svg]:w-8" 
+              className="ml-0 sm:ml-2 h-8 w-8 sm:h-10 sm:w-10 p-1.5 flex-shrink-0 border border-border/50 rounded-md hover:bg-accent [&>svg]:h-5 [&>svg]:w-5 sm:[&>svg]:h-6 sm:[&>svg]:w-6" 
             />
             <Link to="/" className="flex items-center leading-none min-w-0 overflow-hidden" aria-label="ServYard home">
               {/* Logo stays consistent - always visible */}
-              <BrandLogo height={60} />
+              <BrandLogo height={50} />
             </Link>
           </div>
 
@@ -133,9 +133,9 @@ export const Header = ({
               <Button
                 variant="ghost"
                 size="icon"
-                className="inline-flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 p-0 transition-transform active:scale-95"
+                className="inline-flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 p-0 transition-transform active:scale-95"
               >
-                <Bell className="block h-8 w-8 sm:h-10 sm:w-10" />
+                <Bell className="block h-5 w-5 sm:h-6 sm:w-6" />
                 {unreadCount > 0 && (
                   <span className="absolute -top-1 -right-1 rounded-full bg-red-600 text-white text-[10px] leading-none h-4 min-w-[16px] px-1 flex items-center justify-center">
                     {unreadCount > 99 ? '99+' : unreadCount}
@@ -150,9 +150,9 @@ export const Header = ({
                 variant="ghost"
                 size="icon"
                 onClick={onLocationChange}
-                className="inline-flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 p-0 transition-transform active:scale-95"
+                className="inline-flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 p-0 transition-transform active:scale-95"
               >
-                <MapPin className="block h-8 w-8 sm:h-10 sm:w-10" />
+                <MapPin className="block h-5 w-5 sm:h-6 sm:w-6" />
               </Button>
             ) : (
               <Tooltip>
@@ -162,9 +162,9 @@ export const Header = ({
                     variant="ghost"
                     size="icon"
                     onClick={onLocationChange}
-                    className="inline-flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 p-0 transition-transform active:scale-95"
+                    className="inline-flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 p-0 transition-transform active:scale-95"
                   >
-                    <MapPin className="block h-8 w-8 sm:h-10 sm:w-10" />
+                    <MapPin className="block h-5 w-5 sm:h-6 sm:w-6" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>{t.nav.location}</TooltipContent>
@@ -175,16 +175,16 @@ export const Header = ({
             <DropdownMenu open={langOpen} onOpenChange={setLangOpen}>
               {isTouch ? (
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="inline-flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 p-0 transition-transform active:scale-95" aria-label={t.nav.language}>
-                    <Globe className="block h-8 w-8 sm:h-10 sm:w-10" />
+                  <Button variant="ghost" size="icon" className="inline-flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 p-0 transition-transform active:scale-95" aria-label={t.nav.language}>
+                    <Globe className="block h-5 w-5 sm:h-6 sm:w-6" />
                   </Button>
                 </DropdownMenuTrigger>
               ) : (
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="inline-flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 p-0 transition-transform active:scale-95" aria-label={t.nav.language}>
-                        <Globe className="block h-8 w-8 sm:h-10 sm:w-10" />
+                      <Button variant="ghost" size="icon" className="inline-flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 p-0 transition-transform active:scale-95" aria-label={t.nav.language}>
+                        <Globe className="block h-5 w-5 sm:h-6 sm:w-6" />
                       </Button>
                     </DropdownMenuTrigger>
                   </TooltipTrigger>
@@ -222,11 +222,11 @@ export const Header = ({
               aria-label={t.nav.theme || 'Theme'}
               variant="ghost"
               size="icon"
-              className="inline-flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 p-0 transition-transform active:scale-95"
+              className="inline-flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 p-0 transition-transform active:scale-95"
             >
               {/* Match icon box sizing to others */}
-              <Sun className="block h-8 w-8 sm:h-10 sm:w-10 dark:hidden" strokeWidth={2} />
-              <Moon className="hidden h-8 w-8 sm:h-10 sm:w-10 dark:block" strokeWidth={2} />
+              <Sun className="block h-5 w-5 sm:h-6 sm:w-6 dark:hidden" strokeWidth={2} />
+              <Moon className="hidden h-5 w-5 sm:h-6 sm:w-6 dark:block" strokeWidth={2} />
               <span className="sr-only">{t.nav.theme || 'Theme'}</span>
             </Button>
 
@@ -235,16 +235,16 @@ export const Header = ({
             <DropdownMenu>
               {isTouch ? (
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="inline-flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 p-0 transition-transform active:scale-95" aria-label={user ? (role === 'provider' ? t.dashboard.providerDashboard : t.dashboard.customerDashboard) : t.nav.providerLogin}>
-                    <User className="block h-8 w-8 sm:h-10 sm:w-10" />
+                  <Button variant="ghost" size="icon" className="inline-flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 p-0 transition-transform active:scale-95" aria-label={user ? (role === 'provider' ? t.dashboard.providerDashboard : t.dashboard.customerDashboard) : t.nav.providerLogin}>
+                    <User className="block h-5 w-5 sm:h-6 sm:w-6" />
                   </Button>
                 </DropdownMenuTrigger>
               ) : (
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="inline-flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 p-0 transition-transform active:scale-95" aria-label={user ? (role === 'provider' ? t.dashboard.providerDashboard : t.dashboard.customerDashboard) : t.nav.providerLogin}>
-                        <User className="block h-8 w-8 sm:h-10 sm:w-10" />
+                      <Button variant="ghost" size="icon" className="inline-flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 p-0 transition-transform active:scale-95" aria-label={user ? (role === 'provider' ? t.dashboard.providerDashboard : t.dashboard.customerDashboard) : t.nav.providerLogin}>
+                        <User className="block h-5 w-5 sm:h-6 sm:w-6" />
                       </Button>
                     </DropdownMenuTrigger>
                   </TooltipTrigger>
