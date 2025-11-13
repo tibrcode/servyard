@@ -127,40 +127,42 @@ export const Header = ({
           </div>
 
           {/* Bottom row: Navigation Actions - perfectly aligned with consistent spacing */}
-          <div className={`flex items-center justify-center gap-3 flex-shrink-0 isolate ${isRTL ? 'flex-row-reverse' : ''}`}>
+          <div className={`flex items-center justify-center gap-3 flex-shrink-0 ${isRTL ? 'flex-row-reverse' : ''}`}>
             {/* 1. Notifications */}
             {isTouch ? (
-              <Link to="/notifications" aria-label={t.nav.notifications || 'Notifications'} className="relative">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-10 w-10 p-0"
-                >
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative h-10 w-10 p-0 flex items-center justify-center"
+                asChild
+              >
+                <Link to="/notifications" aria-label={t.nav.notifications || 'Notifications'}>
                   <Bell className="h-5 w-5" />
                   {unreadCount > 0 && (
                     <span className="absolute -top-1 -right-1 rounded-full bg-red-600 text-white text-[10px] leading-none h-4 min-w-[16px] px-1 flex items-center justify-center">
                       {unreadCount > 99 ? '99+' : unreadCount}
                     </span>
                   )}
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             ) : (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Link to="/notifications" aria-label={t.nav.notifications || 'Notifications'} className="relative">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-10 w-10 p-0"
-                    >
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="relative h-10 w-10 p-0 flex items-center justify-center"
+                    asChild
+                  >
+                    <Link to="/notifications" aria-label={t.nav.notifications || 'Notifications'}>
                       <Bell className="h-5 w-5" />
                       {unreadCount > 0 && (
                         <span className="absolute -top-1 -right-1 rounded-full bg-red-600 text-white text-[10px] leading-none h-4 min-w-[16px] px-1 flex items-center justify-center">
                           {unreadCount > 99 ? '99+' : unreadCount}
                         </span>
                       )}
-                    </Button>
-                  </Link>
+                    </Link>
+                  </Button>
                 </TooltipTrigger>
                 <TooltipContent>{t.nav.notifications || 'Notifications'}</TooltipContent>
               </Tooltip>
@@ -173,7 +175,7 @@ export const Header = ({
                 variant="ghost"
                 size="icon"
                 onClick={onLocationChange}
-                className="h-10 w-10 p-0"
+                className="h-10 w-10 p-0 flex items-center justify-center"
               >
                 <MapPin className="h-5 w-5" />
               </Button>
@@ -185,7 +187,7 @@ export const Header = ({
                     variant="ghost"
                     size="icon"
                     onClick={onLocationChange}
-                    className="h-10 w-10 p-0"
+                    className="h-10 w-10 p-0 flex items-center justify-center"
                   >
                     <MapPin className="h-5 w-5" />
                   </Button>
@@ -196,27 +198,29 @@ export const Header = ({
 
             {/* 3. Timezone */}
             {isTouch ? (
-              <Link to="/timezone" aria-label={isRTL ? 'المنطقة الزمنية' : 'Timezone'}>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-10 w-10 p-0"
-                >
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-10 w-10 p-0 flex items-center justify-center"
+                asChild
+              >
+                <Link to="/timezone" aria-label={isRTL ? 'المنطقة الزمنية' : 'Timezone'}>
                   <Clock className="h-5 w-5" />
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             ) : (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Link to="/timezone" aria-label={isRTL ? 'المنطقة الزمنية' : 'Timezone'}>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-10 w-10 p-0"
-                    >
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-10 w-10 p-0 flex items-center justify-center"
+                    asChild
+                  >
+                    <Link to="/timezone" aria-label={isRTL ? 'المنطقة الزمنية' : 'Timezone'}>
                       <Clock className="h-5 w-5" />
-                    </Button>
-                  </Link>
+                    </Link>
+                  </Button>
                 </TooltipTrigger>
                 <TooltipContent>{isRTL ? 'المنطقة الزمنية' : 'Timezone'}</TooltipContent>
               </Tooltip>
@@ -229,7 +233,7 @@ export const Header = ({
                   <Button 
                     variant="ghost" 
                     size="icon" 
-                    className="h-10 w-10 p-0" 
+                    className="h-10 w-10 p-0 flex items-center justify-center" 
                     aria-label={t.nav.language}
                   >
                     <Globe className="h-5 w-5" />
@@ -242,7 +246,7 @@ export const Header = ({
                       <Button 
                         variant="ghost" 
                         size="icon" 
-                        className="h-10 w-10 p-0" 
+                        className="h-10 w-10 p-0 flex items-center justify-center" 
                         aria-label={t.nav.language}
                       >
                         <Globe className="h-5 w-5" />
@@ -283,7 +287,7 @@ export const Header = ({
               aria-label={t.nav.theme || 'Theme'}
               variant="ghost"
               size="icon"
-              className="h-10 w-10 p-0"
+              className="h-10 w-10 p-0 flex items-center justify-center"
             >
               <Sun className="h-5 w-5 dark:hidden" />
               <Moon className="hidden h-5 w-5 dark:block" />
@@ -297,7 +301,7 @@ export const Header = ({
                   <Button 
                     variant="ghost" 
                     size="icon" 
-                    className="h-10 w-10 p-0" 
+                    className="h-10 w-10 p-0 flex items-center justify-center" 
                     aria-label={user ? (role === 'provider' ? t.dashboard.providerDashboard : t.dashboard.customerDashboard) : t.nav.providerLogin}
                   >
                     <User className="h-5 w-5" />
@@ -310,7 +314,7 @@ export const Header = ({
                       <Button 
                         variant="ghost" 
                         size="icon" 
-                        className="h-10 w-10 p-0" 
+                        className="h-10 w-10 p-0 flex items-center justify-center" 
                         aria-label={user ? (role === 'provider' ? t.dashboard.providerDashboard : t.dashboard.customerDashboard) : t.nav.providerLogin}
                       >
                         <User className="h-5 w-5" />
