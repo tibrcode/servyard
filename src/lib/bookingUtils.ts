@@ -164,6 +164,7 @@ export function calculateAvailableSlots(
 
     const booked = overlappingBookings.length;
     // Slot is unavailable if: it has passed OR it's fully booked
+    // الموعد غير متاح إذا: مضى وقته أو ممتلئ بالكامل
     const available = !hasPassed && booked < settings.max_concurrent_bookings;
 
     return {

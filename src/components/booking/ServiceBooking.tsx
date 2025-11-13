@@ -101,7 +101,7 @@ export function ServiceBooking({
     minutes: isRTL ? 'دقيقة' : 'minutes',
     available: isRTL ? 'متاح' : 'Available',
     partiallyBooked: isRTL ? 'محجوز جزئياً' : 'Partially Booked',
-    fullyBooked: isRTL ? 'ممتلئ' : 'Fully Booked',
+    fullyBooked: isRTL ? 'غير متاح' : 'Unavailable',
     slots: isRTL ? 'مقاعد' : 'slots',
     requiresConfirmation: isRTL ? 'يتطلب تأكيد من مقدم الخدمة' : 'Requires provider confirmation',
   };
