@@ -111,11 +111,11 @@ export const Header = ({
       }
       dir={isRTL ? 'rtl' : 'ltr'}
     >
-      <div className="container mx-auto px-2 sm:px-4 py-1">
+      <div className="container mx-auto px-2 sm:px-4 py-0.5">
         {/* Stack layout: Logo on top, buttons below */}
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-0.5">
           {/* Top row: Menu Trigger & Logo */}
-          <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+          <div className="flex items-center gap-1.5 sm:gap-3 min-w-0">
             <SidebarTrigger 
               aria-label="Toggle sidebar" 
               className="ml-0 sm:ml-2 h-8 w-8 sm:h-10 sm:w-10 p-1.5 flex-shrink-0 border border-border/50 rounded-md hover:bg-accent [&>svg]:h-5 [&>svg]:w-5 sm:[&>svg]:h-6 sm:[&>svg]:w-6" 
@@ -127,7 +127,7 @@ export const Header = ({
           </div>
 
           {/* Bottom row: Navigation Actions - centered */}
-          <div className={`flex items-center justify-center gap-2 sm:gap-3 md:gap-4 flex-shrink-0 isolate whitespace-nowrap flex-wrap ${isRTL ? 'flex-row-reverse' : ''}`}>
+          <div className={`flex items-center justify-center gap-1.5 sm:gap-2 md:gap-3 flex-shrink-0 isolate whitespace-nowrap flex-wrap ${isRTL ? 'flex-row-reverse' : ''}`}>
             {/* Notifications (header quick link) */}
             <Link to="/notifications" aria-label={t.nav.notifications || 'Notifications'} className="relative inline-flex">
               <Button
