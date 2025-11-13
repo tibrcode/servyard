@@ -24,6 +24,7 @@ const CustomerDashboard = React.lazy(() => import('@/pages/CustomerDashboard'));
 import AddService from "@/pages/AddService";
 import EditService from "@/pages/EditService";
 import EditProfile from "@/pages/EditProfile";
+import TimezoneSettings from "@/pages/TimezoneSettings";
 import ProviderProfile from "@/pages/ProviderProfile";
 const AdminConsole = React.lazy(() => import('@/pages/AdminConsole'));
 import Terms from "@/pages/Terms";
@@ -337,6 +338,7 @@ const AppContent = () => {
                       <Route path="/add-service" element={<AddService currentLanguage={currentLanguage} />} />
                       <Route path="/edit-service/:serviceId" element={<EditService currentLanguage={currentLanguage} />} />
                       <Route path="/edit-profile" element={<EditProfile currentLanguage={currentLanguage} />} />
+                      <Route path="/timezone" element={<TimezoneSettings currentLanguage={currentLanguage} />} />
                       <Route path="/provider/:providerId" element={<ProviderProfile currentLanguage={currentLanguage} onLanguageChange={handleLanguageChange} />} />
                       <Route path="/console" element={<React.Suspense fallback={<div className="p-6 text-center text-sm text-muted-foreground">Loading console…</div>}><AdminConsole currentLanguage={currentLanguage} /></React.Suspense>} />
                       <Route path="/terms" element={<Terms currentLanguage={currentLanguage} />} />

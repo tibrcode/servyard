@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Globe, MapPin, User, UserPlus, LogOut, Sun, Moon, Shield, Bell } from "lucide-react";
+import { Globe, MapPin, User, UserPlus, LogOut, Sun, Moon, Shield, Bell, Clock } from "lucide-react";
 import { useNotificationLog } from "@/contexts/NotificationLogContext";
 import { useTranslation, supportedLanguages } from "@/lib/i18n";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -170,6 +170,32 @@ export const Header = ({
                 <TooltipContent>{t.nav.location}</TooltipContent>
               </Tooltip>
             )}
+
+            {/* Timezone Settings */}
+            <Link to="/timezone" aria-label={isRTL ? 'المنطقة الزمنية' : 'Timezone'}>
+              {isTouch ? (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="inline-flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 p-0 transition-transform active:scale-95"
+                >
+                  <Clock className="block h-5 w-5 sm:h-6 sm:w-6" />
+                </Button>
+              ) : (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="inline-flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 p-0 transition-transform active:scale-95"
+                    >
+                      <Clock className="block h-5 w-5 sm:h-6 sm:w-6" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>{isRTL ? 'المنطقة الزمنية' : 'Timezone'}</TooltipContent>
+                </Tooltip>
+              )}
+            </Link>
 
             {/* Language Selector */}
             <DropdownMenu open={langOpen} onOpenChange={setLangOpen}>
