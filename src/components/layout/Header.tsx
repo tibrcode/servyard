@@ -111,24 +111,23 @@ export const Header = ({
       }
       dir={isRTL ? 'rtl' : 'ltr'}
     >
-      <div className="container mx-auto px-2 sm:px-4 py-0">
-        <div className="flex items-center justify-between min-h-12 gap-2 flex-nowrap w-full overflow-x-hidden">
-          {/* Menu Trigger & Logo */}
+      <div className="container mx-auto px-2 sm:px-4 py-2">
+        {/* Stack layout: Logo on top, buttons below */}
+        <div className="flex flex-col gap-3">
+          {/* Top row: Menu Trigger & Logo */}
           <div className="flex items-center gap-2 sm:gap-4 min-w-0">
             <SidebarTrigger 
               aria-label="Toggle sidebar" 
-              className="ml-0 sm:ml-2 h-12 w-12 sm:h-12 sm:w-12 p-2 flex-shrink-0 border border-border/50 rounded-md hover:bg-accent [&>svg]:h-8 [&>svg]:w-8 sm:[&>svg]:h-10 sm:[&>svg]:w-10" 
+              className="ml-0 sm:ml-2 h-10 w-10 sm:h-12 sm:w-12 p-2 flex-shrink-0 border border-border/50 rounded-md hover:bg-accent [&>svg]:h-6 [&>svg]:w-6 sm:[&>svg]:h-8 sm:[&>svg]:w-8" 
             />
             <Link to="/" className="flex items-center leading-none min-w-0 overflow-hidden" aria-label="ServYard home">
-              {/* Responsive logo sizes to keep everything on a single row on small screens */}
-              <span className="sm:hidden block"><BrandLogo height={40} /></span>
-              <span className="hidden sm:inline md:hidden"><BrandLogo height={48} /></span>
-              <span className="hidden md:inline-block"><BrandLogo height={80} /></span>
+              {/* Logo stays consistent - always visible */}
+              <BrandLogo height={60} />
             </Link>
           </div>
 
-          {/* Navigation Actions */}
-          <div className={`ml-auto flex items-center gap-2 sm:gap-3 md:gap-4 flex-shrink-0 isolate whitespace-nowrap flex-nowrap max-w-full ${isRTL ? 'flex-row-reverse' : ''}`}>
+          {/* Bottom row: Navigation Actions - centered */}
+          <div className={`flex items-center justify-center gap-2 sm:gap-3 md:gap-4 flex-shrink-0 isolate whitespace-nowrap flex-wrap ${isRTL ? 'flex-row-reverse' : ''}`}>
             {/* Notifications (header quick link) */}
             <Link to="/notifications" aria-label={t.nav.notifications || 'Notifications'} className="relative inline-flex">
               <Button
