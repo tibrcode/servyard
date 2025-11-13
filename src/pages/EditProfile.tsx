@@ -399,6 +399,31 @@ const EditProfile: React.FC<EditProfileProps> = ({ currentLanguage }) => {
               />
             </div>
 
+            {/* Timezone - For all users */}
+            <div className="space-y-2">
+              <Label>{isRTL ? 'المنطقة الزمنية' : 'Timezone'}</Label>
+              <Select
+                value={formData.timezone || getBrowserTimezone()}
+                onValueChange={(val) => handleInputChange('timezone', val)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={isRTL ? 'اختر المنطقة الزمنية' : 'Select timezone'} />
+                </SelectTrigger>
+                <SelectContent className="max-h-72">
+                  {commonTimezones.map((tz) => (
+                    <SelectItem key={tz.value} value={tz.value}>
+                      {tz.label} ({tz.offset})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                {isRTL 
+                  ? 'يستخدم لحساب الأوقات والإشعارات بدقة'
+                  : 'Used to accurately calculate times and notifications'}
+              </p>
+            </div>
+
             {/* Provider-specific fields */}
             {role === 'provider' && (
               <div className="space-y-4">
@@ -444,30 +469,6 @@ const EditProfile: React.FC<EditProfileProps> = ({ currentLanguage }) => {
                         ))}
                       </SelectContent>
                     </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>{isRTL ? 'المنطقة الزمنية' : 'Timezone'}</Label>
-                    <Select
-                      value={formData.timezone || getBrowserTimezone()}
-                      onValueChange={(val) => handleInputChange('timezone', val)}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder={isRTL ? 'اختر المنطقة الزمنية' : 'Select timezone'} />
-                      </SelectTrigger>
-                      <SelectContent className="max-h-72">
-                        {commonTimezones.map((tz) => (
-                          <SelectItem key={tz.value} value={tz.value}>
-                            {tz.label} ({tz.offset})
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <p className="text-xs text-muted-foreground">
-                      {isRTL 
-                        ? 'يستخدم لحساب الأوقات المتاحة للحجز بدقة'
-                        : 'Used to accurately calculate available booking times'}
-                    </p>
                   </div>
 
                   <div className="space-y-2">
