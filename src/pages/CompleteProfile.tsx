@@ -9,6 +9,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, ClipboardCheck } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
+import { commonTimezones, getBrowserTimezone } from "@/lib/timezones";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { db } from "@/integrations/firebase/client";
 import { doc, setDoc } from "firebase/firestore";
 
@@ -33,6 +35,7 @@ export default function CompleteProfile({ currentLanguage }: CompleteProfileProp
   const [city, setCity] = useState('');
   const [country, setCountry] = useState('');
   const [phone, setPhone] = useState('');
+  const [timezone, setTimezone] = useState(getBrowserTimezone());
   const [accepted, setAccepted] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -43,6 +46,7 @@ export default function CompleteProfile({ currentLanguage }: CompleteProfileProp
       setFullName(profile?.full_name || user.displayName || '');
       setCity(profile?.city || '');
       setCountry(profile?.country || '');
+      setTimezone(profile?.timezone || getBrowserTimezone());
     }
   }, [loading, user, profile]);
 
@@ -88,6 +92,7 @@ export default function CompleteProfile({ currentLanguage }: CompleteProfileProp
         full_name: fullName,
         city,
         country,
+        timezone: timezone || getBrowserTimezone(),
         terms_accepted_at: new Date(),
         updated_at: new Date(),
       };
@@ -148,6 +153,27 @@ export default function CompleteProfile({ currentLanguage }: CompleteProfileProp
                 <Label htmlFor="country">{t.auth.country} *</Label>
                 <Input id="country" value={country} onChange={(e) => setCountry(e.target.value)} required disabled={saving} />
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>{isRTL ? 'المنطقة الزمنية *' : 'Timezone *'}</Label>
+              <Select value={timezone} onValueChange={setTimezone} disabled={saving}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={isRTL ? 'اختر المنطقة الزمنية' : 'Select timezone'} />
+                </SelectTrigger>
+                <SelectContent className="max-h-72">
+                  {commonTimezones.map((tz) => (
+                    <SelectItem key={tz.value} value={tz.value}>
+                      {tz.label} ({tz.offset})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                {isRTL 
+                  ? 'يستخدم لحساب الأوقات بدقة'
+                  : 'Used to calculate times accurately'}
+              </p>
             </div>
 
             <div className="flex items-start space-x-2">
