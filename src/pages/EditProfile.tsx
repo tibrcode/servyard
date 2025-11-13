@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ArrowLeft, Save, Plus, X, Trash2 } from "lucide-react";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { currencyList, getCurrencyLabel } from "@/lib/currencies";
+import { commonTimezones, getBrowserTimezone } from "@/lib/timezones";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "@/lib/i18n";
@@ -36,6 +37,7 @@ interface ProfileData {
   facebook_url: string;
   tiktok_url: string;
   currency_code?: string;
+  timezone?: string;
   // حقول الموقع الجغرافي
   latitude?: number;
   longitude?: number;
@@ -68,6 +70,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ currentLanguage }) => {
     facebook_url: '',
     tiktok_url: '',
     currency_code: '',
+    timezone: getBrowserTimezone(),
     latitude: undefined,
     longitude: undefined,
     location_address: ''
@@ -110,6 +113,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ currentLanguage }) => {
           facebook_url: profile.facebook_url || '',
           tiktok_url: profile.tiktok_url || '',
           currency_code: profile.currency_code || '',
+          timezone: profile.timezone || 'Asia/Dubai',
           latitude: profile.latitude,
           longitude: profile.longitude,
           location_address: profile.location_address || ''
@@ -191,6 +195,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ currentLanguage }) => {
         facebook_url: formData.facebook_url.trim(),
         tiktok_url: formData.tiktok_url.trim(),
         currency_code: (formData.currency_code || '').trim() || null,
+        timezone: formData.timezone || 'Asia/Dubai',
         // حفظ الموقع الجغرافي
         latitude: formData.latitude || null,
         longitude: formData.longitude || null,
@@ -439,6 +444,30 @@ const EditProfile: React.FC<EditProfileProps> = ({ currentLanguage }) => {
                         ))}
                       </SelectContent>
                     </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>{isRTL ? 'المنطقة الزمنية' : 'Timezone'}</Label>
+                    <Select
+                      value={formData.timezone || getBrowserTimezone()}
+                      onValueChange={(val) => handleInputChange('timezone', val)}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder={isRTL ? 'اختر المنطقة الزمنية' : 'Select timezone'} />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-72">
+                        {commonTimezones.map((tz) => (
+                          <SelectItem key={tz.value} value={tz.value}>
+                            {tz.label} ({tz.offset})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-muted-foreground">
+                      {isRTL 
+                        ? 'يستخدم لحساب الأوقات المتاحة للحجز بدقة'
+                        : 'Used to accurately calculate available booking times'}
+                    </p>
                   </div>
 
                   <div className="space-y-2">

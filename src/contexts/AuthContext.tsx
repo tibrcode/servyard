@@ -15,6 +15,7 @@ export interface Profile {
   user_type?: UserRole;
   is_online?: boolean;
   profile_description?: string;
+  timezone?: string; // e.g., 'Asia/Dubai', 'America/New_York'
 }
 
 interface AuthContextValue {

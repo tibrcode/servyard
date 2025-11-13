@@ -1050,9 +1050,13 @@ export const notifyBookingStatusChange = onRequest({ cors: true, invoker: 'publi
         return errorResponse(res, 200, 'no_notification_for_status', 'No notification for this status', trace);
     }
 
-    // Respect quiet hours if configured (Asia/Dubai by default)
+    // Respect quiet hours if configured (using provider's timezone)
     if (quiet.enabled) {
-      const currentHM = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Asia/Dubai' });
+      // Get provider timezone from database (already fetched above as providerDoc)
+      const providerData = providerDoc.data();
+      const providerTimezone = providerData?.timezone || 'Asia/Dubai';
+      
+      const currentHM = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: providerTimezone });
       const [ch, cm] = currentHM.split(':').map(Number);
       const nowMin = ch * 60 + cm;
       const parseHM = (s: string) => {
@@ -1161,9 +1165,10 @@ export const sendScheduledReminders = onSchedule(
             continue;
           }
 
-          // Quiet hours suppression
+          // Quiet hours suppression (using customer's timezone)
           if (quiet2.enabled) {
-            const currentHM = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Asia/Dubai' });
+            const customerTimezone = customerProfile2.data()?.timezone || 'Asia/Dubai';
+            const currentHM = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: customerTimezone });
             const [ch, cm] = currentHM.split(':').map(Number);
             const nowMin = ch * 60 + cm;
             const parseHM = (s: string) => {

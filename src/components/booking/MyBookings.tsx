@@ -310,6 +310,17 @@ export function MyBookings({
       if (serviceDoc.exists()) {
         const serviceData = serviceDoc.data();
         
+        // Load provider timezone
+        let providerTimezone = 'Asia/Dubai';
+        try {
+          const providerDoc = await getDoc(doc(db, 'profiles', booking.provider_id));
+          if (providerDoc.exists()) {
+            providerTimezone = providerDoc.data().timezone || 'Asia/Dubai';
+          }
+        } catch (error) {
+          console.error('Error loading provider timezone:', error);
+        }
+        
         // Build booking settings from service data
         const bookingSettings: BookingSettings = {
           booking_enabled: true,
@@ -326,6 +337,7 @@ export function MyBookings({
           ...serviceData,
           id: booking.service_id,
           bookingSettings,
+          providerTimezone,
         });
         
         setEditDialogOpen(true);
@@ -771,6 +783,7 @@ export function MyBookings({
                 price={selectedBookingForEdit.price}
                 currency={selectedBookingForEdit.currency}
                 bookingSettings={serviceDetails.bookingSettings}
+                providerTimezone={serviceDetails.providerTimezone || 'Asia/Dubai'}
                 language={language}
                 onBookingComplete={handleEditBookingComplete}
               />

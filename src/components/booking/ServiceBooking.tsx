@@ -44,6 +44,7 @@ interface ServiceBookingProps {
   price: number;
   currency: string;
   bookingSettings: BookingSettings;
+  providerTimezone?: string;
   language?: 'ar' | 'en';
   onBookingComplete?: (bookingId: string) => void;
 }
@@ -58,6 +59,7 @@ export function ServiceBooking({
   price,
   currency,
   bookingSettings,
+  providerTimezone = 'Asia/Dubai',
   language = 'ar',
   onBookingComplete,
 }: ServiceBookingProps) {
@@ -161,7 +163,8 @@ export function ServiceBooking({
         dateString,
         schedule,
         bookings,
-        bookingSettings
+        bookingSettings,
+        providerTimezone
       );
 
       console.log('✅ Availability calculated:', dailyAvailability);

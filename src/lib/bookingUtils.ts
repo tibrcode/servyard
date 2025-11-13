@@ -123,7 +123,8 @@ export function calculateAvailableSlots(
   date: string,
   schedule: ServiceSchedule | null,
   bookings: Booking[],
-  settings: BookingSettings
+  settings: BookingSettings,
+  providerTimezone: string = 'Asia/Dubai'
 ): TimeSlot[] {
   // No schedule for this day
   if (!schedule || !schedule.is_active) {
@@ -137,8 +138,9 @@ export function calculateAvailableSlots(
     settings.buffer_time_minutes || 0
   );
 
-  // Get current date and time for comparison
-  const now = new Date();
+  // Get current date and time in provider's timezone for comparison
+  const nowInProviderTZ = new Date().toLocaleString('en-US', { timeZone: providerTimezone });
+  const now = new Date(nowInProviderTZ);
   const today = formatDate(now);
   const isToday = date === today;
 
@@ -188,10 +190,11 @@ export function getDailyAvailability(
   date: string,
   schedule: ServiceSchedule | null,
   bookings: Booking[],
-  settings: BookingSettings
+  settings: BookingSettings,
+  providerTimezone: string = 'Asia/Dubai'
 ): DailyAvailability {
   const dayOfWeek = getDayOfWeek(date);
-  const slots = calculateAvailableSlots(date, schedule, bookings, settings);
+  const slots = calculateAvailableSlots(date, schedule, bookings, settings, providerTimezone);
   const isAvailable = slots.some(slot => slot.available);
 
   return {

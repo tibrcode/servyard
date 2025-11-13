@@ -44,6 +44,7 @@ interface Provider {
   phone_numbers?: string[];
   whatsapp_number?: string;
   currency_code?: string;
+  timezone?: string;
 }
 
 interface BookingModalProps {
@@ -198,6 +199,7 @@ export const BookingModal = ({ service, provider, isOpen, onClose, currentLangua
             price={parseFloat(service.approximate_price || '0')}
             currency={provider.currency_code || 'AED'}
             bookingSettings={bookingSettings}
+            providerTimezone={provider.timezone || 'Asia/Dubai'}
             language={currentLanguage as 'en' | 'ar'}
             onBookingComplete={() => {
               toast({
