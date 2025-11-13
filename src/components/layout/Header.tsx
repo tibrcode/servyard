@@ -111,9 +111,9 @@ export const Header = ({
       }
       dir={isRTL ? 'rtl' : 'ltr'}
     >
-      <div className="container mx-auto px-2 sm:px-4 py-0.5">
+      <div className="container mx-auto px-2 sm:px-4 py-2">
         {/* Stack layout: Logo on top, buttons below */}
-        <div className="flex flex-col gap-0.5">
+        <div className="flex flex-col gap-1">
           {/* Top row: Menu Trigger & Logo */}
           <div className="flex items-center gap-1.5 sm:gap-3 min-w-0">
             <SidebarTrigger 
