@@ -138,44 +138,44 @@ All colors MUST be HSL. Premium dark/light theme with gold accents.
   }
 
   .dark {
-    /* Dark theme - Dark green background with beige cards */
-    --background: 165 78% 26%;
+    /* Dark theme - Deep dark green background with dark brown cards */
+    --background: 165 78% 10%;
     --foreground: 220 9% 96%;
 
-    --card: 25 53% 60%;
-    --card-foreground: 0 0% 10%;
+    --card: 25 53% 20%;
+    --card-foreground: 220 9% 96%;
 
-    --popover: 25 53% 60%;
-    --popover-foreground: 0 0% 10%;
+    --popover: 25 53% 20%;
+    --popover-foreground: 220 9% 96%;
 
     /* Gold primary remains consistent */
     --primary: 41 92% 55%;
     --primary-foreground: 220 27% 8%;
     --primary-glow: 41 92% 65%;
 
-    --secondary: 25 53% 65%;
-    --secondary-foreground: 0 0% 10%;
+    --secondary: 25 53% 22%;
+    --secondary-foreground: 220 9% 96%;
 
-    --muted: 25 53% 65%;
-    --muted-foreground: 0 0% 20%;
+    --muted: 25 53% 22%;
+    --muted-foreground: 220 9% 65%;
 
-    --accent: 25 53% 65%;
-    --accent-foreground: 0 0% 10%;
+    --accent: 25 53% 22%;
+    --accent-foreground: 220 9% 96%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 220 9% 96%;
 
-    --border: 25 53% 50%;
-    --input: 25 53% 50%;
+    --border: 25 53% 25%;
+    --input: 25 53% 25%;
     --ring: 41 92% 55%;
 
     /* Dark theme custom tokens */
     --luxury-gradient: linear-gradient(135deg, hsl(41 92% 55%), hsl(41 92% 65%));
-    --surface-elevation: 25 53% 65%;
+    --surface-elevation: 25 53% 22%;
     --shadow-luxury: 0 10px 30px -10px hsl(41 92% 55% / 0.3);
-    --shadow-soft: 0 4px 12px -4px hsl(165 78% 26% / 0.4);
-    --sidebar-background: 25 53% 60%;
-    --sidebar-foreground: 0 0% 10%;
+    --shadow-soft: 0 4px 12px -4px hsl(165 78% 10% / 0.4);
+    --sidebar-background: 25 53% 20%;
+    --sidebar-foreground: 220 9% 96%;
     --sidebar-primary: 224.3 76.3% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 240 3.7% 15.9%;
