@@ -138,8 +138,8 @@ All colors MUST be HSL. Premium dark/light theme with gold accents.
   }
 
   .dark {
-    /* Dark theme - Pure dark gray with gold accents */
-    --background: 220 27% 8%;
+    /* Dark theme - Pure black background with gold accents */
+    --background: 0 0% 0%;
     --foreground: 220 9% 96%;
 
     --card: 0 0% 8%;
