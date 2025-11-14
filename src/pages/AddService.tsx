@@ -187,7 +187,7 @@ const AddService = ({ currentLanguage }: AddServiceProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-background" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="container mx-auto p-6 max-w-4xl">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">

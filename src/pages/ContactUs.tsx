@@ -11,7 +11,7 @@ const ContactUs = ({ currentLanguage }: ContactUsProps) => {
   const { t, isRTL } = useTranslation(currentLanguage);
 
   return (
-    <div className="min-h-screen flex flex-col bg-background" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen flex flex-col" dir={isRTL ? 'rtl' : 'ltr'}>
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <Card>

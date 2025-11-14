@@ -441,7 +441,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background overflow-x-hidden max-w-[100vw]" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen flex flex-col overflow-x-hidden max-w-[100vw]" dir={isRTL ? 'rtl' : 'ltr'}>
       <main className="flex-1 container mx-auto px-3 sm:px-4 py-6 sm:py-8 overflow-x-hidden touch-pan-y max-w-[100vw]">
         {/* Search & Filters */}
         <div className="mb-6 sm:mb-8">

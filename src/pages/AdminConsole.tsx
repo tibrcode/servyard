@@ -254,7 +254,7 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-background px-3 sm:px-6 md:px-8 py-6 md:py-8">
+    <div className="min-h-screen px-3 sm:px-6 md:px-8 py-6 md:py-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center gap-3 mb-8">
           <Shield className="h-8 w-8 text-primary" />
