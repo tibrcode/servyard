@@ -32,12 +32,9 @@ export const SearchHero = ({
 
   return (
     <section 
-      className="relative py-20 md:py-32 bg-gradient-to-br from-primary/5 via-background to-primary/10"
+      className="relative py-20 md:py-32"
       dir={isRTL ? 'rtl' : 'ltr'}
     >
-      {/* Background Pattern */}
-      <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-      
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
           {/* Hero Content */}

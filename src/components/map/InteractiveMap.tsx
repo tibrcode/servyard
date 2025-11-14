@@ -76,42 +76,51 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
     clickToSelect: isRTL ? "انقر لتحديد الموقع" : "Click to select location"
   };
 
-  // تحميل Google Maps API
+  // تحميل Google Maps API مع معالجة أفضل للأخطاء
   useEffect(() => {
+    let mounted = true;
+    
     // التحقق من تحميل API (محمّل من index.html)
     const checkGoogleMaps = () => {
       if (window.google && window.google.maps) {
         console.log('✅ InteractiveMap: Google Maps API ready');
-        setApiLoaded(true);
-        setLoading(false);
+        if (mounted) {
+          setApiLoaded(true);
+          setLoading(false);
+          setError('');
+        }
         return true;
       }
       return false;
     };
 
     // تحقق فوري
-    if (checkGoogleMaps()) return;
+    if (checkGoogleMaps()) return () => { mounted = false; };
 
+    console.log('⏳ Waiting for Google Maps API...');
+    
     // انتظار callback من index.html
+    let attempts = 0;
+    const maxAttempts = 100; // 10 ثواني (100 * 100ms)
+    
     const checkInterval = setInterval(() => {
+      attempts++;
       if (checkGoogleMaps()) {
         clearInterval(checkInterval);
+      } else if (attempts >= maxAttempts) {
+        clearInterval(checkInterval);
+        if (mounted) {
+          console.error('❌ Google Maps API failed to load after 10s');
+          console.error('Check: 1) API Key validity, 2) API is enabled in Google Cloud, 3) Network connection');
+          setError(t.error + ' - Please check API Key configuration');
+          setLoading(false);
+        }
       }
     }, 100);
 
-    // timeout بعد 10 ثواني
-    const timeoutId = setTimeout(() => {
-      if (!window.google || !window.google.maps) {
-        console.error('❌ Google Maps API failed to load after 10s');
-        setError(t.error);
-        setLoading(false);
-      }
-      clearInterval(checkInterval);
-    }, 10000);
-
     return () => {
+      mounted = false;
       clearInterval(checkInterval);
-      clearTimeout(timeoutId);
     };
   }, []);
 

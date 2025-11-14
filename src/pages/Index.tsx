@@ -20,7 +20,7 @@ const Index = ({ currentLanguage, onLanguageChange, onLocationChange }: {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col">
       {/* Main Content */}
       <main className="flex-1">
         {/* Hero Section with Search */}

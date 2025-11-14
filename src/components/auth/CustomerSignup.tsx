@@ -8,7 +8,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Loader2, ShoppingBag, Mail, Lock, Phone, MapPin, FileText } from "lucide-react";
 import { auth, db } from "@/integrations/firebase/client";
-import { createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { signInWithGoogle } from "@/lib/firebase/googleAuth";
 import { doc, setDoc } from "firebase/firestore";
 import { useTranslation } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
@@ -286,8 +287,7 @@ export const CustomerSignup = ({ currentLanguage }: CustomerSignupProps) => {
               if (!formData.termsAccepted) return;
               setIsGoogleLoading(true);
               try {
-                const provider = new GoogleAuthProvider();
-                const { user } = await signInWithPopup(auth, provider);
+                const { user } = await signInWithGoogle();
 
                 if (!user.displayName && formData.fullName) {
                   await updateProfile(user, { displayName: formData.fullName });

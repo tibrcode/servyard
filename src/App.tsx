@@ -292,7 +292,7 @@ const AppContent = () => {
           <SidebarProvider>
               {/* Global guard: if user is signed-in but profile is incomplete, send to /complete-profile */}
               <EnsureProfile />
-              <div className="flex min-h-screen w-full">
+              <div className="flex min-h-screen w-full bg-gradient-to-br from-primary/5 via-background to-primary/10">
                 <AppSidebar
                   currentLanguage={currentLanguage}
                   onLanguageChange={handleLanguageChange}
@@ -308,7 +308,11 @@ const AppContent = () => {
                   {/* Spacer to offset fixed header height */}
                   <div style={{ height: 'var(--app-header-height, 56px)' }} />
 
-                  <main className="flex-1">
+                  <main className="flex-1 relative">
+                    {/* Background Pattern */}
+                    <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none"></div>
+                    
+                    <div className="relative z-10">
                     <Routes>
                       <Route path="/" element={
                         <Index
@@ -353,6 +357,7 @@ const AppContent = () => {
                       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                       <Route path="*" element={<NotFound currentLanguage={currentLanguage} />} />
                     </Routes>
+                    </div>
                   </main>
                 </div>
               </div>

@@ -11,7 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { currencyList, getCurrencyLabel } from "@/lib/currencies";
 import { Loader2, Building2, FileText } from "lucide-react";
 import { auth, db } from "@/integrations/firebase/client";
-import { createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { signInWithGoogle } from "@/lib/firebase/googleAuth";
 import { doc, setDoc } from "firebase/firestore";
 import { useTranslation } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
@@ -155,8 +156,7 @@ export const ProviderSignup = ({ currentLanguage }: ProviderSignupProps) => {
     }
     setIsGoogleLoading(true);
     try {
-      const provider = new GoogleAuthProvider();
-      const { user } = await signInWithPopup(auth, provider);
+      const result = await signInWithGoogle();
 
       // Ensure displayName exists
       if (!user.displayName && formData.fullName) {

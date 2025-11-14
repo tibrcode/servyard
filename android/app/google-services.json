@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "866507388194",
+    "project_id": "servyard-de527",
+    "storage_bucket": "servyard-de527.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:866507388194:android:7f546d73d14cbc921fe17b",
+        "android_client_info": {
+          "package_name": "com.servyard.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "866507388194-l4dg70gls2tso7fb4n87nf453bg505kb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.servyard.app",
+            "certificate_hash": "c461cd39e689a01bc3561da5dd78e4c6bc9d682f"
+          }
+        },
+        {
+          "client_id": "866507388194-klhudvu1tasm4fp8dt4dd6f8ttinqhnq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDjywq55Bz1MneOdD1ewSS0eqwfXnyas_c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "866507388194-klhudvu1tasm4fp8dt4dd6f8ttinqhnq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

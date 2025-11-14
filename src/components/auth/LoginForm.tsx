@@ -5,8 +5,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, Mail, Lock } from "lucide-react";
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { auth, db } from "@/integrations/firebase/client";
+import { auth } from "@/integrations/firebase/client";
+import { signInWithGoogle } from "@/lib/firebase/googleAuth";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { useTranslation } from "@/lib/i18n";
@@ -81,14 +81,13 @@ export const LoginForm = ({ currentLanguage }: LoginFormProps) => {
     setError('');
     setIsGoogleLoading(true);
     try {
-      const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
+      await signInWithGoogle();
       toast({ title: t.auth.loginSuccess, description: t.auth.welcomeBack });
       navigate('/auth');
     } catch (err: any) {
       console.error('Google sign-in error:', err);
       let errorMessage = err?.message || t.auth.loginError;
-      if (errorMessage.includes('popup-closed-by-user')) {
+      if (errorMessage.includes('popup-closed-by-user') || errorMessage.includes('User cancelled')) {
         errorMessage = '';
       } else if (errorMessage.includes('auth/popup-blocked')) {
         errorMessage = 'تم حظر النافذة المنبثقة. يرجى السماح بالنوافذ المنبثقة أو المحاولة مجدداً.';

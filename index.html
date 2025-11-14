@@ -34,14 +34,31 @@
   <!-- Google Maps API -->
   <script>
     window.GOOGLE_MAPS_API_KEY = 'AIzaSyCWyxfuREVLTTAyTqDbByxbPSqVwYg830Y';
+    window.googleMapsLoaded = false;
+    
     // Callback function for Google Maps initialization
     window.initGoogleMaps = function() {
       window.googleMapsLoaded = true;
       console.log('✅ Google Maps API loaded successfully');
+      console.log('✅ Google Maps version:', google.maps.version);
+    };
+    
+    // Error handler for Google Maps authentication
+    window.gm_authFailure = function() {
+      console.error('❌ Google Maps authentication failed');
+      console.error('Possible reasons:');
+      console.error('1. Invalid API Key');
+      console.error('2. API not enabled in Google Cloud Console');
+      console.error('3. API Key restrictions blocking the request');
+      console.error('4. Billing not enabled');
+      alert('Google Maps authentication failed. Please check the console for details.');
     };
   </script>
-  <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCWyxfuREVLTTAyTqDbByxbPSqVwYg830Y&libraries=places&callback=initGoogleMaps">
+  <script 
+    async 
+    defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCWyxfuREVLTTAyTqDbByxbPSqVwYg830Y&libraries=places&callback=initGoogleMaps&v=weekly"
+    onerror="console.error('❌ Failed to load Google Maps script from googleapis.com')">
   </script>
   <script>
     // إخفاء Google Maps warnings المعروفة (false positives)
