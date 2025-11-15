@@ -46,7 +46,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   markers = [],
   onLocationSelect,
   onServiceClick,
-  height = "400px",
+  height = "500px",
   currentLanguage,
   showCurrentLocation = true,
   zoom = 12
@@ -415,11 +415,11 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
           )}
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-0">
         <div 
           ref={mapRef} 
           style={{ width: '100%', height }}
-          className="rounded-lg overflow-hidden border"
+          className="overflow-hidden"
         />
       </CardContent>
     </Card>
