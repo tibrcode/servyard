@@ -306,27 +306,27 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
             color: ${colors.text};
             box-sizing: border-box;
             border-radius: 8px;
-            overflow: hidden;
           ">
             <!-- Header -->
             <div style="
               background: ${colors.headerBg};
               color: white;
-              padding: 12px 16px;
+              padding: 12px 0;
               border-radius: 8px 8px 0 0;
             ">
               <div style="
                 font-size: 14px; 
                 font-weight: 600; 
                 margin-bottom: 4px;
+                padding: 0 16px;
                 overflow-x: auto;
                 overflow-y: hidden;
-                white-space: nowrap;
-                -webkit-overflow-scrolling: touch;
               ">
-                ${providerName}
+                <div style="white-space: nowrap; min-width: min-content;">
+                  ${providerName}
+                </div>
               </div>
-              <div style="font-size: 11px; opacity: 0.9;">
+              <div style="font-size: 11px; opacity: 0.9; padding: 0 16px;">
                 ${isRTL ? `${servicesCount} خدمة متوفرة` : `${servicesCount} services available`}
               </div>
             </div>
@@ -337,7 +337,6 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
               overflow-y: auto; 
               overflow-x: hidden; 
               padding: 10px 14px;
-              -webkit-overflow-scrolling: touch;
             ">
               ${location.services.map((service, index) => `
                 <div style="
@@ -374,7 +373,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
             
             <!-- Footer -->
             <div style="
-              padding: 10px 16px 12px 16px;
+              padding: 10px 0 12px 0;
               border-top: 1px solid ${colors.border};
               border-radius: 0 0 8px 8px;
             ">
@@ -382,12 +381,13 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                 color: ${colors.textSecondary};
                 font-size: 10px;
                 line-height: 1.5;
+                padding: 0 16px;
                 overflow-x: auto;
                 overflow-y: hidden;
-                white-space: nowrap;
-                -webkit-overflow-scrolling: touch;
               ">
-                ${isRTL ? '👆 اضغط على أي خدمة لعرض التفاصيل' : '👆 Click any service to view details'}
+                <div style="white-space: nowrap; min-width: min-content;">
+                  ${isRTL ? '👆 اضغط على أي خدمة لعرض التفاصيل' : '👆 Click any service to view details'}
+                </div>
               </div>
             </div>
           </div>
