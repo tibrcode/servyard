@@ -299,8 +299,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
         content = `
           <div style="
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            min-width: 280px;
-            max-width: 320px;
+            width: 280px;
             padding: 0;
             direction: ${isRTL ? 'rtl' : 'ltr'};
             background: ${colors.background};
@@ -314,16 +313,13 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
               color: white;
               padding: 12px 16px;
               border-radius: 8px 8px 0 0;
+              overflow-x: auto;
             ">
               <div style="
                 font-size: 14px; 
                 font-weight: 600; 
-                margin-bottom: 4px; 
-                line-height: 1.3;
-                height: 2.6em;
-                overflow: hidden;
-                word-break: break-word;
-                hyphens: auto;
+                margin-bottom: 4px;
+                white-space: nowrap;
               ">
                 ${providerName}
               </div>
@@ -369,16 +365,15 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
             
             <!-- Footer -->
             <div style="
-              padding: 10px 8px 12px 16px;
+              padding: 10px 16px 12px 16px;
               border-top: 1px solid ${colors.border};
-              text-align: ${isRTL ? 'right' : 'left'};
               border-radius: 0 0 8px 8px;
-              overflow: hidden;
             ">
               <div style="
                 color: ${colors.textSecondary};
                 font-size: 10px;
                 line-height: 1.5;
+                white-space: nowrap;
               ">
                 ${isRTL ? '👆 اضغط على أي خدمة لعرض التفاصيل' : '👆 Click any service to view details'}
               </div>
