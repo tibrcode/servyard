@@ -80,6 +80,27 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   useEffect(() => {
     let mounted = true;
     
+    // إضافة CSS لإخفاء الإطار الأبيض من InfoWindow
+    const style = document.createElement('style');
+    style.innerHTML = `
+      .gm-style-iw-c {
+        padding: 0 !important;
+        border-radius: 8px !important;
+        box-shadow: 0 2px 7px 1px rgba(0,0,0,0.3) !important;
+      }
+      .gm-style-iw-d {
+        overflow: hidden !important;
+      }
+      .gm-ui-hover-effect {
+        top: 2px !important;
+        right: 2px !important;
+      }
+      .gm-style .gm-style-iw-tc {
+        display: none !important;
+      }
+    `;
+    document.head.appendChild(style);
+    
     // التحقق من تحميل API (محمّل من index.html)
     const checkGoogleMaps = () => {
       if (window.google && window.google.maps) {
@@ -223,8 +244,9 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
         const providerName = location.services[0].provider_name;
         const servicesCount = location.services.length;
         
-        // الكشف عن الوضع الليلي من خلال فحص class الـ body
-        const isDarkMode = document.documentElement.classList.contains('dark');
+        // الكشف عن الوضع الليلي - نستخدم MutationObserver لمراقبة التغييرات
+        const checkDarkMode = () => document.documentElement.classList.contains('dark');
+        const isDarkMode = checkDarkMode();
         
         // ألوان تتكيف مع الوضع الليلي/النهاري
         const colors = isDarkMode ? {
@@ -248,20 +270,21 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             width: 260px;
             max-width: 90vw;
-            padding: 0;
+            padding: 8px 12px;
             direction: ${isRTL ? 'rtl' : 'ltr'};
             background: ${colors.background};
             color: ${colors.text};
             box-sizing: border-box;
             overflow: hidden;
+            border-radius: 8px;
           ">
             <!-- Header -->
             <div style="
               background: ${colors.headerBg};
               color: white;
               padding: 8px 12px;
-              border-radius: 6px 6px 0 0;
-              margin: -12px -16px 8px -16px;
+              border-radius: 6px;
+              margin: -8px -12px 8px -12px;
             ">
               <div style="font-size: 14px; font-weight: 600; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                 ${providerName}
@@ -272,16 +295,14 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
             </div>
             
             <!-- Services List -->
-            <div style="max-height: 250px; overflow-y: auto; overflow-x: hidden;">
+            <div style="max-height: 250px; overflow-y: auto; overflow-x: hidden; padding: 0 4px;">
               ${location.services.map((service, index) => `
                 <div style="
-                  padding: 6px 0;
+                  padding: 6px 4px;
                   border-bottom: ${index < location.services!.length - 1 ? `1px solid ${colors.border}` : 'none'};
                   cursor: pointer;
                   transition: background 0.2s;
-                  white-space: nowrap;
-                  overflow: hidden;
-                  text-overflow: ellipsis;
+                  border-radius: 4px;
                 " 
                 onmouseover="this.style.background='${colors.hover}'"
                 onmouseout="this.style.background='transparent'"
@@ -326,7 +347,10 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
         `;
       } else {
         // fallback للـ label العادي
-        content = `<div style="padding: 8px; font-weight: 500;">${label}</div>`;
+        const isDarkMode = document.documentElement.classList.contains('dark');
+        const bgColor = isDarkMode ? '#1b1f22' : '#ffffff';
+        const textColor = isDarkMode ? '#e5e7eb' : '#111827';
+        content = `<div style="padding: 8px; font-weight: 500; background: ${bgColor}; color: ${textColor}; border-radius: 8px;">${label}</div>`;
       }
       
       const infoWindow = new google.maps.InfoWindow({
