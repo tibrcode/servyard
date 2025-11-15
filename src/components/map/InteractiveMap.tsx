@@ -317,7 +317,18 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
               border-radius: 6px;
               margin: -8px -12px 8px -12px;
             ">
-              <div style="font-size: 14px; font-weight: 600; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+              <div style="
+                font-size: 14px; 
+                font-weight: 600; 
+                margin-bottom: 2px; 
+                line-height: 1.3;
+                max-height: 2.6em;
+                overflow: hidden;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                word-break: break-word;
+              ">
                 ${providerName}
               </div>
               <div style="font-size: 11px; opacity: 0.9;">
@@ -364,12 +375,15 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
             <div style="
               margin-top: 6px;
               padding-top: 6px;
+              padding-bottom: 2px;
               border-top: 1px solid ${colors.border};
               text-align: center;
             ">
               <div style="
                 color: ${colors.textSecondary};
                 font-size: 10px;
+                line-height: 1.4;
+                padding: 0 4px;
               ">
                 ${isRTL ? '👆 اضغط على أي خدمة لعرض التفاصيل' : '👆 Click any service to view details'}
               </div>
