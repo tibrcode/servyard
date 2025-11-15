@@ -292,7 +292,7 @@ const AppContent = () => {
           <SidebarProvider>
               {/* Global guard: if user is signed-in but profile is incomplete, send to /complete-profile */}
               <EnsureProfile />
-              <div className="flex min-h-screen w-full bg-gradient-to-br from-primary/5 via-background to-primary/10">
+              <div className="flex min-h-screen w-full bg-background">
                 <AppSidebar
                   currentLanguage={currentLanguage}
                   onLanguageChange={handleLanguageChange}
