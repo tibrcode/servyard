@@ -847,14 +847,14 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                       </div>
                     </CardHeader>
 
-                    <CardContent className="pt-0 px-4 sm:px-6 pb-6">
+                    <CardContent className="pt-0 px-3 sm:px-6 pb-4 sm:pb-6">
                       {service.description && (
-                        <p className="text-muted-foreground text-sm mb-2 sm:mb-3 line-clamp-2">
+                        <p className="text-muted-foreground text-sm mb-1.5 sm:mb-3 line-clamp-2">
                           {service.description}
                         </p>
                       )}
 
-                      <div className="flex flex-col gap-0.5 sm:gap-1 text-sm text-muted-foreground mb-2 sm:mb-3">
+                      <div className="flex flex-col gap-0 sm:gap-1 text-sm text-muted-foreground mb-1.5 sm:mb-3">
                         {/* Service rating */}
                         <div className="flex items-center gap-2">
                           <div className="flex items-center gap-1">
@@ -901,7 +901,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                         )}
                       </div>
 
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between mb-2 sm:mb-0">
                         {service.duration_minutes && (
                           <div className="flex items-center gap-1 text-sm text-muted-foreground">
                             <Clock className="h-4 w-4" />
@@ -920,7 +920,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                         )}
                       </div>
 
-                      <div className="flex gap-2 mt-4">
+                      <div className="flex gap-2 mt-2 sm:mt-4">
                         {service.booking_enabled && (
                           <Button
                             className="flex-1"
@@ -948,7 +948,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                         </Button>
                       </div>
 
-                      <Button className="w-full mt-2" onClick={(e) => {
+                      <Button className="w-full mt-1.5 sm:mt-2" onClick={(e) => {
                         e.stopPropagation();
                         handleServiceClick(service);
                       }}>
