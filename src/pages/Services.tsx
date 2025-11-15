@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Filter, MapPin, Star, Clock, ExternalLink, Calendar, Map as MapIcon, List } from "lucide-react";
+import { Search, Filter, MapPin, Star, Clock, ExternalLink, Calendar, Map as MapIcon, List, ChevronDown } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
 // Currency display uses Latin currency code (e.g., AED) instead of symbol
@@ -89,6 +89,9 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
   // Selected service from map
   const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
   const selectedServiceRef = useRef<HTMLDivElement>(null);
+  
+  // Expanded service card state (for accordion)
+  const [expandedServiceId, setExpandedServiceId] = useState<string | null>(null);
   
   // Booking modal state
   const [bookingService, setBookingService] = useState<Service | null>(null);
@@ -818,143 +821,146 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
         ) : (
           /* List View */
           <div className="w-full max-w-full overflow-x-clip">
-            <div className="grid w-full grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <div className="grid w-full grid-cols-1 gap-3 sm:gap-4">
               {filteredServices.map((service) => {
                 const provider = providers[service.provider_id];
+                const isExpanded = expandedServiceId === service.id;
 
                 return (
                   <Card
                     key={service.id}
-                    className="w-full cursor-pointer hover:shadow-lg transition-shadow"
-                    onClick={() => handleServiceClick(service)}
+                    className="w-full transition-all duration-200"
                   >
-                    <CardHeader>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <ProviderLogo
-                            providerName={provider?.full_name || t.ui.noData}
-                            verified={true}
-                            size="md"
-                            showName={false}
-                          />
-                          <div>
-                            <CardTitle className="text-lg">{service.name}</CardTitle>
-                            <p className="text-muted-foreground text-sm">
-                              {provider?.full_name || t.ui.noData}
-                            </p>
-                          </div>
+                    {/* Compact Header - Always Visible */}
+                    <div 
+                      className="flex items-center justify-between p-3 sm:p-4 cursor-pointer hover:bg-muted/50 transition-colors"
+                      onClick={() => setExpandedServiceId(isExpanded ? null : service.id)}
+                    >
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <ProviderLogo
+                          providerName={provider?.full_name || t.ui.noData}
+                          verified={true}
+                          size="sm"
+                          showName={false}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-sm sm:text-base truncate">{service.name}</h3>
+                          <p className="text-xs sm:text-sm text-muted-foreground truncate">
+                            {provider?.full_name || t.ui.noData}
+                          </p>
                         </div>
                       </div>
-                    </CardHeader>
-
-                    <CardContent className="pt-0 px-3 sm:px-6 pb-4 sm:pb-6">
-                      {service.description && (
-                        <p className="text-muted-foreground text-sm mb-1.5 sm:mb-3 line-clamp-2">
-                          {service.description}
-                        </p>
-                      )}
-
-                      <div className="flex flex-col gap-0 sm:gap-1 text-sm text-muted-foreground mb-1.5 sm:mb-3">
-                        {/* Service rating */}
-                        <div className="flex items-center gap-2">
-                          <div className="flex items-center gap-1">
-                            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                            {serviceRatings[service.id] ? (
-                              <span className="whitespace-nowrap">
-                                {serviceRatings[service.id].avg.toFixed(1)} {t.customer.outOf5 || '/5'} ({serviceRatings[service.id].count})
-                              </span>
-                            ) : (
-                              <span>{t.booking.noRatingYet}</span>
-                            )}
-                          </div>
-                          <span className="opacity-70">• {t.provider.rating}</span>
-                        </div>
-
-                        {/* Provider (customer) rating */}
-                        <div className="flex items-center gap-2">
-                          <div className="flex items-center gap-1">
-                            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                            {provider && providerRatings[provider.id] ? (
-                              <span className="whitespace-nowrap">
-                                {providerRatings[provider.id].avg.toFixed(1)} {t.customer.outOf5 || '/5'} ({providerRatings[provider.id].count})
-                              </span>
-                            ) : (
-                              <span>{t.booking.noRatingYet}</span>
-                            )}
-                          </div>
-                          <span className="opacity-70">• {t.booking.clientRating}</span>
-                        </div>
-
-                        {provider?.city && (
-                          <div className="flex items-center gap-1">
-                            <MapPin className="h-4 w-4" />
-                            <span>{provider.city}</span>
-                          </div>
-                        )}
-
-                        {/* Display distance if available */}
-                        {(service as any).distance !== undefined && (
-                          <div className="flex items-center gap-1 text-primary font-medium">
-                            <MapPin className="h-4 w-4" />
-                            <span>{formatDistance((service as any).distance, currentLanguage === 'ar' ? 'ar' : 'en')}</span>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="flex items-center justify-between mb-2 sm:mb-0">
-                        {service.duration_minutes && (
-                          <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                            <Clock className="h-4 w-4" />
-                            <span>{service.duration_minutes} {t.ui.minutes}</span>
-                          </div>
-                        )}
-
+                      
+                      <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
                         {service.approximate_price && (
-                          <div className="text-lg font-semibold text-primary">
+                          <div className="text-base sm:text-lg font-semibold text-primary">
                             {provider?.currency_code ? (
-                              <span>{provider.currency_code} {service.approximate_price}</span>
+                              <span className="whitespace-nowrap">{provider.currency_code} {service.approximate_price}</span>
                             ) : (
                               <span>{service.approximate_price}</span>
                             )}
                           </div>
                         )}
+                        <ChevronDown 
+                          className={`h-5 w-5 text-muted-foreground transition-transform duration-200 flex-shrink-0 ${isExpanded ? 'rotate-180' : ''}`}
+                        />
                       </div>
+                    </div>
 
-                      <div className="flex gap-2 mt-2 sm:mt-4">
-                        {service.booking_enabled && (
-                          <Button
-                            className="flex-1"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleServiceClick(service);
-                            }}
-                          >
-                            <Calendar className="h-4 w-4 mr-2" />
-                            {isRTL ? 'حجز موعد' : 'Book Appointment'}
-                          </Button>
-                        )}
-                        <Button
-                          variant="outline"
-                          className={service.booking_enabled ? 'flex-1' : 'w-full'}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (provider?.id) {
-                              window.location.href = `/provider/${provider.id}`;
-                            }
-                          }}
-                        >
-                          <ExternalLink className="h-4 w-4 mr-2" />
-                          {t.actions.viewProvider}
-                        </Button>
-                      </div>
+                    {/* Expanded Content - Shown on Click */}
+                    {isExpanded && (
+                      <CardContent className="pt-0 px-3 sm:px-4 pb-3 sm:pb-4 border-t">
+                        <div className="space-y-3 sm:space-y-4 mt-3 sm:mt-4">
+                          {service.description && (
+                            <p className="text-muted-foreground text-sm">
+                              {service.description}
+                            </p>
+                          )}
 
-                      <Button className="w-full mt-1.5 sm:mt-2" onClick={(e) => {
-                        e.stopPropagation();
-                        handleServiceClick(service);
-                      }}>
-                        {t.actions.book}
-                      </Button>
-                    </CardContent>
+                          <div className="flex flex-col gap-1.5 text-sm text-muted-foreground">
+                            {/* Service rating */}
+                            <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-1">
+                                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                                {serviceRatings[service.id] ? (
+                                  <span className="whitespace-nowrap">
+                                    {serviceRatings[service.id].avg.toFixed(1)} {t.customer.outOf5 || '/5'} ({serviceRatings[service.id].count})
+                                  </span>
+                                ) : (
+                                  <span>{t.booking.noRatingYet}</span>
+                                )}
+                              </div>
+                              <span className="opacity-70">• {t.provider.rating}</span>
+                            </div>
+
+                            {/* Provider (customer) rating */}
+                            <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-1">
+                                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                                {provider && providerRatings[provider.id] ? (
+                                  <span className="whitespace-nowrap">
+                                    {providerRatings[provider.id].avg.toFixed(1)} {t.customer.outOf5 || '/5'} ({providerRatings[provider.id].count})
+                                  </span>
+                                ) : (
+                                  <span>{t.booking.noRatingYet}</span>
+                                )}
+                              </div>
+                              <span className="opacity-70">• {t.booking.clientRating}</span>
+                            </div>
+
+                            {provider?.city && (
+                              <div className="flex items-center gap-1">
+                                <MapPin className="h-4 w-4" />
+                                <span>{provider.city}</span>
+                              </div>
+                            )}
+
+                            {/* Display distance if available */}
+                            {(service as any).distance !== undefined && (
+                              <div className="flex items-center gap-1 text-primary font-medium">
+                                <MapPin className="h-4 w-4" />
+                                <span>{formatDistance((service as any).distance, currentLanguage === 'ar' ? 'ar' : 'en')}</span>
+                              </div>
+                            )}
+
+                            {service.duration_minutes && (
+                              <div className="flex items-center gap-1">
+                                <Clock className="h-4 w-4" />
+                                <span>{service.duration_minutes} {t.ui.minutes}</span>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex flex-col sm:flex-row gap-2">
+                            {service.booking_enabled && (
+                              <Button
+                                className="flex-1"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleServiceClick(service);
+                                }}
+                              >
+                                <Calendar className="h-4 w-4 mr-2" />
+                                {isRTL ? 'حجز موعد' : 'Book Appointment'}
+                              </Button>
+                            )}
+                            <Button
+                              variant="outline"
+                              className="flex-1"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (provider?.id) {
+                                  window.location.href = `/provider/${provider.id}`;
+                                }
+                              }}
+                            >
+                              <ExternalLink className="h-4 w-4 mr-2" />
+                              {t.actions.viewProvider}
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    )}
                   </Card>
                 );
               })}
