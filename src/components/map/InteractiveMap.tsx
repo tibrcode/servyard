@@ -301,30 +301,28 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             width: 260px;
             max-width: 90vw;
-            padding: 8px 12px;
+            padding: 0;
             direction: ${isRTL ? 'rtl' : 'ltr'};
             background: ${colors.background};
             color: ${colors.text};
             box-sizing: border-box;
-            overflow: hidden;
+            overflow: visible;
             border-radius: 8px;
           ">
             <!-- Header -->
             <div style="
               background: ${colors.headerBg};
               color: white;
-              padding: 8px 12px;
-              border-radius: 6px;
-              margin: -8px -12px 8px -12px;
+              padding: 10px 14px;
+              border-radius: 8px 8px 0 0;
             ">
               <div style="
                 font-size: 14px; 
                 font-weight: 600; 
-                margin-bottom: 2px; 
-                line-height: 1.3;
-                max-height: 2.6em;
-                overflow: hidden;
+                margin-bottom: 3px; 
+                line-height: 1.4;
                 word-wrap: break-word;
+                overflow-wrap: break-word;
                 white-space: normal;
               ">
                 ${providerName}
@@ -335,7 +333,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
             </div>
             
             <!-- Services List -->
-            <div style="max-height: 250px; overflow-y: auto; overflow-x: hidden; padding: 0 4px;">
+            <div style="max-height: 250px; overflow-y: auto; overflow-x: hidden; padding: 8px 12px;">
               ${location.services.map((service, index) => `
                 <div style="
                   padding: 6px 4px;
@@ -371,17 +369,15 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
             
             <!-- Footer -->
             <div style="
-              margin-top: 6px;
-              padding-top: 6px;
-              padding-bottom: 2px;
+              padding: 8px 12px 10px 12px;
               border-top: 1px solid ${colors.border};
               text-align: center;
+              border-radius: 0 0 8px 8px;
             ">
               <div style="
                 color: ${colors.textSecondary};
                 font-size: 10px;
-                line-height: 1.4;
-                padding: 0 4px;
+                line-height: 1.5;
               ">
                 ${isRTL ? '👆 اضغط على أي خدمة لعرض التفاصيل' : '👆 Click any service to view details'}
               </div>
