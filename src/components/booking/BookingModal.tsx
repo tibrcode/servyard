@@ -208,6 +208,7 @@ export const BookingModal = ({ service, provider, isOpen, onClose, currentLangua
               });
               onClose();
             }}
+            onBack={onClose}
           />
         </DialogContent>
       </Dialog>

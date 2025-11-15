@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Calendar as CalendarIcon, Clock, User, DollarSign, CheckCircle } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, User, DollarSign, CheckCircle, ArrowLeft } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
@@ -47,6 +47,7 @@ interface ServiceBookingProps {
   providerTimezone?: string;
   language?: 'ar' | 'en';
   onBookingComplete?: (bookingId: string) => void;
+  onBack?: () => void;
 }
 
 export function ServiceBooking({
@@ -62,6 +63,7 @@ export function ServiceBooking({
   providerTimezone = 'Asia/Dubai',
   language = 'ar',
   onBookingComplete,
+  onBack,
 }: ServiceBookingProps) {
   const { toast } = useToast();
   const [selectedDate, setSelectedDate] = useState<Date>();
@@ -282,7 +284,20 @@ export function ServiceBooking({
         {/* Step 1: Select Date */}
         {step === 1 && (
           <div className="space-y-4">
-            <Label>{t.selectDate}</Label>
+            <div className="flex items-center justify-between">
+              <Label>{t.selectDate}</Label>
+              {onBack && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onBack}
+                  className="flex items-center gap-2"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  {isRTL ? 'رجوع' : 'Back'}
+                </Button>
+              )}
+            </div>
             <div className="flex justify-center">
               <Calendar
                 mode="single"
