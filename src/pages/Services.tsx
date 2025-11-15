@@ -869,72 +869,66 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
 
                     {/* Expanded Content - Shown on Click */}
                     {isExpanded && (
-                      <CardContent className="pt-0 px-3 sm:px-4 pb-2 sm:pb-3 border-t">
-                        <div className="space-y-2 mt-2 sm:mt-3">
+                      <CardContent className="pt-0 px-3 sm:px-4 pb-1.5 border-t">
+                        <div className="space-y-1 mt-1.5">
                           {service.description && (
-                            <p className="text-muted-foreground text-sm leading-snug">
+                            <p className="text-muted-foreground text-sm leading-tight sm:leading-normal">
                               {service.description}
                             </p>
                           )}
 
-                          <div className="flex flex-col gap-0.5 text-sm text-muted-foreground">
+                          <div className="flex flex-col gap-0 sm:gap-0.5 text-sm text-muted-foreground leading-tight sm:leading-normal">
                             {/* Service rating */}
-                            <div className="flex items-center gap-2">
-                              <div className="flex items-center gap-1">
-                                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                                {serviceRatings[service.id] ? (
-                                  <span className="whitespace-nowrap">
-                                    {serviceRatings[service.id].avg.toFixed(1)} {t.customer.outOf5 || '/5'} ({serviceRatings[service.id].count})
-                                  </span>
-                                ) : (
-                                  <span>{t.booking.noRatingYet}</span>
-                                )}
-                              </div>
-                              <span className="opacity-70">• {t.provider.rating}</span>
+                            <div className="flex items-center gap-1 sm:gap-1.5">
+                              <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400 flex-shrink-0" />
+                              {serviceRatings[service.id] ? (
+                                <span>
+                                  {serviceRatings[service.id].avg.toFixed(1)} {t.customer.outOf5 || '/5'} ({serviceRatings[service.id].count}) • {t.provider.rating}
+                                </span>
+                              ) : (
+                                <span>{t.booking.noRatingYet} • {t.provider.rating}</span>
+                              )}
                             </div>
 
                             {/* Provider (customer) rating */}
-                            <div className="flex items-center gap-2">
-                              <div className="flex items-center gap-1">
-                                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                                {provider && providerRatings[provider.id] ? (
-                                  <span className="whitespace-nowrap">
-                                    {providerRatings[provider.id].avg.toFixed(1)} {t.customer.outOf5 || '/5'} ({providerRatings[provider.id].count})
-                                  </span>
-                                ) : (
-                                  <span>{t.booking.noRatingYet}</span>
-                                )}
-                              </div>
-                              <span className="opacity-70">• {t.booking.clientRating}</span>
+                            <div className="flex items-center gap-1 sm:gap-1.5">
+                              <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400 flex-shrink-0" />
+                              {provider && providerRatings[provider.id] ? (
+                                <span>
+                                  {providerRatings[provider.id].avg.toFixed(1)} {t.customer.outOf5 || '/5'} ({providerRatings[provider.id].count}) • {t.booking.clientRating}
+                                </span>
+                              ) : (
+                                <span>{t.booking.noRatingYet} • {t.booking.clientRating}</span>
+                              )}
                             </div>
 
                             {provider?.city && (
-                              <div className="flex items-center gap-1">
-                                <MapPin className="h-4 w-4" />
+                              <div className="flex items-center gap-1 sm:gap-1.5">
+                                <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
                                 <span>{provider.city}</span>
                               </div>
                             )}
 
                             {/* Display distance if available */}
                             {(service as any).distance !== undefined && (
-                              <div className="flex items-center gap-1 text-primary font-medium">
-                                <MapPin className="h-4 w-4" />
+                              <div className="flex items-center gap-1 sm:gap-1.5 text-primary font-medium">
+                                <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
                                 <span>{formatDistance((service as any).distance, currentLanguage === 'ar' ? 'ar' : 'en')}</span>
                               </div>
                             )}
 
                             {service.duration_minutes && (
-                              <div className="flex items-center gap-1">
-                                <Clock className="h-4 w-4" />
+                              <div className="flex items-center gap-1 sm:gap-1.5">
+                                <Clock className="h-3.5 w-3.5 flex-shrink-0" />
                                 <span>{service.duration_minutes} {t.ui.minutes}</span>
                               </div>
                             )}
                           </div>
 
-                          <div className="flex flex-col sm:flex-row gap-1.5 sm:gap-2 pt-1">
+                          <div className="flex flex-col gap-1 sm:gap-1.5 pt-1.5 sm:pt-2">
                             {service.booking_enabled && (
                               <Button
-                                className="flex-1"
+                                className="w-full"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleServiceClick(service);
@@ -946,7 +940,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                             )}
                             <Button
                               variant="outline"
-                              className="flex-1"
+                              className="w-full"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 if (provider?.id) {
