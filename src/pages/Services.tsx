@@ -869,15 +869,15 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
 
                     {/* Expanded Content - Shown on Click */}
                     {isExpanded && (
-                      <CardContent className="pt-0 px-3 sm:px-4 pb-3 sm:pb-4 border-t">
-                        <div className="space-y-3 sm:space-y-4 mt-3 sm:mt-4">
+                      <CardContent className="pt-0 px-3 sm:px-4 pb-2 sm:pb-3 border-t">
+                        <div className="space-y-2 mt-2 sm:mt-3">
                           {service.description && (
-                            <p className="text-muted-foreground text-sm">
+                            <p className="text-muted-foreground text-sm leading-snug">
                               {service.description}
                             </p>
                           )}
 
-                          <div className="flex flex-col gap-1.5 text-sm text-muted-foreground">
+                          <div className="flex flex-col gap-0.5 text-sm text-muted-foreground">
                             {/* Service rating */}
                             <div className="flex items-center gap-2">
                               <div className="flex items-center gap-1">
@@ -931,7 +931,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                             )}
                           </div>
 
-                          <div className="flex flex-col sm:flex-row gap-2">
+                          <div className="flex flex-col sm:flex-row gap-1.5 sm:gap-2 pt-1">
                             {service.booking_enabled && (
                               <Button
                                 className="flex-1"
