@@ -299,8 +299,8 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
         content = `
           <div style="
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            width: 280px;
-            max-width: 90vw;
+            min-width: 280px;
+            max-width: 320px;
             padding: 0;
             direction: ${isRTL ? 'rtl' : 'ltr'};
             background: ${colors.background};
@@ -321,9 +321,14 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                 font-weight: 600; 
                 margin-bottom: 4px; 
                 line-height: 1.4;
+                max-height: 2.8em;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
                 word-wrap: break-word;
-                overflow-wrap: break-word;
-                white-space: normal;
+                word-break: break-word;
               ">
                 ${providerName}
               </div>
@@ -369,9 +374,9 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
             
             <!-- Footer -->
             <div style="
-              padding: 10px 16px 12px 16px;
+              padding: 10px 8px 12px 16px;
               border-top: 1px solid ${colors.border};
-              text-align: center;
+              text-align: ${isRTL ? 'right' : 'left'};
               border-radius: 0 0 8px 8px;
               overflow: hidden;
             ">
