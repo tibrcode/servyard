@@ -18,6 +18,11 @@ const config: CapacitorConfig = {
         SplashScreen: {
             launchShowDuration: 0,
         },
+        GoogleAuth: {
+            scopes: ['profile', 'email'],
+            serverClientId: '866507388194-klhudvu1tasm4fp8dt4dd6f8ttinqhnq.apps.googleusercontent.com',
+            forceCodeForRefreshToken: true,
+        },
     },
 };
 

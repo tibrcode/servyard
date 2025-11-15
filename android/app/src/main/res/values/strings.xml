@@ -4,4 +4,5 @@
     <string name="title_activity_main">ServYard</string>
     <string name="package_name">com.servyard.app</string>
     <string name="custom_url_scheme">com.servyard.app</string>
+    <string name="server_client_id">866507388194-klhudvu1tasm4fp8dt4dd6f8ttinqhnq.apps.googleusercontent.com</string>
 </resources>
