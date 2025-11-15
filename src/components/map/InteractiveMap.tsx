@@ -306,6 +306,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
             color: ${colors.text};
             box-sizing: border-box;
             border-radius: 8px;
+            overflow: hidden;
           ">
             <!-- Header -->
             <div style="
@@ -313,13 +314,15 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
               color: white;
               padding: 12px 16px;
               border-radius: 8px 8px 0 0;
-              overflow-x: auto;
             ">
               <div style="
                 font-size: 14px; 
                 font-weight: 600; 
                 margin-bottom: 4px;
+                overflow-x: auto;
+                overflow-y: hidden;
                 white-space: nowrap;
+                -webkit-overflow-scrolling: touch;
               ">
                 ${providerName}
               </div>
@@ -329,7 +332,13 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
             </div>
             
             <!-- Services List -->
-            <div style="max-height: 250px; overflow-y: auto; overflow-x: hidden; padding: 10px 14px;">
+            <div style="
+              max-height: 250px; 
+              overflow-y: auto; 
+              overflow-x: hidden; 
+              padding: 10px 14px;
+              -webkit-overflow-scrolling: touch;
+            ">
               ${location.services.map((service, index) => `
                 <div style="
                   padding: 7px 6px;
@@ -373,7 +382,10 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                 color: ${colors.textSecondary};
                 font-size: 10px;
                 line-height: 1.5;
+                overflow-x: auto;
+                overflow-y: hidden;
                 white-space: nowrap;
+                -webkit-overflow-scrolling: touch;
               ">
                 ${isRTL ? '👆 اضغط على أي خدمة لعرض التفاصيل' : '👆 Click any service to view details'}
               </div>
