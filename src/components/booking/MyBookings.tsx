@@ -648,11 +648,6 @@ export function MyBookings({
 
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'} className="space-y-4">
-      <div className="flex items-center gap-2">
-        <Calendar className="h-5 w-5" />
-        <h2 className="text-xl font-semibold">{t.customer.myBookings}</h2>
-      </div>
-      
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'upcoming' | 'past')}>
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="upcoming">
