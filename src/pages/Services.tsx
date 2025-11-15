@@ -869,78 +869,63 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
 
                     {/* Expanded Content - Shown on Click */}
                     {isExpanded && (
-                      <CardContent className="pt-1.5 px-2.5 pb-1.5">
-                        <div className="space-y-0.5">
+                      <CardContent className="pt-2 px-2.5 pb-2">
+                        <div className="space-y-1">
                           {service.description && (
-                            <p className="text-muted-foreground text-xs sm:text-sm leading-tight">
-                              {service.description}
+                            <p className="text-foreground text-sm">{service.description}</p>
+                          )}
+
+                          {/* Service Rating */}
+                          {serviceRatings[service.id] ? (
+                            <p className="text-foreground text-sm">
+                              Servis Rating: {serviceRatings[service.id].avg.toFixed(1)} out of 5 ({serviceRatings[service.id].count})
+                            </p>
+                          ) : (
+                            <p className="text-foreground text-sm">Servis Rating: {t.booking.noRatingYet}</p>
+                          )}
+
+                          {/* Client Rating */}
+                          {provider && providerRatings[provider.id] ? (
+                            <p className="text-foreground text-sm">
+                              Client Rating: {providerRatings[provider.id].avg.toFixed(1)} out of 5 ({providerRatings[provider.id].count})
+                            </p>
+                          ) : (
+                            <p className="text-foreground text-sm">Client Rating: {t.booking.noRatingYet}</p>
+                          )}
+
+                          {/* City */}
+                          {provider?.city && (
+                            <p className="text-foreground text-sm">City: {provider.city}</p>
+                          )}
+
+                          {/* Distance if available */}
+                          {(service as any).distance !== undefined && (
+                            <p className="text-foreground text-sm">
+                              {formatDistance((service as any).distance, currentLanguage === 'ar' ? 'ar' : 'en')}
                             </p>
                           )}
 
-                          <div className="flex flex-col text-xs sm:text-sm text-muted-foreground leading-tight">
-                            {/* Service rating */}
-                            <div className="flex items-center gap-1">
-                              <Star className="h-3 w-3 fill-yellow-400 text-yellow-400 flex-shrink-0" />
-                              {serviceRatings[service.id] ? (
-                                <span className="text-xs">
-                                  {serviceRatings[service.id].avg.toFixed(1)} {t.customer.outOf5 || '/5'} ({serviceRatings[service.id].count}) • {t.provider.rating}
-                                </span>
-                              ) : (
-                                <span className="text-xs">{t.booking.noRatingYet} • {t.provider.rating}</span>
-                              )}
-                            </div>
+                          {/* Duration */}
+                          {service.duration_minutes && (
+                            <p className="text-foreground text-sm">Duration: {service.duration_minutes} minutes</p>
+                          )}
 
-                            {/* Provider (customer) rating */}
-                            <div className="flex items-center gap-1">
-                              <Star className="h-3 w-3 fill-yellow-400 text-yellow-400 flex-shrink-0" />
-                              {provider && providerRatings[provider.id] ? (
-                                <span className="text-xs">
-                                  {providerRatings[provider.id].avg.toFixed(1)} {t.customer.outOf5 || '/5'} ({providerRatings[provider.id].count}) • {t.booking.clientRating}
-                                </span>
-                              ) : (
-                                <span className="text-xs">{t.booking.noRatingYet} • {t.booking.clientRating}</span>
-                              )}
-                            </div>
-
-                            {provider?.city && (
-                              <div className="flex items-center gap-1">
-                                <MapPin className="h-3 w-3 flex-shrink-0" />
-                                <span className="text-xs">{provider.city}</span>
-                              </div>
-                            )}
-
-                            {/* Display distance if available */}
-                            {(service as any).distance !== undefined && (
-                              <div className="flex items-center gap-1 text-primary font-medium">
-                                <MapPin className="h-3 w-3 flex-shrink-0" />
-                                <span className="text-xs">{formatDistance((service as any).distance, currentLanguage === 'ar' ? 'ar' : 'en')}</span>
-                              </div>
-                            )}
-
-                            {service.duration_minutes && (
-                              <div className="flex items-center gap-1">
-                                <Clock className="h-3 w-3 flex-shrink-0" />
-                                <span className="text-xs">{service.duration_minutes} {t.ui.minutes}</span>
-                              </div>
-                            )}
-                          </div>
-
-                          <div className="flex flex-col gap-1 pt-1.5">
+                          <div className="flex flex-col gap-2 pt-2">
                             {service.booking_enabled && (
                               <Button
-                                className="w-full"
+                                className="w-full justify-start"
+                                variant="ghost"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleServiceClick(service);
                                 }}
                               >
-                                <Calendar className="h-4 w-4 mr-2" />
                                 {isRTL ? 'حجز موعد' : 'Book Appointment'}
                               </Button>
                             )}
                             <Button
-                              variant="outline"
-                              className="w-full"
+                              variant="ghost"
+                              className="w-full justify-start"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 if (provider?.id) {
@@ -948,8 +933,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                 }
                               }}
                             >
-                              <ExternalLink className="h-4 w-4 mr-2" />
-                              {t.actions.viewProvider}
+                              {isRTL ? 'عرض المزود' : 'View Provider'}
                             </Button>
                           </div>
                         </div>
