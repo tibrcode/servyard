@@ -638,57 +638,51 @@ export function MyBookings({
 
   if (isLoading) {
     return (
-      <Card dir={isRTL ? 'rtl' : 'ltr'}>
-        <CardContent className="py-8">
-          <div className="flex items-center justify-center">
-            <p className="text-muted-foreground">{localT.loading}</p>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="py-8" dir={isRTL ? 'rtl' : 'ltr'}>
+        <div className="flex items-center justify-center">
+          <p className="text-muted-foreground">{localT.loading}</p>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Card dir={isRTL ? 'rtl' : 'ltr'}>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Calendar className="h-5 w-5" />
-          {t.customer.myBookings}
-        </CardTitle>
-        <CardDescription>{t.customer.viewManageBookings}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'upcoming' | 'past')}>
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="upcoming">
-              {t.customer.upcoming} ({upcomingBookings.length})
-            </TabsTrigger>
-            <TabsTrigger value="past">
-              {t.customer.past} ({pastBookings.length})
-            </TabsTrigger>
-          </TabsList>
+    <div dir={isRTL ? 'rtl' : 'ltr'} className="space-y-4">
+      <div className="flex items-center gap-2">
+        <Calendar className="h-5 w-5" />
+        <h2 className="text-xl font-semibold">{t.customer.myBookings}</h2>
+      </div>
+      
+      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'upcoming' | 'past')}>
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="upcoming">
+            {t.customer.upcoming} ({upcomingBookings.length})
+          </TabsTrigger>
+          <TabsTrigger value="past">
+            {t.customer.past} ({pastBookings.length})
+          </TabsTrigger>
+        </TabsList>
 
-          <TabsContent value="upcoming" className="space-y-4 mt-6">
-            {upcomingBookings.length === 0 ? (
-              <div className="py-8 text-center">
-                <p className="text-muted-foreground">{t.customer.noUpcomingBookings}</p>
-              </div>
-            ) : (
-              upcomingBookings.map(renderBookingCard)
-            )}
-          </TabsContent>
+        <TabsContent value="upcoming" className="space-y-4 mt-6">
+          {upcomingBookings.length === 0 ? (
+            <div className="py-8 text-center">
+              <p className="text-muted-foreground">{t.customer.noUpcomingBookings}</p>
+            </div>
+          ) : (
+            upcomingBookings.map(renderBookingCard)
+          )}
+        </TabsContent>
 
-          <TabsContent value="past" className="space-y-4 mt-6">
-            {pastBookings.length === 0 ? (
-              <div className="py-8 text-center">
-                <p className="text-muted-foreground">{localT.noPast}</p>
-              </div>
-            ) : (
-              pastBookings.map(renderBookingCard)
-            )}
-          </TabsContent>
-        </Tabs>
-      </CardContent>
+        <TabsContent value="past" className="space-y-4 mt-6">
+          {pastBookings.length === 0 ? (
+            <div className="py-8 text-center">
+              <p className="text-muted-foreground">{localT.noPast}</p>
+            </div>
+          ) : (
+            pastBookings.map(renderBookingCard)
+          )}
+        </TabsContent>
+      </Tabs>
 
       {/* Review Dialog */}
       <Dialog open={reviewDialogOpen} onOpenChange={setReviewDialogOpen}>
@@ -787,6 +781,6 @@ export function MyBookings({
           </div>
         </DialogContent>
       </Dialog>
-    </Card>
+    </div>
   );
 }
