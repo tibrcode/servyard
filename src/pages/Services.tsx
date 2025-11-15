@@ -833,10 +833,10 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                   >
                     {/* Compact Header - Always Visible */}
                     <div 
-                      className="flex items-center justify-between p-2.5 cursor-pointer hover:bg-muted/50 transition-colors"
+                      className="flex items-center justify-between p-3 cursor-pointer hover:bg-muted/50 transition-colors"
                       onClick={() => setExpandedServiceId(isExpanded ? null : service.id)}
                     >
-                      <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
                         <ProviderLogo
                           providerName={provider?.full_name || t.ui.noData}
                           verified={true}
@@ -844,8 +844,8 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                           showName={false}
                         />
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-sm sm:text-base truncate leading-tight">{service.name}</h3>
-                          <p className="text-xs sm:text-sm text-muted-foreground truncate leading-tight">
+                          <h3 className="font-bold text-base truncate">{service.name}</h3>
+                          <p className="text-sm text-muted-foreground truncate">
                             {provider?.full_name || t.ui.noData}
                           </p>
                         </div>
@@ -853,7 +853,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                       
                       <div className="flex items-center gap-2 flex-shrink-0">
                         {service.approximate_price && (
-                          <div className="text-sm sm:text-base font-semibold text-primary">
+                          <div className="text-base font-semibold text-primary">
                             {provider?.currency_code ? (
                               <span className="whitespace-nowrap">{provider.currency_code} {service.approximate_price}</span>
                             ) : (
@@ -862,36 +862,50 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                           </div>
                         )}
                         <ChevronDown 
-                          className={`h-4 w-4 text-muted-foreground transition-transform duration-200 flex-shrink-0 ${isExpanded ? 'rotate-180' : ''}`}
+                          className={`h-5 w-5 text-muted-foreground transition-transform duration-200 flex-shrink-0 ${isExpanded ? 'rotate-180' : ''}`}
                         />
                       </div>
                     </div>
 
                     {/* Expanded Content - Shown on Click */}
                     {isExpanded && (
-                      <CardContent className="pt-2 px-2.5 pb-2">
-                        <div className="space-y-1">
+                      <CardContent className="pt-2 px-3 pb-3">
+                        <div className="space-y-1.5">
+                          {/* Description */}
                           {service.description && (
                             <p className="text-foreground text-sm">{service.description}</p>
                           )}
 
-                          {/* Service Rating */}
-                          {serviceRatings[service.id] ? (
+                          {/* Duration */}
+                          {service.duration_minutes && (
                             <p className="text-foreground text-sm">
-                              Servis Rating: {serviceRatings[service.id].avg.toFixed(1)} out of 5 ({serviceRatings[service.id].count})
+                              Service Duration: {service.duration_minutes} minutes
                             </p>
-                          ) : (
-                            <p className="text-foreground text-sm">Servis Rating: {t.booking.noRatingYet}</p>
                           )}
 
-                          {/* Client Rating */}
-                          {provider && providerRatings[provider.id] ? (
-                            <p className="text-foreground text-sm">
-                              Client Rating: {providerRatings[provider.id].avg.toFixed(1)} out of 5 ({providerRatings[provider.id].count})
-                            </p>
-                          ) : (
-                            <p className="text-foreground text-sm">Client Rating: {t.booking.noRatingYet}</p>
-                          )}
+                          {/* Service Rating with star */}
+                          <div className="flex items-center gap-1">
+                            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400 flex-shrink-0" />
+                            {serviceRatings[service.id] ? (
+                              <span className="text-foreground text-sm">
+                                Servis Rating: {serviceRatings[service.id].avg.toFixed(1)} out of 5 ({serviceRatings[service.id].count})
+                              </span>
+                            ) : (
+                              <span className="text-foreground text-sm">Servis Rating: {t.booking.noRatingYet}</span>
+                            )}
+                          </div>
+
+                          {/* Client Rating with star */}
+                          <div className="flex items-center gap-1">
+                            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400 flex-shrink-0" />
+                            {provider && providerRatings[provider.id] ? (
+                              <span className="text-foreground text-sm">
+                                Client Rating: {providerRatings[provider.id].avg.toFixed(1)} out of 5 ({providerRatings[provider.id].count})
+                              </span>
+                            ) : (
+                              <span className="text-foreground text-sm">Client Rating: {t.booking.noRatingYet}</span>
+                            )}
+                          </div>
 
                           {/* City */}
                           {provider?.city && (
@@ -905,27 +919,23 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                             </p>
                           )}
 
-                          {/* Duration */}
-                          {service.duration_minutes && (
-                            <p className="text-foreground text-sm">Duration: {service.duration_minutes} minutes</p>
-                          )}
-
-                          <div className="flex flex-col gap-2 pt-2">
+                          {/* Buttons */}
+                          <div className="space-y-2 pt-2">
                             {service.booking_enabled && (
                               <Button
-                                className="w-full justify-start"
-                                variant="ghost"
+                                className="w-full"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleServiceClick(service);
                                 }}
                               >
+                                <Calendar className="h-4 w-4 mr-2" />
                                 {isRTL ? 'حجز موعد' : 'Book Appointment'}
                               </Button>
                             )}
                             <Button
-                              variant="ghost"
-                              className="w-full justify-start"
+                              variant="outline"
+                              className="w-full"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 if (provider?.id) {
@@ -933,6 +943,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                 }
                               }}
                             >
+                              <ExternalLink className="h-4 w-4 mr-2" />
                               {isRTL ? 'عرض المزود' : 'View Provider'}
                             </Button>
                           </div>
