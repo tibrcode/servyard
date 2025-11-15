@@ -829,7 +829,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                 return (
                   <Card
                     key={service.id}
-                    className="w-full transition-all duration-200"
+                    className="w-full transition-all duration-200 overflow-hidden p-0"
                   >
                     {/* Compact Header - Always Visible */}
                     <div 
