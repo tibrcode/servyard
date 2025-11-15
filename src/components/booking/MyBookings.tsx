@@ -468,175 +468,171 @@ export function MyBookings({
     const bookingDate = new Date(booking.booking_date);
 
     return (
-      <Card key={booking.booking_id} data-booking-id={booking.booking_id} id={`booking-${booking.booking_id}`}>
-        <CardContent className="pt-6">
-          <div className="space-y-4">
-            {/* Service Title */}
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <h3 className="font-semibold text-lg">{booking.service_title}</h3>
-                {booking.notes && (
-                  <p className="text-sm text-muted-foreground mt-2">{booking.notes}</p>
+      <div key={booking.booking_id} data-booking-id={booking.booking_id} id={`booking-${booking.booking_id}`} className="p-4 space-y-4">
+        {/* Service Title */}
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <h3 className="font-semibold text-lg">{booking.service_title}</h3>
+            {booking.notes && (
+              <p className="text-sm text-muted-foreground mt-2">{booking.notes}</p>
+            )}
+          </div>
+          {getStatusBadge(booking.status)}
+        </div>
+
+        <Separator />
+
+        {/* Booking Details */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 text-sm">
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <span>{format(bookingDate, 'PPP', { locale: dateLocale })}</span>
+          </div>
+
+          <div className="flex items-center gap-2 text-sm">
+            <Clock className="h-4 w-4 text-muted-foreground" />
+            <span>
+              {formatTimeDisplay(booking.start_time, language)} - {formatTimeDisplay(booking.end_time, language)}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2 text-sm">
+            <span className="font-medium">
+              {booking.price} {booking.currency}
+            </span>
+          </div>
+
+          {/* Distance to provider */}
+          {customerLocation && providerContacts[booking.provider_id]?.latitude && providerContacts[booking.provider_id]?.longitude && (
+            <div className="flex items-center gap-2 text-sm text-primary font-medium">
+              <Navigation className="h-4 w-4" />
+              <span>
+                {formatDistance(
+                  calculateDistance(
+                    customerLocation,
+                    {
+                      latitude: providerContacts[booking.provider_id].latitude!,
+                      longitude: providerContacts[booking.provider_id].longitude!
+                    }
+                  ),
+                  language
                 )}
-              </div>
-              {getStatusBadge(booking.status)}
+              </span>
             </div>
+          )}
+        </div>
 
+        {/* Actions */}
+        {isUpcoming(booking) && booking.status !== 'cancelled' && (
+          <>
             <Separator />
+            <div className="flex gap-2 flex-wrap">
+              {/* Edit Button */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleOpenEditDialog(booking)}
+                className="flex-1 min-w-[120px]"
+              >
+                <Edit className="h-4 w-4 mr-1" />
+                {localT.edit}
+              </Button>
 
-            {/* Booking Details */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 text-sm">
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span>{format(bookingDate, 'PPP', { locale: dateLocale })}</span>
-              </div>
-
-              <div className="flex items-center gap-2 text-sm">
-                <Clock className="h-4 w-4 text-muted-foreground" />
-                <span>
-                  {formatTimeDisplay(booking.start_time, language)} - {formatTimeDisplay(booking.end_time, language)}
-                </span>
-              </div>
-
-              <div className="flex items-center gap-2 text-sm">
-                <span className="font-medium">
-                  {booking.price} {booking.currency}
-                </span>
-              </div>
-
-              {/* Distance to provider */}
-              {customerLocation && providerContacts[booking.provider_id]?.latitude && providerContacts[booking.provider_id]?.longitude && (
-                <div className="flex items-center gap-2 text-sm text-primary font-medium">
-                  <Navigation className="h-4 w-4" />
-                  <span>
-                    {formatDistance(
-                      calculateDistance(
-                        customerLocation,
-                        {
-                          latitude: providerContacts[booking.provider_id].latitude!,
-                          longitude: providerContacts[booking.provider_id].longitude!
-                        }
-                      ),
-                      language
+              {/* Cancel Button */}
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    disabled={!canCancel || cancellingId === booking.booking_id}
+                    className="flex-1 min-w-[120px]"
+                  >
+                    {cancellingId === booking.booking_id ? (
+                      localT.cancelling
+                    ) : (
+                      <>
+                        <X className="h-4 w-4 mr-1" />
+                        {localT.cancel}
+                      </>
                     )}
-                  </span>
-                </div>
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent dir={isRTL ? 'rtl' : 'ltr'}>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>{localT.cancelTitle}</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      {localT.cancelDesc}
+                      <br />
+                      <span className="text-destructive">{localT.cancelWarning}</span>
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>{localT.keepBooking}</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => handleCancelBooking(booking)}
+                      className="bg-destructive hover:bg-destructive/90"
+                    >
+                      {localT.confirmCancel}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+
+              {/* Phone Button */}
+              {providerContacts[booking.provider_id]?.phone && providerContacts[booking.provider_id]?.phone.length > 0 && (
+                <Button variant="outline" size="sm" className="flex-1 min-w-[120px]" asChild>
+                  <a href={`tel:${providerContacts[booking.provider_id].phone[0]}`}>
+                    <Phone className="h-4 w-4 mr-1" />
+                    {localT.contactProvider}
+                  </a>
+                </Button>
+              )}
+
+              {/* WhatsApp Button */}
+              {providerContacts[booking.provider_id]?.whatsapp && (
+                <Button variant="outline" size="sm" className="flex-1 min-w-[120px]" asChild>
+                  <a href={`https://wa.me/${providerContacts[booking.provider_id].whatsapp.replace(/[^\d]/g, '')}`} target="_blank" rel="noopener noreferrer">
+                    <MessageSquare className="h-4 w-4 mr-1" />
+                    {isRTL ? 'واتساب' : 'WhatsApp'}
+                  </a>
+                </Button>
               )}
             </div>
 
-            {/* Actions */}
-            {isUpcoming(booking) && booking.status !== 'cancelled' && (
-              <>
-                <Separator />
-                <div className="flex gap-2 flex-wrap">
-                  {/* Edit Button */}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleOpenEditDialog(booking)}
-                    className="flex-1 min-w-[120px]"
-                  >
-                    <Edit className="h-4 w-4 mr-1" />
-                    {localT.edit}
-                  </Button>
-
-                  {/* Cancel Button */}
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        disabled={!canCancel || cancellingId === booking.booking_id}
-                        className="flex-1 min-w-[120px]"
-                      >
-                        {cancellingId === booking.booking_id ? (
-                          localT.cancelling
-                        ) : (
-                          <>
-                            <X className="h-4 w-4 mr-1" />
-                            {localT.cancel}
-                          </>
-                        )}
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent dir={isRTL ? 'rtl' : 'ltr'}>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>{localT.cancelTitle}</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          {localT.cancelDesc}
-                          <br />
-                          <span className="text-destructive">{localT.cancelWarning}</span>
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>{localT.keepBooking}</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() => handleCancelBooking(booking)}
-                          className="bg-destructive hover:bg-destructive/90"
-                        >
-                          {localT.confirmCancel}
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-
-                  {/* Phone Button */}
-                  {providerContacts[booking.provider_id]?.phone && providerContacts[booking.provider_id]?.phone.length > 0 && (
-                    <Button variant="outline" size="sm" className="flex-1 min-w-[120px]" asChild>
-                      <a href={`tel:${providerContacts[booking.provider_id].phone[0]}`}>
-                        <Phone className="h-4 w-4 mr-1" />
-                        {localT.contactProvider}
-                      </a>
-                    </Button>
-                  )}
-
-                  {/* WhatsApp Button */}
-                  {providerContacts[booking.provider_id]?.whatsapp && (
-                    <Button variant="outline" size="sm" className="flex-1 min-w-[120px]" asChild>
-                      <a href={`https://wa.me/${providerContacts[booking.provider_id].whatsapp.replace(/[^\d]/g, '')}`} target="_blank" rel="noopener noreferrer">
-                        <MessageSquare className="h-4 w-4 mr-1" />
-                        {isRTL ? 'واتساب' : 'WhatsApp'}
-                      </a>
-                    </Button>
-                  )}
-                </div>
-
-                {!canCancel && (
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <AlertCircle className="h-3 w-3" />
-                    <span>{localT.cannotCancelDesc}</span>
-                  </div>
-                )}
-              </>
+            {!canCancel && (
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <AlertCircle className="h-3 w-3" />
+                <span>{localT.cannotCancelDesc}</span>
+              </div>
             )}
+          </>
+        )}
 
-            {/* Review Action for Completed Bookings */}
-            {!isUpcoming(booking) && booking.status === 'completed' && (
-              <>
-                <Separator />
-                <div className="flex gap-2">
-                  {existingReviews.has(booking.booking_id) ? (
-                    <Button variant="outline" size="sm" disabled className="flex-1">
-                      <CheckCircle2 className="h-4 w-4 mr-1 text-green-500" />
-                      {t.customer.alreadyReviewed || 'Already Reviewed'}
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="default"
-                      size="sm"
-                      className="flex-1"
-                      onClick={() => handleOpenReviewDialog(booking)}
-                    >
-                      <Star className="h-4 w-4 mr-1" />
-                      {t.customer.reviewService || 'Review Service'}
-                    </Button>
-                  )}
-                </div>
-              </>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+        {/* Review Action for Completed Bookings */}
+        {!isUpcoming(booking) && booking.status === 'completed' && (
+          <>
+            <Separator />
+            <div className="flex gap-2">
+              {existingReviews.has(booking.booking_id) ? (
+                <Button variant="outline" size="sm" disabled className="flex-1">
+                  <CheckCircle2 className="h-4 w-4 mr-1 text-green-500" />
+                  {t.customer.alreadyReviewed || 'Already Reviewed'}
+                </Button>
+              ) : (
+                <Button
+                  variant="default"
+                  size="sm"
+                  className="flex-1"
+                  onClick={() => handleOpenReviewDialog(booking)}
+                >
+                  <Star className="h-4 w-4 mr-1" />
+                  {t.customer.reviewService || 'Review Service'}
+                </Button>
+              )}
+            </div>
+          </>
+        )}
+      </div>
     );
   };
 
