@@ -833,10 +833,10 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                   >
                     {/* Compact Header - Always Visible */}
                     <div 
-                      className="flex items-center justify-between p-3 cursor-pointer hover:bg-muted/50 transition-colors"
+                      className="flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-muted/50 transition-colors"
                       onClick={() => setExpandedServiceId(isExpanded ? null : service.id)}
                     >
-                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <div className="flex items-center gap-2.5 flex-1 min-w-0">
                         <ProviderLogo
                           providerName={provider?.full_name || t.ui.noData}
                           verified={true}
@@ -844,8 +844,8 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                           showName={false}
                         />
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-bold text-base truncate">{service.name}</h3>
-                          <p className="text-sm text-muted-foreground truncate">
+                          <h3 className="font-bold text-base truncate leading-tight">{service.name}</h3>
+                          <p className="text-sm text-muted-foreground truncate leading-tight">
                             {provider?.full_name || t.ui.noData}
                           </p>
                         </div>
