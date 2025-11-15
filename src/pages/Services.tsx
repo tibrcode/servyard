@@ -821,7 +821,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
         ) : (
           /* List View */
           <div className="w-full max-w-full overflow-x-clip">
-            <div className="grid w-full grid-cols-1 gap-3 sm:gap-4">
+            <div className="grid w-full grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
               {filteredServices.map((service) => {
                 const provider = providers[service.provider_id];
                 const isExpanded = expandedServiceId === service.id;
