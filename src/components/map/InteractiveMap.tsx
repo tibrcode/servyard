@@ -223,52 +223,82 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
         const providerName = location.services[0].provider_name;
         const servicesCount = location.services.length;
         
+        // الكشف عن الوضع الليلي من خلال فحص class الـ body
+        const isDarkMode = document.documentElement.classList.contains('dark');
+        
+        // ألوان تتكيف مع الوضع الليلي/النهاري
+        const colors = isDarkMode ? {
+          background: '#1b1f22',
+          text: '#e5e7eb',
+          textSecondary: '#9ca3af',
+          border: '#374151',
+          hover: '#374151',
+          headerBg: 'linear-gradient(135deg, #d97706 0%, #b45309 100%)',
+        } : {
+          background: '#ffffff',
+          text: '#111827',
+          textSecondary: '#6b7280',
+          border: '#e5e7eb',
+          hover: '#f3f4f6',
+          headerBg: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+        };
+        
         content = `
           <div style="
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            min-width: 280px;
-            max-width: 400px;
+            width: 260px;
+            max-width: 90vw;
             padding: 0;
             direction: ${isRTL ? 'rtl' : 'ltr'};
+            background: ${colors.background};
+            color: ${colors.text};
+            box-sizing: border-box;
+            overflow: hidden;
           ">
             <!-- Header -->
             <div style="
-              background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+              background: ${colors.headerBg};
               color: white;
-              padding: 12px 16px;
-              border-radius: 8px 8px 0 0;
-              margin: -12px -16px 12px -16px;
+              padding: 8px 12px;
+              border-radius: 6px 6px 0 0;
+              margin: -12px -16px 8px -16px;
             ">
-              <div style="font-size: 16px; font-weight: 600; margin-bottom: 4px;">
+              <div style="font-size: 14px; font-weight: 600; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                 ${providerName}
               </div>
-              <div style="font-size: 12px; opacity: 0.9;">
+              <div style="font-size: 11px; opacity: 0.9;">
                 ${isRTL ? `${servicesCount} خدمة متوفرة` : `${servicesCount} services available`}
               </div>
             </div>
             
             <!-- Services List -->
-            <div style="max-height: 300px; overflow-y: auto;">
+            <div style="max-height: 250px; overflow-y: auto; overflow-x: hidden;">
               ${location.services.map((service, index) => `
                 <div style="
-                  padding: 10px 0;
-                  border-bottom: ${index < location.services!.length - 1 ? '1px solid #e5e7eb' : 'none'};
+                  padding: 6px 0;
+                  border-bottom: ${index < location.services!.length - 1 ? `1px solid ${colors.border}` : 'none'};
                   cursor: pointer;
                   transition: background 0.2s;
+                  white-space: nowrap;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
                 " 
-                onmouseover="this.style.background='#f3f4f6'"
+                onmouseover="this.style.background='${colors.hover}'"
                 onmouseout="this.style.background='transparent'"
                 onclick="window.handleServiceClick?.('${service.id}')">
                   <div style="
-                    font-size: 14px;
+                    font-size: 13px;
                     font-weight: 500;
-                    color: #111827;
-                    margin-bottom: 4px;
+                    color: ${colors.text};
+                    margin-bottom: 2px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
                   ">
                     ${service.name}
                   </div>
                   <div style="
-                    font-size: 13px;
+                    font-size: 12px;
                     color: #f59e0b;
                     font-weight: 600;
                   ">
@@ -280,14 +310,14 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
             
             <!-- Footer -->
             <div style="
-              margin-top: 12px;
-              padding-top: 12px;
-              border-top: 1px solid #e5e7eb;
+              margin-top: 6px;
+              padding-top: 6px;
+              border-top: 1px solid ${colors.border};
               text-align: center;
             ">
               <div style="
-                color: #6b7280;
-                font-size: 11px;
+                color: ${colors.textSecondary};
+                font-size: 10px;
               ">
                 ${isRTL ? '👆 اضغط على أي خدمة لعرض التفاصيل' : '👆 Click any service to view details'}
               </div>
