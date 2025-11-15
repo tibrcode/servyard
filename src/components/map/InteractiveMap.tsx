@@ -80,7 +80,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   useEffect(() => {
     let mounted = true;
     
-    // إضافة CSS لإخفاء الإطار الأبيض من InfoWindow
+    // إضافة CSS لإخفاء الإطار الأبيض من InfoWindow وتصغير زر الإغلاق
     const style = document.createElement('style');
     style.innerHTML = `
       .gm-style-iw-c {
@@ -94,6 +94,13 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
       .gm-ui-hover-effect {
         top: 2px !important;
         right: 2px !important;
+        width: 24px !important;
+        height: 24px !important;
+      }
+      .gm-ui-hover-effect > span {
+        margin: 4px !important;
+        width: 16px !important;
+        height: 16px !important;
       }
       .gm-style .gm-style-iw-tc {
         display: none !important;
@@ -206,6 +213,30 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
       addMarker(marker, marker.label);
     });
   }, [apiLoaded, markers, currentLanguage]);
+
+  // مراقبة التغيير بين النمط الليلي والنهاري
+  useEffect(() => {
+    if (!apiLoaded || !mapInstanceRef.current) return;
+
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class') {
+          // إعادة رسم العلامات عند تغيير النمط
+          clearMarkers();
+          markers.forEach((marker) => {
+            addMarker(marker, marker.label);
+          });
+        }
+      });
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+    return () => observer.disconnect();
+  }, [apiLoaded, markers]);
 
   // إضافة علامة محسّنة مع معلومات الخدمات
   const addMarker = (location: Location, label?: string, draggable = false) => {
