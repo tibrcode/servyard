@@ -833,10 +833,10 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                   >
                     {/* Compact Header - Always Visible */}
                     <div 
-                      className="flex items-center justify-between p-3 sm:p-4 cursor-pointer hover:bg-muted/50 transition-colors"
+                      className="flex items-center justify-between p-2.5 cursor-pointer hover:bg-muted/50 transition-colors"
                       onClick={() => setExpandedServiceId(isExpanded ? null : service.id)}
                     >
-                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <div className="flex items-center gap-2.5 flex-1 min-w-0">
                         <ProviderLogo
                           providerName={provider?.full_name || t.ui.noData}
                           verified={true}
@@ -844,16 +844,16 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                           showName={false}
                         />
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-sm sm:text-base truncate">{service.name}</h3>
-                          <p className="text-xs sm:text-sm text-muted-foreground truncate">
+                          <h3 className="font-semibold text-sm sm:text-base truncate leading-tight">{service.name}</h3>
+                          <p className="text-xs sm:text-sm text-muted-foreground truncate leading-tight">
                             {provider?.full_name || t.ui.noData}
                           </p>
                         </div>
                       </div>
                       
-                      <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+                      <div className="flex items-center gap-2 flex-shrink-0">
                         {service.approximate_price && (
-                          <div className="text-base sm:text-lg font-semibold text-primary">
+                          <div className="text-sm sm:text-base font-semibold text-primary">
                             {provider?.currency_code ? (
                               <span className="whitespace-nowrap">{provider.currency_code} {service.approximate_price}</span>
                             ) : (
@@ -862,70 +862,70 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                           </div>
                         )}
                         <ChevronDown 
-                          className={`h-5 w-5 text-muted-foreground transition-transform duration-200 flex-shrink-0 ${isExpanded ? 'rotate-180' : ''}`}
+                          className={`h-4 w-4 text-muted-foreground transition-transform duration-200 flex-shrink-0 ${isExpanded ? 'rotate-180' : ''}`}
                         />
                       </div>
                     </div>
 
                     {/* Expanded Content - Shown on Click */}
                     {isExpanded && (
-                      <CardContent className="pt-0 px-3 sm:px-4 pb-1.5 border-t">
-                        <div className="space-y-1 mt-1.5">
+                      <CardContent className="pt-1.5 px-2.5 pb-1.5">
+                        <div className="space-y-0.5">
                           {service.description && (
-                            <p className="text-muted-foreground text-sm leading-tight sm:leading-normal">
+                            <p className="text-muted-foreground text-xs sm:text-sm leading-tight">
                               {service.description}
                             </p>
                           )}
 
-                          <div className="flex flex-col gap-0 sm:gap-0.5 text-sm text-muted-foreground leading-tight sm:leading-normal">
+                          <div className="flex flex-col text-xs sm:text-sm text-muted-foreground leading-tight">
                             {/* Service rating */}
-                            <div className="flex items-center gap-1 sm:gap-1.5">
-                              <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400 flex-shrink-0" />
+                            <div className="flex items-center gap-1">
+                              <Star className="h-3 w-3 fill-yellow-400 text-yellow-400 flex-shrink-0" />
                               {serviceRatings[service.id] ? (
-                                <span>
+                                <span className="text-xs">
                                   {serviceRatings[service.id].avg.toFixed(1)} {t.customer.outOf5 || '/5'} ({serviceRatings[service.id].count}) • {t.provider.rating}
                                 </span>
                               ) : (
-                                <span>{t.booking.noRatingYet} • {t.provider.rating}</span>
+                                <span className="text-xs">{t.booking.noRatingYet} • {t.provider.rating}</span>
                               )}
                             </div>
 
                             {/* Provider (customer) rating */}
-                            <div className="flex items-center gap-1 sm:gap-1.5">
-                              <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400 flex-shrink-0" />
+                            <div className="flex items-center gap-1">
+                              <Star className="h-3 w-3 fill-yellow-400 text-yellow-400 flex-shrink-0" />
                               {provider && providerRatings[provider.id] ? (
-                                <span>
+                                <span className="text-xs">
                                   {providerRatings[provider.id].avg.toFixed(1)} {t.customer.outOf5 || '/5'} ({providerRatings[provider.id].count}) • {t.booking.clientRating}
                                 </span>
                               ) : (
-                                <span>{t.booking.noRatingYet} • {t.booking.clientRating}</span>
+                                <span className="text-xs">{t.booking.noRatingYet} • {t.booking.clientRating}</span>
                               )}
                             </div>
 
                             {provider?.city && (
-                              <div className="flex items-center gap-1 sm:gap-1.5">
-                                <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
-                                <span>{provider.city}</span>
+                              <div className="flex items-center gap-1">
+                                <MapPin className="h-3 w-3 flex-shrink-0" />
+                                <span className="text-xs">{provider.city}</span>
                               </div>
                             )}
 
                             {/* Display distance if available */}
                             {(service as any).distance !== undefined && (
-                              <div className="flex items-center gap-1 sm:gap-1.5 text-primary font-medium">
-                                <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
-                                <span>{formatDistance((service as any).distance, currentLanguage === 'ar' ? 'ar' : 'en')}</span>
+                              <div className="flex items-center gap-1 text-primary font-medium">
+                                <MapPin className="h-3 w-3 flex-shrink-0" />
+                                <span className="text-xs">{formatDistance((service as any).distance, currentLanguage === 'ar' ? 'ar' : 'en')}</span>
                               </div>
                             )}
 
                             {service.duration_minutes && (
-                              <div className="flex items-center gap-1 sm:gap-1.5">
-                                <Clock className="h-3.5 w-3.5 flex-shrink-0" />
-                                <span>{service.duration_minutes} {t.ui.minutes}</span>
+                              <div className="flex items-center gap-1">
+                                <Clock className="h-3 w-3 flex-shrink-0" />
+                                <span className="text-xs">{service.duration_minutes} {t.ui.minutes}</span>
                               </div>
                             )}
                           </div>
 
-                          <div className="flex flex-col gap-1 sm:gap-1.5 pt-1.5 sm:pt-2">
+                          <div className="flex flex-col gap-1 pt-1.5">
                             {service.booking_enabled && (
                               <Button
                                 className="w-full"
