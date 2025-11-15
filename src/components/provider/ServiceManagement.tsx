@@ -223,14 +223,14 @@ export const ServiceManagement = ({ currentLanguage, currencyCode }: ServiceMana
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {services.map((service) => (
             <Card key={service.id} className="h-auto">
-              <CardContent className="p-4">
-                <div className="flex flex-col gap-4">
-                  <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+              <CardContent className="p-3 sm:p-4">
+                <div className="flex flex-col gap-3 sm:gap-4">
+                  <div className="flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-4">
                     <div className="flex-1 min-w-0">
-                      <div className="flex flex-col gap-2 mb-3">
+                      <div className="flex flex-col gap-1.5 sm:gap-2 mb-2 sm:mb-3">
                         <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                           <h3 className="text-base sm:text-lg font-semibold leading-snug break-words hyphens-auto min-w-0 flex-1">{service.name}</h3>
                           <Badge
@@ -243,7 +243,7 @@ export const ServiceManagement = ({ currentLanguage, currencyCode }: ServiceMana
                       </div>
 
                       {service.description && (
-                        <p className="text-muted-foreground mb-3 text-sm leading-relaxed break-words hyphens-auto">
+                        <p className="text-muted-foreground mb-2 sm:mb-3 text-sm leading-relaxed break-words hyphens-auto">
                           {service.description}
                         </p>
                       )}

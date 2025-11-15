@@ -433,10 +433,10 @@ const ProviderProfile = ({ currentLanguage, onLanguageChange }: ProviderProfileP
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid gap-4">
+                    <div className="grid gap-3 sm:gap-4">
                       {offers.map((offer) => (
-                        <div key={offer.id} className="p-4 bg-gradient-to-r from-primary/5 to-primary-glow/5 rounded-lg border">
-                          <div className="flex justify-between items-start mb-2">
+                        <div key={offer.id} className="p-3 sm:p-4 bg-gradient-to-r from-primary/5 to-primary-glow/5 rounded-lg border">
+                          <div className="flex justify-between items-start mb-1 sm:mb-2">
                             <h3 className="font-semibold text-lg">{offer.title}</h3>
                             <Badge className="bg-green-100 text-green-800">
                               {offer.discount_percentage != null && offer.discount_percentage !== undefined
@@ -444,7 +444,7 @@ const ProviderProfile = ({ currentLanguage, onLanguageChange }: ProviderProfileP
                                 : `${offer.discount_amount} ${t.offers.currencySar || ''}`}
                             </Badge>
                           </div>
-                          <p className="text-muted-foreground mb-3">{offer.description}</p>
+                          <p className="text-muted-foreground mb-2 sm:mb-3">{offer.description}</p>
                           <p className="text-sm text-muted-foreground">
                             {new Date(offer.valid_until.seconds ? offer.valid_until.toDate() : offer.valid_until).toLocaleDateString(currentLanguage)}
                           </p>
@@ -468,12 +468,12 @@ const ProviderProfile = ({ currentLanguage, onLanguageChange }: ProviderProfileP
                   ) : (
                     <div className="grid gap-4">
                       {services.map((service) => (
-                        <div key={service.id} className="p-6 border rounded-lg hover:shadow-md transition-shadow">
-                          <div className="flex justify-between items-start mb-4">
+                        <div key={service.id} className="p-4 sm:p-6 border rounded-lg hover:shadow-md transition-shadow">
+                          <div className="flex justify-between items-start mb-2 sm:mb-4">
                             <div className="flex-1">
-                              <h3 className="text-xl font-semibold mb-2">{service.name}</h3>
-                              <p className="text-muted-foreground mb-3">{service.description}</p>
-                              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                              <h3 className="text-xl font-semibold mb-1 sm:mb-2">{service.name}</h3>
+                              <p className="text-muted-foreground mb-2 sm:mb-3">{service.description}</p>
+                              <div className="flex items-center gap-3 sm:gap-4 text-sm text-muted-foreground">
                                 <div className="flex items-center gap-1">
                                   <Clock className="w-4 h-4" />
                                   <span>{service.duration_minutes} {t.ui.minutes || 'minutes'}</span>

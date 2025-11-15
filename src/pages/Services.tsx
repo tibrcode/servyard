@@ -687,10 +687,10 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                               </Button>
                             </div>
                           </CardHeader>
-                          <CardContent className="pt-6">
-                            <div className="grid md:grid-cols-2 gap-6">
+                          <CardContent className="pt-4 sm:pt-6">
+                            <div className="grid md:grid-cols-2 gap-4 sm:gap-6">
                               {/* معلومات الخدمة */}
-                              <div className="space-y-4">
+                              <div className="space-y-2 sm:space-y-4">
                                 <h3 className="font-semibold text-lg border-b pb-2">
                                   {isRTL ? '📋 تفاصيل الخدمة' : '📋 Service Details'}
                                 </h3>
@@ -720,7 +720,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                               </div>
                               
                               {/* معلومات المزود */}
-                              <div className="space-y-4">
+                              <div className="space-y-2 sm:space-y-4">
                                 <h3 className="font-semibold text-lg border-b pb-2">
                                   {isRTL ? '👤 معلومات المزود' : '👤 Provider Info'}
                                 </h3>
@@ -849,12 +849,12 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
 
                     <CardContent className="pt-0 px-4 sm:px-6 pb-6">
                       {service.description && (
-                        <p className="text-muted-foreground text-sm mb-3 line-clamp-2">
+                        <p className="text-muted-foreground text-sm mb-2 sm:mb-3 line-clamp-2">
                           {service.description}
                         </p>
                       )}
 
-                      <div className="flex flex-col gap-1 text-sm text-muted-foreground mb-3">
+                      <div className="flex flex-col gap-0.5 sm:gap-1 text-sm text-muted-foreground mb-2 sm:mb-3">
                         {/* Service rating */}
                         <div className="flex items-center gap-2">
                           <div className="flex items-center gap-1">
