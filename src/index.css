@@ -142,10 +142,10 @@ All colors MUST be HSL. Premium dark/light theme with gold accents.
     --background: 206 30% 6%;
     --foreground: 220 9% 96%;
 
-    --card: 206 21% 11%;
+    --card: 206 21% 8%;
     --card-foreground: 220 9% 96%;
 
-    --popover: 206 21% 11%;
+    --popover: 206 21% 8%;
     --popover-foreground: 220 9% 96%;
 
     /* Gold primary remains consistent */
@@ -153,28 +153,28 @@ All colors MUST be HSL. Premium dark/light theme with gold accents.
     --primary-foreground: 220 27% 8%;
     --primary-glow: 41 92% 65%;
 
-    --secondary: 206 21% 13%;
+    --secondary: 206 21% 10%;
     --secondary-foreground: 220 9% 96%;
 
-    --muted: 206 21% 13%;
+    --muted: 206 21% 10%;
     --muted-foreground: 220 9% 65%;
 
-    --accent: 206 21% 13%;
+    --accent: 206 21% 10%;
     --accent-foreground: 220 9% 96%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 220 9% 96%;
 
-    --border: 206 21% 15%;
-    --input: 206 21% 15%;
+    --border: 206 21% 12%;
+    --input: 206 21% 12%;
     --ring: 41 92% 55%;
 
     /* Dark theme custom tokens */
     --luxury-gradient: linear-gradient(135deg, hsl(41 92% 55%), hsl(41 92% 65%));
-    --surface-elevation: 206 21% 13%;
+    --surface-elevation: 206 21% 10%;
     --shadow-luxury: 0 10px 30px -10px hsl(41 92% 55% / 0.3);
     --shadow-soft: 0 4px 12px -4px hsl(206 30% 6% / 0.4);
-    --sidebar-background: 206 21% 11%;
+    --sidebar-background: 206 21% 8%;
     --sidebar-foreground: 220 9% 96%;
     --sidebar-primary: 224.3 76.3% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
