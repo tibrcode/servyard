@@ -468,9 +468,10 @@ export function MyBookings({
     const bookingDate = new Date(booking.booking_date);
 
     return (
-      <div key={booking.booking_id} data-booking-id={booking.booking_id} id={`booking-${booking.booking_id}`} className="p-4 space-y-4">
-        {/* Service Title */}
-        <div className="flex items-start justify-between">
+      <Card key={booking.booking_id} data-booking-id={booking.booking_id} id={`booking-${booking.booking_id}`}>
+        <CardContent className="p-4 space-y-4">
+          {/* Service Title */}
+          <div className="flex items-start justify-between">
           <div className="flex-1">
             <h3 className="font-semibold text-lg">{booking.service_title}</h3>
             {booking.notes && (
@@ -632,7 +633,8 @@ export function MyBookings({
             </div>
           </>
         )}
-      </div>
+        </CardContent>
+      </Card>
     );
   };
 
