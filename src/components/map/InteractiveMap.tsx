@@ -324,10 +324,8 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                 line-height: 1.3;
                 max-height: 2.6em;
                 overflow: hidden;
-                display: -webkit-box;
-                -webkit-line-clamp: 2;
-                -webkit-box-orient: vertical;
-                word-break: break-word;
+                word-wrap: break-word;
+                white-space: normal;
               ">
                 ${providerName}
               </div>
