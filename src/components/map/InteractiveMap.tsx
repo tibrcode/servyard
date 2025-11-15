@@ -299,27 +299,27 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
         content = `
           <div style="
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            width: 260px;
+            width: 280px;
             max-width: 90vw;
             padding: 0;
             direction: ${isRTL ? 'rtl' : 'ltr'};
             background: ${colors.background};
             color: ${colors.text};
             box-sizing: border-box;
-            overflow: visible;
             border-radius: 8px;
           ">
             <!-- Header -->
             <div style="
               background: ${colors.headerBg};
               color: white;
-              padding: 10px 14px;
+              padding: 12px 16px;
               border-radius: 8px 8px 0 0;
+              overflow: hidden;
             ">
               <div style="
                 font-size: 14px; 
                 font-weight: 600; 
-                margin-bottom: 3px; 
+                margin-bottom: 4px; 
                 line-height: 1.4;
                 word-wrap: break-word;
                 overflow-wrap: break-word;
@@ -333,10 +333,10 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
             </div>
             
             <!-- Services List -->
-            <div style="max-height: 250px; overflow-y: auto; overflow-x: hidden; padding: 8px 12px;">
+            <div style="max-height: 250px; overflow-y: auto; overflow-x: hidden; padding: 10px 14px;">
               ${location.services.map((service, index) => `
                 <div style="
-                  padding: 6px 4px;
+                  padding: 7px 6px;
                   border-bottom: ${index < location.services!.length - 1 ? `1px solid ${colors.border}` : 'none'};
                   cursor: pointer;
                   transition: background 0.2s;
@@ -349,7 +349,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                     font-size: 13px;
                     font-weight: 500;
                     color: ${colors.text};
-                    margin-bottom: 2px;
+                    margin-bottom: 3px;
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
@@ -369,10 +369,11 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
             
             <!-- Footer -->
             <div style="
-              padding: 8px 12px 10px 12px;
+              padding: 10px 16px 12px 16px;
               border-top: 1px solid ${colors.border};
               text-align: center;
               border-radius: 0 0 8px 8px;
+              overflow: hidden;
             ">
               <div style="
                 color: ${colors.textSecondary};
