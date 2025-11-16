@@ -363,7 +363,7 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
                         const provider = providers[review.provider_id];
 
                         return (
-                          <div key={review.id || index} className="border rounded-lg p-4 bg-card/50 hover:bg-card/70 transition-colors">
+                          <div key={review.id || index} className="border rounded-lg p-4 bg-muted/30 hover:bg-muted/50 transition-colors">
                             <div className="flex justify-between items-start mb-3">
                               <div>
                                 <h4 className="font-semibold">{service?.name || t.ui.noData}</h4>
