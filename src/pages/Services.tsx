@@ -851,7 +851,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                           <p className="text-xs text-muted-foreground truncate leading-none m-0 p-0">
                             {provider?.full_name || t.ui.noData}
                           </p>
-                          <div className="flex items-center justify-between gap-2 m-0 p-0 w-full" style={{ lineHeight: 1 }}>
+                          <div className="flex flex-col gap-0.5 m-0 p-0 w-full sm:flex-row sm:items-center sm:justify-between" style={{ lineHeight: 1 }}>
                             <div className="flex items-center gap-0.5" style={{ lineHeight: 1 }}>
                               {[1, 2, 3, 4, 5].map((star) => {
                                 const rating = serviceRatings[service.id]?.avg || 0;
