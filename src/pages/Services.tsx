@@ -833,7 +833,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                   >
                     {/* Compact Header - Always Visible */}
                     <div
-                      className="flex flex-col px-3 pt-1.5 pb-1 sm:pt-2 sm:pb-1.5 cursor-pointer hover:bg-muted/50 transition-colors gap-0.5"
+                      className="flex flex-col px-3 pt-1.5 pb-0.5 sm:pt-2 sm:pb-1.5 cursor-pointer hover:bg-muted/50 transition-colors gap-0.5"
                       onClick={() => setExpandedServiceId(isExpanded ? null : service.id)}
                     >
                       {/* Row 1: Service name */}
