@@ -821,7 +821,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
         ) : (
           /* List View */
           <div className="w-full max-w-full overflow-x-clip">
-            <div className="grid w-full grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1.5 md:gap-3">
+            <div className="grid w-full grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1 md:gap-3">
               {filteredServices.map((service) => {
                 const provider = providers[service.provider_id];
                 const isExpanded = expandedServiceId === service.id;
@@ -829,11 +829,11 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                 return (
                   <Card
                     key={service.id}
-                    className="w-full transition-all duration-200 overflow-hidden p-0 m-0 border-primary/20 hover:border-primary/40 hover:shadow-lg"
+                    className="w-full transition-all duration-200 overflow-hidden p-0 m-0 border-primary/20 hover:border-primary/40 hover:shadow-lg rounded-xl"
                   >
                     {/* Compact Header - Always Visible (also acts as closed card body on mobile) */}
                     <div
-                      className="flex flex-col px-3 pt-1.5 pb-0 sm:pt-2 sm:pb-1.5 cursor-pointer hover:bg-muted/50 transition-colors gap-0.5"
+                      className="flex flex-col px-3 pt-1.5 pb-0.5 sm:pt-2 sm:pb-1 cursor-pointer hover:bg-muted/50 transition-colors gap-0.5"
                       onClick={() => setExpandedServiceId(isExpanded ? null : service.id)}
                     >
                       {/* Row 1: Service name */}
@@ -845,13 +845,13 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
 
                       {/* Row 2: Provider name */}
                       <div className="flex items-center mt-0.5">
-                        <p className="text-[11px] sm:text-xs text-muted-foreground leading-snug m-0 p-0 truncate">
+                        <p className="text-[11px] sm:text-[11px] text-muted-foreground leading-snug m-0 p-0 truncate">
                           {provider?.full_name || t.ui.noData}
                         </p>
                       </div>
 
                       {/* Row 3: Rating left + price + arrow right (single row) */}
-                      <div className="flex items-center justify-between w-full mt-1">
+                      <div className="flex items-center justify-between w-full mt-0.5">
                         {/* Rating left */}
                         <div className="flex items-center gap-0.5" style={{ lineHeight: 1 }}>
                           {[1, 2, 3, 4, 5].map((star) => {
@@ -878,7 +878,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                         {/* Price + arrow right */}
                         <div className="flex items-center gap-1 flex-shrink-0">
                           {service.approximate_price && (
-                            <div className="text-sm font-semibold text-primary whitespace-nowrap">
+                            <div className="text-[13px] font-semibold text-primary whitespace-nowrap">
                               {provider?.currency_code} {service.approximate_price}
                             </div>
                           )}
