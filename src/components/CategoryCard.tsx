@@ -19,13 +19,13 @@ export function CategoryCard({ icon, title, onClick, className = "", onTitleFit,
             }
             type="button"
         >
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-2.5 gap-2 min-w-0">
-                <div className="opacity-90 mb-2">{icon}</div>
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-3 gap-1.5 min-w-0">
+                <div className="opacity-90 flex-shrink-0">{icon}</div>
                 <FitTwoLines
                     text={title}
                     onFit={onTitleFit}
                     forcedSize={unifiedSize ?? null}
-                    className="block mx-auto text-center font-medium text-foreground w-[88%] max-w-[88%] leading-tight tracking-normal dark:text-white"
+                    className="block mx-auto text-center font-medium text-foreground w-full px-1 leading-tight tracking-normal dark:text-white"
                     min={9}
                     max={11}
                     xsMin={8}
