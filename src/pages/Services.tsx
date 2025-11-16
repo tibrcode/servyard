@@ -833,57 +833,66 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                   >
                     {/* Compact Header - Always Visible */}
                     <div 
-                      className="flex flex-col px-3 pt-2 pb-1.5 cursor-pointer hover:bg-muted/50 transition-colors gap-1"
+                      className="flex px-3 pt-2 pb-1.5 cursor-pointer hover:bg-muted/50 transition-colors gap-3"
                       onClick={() => setExpandedServiceId(isExpanded ? null : service.id)}
                     >
-                      {/* Top row: Avatar + title + price + arrow */}
-                      <div className="flex items-center gap-2 w-full">
+                      {/* Left column: provider logo + arrow */}
+                      <div className="flex flex-col items-center gap-2 pt-0.5">
                         <ProviderLogo
                           providerName={provider?.full_name || t.ui.noData}
                           verified={true}
                           size="sm"
                           showName={false}
                         />
-                        <div className="flex-1 min-w-0 flex items-center justify-between gap-2">
-                          <h3 className="flex-1 min-w-0 font-bold text-sm truncate leading-tight m-0 p-0">{service.name}</h3>
-                          <div className="flex items-center gap-2 flex-shrink-0">
-                            {service.approximate_price && (
-                              <div className="text-sm font-semibold text-primary whitespace-nowrap">
-                                {provider?.currency_code} {service.approximate_price}
-                              </div>
-                            )}
-                            <ChevronDown 
-                              className={`h-4 w-4 text-muted-foreground transition-transform duration-200 flex-shrink-0 ${isExpanded ? 'rotate-180' : ''}`}
-                            />
-                          </div>
-                        </div>
+                        <ChevronDown 
+                          className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+                        />
                       </div>
 
-                      {/* Second row: provider name + rating */}
-                      <div className="flex items-center justify-between w-full">
-                        <p className="text-xs text-muted-foreground truncate leading-tight m-0 p-0 flex-1 min-w-0">
+                      {/* Right column: 4 lines (title, provider, price, stars) */}
+                      <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+                        {/* Line 1: service name */}
+                        <h3 className="font-bold text-sm truncate leading-tight m-0 p-0">
+                          {service.name}
+                        </h3>
+
+                        {/* Line 2: provider name */}
+                        <p className="text-xs text-muted-foreground truncate leading-tight m-0 p-0">
                           {provider?.full_name || t.ui.noData}
                         </p>
-                        <div className="flex items-center gap-0.5 flex-shrink-0 ml-2" style={{ lineHeight: 1 }}>
-                          {[1, 2, 3, 4, 5].map((star) => {
-                            const rating = serviceRatings[service.id]?.avg || 0;
-                            const isFilled = star <= Math.round(rating);
-                            return (
-                              <Star
-                                key={star}
-                                className={`h-3 w-3 ${
-                                  isFilled 
-                                    ? 'fill-yellow-400 text-yellow-400' 
-                                    : 'fill-muted text-muted-foreground/30'
-                                }`}
-                              />
-                            );
-                          })}
-                          {serviceRatings[service.id] && (
-                            <span className="text-xs text-muted-foreground ml-1">
-                              ({serviceRatings[service.id].count})
-                            </span>
-                          )}
+
+                        {/* Line 3: price on the right */}
+                        {service.approximate_price && (
+                          <div className="flex justify-end">
+                            <div className="text-sm font-semibold text-primary whitespace-nowrap">
+                              {provider?.currency_code} {service.approximate_price}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Line 4: stars under price aligned right */}
+                        <div className="flex justify-end">
+                          <div className="flex items-center gap-0.5" style={{ lineHeight: 1 }}>
+                            {[1, 2, 3, 4, 5].map((star) => {
+                              const rating = serviceRatings[service.id]?.avg || 0;
+                              const isFilled = star <= Math.round(rating);
+                              return (
+                                <Star
+                                  key={star}
+                                  className={`h-3 w-3 ${
+                                    isFilled 
+                                      ? 'fill-yellow-400 text-yellow-400' 
+                                      : 'fill-muted text-muted-foreground/30'
+                                  }`}
+                                />
+                              );
+                            })}
+                            {serviceRatings[service.id] && (
+                              <span className="text-xs text-muted-foreground ml-1">
+                                ({serviceRatings[service.id].count})
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
