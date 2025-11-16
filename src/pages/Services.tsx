@@ -883,28 +883,64 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                             </p>
                           )}
 
-                          {/* Service Rating with star */}
-                          <div className="flex items-center gap-1">
-                            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400 flex-shrink-0" />
-                            {serviceRatings[service.id] ? (
-                              <span className="text-foreground text-sm">
-                                Servis Rating: {serviceRatings[service.id].avg.toFixed(1)} out of 5 ({serviceRatings[service.id].count})
-                              </span>
-                            ) : (
-                              <span className="text-foreground text-sm">Servis Rating: {t.booking.noRatingYet}</span>
-                            )}
+                          {/* Service Rating with 5 stars */}
+                          <div className="flex flex-col gap-1">
+                            <span className="text-foreground text-sm">Servis Rating:</span>
+                            <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-0.5">
+                                {[1, 2, 3, 4, 5].map((star) => {
+                                  const rating = serviceRatings[service.id]?.avg || 0;
+                                  const isFilled = star <= Math.round(rating);
+                                  return (
+                                    <Star
+                                      key={star}
+                                      className={`h-4 w-4 ${
+                                        isFilled 
+                                          ? 'fill-yellow-400 text-yellow-400' 
+                                          : 'fill-muted text-muted-foreground/30'
+                                      }`}
+                                    />
+                                  );
+                                })}
+                              </div>
+                              {serviceRatings[service.id] ? (
+                                <span className="text-foreground text-sm">
+                                  {serviceRatings[service.id].avg.toFixed(1)} ({serviceRatings[service.id].count})
+                                </span>
+                              ) : (
+                                <span className="text-muted-foreground text-sm">{t.booking.noRatingYet}</span>
+                              )}
+                            </div>
                           </div>
 
-                          {/* Client Rating with star */}
-                          <div className="flex items-center gap-1">
-                            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400 flex-shrink-0" />
-                            {provider && providerRatings[provider.id] ? (
-                              <span className="text-foreground text-sm">
-                                Client Rating: {providerRatings[provider.id].avg.toFixed(1)} out of 5 ({providerRatings[provider.id].count})
-                              </span>
-                            ) : (
-                              <span className="text-foreground text-sm">Client Rating: {t.booking.noRatingYet}</span>
-                            )}
+                          {/* Client Rating with 5 stars */}
+                          <div className="flex flex-col gap-1">
+                            <span className="text-foreground text-sm">Client Rating:</span>
+                            <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-0.5">
+                                {[1, 2, 3, 4, 5].map((star) => {
+                                  const rating = provider && providerRatings[provider.id] ? providerRatings[provider.id].avg : 0;
+                                  const isFilled = star <= Math.round(rating);
+                                  return (
+                                    <Star
+                                      key={star}
+                                      className={`h-4 w-4 ${
+                                        isFilled 
+                                          ? 'fill-yellow-400 text-yellow-400' 
+                                          : 'fill-muted text-muted-foreground/30'
+                                      }`}
+                                    />
+                                  );
+                                })}
+                              </div>
+                              {provider && providerRatings[provider.id] ? (
+                                <span className="text-foreground text-sm">
+                                  {providerRatings[provider.id].avg.toFixed(1)} ({providerRatings[provider.id].count})
+                                </span>
+                              ) : (
+                                <span className="text-muted-foreground text-sm">{t.booking.noRatingYet}</span>
+                              )}
+                            </div>
                           </div>
 
                           {/* City */}
