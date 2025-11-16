@@ -20,7 +20,7 @@ export function CategoryCard({ icon, title, onClick, className = "", onTitleFit,
             type="button"
         >
             <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-3 gap-0 min-w-0">
-                <div className="opacity-90 flex-shrink-0">{icon}</div>
+                <div className="opacity-90 flex-shrink-0 -mb-1">{icon}</div>
                 <FitTwoLines
                     text={title}
                     onFit={onTitleFit}
