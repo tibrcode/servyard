@@ -829,7 +829,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                 return (
                   <Card
                     key={service.id}
-                    className="w-full transition-all duration-200 overflow-hidden p-0 m-0"
+                    className="w-full transition-all duration-200 overflow-hidden p-0 m-0 border-primary/20 hover:border-primary/40 hover:shadow-lg"
                     style={{ height: 'fit-content', minHeight: 'unset' }}
                   >
                     {/* Compact Header - Always Visible */}
