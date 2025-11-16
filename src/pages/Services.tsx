@@ -830,14 +830,13 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                   <Card
                     key={service.id}
                     className="w-full transition-all duration-200 overflow-hidden p-0 m-0 border-primary/20 hover:border-primary/40 hover:shadow-lg"
-                    style={{ height: 'fit-content', minHeight: 'unset' }}
                   >
                     {/* Compact Header - Always Visible */}
                     <div 
-                      className="flex flex-col px-3 pt-1.5 pb-1.5 cursor-pointer hover:bg-muted/50 transition-colors gap-1.5"
+                      className="flex flex-col px-3 pt-2 pb-1.5 cursor-pointer hover:bg-muted/50 transition-colors gap-1"
                       onClick={() => setExpandedServiceId(isExpanded ? null : service.id)}
                     >
-                      {/* Top row: Avatar + title + arrow + price */}
+                      {/* Top row: Avatar + title + price + arrow */}
                       <div className="flex items-center gap-2 w-full">
                         <ProviderLogo
                           providerName={provider?.full_name || t.ui.noData}
@@ -846,11 +845,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                           showName={false}
                         />
                         <div className="flex-1 min-w-0 flex items-center justify-between gap-2">
-                          <div className="flex-1 min-w-0 flex items-center gap-2">
-                            <div className="flex-1 min-w-0">
-                              <h3 className="font-bold text-sm truncate leading-tight m-0 p-0">{service.name}</h3>
-                            </div>
-                          </div>
+                          <h3 className="flex-1 min-w-0 font-bold text-sm truncate leading-tight m-0 p-0">{service.name}</h3>
                           <div className="flex items-center gap-2 flex-shrink-0">
                             {service.approximate_price && (
                               <div className="text-sm font-semibold text-primary whitespace-nowrap">
