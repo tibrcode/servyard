@@ -845,12 +845,12 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                           size="sm"
                           showName={false}
                         />
-                        <div className="flex-1 min-w-0 flex flex-col">
-                          <h3 className="font-bold text-sm truncate leading-tight m-0 p-0">{service.name}</h3>
-                          <p className="text-xs text-muted-foreground truncate leading-tight m-0 mt-0.5 p-0">
+                        <div className="flex-1 min-w-0 flex flex-col gap-0">
+                          <h3 className="font-bold text-sm truncate leading-none m-0 p-0">{service.name}</h3>
+                          <p className="text-xs text-muted-foreground truncate leading-none m-0 p-0">
                             {provider?.full_name || t.ui.noData}
                           </p>
-                          <div className="flex items-center justify-between gap-2 mt-0.5 w-full">
+                          <div className="flex items-center justify-between gap-2 m-0 p-0 w-full leading-none">
                             <div className="flex items-center gap-0.5">
                               {[1, 2, 3, 4, 5].map((star) => {
                                 const rating = serviceRatings[service.id]?.avg || 0;
