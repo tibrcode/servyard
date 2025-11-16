@@ -851,7 +851,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                       </div>
 
                       {/* Row 3: Bottom bar for rating + price */}
-                      <div className="mt-1 -mx-3 px-3 py-1 bg-muted/10 border-t border-primary/10 flex items-center justify-between">
+                      <div className="mt-0.5 -mx-3 -mb-0 px-3 py-0.5 bg-muted/10 border-t border-primary/10 flex items-center justify-between">
                         {/* Rating left */}
                         <div className="flex items-center gap-0.5" style={{ lineHeight: 1 }}>
                           {[1, 2, 3, 4, 5].map((star) => {
