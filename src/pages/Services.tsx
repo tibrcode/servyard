@@ -829,27 +829,28 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                 return (
                   <Card
                     key={service.id}
-                    className="w-full transition-all duration-200 overflow-hidden p-0"
+                    className="w-full transition-all duration-200 overflow-hidden p-0 m-0"
                   >
                     {/* Compact Header - Always Visible */}
                     <div 
-                      className="flex items-start justify-between px-3 pt-1.5 pb-1 cursor-pointer hover:bg-muted/50 transition-colors gap-2"
+                      className="flex items-start justify-between px-3 pt-1.5 pb-0 cursor-pointer hover:bg-muted/50 transition-colors gap-2 min-h-0"
                       onClick={() => setExpandedServiceId(isExpanded ? null : service.id)}
+                      style={{ lineHeight: 1 }}
                     >
                       {/* Left side: Logo + Info */}
-                      <div className="flex items-start gap-2 flex-1 min-w-0">
+                      <div className="flex items-start gap-2 flex-1 min-w-0 min-h-0">
                         <ProviderLogo
                           providerName={provider?.full_name || t.ui.noData}
                           verified={true}
                           size="sm"
                           showName={false}
                         />
-                        <div className="flex-1 min-w-0 flex flex-col gap-0">
-                          <h3 className="font-bold text-sm truncate leading-none m-0">{service.name}</h3>
-                          <p className="text-xs text-muted-foreground truncate leading-none m-0 mt-0.5">
+                        <div className="flex-1 min-w-0 flex flex-col gap-0 min-h-0">
+                          <h3 className="font-bold text-sm truncate leading-none m-0 p-0" style={{ lineHeight: 1 }}>{service.name}</h3>
+                          <p className="text-xs text-muted-foreground truncate leading-none m-0 mt-0.5 p-0" style={{ lineHeight: 1 }}>
                             {provider?.full_name || t.ui.noData}
                           </p>
-                          <div className="flex items-center justify-between gap-2 mt-0.5 w-full">
+                          <div className="flex items-center justify-between gap-2 mt-0.5 w-full min-h-0" style={{ lineHeight: 1 }}>
                             <div className="flex items-center gap-0.5">
                               {[1, 2, 3, 4, 5].map((star) => {
                                 const rating = serviceRatings[service.id]?.avg || 0;
