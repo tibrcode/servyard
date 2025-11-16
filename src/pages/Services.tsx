@@ -836,31 +836,21 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                       className="flex flex-col px-3 pt-2 pb-1.5 cursor-pointer hover:bg-muted/50 transition-colors gap-0.5"
                       onClick={() => setExpandedServiceId(isExpanded ? null : service.id)}
                     >
-                      {/* Row 1: Avatar only */}
-                      <div className="flex items-center">
-                        <ProviderLogo
-                          providerName={provider?.full_name || t.ui.noData}
-                          verified={true}
-                          size="sm"
-                          showName={false}
-                        />
-                      </div>
-
-                      {/* Row 2: Service name */}
+                      {/* Row 1: Service name */}
                       <div className="flex items-center">
                         <h3 className="font-bold text-sm leading-tight m-0 p-0 truncate">
                           {service.name}
                         </h3>
                       </div>
 
-                      {/* Row 3: Provider name */}
+                      {/* Row 2: Provider name */}
                       <div className="flex items-center">
                         <p className="text-xs text-muted-foreground leading-tight m-0 p-0 truncate">
                           {provider?.full_name || t.ui.noData}
                         </p>
                       </div>
 
-                      {/* Row 4: Price (right) + rating (left) */}
+                      {/* Row 3: Price (right) + rating (left) */}
                       <div className="flex items-center justify-between w-full mt-0.5">
                         {/* Rating left */}
                         <div className="flex items-center gap-0.5" style={{ lineHeight: 1 }}>
@@ -893,7 +883,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                         )}
                       </div>
 
-                      {/* Row 5: Arrow centered */}
+                      {/* Row 4: Arrow centered */}
                       <div className="flex items-center justify-center w-full mt-0.5">
                         <ChevronDown
                           className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${
