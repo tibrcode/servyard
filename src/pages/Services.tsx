@@ -832,43 +832,37 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                     className="w-full transition-all duration-200 overflow-hidden p-0 m-0 border-primary/20 hover:border-primary/40 hover:shadow-lg"
                   >
                     {/* Compact Header - Always Visible */}
-                    <div 
-                      className="flex flex-col px-3 pt-2 pb-1.5 cursor-pointer hover:bg-muted/50 transition-colors gap-1.5"
+                    <div
+                      className="flex flex-col px-3 pt-2 pb-1.5 cursor-pointer hover:bg-muted/50 transition-colors gap-0.5"
                       onClick={() => setExpandedServiceId(isExpanded ? null : service.id)}
                     >
-                      {/* Row 1: logo + title + price + arrow */}
-                      <div className="flex items-center gap-2 w-full">
+                      {/* Row 1: Avatar only */}
+                      <div className="flex items-center">
                         <ProviderLogo
                           providerName={provider?.full_name || t.ui.noData}
                           verified={true}
                           size="sm"
                           showName={false}
                         />
-                        <div className="flex-1 min-w-0 flex items-center justify-between gap-2">
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-bold text-sm truncate leading-tight m-0 p-0">
-                              {service.name}
-                            </h3>
-                            <p className="text-xs text-muted-foreground truncate leading-tight m-0 p-0">
-                              {provider?.full_name || t.ui.noData}
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-2 flex-shrink-0">
-                            {service.approximate_price && (
-                              <div className="text-sm font-semibold text-primary whitespace-nowrap">
-                                {provider?.currency_code} {service.approximate_price}
-                              </div>
-                            )}
-                            <ChevronDown 
-                              className={`h-4 w-4 text-muted-foreground transition-transform duration-200 flex-shrink-0 ${isExpanded ? 'rotate-180' : ''}`}
-                            />
-                          </div>
-                        </div>
                       </div>
 
-                      {/* Row 2: rating only, aligned with text */}
-                      <div className="flex items-center justify-between w-full">
-                        <div className="flex-1" />
+                      {/* Row 2: Service name */}
+                      <div className="flex items-center">
+                        <h3 className="font-bold text-sm leading-tight m-0 p-0 truncate">
+                          {service.name}
+                        </h3>
+                      </div>
+
+                      {/* Row 3: Provider name */}
+                      <div className="flex items-center">
+                        <p className="text-xs text-muted-foreground leading-tight m-0 p-0 truncate">
+                          {provider?.full_name || t.ui.noData}
+                        </p>
+                      </div>
+
+                      {/* Row 4: Price (right) + rating (left) */}
+                      <div className="flex items-center justify-between w-full mt-0.5">
+                        {/* Rating left */}
                         <div className="flex items-center gap-0.5" style={{ lineHeight: 1 }}>
                           {[1, 2, 3, 4, 5].map((star) => {
                             const rating = serviceRatings[service.id]?.avg || 0;
@@ -877,8 +871,8 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                               <Star
                                 key={star}
                                 className={`h-3 w-3 ${
-                                  isFilled 
-                                    ? 'fill-yellow-400 text-yellow-400' 
+                                  isFilled
+                                    ? 'fill-yellow-400 text-yellow-400'
                                     : 'fill-muted text-muted-foreground/30'
                                 }`}
                               />
@@ -890,6 +884,22 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                             </span>
                           )}
                         </div>
+
+                        {/* Price right */}
+                        {service.approximate_price && (
+                          <div className="text-sm font-semibold text-primary whitespace-nowrap">
+                            {provider?.currency_code} {service.approximate_price}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Row 5: Arrow centered */}
+                      <div className="flex items-center justify-center w-full mt-0.5">
+                        <ChevronDown
+                          className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${
+                            isExpanded ? 'rotate-180' : ''
+                          }`}
+                        />
                       </div>
                     </div>
 
