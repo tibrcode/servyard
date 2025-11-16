@@ -833,7 +833,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                   >
                     {/* Compact Header - Always Visible */}
                     <div 
-                      className="flex items-start justify-between px-3 py-2 cursor-pointer hover:bg-muted/50 transition-colors gap-2"
+                      className="flex items-start justify-between px-3 py-1.5 cursor-pointer hover:bg-muted/50 transition-colors gap-2"
                       onClick={() => setExpandedServiceId(isExpanded ? null : service.id)}
                     >
                       {/* Left side: Logo + Info */}
