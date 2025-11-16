@@ -834,7 +834,8 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                   >
                     {/* Compact Header - Always Visible */}
                     <div 
-                      className="flex items-start justify-between px-3 pt-1.5 pb-0 cursor-pointer hover:bg-muted/50 transition-colors gap-2"
+                      className="flex items-start justify-between px-3 pt-1.5 cursor-pointer hover:bg-muted/50 transition-colors gap-2"
+                      style={{ paddingBottom: 0 }}
                       onClick={() => setExpandedServiceId(isExpanded ? null : service.id)}
                     >
                       {/* Left side: Logo + Info */}
@@ -845,7 +846,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                           size="sm"
                           showName={false}
                         />
-                        <div className="flex-1 min-w-0 flex flex-col gap-0">
+                        <div className="flex-1 min-w-0 flex flex-col gap-0" style={{ margin: 0, padding: 0 }}>
                           <h3 className="font-bold text-sm truncate leading-none m-0 p-0">{service.name}</h3>
                           <p className="text-xs text-muted-foreground truncate leading-none m-0 p-0">
                             {provider?.full_name || t.ui.noData}
