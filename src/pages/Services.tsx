@@ -892,15 +892,15 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                     {/* Expanded Content - Shown on Click */}
                     {isExpanded && (
                       <CardContent className="pt-2 px-3 pb-3">
-                        <div className="space-y-1.5">
+                        <div className="space-y-2">
                           {/* Description */}
                           {service.description && (
-                            <p className="text-foreground text-sm">{service.description}</p>
+                            <p className="text-foreground text-sm leading-relaxed m-0">{service.description}</p>
                           )}
 
                           {/* Duration */}
                           {service.duration_minutes && (
-                            <p className="text-foreground text-sm">
+                            <p className="text-foreground text-sm leading-relaxed m-0">
                               Service Duration: {service.duration_minutes} minutes
                             </p>
                           )}
@@ -963,7 +963,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
 
                           {/* City */}
                           {provider?.city && (
-                            <p className="text-foreground text-sm">City: {provider.city}</p>
+                            <p className="text-foreground text-sm leading-relaxed m-0">City: {provider.city}</p>
                           )}
 
                           {/* Distance if available */}
