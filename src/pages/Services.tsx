@@ -850,17 +850,17 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                         </p>
                       </div>
 
-                      {/* Row 3: Bottom bar for rating + price */}
-                      <div className="mt-0.5 -mx-3 -mb-0 px-3 py-0.5 bg-muted/10 border-t border-primary/10 flex items-center justify-between">
+                      {/* Row 3: Rating + price (inline, no extra spacing) */}
+                      <div className="flex items-center justify-between w-full mt-0.5" style={{ lineHeight: 1 }}>
                         {/* Rating left */}
-                        <div className="flex items-center gap-0.5" style={{ lineHeight: 1 }}>
+                        <div className="flex items-center gap-0.5">
                           {[1, 2, 3, 4, 5].map((star) => {
                             const rating = serviceRatings[service.id]?.avg || 0;
                             const isFilled = star <= Math.round(rating);
                             return (
                               <Star
                                 key={star}
-                                className={`h-3.5 w-3.5 sm:h-3 w-3 ${
+                                className={`h-3 w-3 ${
                                   isFilled
                                     ? 'fill-yellow-400 text-yellow-400'
                                     : 'fill-muted text-muted-foreground/30'
@@ -883,7 +883,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                             </div>
                           )}
                           <ChevronDown
-                            className={`h-4 w-4 text-muted-foreground transition-transform duration-200 flex-shrink-0 ${
+                            className={`h-3.5 w-3.5 text-muted-foreground transition-transform duration-200 flex-shrink-0 ${
                               isExpanded ? 'rotate-180' : ''
                             }`}
                           />
