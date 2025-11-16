@@ -833,11 +833,11 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                   >
                     {/* Compact Header - Always Visible */}
                     <div 
-                      className="flex items-center justify-between px-3 py-1.5 cursor-pointer hover:bg-muted/50 transition-colors gap-2"
+                      className="flex items-start justify-between px-3 py-1.5 cursor-pointer hover:bg-muted/50 transition-colors gap-2"
                       onClick={() => setExpandedServiceId(isExpanded ? null : service.id)}
                     >
                       {/* Left side: Logo + Info */}
-                      <div className="flex items-center gap-2 flex-1 min-w-0">
+                      <div className="flex items-start gap-2 flex-1 min-w-0">
                         <ProviderLogo
                           providerName={provider?.full_name || t.ui.noData}
                           verified={true}
