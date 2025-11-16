@@ -843,17 +843,14 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                         </h3>
                       </div>
 
-                      {/* Row 2: Provider name */}
-                      <div className="flex items-center mt-0.5">
+                      {/* Row 2: Provider name + Rating stars */}
+                      <div className="flex items-center justify-between mt-0.5 gap-2">
                         <p className="text-[11px] sm:text-[11px] text-muted-foreground leading-snug m-0 p-0 truncate">
                           {provider?.full_name || t.ui.noData}
                         </p>
-                      </div>
-
-                      {/* Row 3: Rating + price (inline, no extra spacing) */}
-                      <div className="flex items-center justify-between w-full mt-0.5" style={{ lineHeight: 1 }}>
-                        {/* Rating left */}
-                        <div className="flex items-center gap-0.5">
+                        
+                        {/* Rating stars on the right */}
+                        <div className="flex items-center gap-0.5 flex-shrink-0" style={{ lineHeight: 1 }}>
                           {[1, 2, 3, 4, 5].map((star) => {
                             const rating = serviceRatings[service.id]?.avg || 0;
                             const isFilled = star <= Math.round(rating);
@@ -874,6 +871,12 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                             </span>
                           )}
                         </div>
+                      </div>
+
+                      {/* Row 3: Price + arrow */}
+                      <div className="flex items-center justify-between w-full mt-0.5" style={{ lineHeight: 1 }}>
+                        {/* Empty left side */}
+                        <div></div>
 
                         {/* Price + arrow right */}
                         <div className="flex items-center gap-1 flex-shrink-0">
