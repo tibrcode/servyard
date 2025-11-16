@@ -838,7 +838,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                     >
                       {/* Row 1: Service name */}
                       <div className="flex items-center">
-                        <h3 className="font-bold text-[13px] sm:text-sm leading-snug m-0 p-0 truncate line-clamp-2">
+                        <h3 className="font-bold text-sm sm:text-base leading-snug m-0 p-0 truncate line-clamp-2">
                           {service.name}
                         </h3>
                       </div>
@@ -878,7 +878,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                         {/* Price + arrow right */}
                         <div className="flex items-center gap-1 flex-shrink-0">
                           {service.approximate_price && (
-                            <div className="text-[13px] font-semibold text-primary whitespace-nowrap">
+                            <div className="text-sm font-semibold text-primary whitespace-nowrap">
                               {provider?.currency_code} {service.approximate_price}
                             </div>
                           )}
