@@ -849,37 +849,39 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                           <p className="text-xs text-muted-foreground truncate leading-none m-0 mt-0.5">
                             {provider?.full_name || t.ui.noData}
                           </p>
-                          <div className="flex items-center gap-0.5 mt-0.5">
-                            {[1, 2, 3, 4, 5].map((star) => {
-                              const rating = serviceRatings[service.id]?.avg || 0;
-                              const isFilled = star <= Math.round(rating);
-                              return (
-                                <Star
-                                  key={star}
-                                  className={`h-3 w-3 ${
-                                    isFilled 
-                                      ? 'fill-yellow-400 text-yellow-400' 
-                                      : 'fill-muted text-muted-foreground/30'
-                                  }`}
-                                />
-                              );
-                            })}
-                            {serviceRatings[service.id] && (
-                              <span className="text-xs text-muted-foreground ml-1">
-                                ({serviceRatings[service.id].count})
-                              </span>
+                          <div className="flex items-center justify-between gap-2 mt-0.5 w-full">
+                            <div className="flex items-center gap-0.5">
+                              {[1, 2, 3, 4, 5].map((star) => {
+                                const rating = serviceRatings[service.id]?.avg || 0;
+                                const isFilled = star <= Math.round(rating);
+                                return (
+                                  <Star
+                                    key={star}
+                                    className={`h-3 w-3 ${
+                                      isFilled 
+                                        ? 'fill-yellow-400 text-yellow-400' 
+                                        : 'fill-muted text-muted-foreground/30'
+                                    }`}
+                                  />
+                                );
+                              })}
+                              {serviceRatings[service.id] && (
+                                <span className="text-xs text-muted-foreground ml-1">
+                                  ({serviceRatings[service.id].count})
+                                </span>
+                              )}
+                            </div>
+                            {service.approximate_price && (
+                              <div className="text-sm font-semibold text-primary whitespace-nowrap">
+                                {provider?.currency_code} {service.approximate_price}
+                              </div>
                             )}
                           </div>
                         </div>
                       </div>
 
-                      {/* Right side: Price + Arrow */}
-                      <div className="flex items-center gap-1.5 flex-shrink-0">
-                        {service.approximate_price && (
-                          <div className="text-sm font-semibold text-primary whitespace-nowrap">
-                            {provider?.currency_code} {service.approximate_price}
-                          </div>
-                        )}
+                      {/* Right side: Arrow only */}
+                      <div className="flex items-center flex-shrink-0">
                         <ChevronDown 
                           className={`h-4 w-4 text-muted-foreground transition-transform duration-200 flex-shrink-0 ${isExpanded ? 'rotate-180' : ''}`}
                         />
