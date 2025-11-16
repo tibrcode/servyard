@@ -836,7 +836,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                       className="flex items-center justify-between px-3 py-1.5 cursor-pointer hover:bg-muted/50 transition-colors gap-2"
                       onClick={() => setExpandedServiceId(isExpanded ? null : service.id)}
                     >
-                      {/* Left side: Logo + Name + Stars in single row */}
+                      {/* Left side: Logo + Info */}
                       <div className="flex items-center gap-2 flex-1 min-w-0">
                         <ProviderLogo
                           providerName={provider?.full_name || t.ui.noData}
@@ -844,11 +844,12 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                           size="sm"
                           showName={false}
                         />
-                        <div className="flex items-center gap-1.5 flex-1 min-w-0">
-                          <h3 className="font-bold text-sm truncate leading-tight">
-                            {service.name}
-                          </h3>
-                          <div className="flex items-center gap-0.5 flex-shrink-0">
+                        <div className="flex-1 min-w-0 flex flex-col">
+                          <h3 className="font-bold text-sm truncate leading-tight">{service.name}</h3>
+                          <p className="text-xs text-muted-foreground truncate leading-tight">
+                            {provider?.full_name || t.ui.noData}
+                          </p>
+                          <div className="flex items-center gap-0.5 mt-0.5">
                             {[1, 2, 3, 4, 5].map((star) => {
                               const rating = serviceRatings[service.id]?.avg || 0;
                               const isFilled = star <= Math.round(rating);
@@ -864,7 +865,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                               );
                             })}
                             {serviceRatings[service.id] && (
-                              <span className="text-xs text-muted-foreground">
+                              <span className="text-xs text-muted-foreground ml-1">
                                 ({serviceRatings[service.id].count})
                               </span>
                             )}
