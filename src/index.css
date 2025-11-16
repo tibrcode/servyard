@@ -82,6 +82,7 @@ All colors MUST be HSL. Premium dark/light theme with gold accents.
 
     --card: 0 0% 100%;
     --card-foreground: 220 13% 9%;
+    --card-nested: 220 8% 97%;
 
     --popover: 0 0% 100%;
     --popover-foreground: 220 13% 9%;
@@ -144,6 +145,7 @@ All colors MUST be HSL. Premium dark/light theme with gold accents.
 
     --card: 171 86% 7%;
     --card-foreground: 220 9% 96%;
+    --card-nested: 171 86% 9%;
 
     --popover: 171 86% 7%;
     --popover-foreground: 220 9% 96%;
@@ -204,6 +206,11 @@ All colors MUST be HSL. Premium dark/light theme with gold accents.
 }
 /* Component utilities */
 @layer components {
+
+  /* Nested card styling - lighter background for cards inside cards */
+  .card-nested {
+    background-color: hsl(var(--card-nested));
+  }
 
   /* Gold glow for cards (works on hover, focus-visible, and active) */
   .glow-card {

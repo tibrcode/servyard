@@ -241,7 +241,7 @@ export const BookingModal = ({ service, provider, isOpen, onClose, currentLangua
 
           <CardContent className="space-y-6">
             {/* Service Details */}
-            <div className="border rounded-lg p-4 bg-muted/50">
+            <div className="border rounded-lg p-4 card-nested">
               <h3 className="font-semibold text-lg mb-2">{service.name}</h3>
               {service.description && (
                 <p className="text-muted-foreground mb-3">{service.description}</p>

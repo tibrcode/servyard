@@ -138,7 +138,7 @@ export default function TimezoneSettings({ currentLanguage }: TimezoneSettingsPr
 
           <CardContent className="space-y-6">
             {/* Current Time Display */}
-            <Card className="bg-muted/50">
+            <Card className="card-nested">
               <CardContent className="pt-6">
                 <div className="text-center space-y-2">
                   <div className="flex items-center justify-center gap-2 text-muted-foreground">

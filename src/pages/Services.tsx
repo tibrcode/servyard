@@ -601,7 +601,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
           /* Map View */
           <div className="space-y-4">
             {/* Map Statistics */}
-            <div className="flex flex-wrap gap-2 items-center justify-between p-4 bg-muted/50 rounded-lg">
+            <div className="flex flex-wrap gap-2 items-center justify-between p-4 card-nested rounded-lg">
               <div className="flex items-center gap-2">
                 <MapPin className="w-5 h-5 text-primary" />
                 <span className="font-semibold">
@@ -728,7 +728,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                   {isRTL ? '👤 معلومات المزود' : '👤 Provider Info'}
                                 </h3>
                                 
-                                <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg">
+                                <div className="flex items-center gap-3 p-3 card-nested rounded-lg">
                                   <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-lg">
                                     {provider.full_name.charAt(0).toUpperCase()}
                                   </div>
