@@ -15,6 +15,7 @@ import { upsertDefaultServiceCategories } from "@/lib/firebase/defaultCategories
 import { getCategoryLabel } from "@/lib/categoriesLocale";
 import { ServiceBookingSettings } from "@/components/booking/ServiceBookingSettings";
 import { BookingSettings } from "@/types/booking";
+import { invalidateServicesCache } from "@/lib/servicesCache";
 
 interface AddServiceProps {
   currentLanguage: string;
@@ -67,14 +68,13 @@ const AddService = ({ currentLanguage }: AddServiceProps) => {
         const categoriesSnapshot = await getDocs(categoriesQuery);
         let categoriesData = categoriesSnapshot.docs.map(doc => ({
           id: doc.id,
-          ...doc.data()
+          ...(doc.data() as any)
         }));
-
         // Deduplicate by name_en/name_ar
         const seen = new Set<string>();
         const deduped: any[] = [];
         for (const cat of categoriesData) {
-          const key = ((cat.name_en || cat.name_ar || cat.id) + '').trim().toLowerCase();
+          const key = ((cat as any).name_en || (cat as any).name_ar || cat.id + '').trim().toLowerCase();
           if (!seen.has(key)) {
             seen.add(key);
             deduped.push(cat);
@@ -91,13 +91,13 @@ const AddService = ({ currentLanguage }: AddServiceProps) => {
           const categoriesSnapshot = await getDocs(collection(db, 'service_categories'));
           let categoriesData = categoriesSnapshot.docs.map(doc => ({
             id: doc.id,
-            ...doc.data()
+            ...(doc.data() as any)
           }));
           categoriesData = categoriesData.filter((cat: any) => cat.is_active);
           const seenF = new Set<string>();
           const dedupF: any[] = [];
           for (const cat of categoriesData) {
-            const key = ((cat.name_en || cat.name_ar || cat.id) + '').trim().toLowerCase();
+            const key = ((cat as any).name_en || (cat as any).name_ar || cat.id + '').trim().toLowerCase();
             if (!seenF.has(key)) {
               seenF.add(key);
               dedupF.push(cat);
@@ -119,6 +119,7 @@ const AddService = ({ currentLanguage }: AddServiceProps) => {
     e.preventDefault();
     setLoading(true);
 
+              invalidateServicesCache();
     try {
       const user = auth.currentUser;
       if (!user) {

@@ -8,6 +8,7 @@ import { Plus, Edit2, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { db, auth } from "@/integrations/firebase/client";
 import { collection, query, where, getDocs, doc, updateDoc, deleteDoc, getDoc } from "firebase/firestore";
+import { invalidateServicesCache } from "@/lib/servicesCache";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "@/lib/i18n";
 
@@ -132,6 +133,9 @@ export const ServiceManagement = ({ currentLanguage, currencyCode }: ServiceMana
         updated_at: new Date()
       });
 
+      // Invalidate cached client services so status changes are reflected
+      invalidateServicesCache();
+
       setServices(prev =>
         prev.map(service =>
           service.id === serviceId
@@ -159,6 +163,9 @@ export const ServiceManagement = ({ currentLanguage, currencyCode }: ServiceMana
 
     try {
       await deleteDoc(doc(db, 'services', serviceId));
+
+      // Invalidate cached client services so deletions are reflected
+      invalidateServicesCache();
 
       setServices(prev => prev.filter(service => service.id !== serviceId));
 

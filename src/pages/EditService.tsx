@@ -18,6 +18,7 @@ import { upsertDefaultServiceCategories } from "@/lib/firebase/defaultCategories
 import { ServiceBookingSettings } from "@/components/booking/ServiceBookingSettings";
 import { ServiceScheduleSetup } from "@/components/booking/ServiceScheduleSetup";
 import { BookingSettings } from "@/types/booking";
+import { invalidateServicesCache } from "@/lib/servicesCache";
 
 interface EditServiceProps {
   currentLanguage: string;
@@ -238,6 +239,9 @@ const EditService: React.FC<EditServiceProps> = ({ currentLanguage }) => {
         // Booking settings
         ...bookingSettings
       });
+
+      // Invalidate cached client service lists so updates appear immediately
+      invalidateServicesCache();
 
       toast({
         title: t.editProfile.successTitle,
