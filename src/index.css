@@ -138,14 +138,14 @@ All colors MUST be HSL. Premium dark/light theme with gold accents.
   }
 
   .dark {
-    /* Dark theme - Deep teal background (#094239) with warm gold cards (#9a845f) */
-    --background: 171 86% 13%;
+    /* Dark theme - Darker teal background with darker warm gold cards */
+    --background: 171 86% 8%;
     --foreground: 220 9% 96%;
 
-    --card: 38 23% 49%;
+    --card: 38 23% 35%;
     --card-foreground: 220 9% 96%;
 
-    --popover: 38 23% 49%;
+    --popover: 38 23% 35%;
     --popover-foreground: 220 9% 96%;
 
     /* Gold primary remains consistent */
@@ -153,34 +153,34 @@ All colors MUST be HSL. Premium dark/light theme with gold accents.
     --primary-foreground: 220 27% 8%;
     --primary-glow: 41 92% 65%;
 
-    --secondary: 38 23% 52%;
+    --secondary: 38 23% 38%;
     --secondary-foreground: 220 9% 96%;
 
-    --muted: 38 23% 52%;
+    --muted: 38 23% 38%;
     --muted-foreground: 220 9% 85%;
 
-    --accent: 38 23% 52%;
+    --accent: 38 23% 38%;
     --accent-foreground: 220 9% 96%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 220 9% 96%;
 
-    --border: 38 23% 45%;
-    --input: 38 23% 45%;
+    --border: 38 23% 32%;
+    --input: 38 23% 32%;
     --ring: 41 92% 55%;
 
     /* Dark theme custom tokens */
     --luxury-gradient: linear-gradient(135deg, hsl(41 92% 55%), hsl(41 92% 65%));
-    --surface-elevation: 38 23% 52%;
+    --surface-elevation: 38 23% 38%;
     --shadow-luxury: 0 10px 30px -10px hsl(41 92% 55% / 0.3);
-    --shadow-soft: 0 4px 12px -4px hsl(171 86% 13% / 0.4);
-    --sidebar-background: 38 23% 49%;
+    --shadow-soft: 0 4px 12px -4px hsl(171 86% 8% / 0.4);
+    --sidebar-background: 38 23% 35%;
     --sidebar-foreground: 220 9% 96%;
     --sidebar-primary: 224.3 76.3% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 38 23% 55%;
+    --sidebar-accent: 38 23% 40%;
     --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 38 23% 45%;
+    --sidebar-border: 38 23% 32%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
