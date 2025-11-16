@@ -829,7 +829,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                 return (
                   <Card
                     key={service.id}
-                    className="w-full transition-all duration-200 overflow-hidden p-0 m-0 border-primary/20 hover:border-primary/40 hover:shadow-lg rounded-xl"
+                    className="w-full transition-all duration-200 overflow-hidden p-0 m-0 border-x border-t border-primary/20 hover:border-primary/40 hover:shadow-lg rounded-t-xl"
                   >
                     {/* Compact Header - Always Visible (also acts as closed card body on mobile) */}
                     <div
@@ -893,7 +893,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
 
                     {/* Expanded Content - Shown on Click (separate body with its own padding) */}
                     {isExpanded && (
-                      <CardContent className="pt-2 px-3 pb-3 border-t border-border/40">
+                      <CardContent className="pt-2 px-3 pb-3 border border-primary/20 border-t-0 rounded-b-xl">
                         <div className="space-y-2">
                           {/* Description */}
                           {service.description && (
