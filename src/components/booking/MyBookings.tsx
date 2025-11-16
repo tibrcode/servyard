@@ -468,7 +468,7 @@ export function MyBookings({
     const bookingDate = new Date(booking.booking_date);
 
     return (
-      <Card key={booking.booking_id} data-booking-id={booking.booking_id} id={`booking-${booking.booking_id}`}>
+      <Card key={booking.booking_id} data-booking-id={booking.booking_id} id={`booking-${booking.booking_id}`} className="bg-muted/50 hover:bg-muted/70 transition-colors">
         <CardContent className="p-4 space-y-4">
           {/* Service Title */}
           <div className="flex items-start justify-between">

@@ -232,7 +232,7 @@ export const ServiceManagement = ({ currentLanguage, currencyCode }: ServiceMana
       ) : (
         <div className="space-y-3 sm:space-y-4">
           {services.map((service) => (
-            <Card key={service.id} className="h-auto">
+            <Card key={service.id} className="h-auto bg-muted/50 hover:bg-muted/70 transition-colors">
               <CardContent className="p-3 sm:p-4">
                 <div className="flex flex-col gap-3 sm:gap-4">
                   <div className="flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-4">

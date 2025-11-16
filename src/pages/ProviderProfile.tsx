@@ -468,7 +468,7 @@ const ProviderProfile = ({ currentLanguage, onLanguageChange }: ProviderProfileP
                   ) : (
                     <div className="grid gap-4">
                       {services.map((service) => (
-                        <div key={service.id} className="p-4 sm:p-6 border rounded-lg hover:shadow-md transition-shadow">
+                        <div key={service.id} className="p-4 sm:p-6 border rounded-lg hover:shadow-md transition-shadow bg-muted/50 hover:bg-muted/70">
                           <div className="flex justify-between items-start mb-2 sm:mb-4">
                             <div className="flex-1">
                               <h3 className="text-xl font-semibold mb-1 sm:mb-2">{service.name}</h3>
