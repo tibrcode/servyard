@@ -838,14 +838,14 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                     >
                       {/* Row 1: Service name */}
                       <div className="flex items-center">
-                        <h3 className="font-bold text-2xl sm:text-3xl leading-snug m-0 p-0 truncate line-clamp-2">
+                        <h3 className="font-bold text-base sm:text-lg leading-snug m-0 p-0 truncate line-clamp-2">
                           {service.name}
                         </h3>
                       </div>
 
                       {/* Row 2: Provider name + Rating stars */}
                       <div className="flex items-center justify-between mt-0.5 gap-2">
-                        <p className="text-base sm:text-lg text-muted-foreground leading-snug m-0 p-0 truncate">
+                        <p className="text-xs sm:text-sm text-muted-foreground leading-snug m-0 p-0 truncate">
                           {provider?.full_name || t.ui.noData}
                         </p>
                         
@@ -857,7 +857,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                             return (
                               <Star
                                 key={star}
-                                className={`h-6 w-6 ${
+                                className={`h-3 w-3 ${
                                   isFilled
                                     ? 'fill-yellow-400 text-yellow-400'
                                     : 'fill-muted text-muted-foreground/30'
@@ -866,7 +866,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                             );
                           })}
                           {serviceRatings[service.id] && (
-                            <span className="text-base text-muted-foreground ml-1">
+                            <span className="text-xs text-muted-foreground ml-1">
                               ({serviceRatings[service.id].count})
                             </span>
                           )}
@@ -881,12 +881,12 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                         {/* Price + arrow right */}
                         <div className="flex items-center gap-1 flex-shrink-0">
                           {service.approximate_price && (
-                            <div className="text-xl font-semibold text-primary whitespace-nowrap">
+                            <div className="text-sm font-semibold text-primary whitespace-nowrap">
                               {provider?.currency_code} {service.approximate_price}
                             </div>
                           )}
                           <ChevronDown
-                            className={`h-7 w-7 text-muted-foreground transition-transform duration-200 flex-shrink-0 ${
+                            className={`h-4 w-4 text-muted-foreground transition-transform duration-200 flex-shrink-0 ${
                               isExpanded ? 'rotate-180' : ''
                             }`}
                           />
