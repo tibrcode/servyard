@@ -851,7 +851,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                     >
                       {/* Row 1: Category icon + Service name */}
                       <div className="flex items-center gap-2">
-                        <CategoryIcon className="h-4 w-4 flex-shrink-0 text-primary" />
+                        <CategoryIcon className="h-8 w-8 flex-shrink-0 text-primary" />
                         <h3 className="font-bold text-base sm:text-lg leading-snug m-0 p-0 truncate line-clamp-2">
                           {service.name}
                         </h3>
