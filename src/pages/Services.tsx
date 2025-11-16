@@ -900,14 +900,15 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
 
                           {/* Duration */}
                           {service.duration_minutes && (
-                            <p className="text-foreground text-sm leading-relaxed m-0">
-                              Service Duration: {service.duration_minutes} minutes
+                            <p className="text-sm leading-relaxed m-0">
+                              <span className="text-primary font-semibold">Service Duration:</span>{' '}
+                              <span className="text-foreground">{service.duration_minutes} minutes</span>
                             </p>
                           )}
 
                           {/* Service Rating with 5 stars */}
                           <div className="flex items-center gap-2">
-                            <span className="text-foreground text-sm">Servis Rating:</span>
+                            <span className="text-primary font-semibold text-sm">Servis Rating:</span>
                             <div className="flex items-center gap-0.5">
                               {[1, 2, 3, 4, 5].map((star) => {
                                 const rating = serviceRatings[service.id]?.avg || 0;
@@ -935,7 +936,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
 
                           {/* Client Rating with 5 stars */}
                           <div className="flex items-center gap-2">
-                            <span className="text-foreground text-sm">Client Rating:</span>
+                            <span className="text-primary font-semibold text-sm">Client Rating:</span>
                             <div className="flex items-center gap-0.5">
                               {[1, 2, 3, 4, 5].map((star) => {
                                 const rating = provider && providerRatings[provider.id] ? providerRatings[provider.id].avg : 0;
@@ -963,7 +964,10 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
 
                           {/* City */}
                           {provider?.city && (
-                            <p className="text-foreground text-sm leading-relaxed m-0">City: {provider.city}</p>
+                            <p className="text-sm leading-relaxed m-0">
+                              <span className="text-primary font-semibold">City:</span>{' '}
+                              <span className="text-foreground">{provider.city}</span>
+                            </p>
                           )}
 
                           {/* Distance if available */}
