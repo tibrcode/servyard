@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Filter, MapPin, Star, Clock, ExternalLink, Calendar, Map as MapIcon, List, ChevronDown } from "lucide-react";
+import { Search, Filter, MapPin, Star, Clock, ExternalLink, Calendar, Map as MapIcon, List, ChevronDown, Sparkles, Wrench, Heart, Dumbbell, Scissors, GraduationCap, Stethoscope, Home, Car, Laptop, Scale, DollarSign, Users, Cog, Palette, Shirt, Code, Building, Megaphone, Camera, Languages, Briefcase, Sofa, PenTool, Music, Plane } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
 // Currency display uses Latin currency code (e.g., AED) instead of symbol
@@ -825,6 +825,19 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
               {filteredServices.map((service) => {
                 const provider = providers[service.provider_id];
                 const isExpanded = expandedServiceId === service.id;
+                const category = categories.find(c => c.id === service.category_id);
+                
+                // Icon mapping for categories
+                const iconMap: { [key: string]: any } = {
+                  'Sparkles': Sparkles, 'Wrench': Wrench, 'Heart': Heart, 'Dumbbell': Dumbbell,
+                  'Scissors': Scissors, 'GraduationCap': GraduationCap, 'Stethoscope': Stethoscope,
+                  'Home': Home, 'Car': Car, 'Laptop': Laptop, 'Scale': Scale, 'DollarSign': DollarSign,
+                  'Users': Users, 'Cog': Cog, 'Palette': Palette, 'Shirt': Shirt, 'Code': Code,
+                  'Building': Building, 'Megaphone': Megaphone, 'Camera': Camera, 'Languages': Languages,
+                  'Briefcase': Briefcase, 'Calendar': Calendar, 'Sofa': Sofa, 'PenTool': PenTool,
+                  'Music': Music, 'Plane': Plane
+                };
+                const CategoryIcon = category?.icon_name ? iconMap[category.icon_name] || Users : Users;
 
                 return (
                   <Card
@@ -836,8 +849,9 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                       className="flex flex-col px-3 pt-1.5 pb-0 sm:pt-2 sm:pb-0 cursor-pointer hover:bg-muted/50 transition-colors gap-0.5"
                       onClick={() => setExpandedServiceId(isExpanded ? null : service.id)}
                     >
-                      {/* Row 1: Service name */}
-                      <div className="flex items-center">
+                      {/* Row 1: Category icon + Service name */}
+                      <div className="flex items-center gap-2">
+                        <CategoryIcon className="h-4 w-4 flex-shrink-0 text-primary" />
                         <h3 className="font-bold text-base sm:text-lg leading-snug m-0 p-0 truncate line-clamp-2">
                           {service.name}
                         </h3>
