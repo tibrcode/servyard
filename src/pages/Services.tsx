@@ -833,25 +833,25 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                   >
                     {/* Compact Header - Always Visible */}
                     <div
-                      className="flex flex-col px-3 pt-2 pb-1.5 cursor-pointer hover:bg-muted/50 transition-colors gap-0.5"
+                      className="flex flex-col px-3 pt-1.5 pb-1 sm:pt-2 sm:pb-1.5 cursor-pointer hover:bg-muted/50 transition-colors gap-0.5"
                       onClick={() => setExpandedServiceId(isExpanded ? null : service.id)}
                     >
                       {/* Row 1: Service name */}
                       <div className="flex items-center">
-                        <h3 className="font-bold text-sm leading-tight m-0 p-0 truncate">
+                        <h3 className="font-bold text-[13px] sm:text-sm leading-snug m-0 p-0 truncate line-clamp-2">
                           {service.name}
                         </h3>
                       </div>
 
                       {/* Row 2: Provider name */}
-                      <div className="flex items-center">
-                        <p className="text-xs text-muted-foreground leading-tight m-0 p-0 truncate">
+                      <div className="flex items-center mt-0.5">
+                        <p className="text-[11px] sm:text-xs text-muted-foreground leading-snug m-0 p-0 truncate">
                           {provider?.full_name || t.ui.noData}
                         </p>
                       </div>
 
-                      {/* Row 3: Price (right) + rating (left) */}
-                      <div className="flex items-center justify-between w-full mt-0.5">
+                      {/* Row 3: Rating left + price + arrow right (single row) */}
+                      <div className="flex items-center justify-between w-full mt-1">
                         {/* Rating left */}
                         <div className="flex items-center gap-0.5" style={{ lineHeight: 1 }}>
                           {[1, 2, 3, 4, 5].map((star) => {
@@ -860,7 +860,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                             return (
                               <Star
                                 key={star}
-                                className={`h-3 w-3 ${
+                                className={`h-3.5 w-3.5 sm:h-3 w-3 ${
                                   isFilled
                                     ? 'fill-yellow-400 text-yellow-400'
                                     : 'fill-muted text-muted-foreground/30'
@@ -875,21 +875,19 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                           )}
                         </div>
 
-                        {/* Price right */}
-                        {service.approximate_price && (
-                          <div className="text-sm font-semibold text-primary whitespace-nowrap">
-                            {provider?.currency_code} {service.approximate_price}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Row 4: Arrow centered */}
-                      <div className="flex items-center justify-center w-full mt-0.5">
-                        <ChevronDown
-                          className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${
-                            isExpanded ? 'rotate-180' : ''
-                          }`}
-                        />
+                        {/* Price + arrow right */}
+                        <div className="flex items-center gap-1 flex-shrink-0">
+                          {service.approximate_price && (
+                            <div className="text-sm font-semibold text-primary whitespace-nowrap">
+                              {provider?.currency_code} {service.approximate_price}
+                            </div>
+                          )}
+                          <ChevronDown
+                            className={`h-4 w-4 text-muted-foreground transition-transform duration-200 flex-shrink-0 ${
+                              isExpanded ? 'rotate-180' : ''
+                            }`}
+                          />
+                        </div>
                       </div>
                     </div>
 
