@@ -829,11 +829,11 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                 return (
                   <Card
                     key={service.id}
-                    className="w-full transition-all duration-200 overflow-hidden p-0 m-0 border-x border-t border-primary/20 hover:border-primary/40 hover:shadow-lg rounded-t-xl"
+                    className="w-full transition-all duration-200 overflow-hidden p-0 m-0 border border-primary/20 hover:border-primary/40 hover:shadow-lg rounded-xl"
                   >
                     {/* Compact Header - Always Visible (also acts as closed card body on mobile) */}
                     <div
-                      className="flex flex-col px-3 pt-1.5 pb-0.5 sm:pt-2 sm:pb-1 cursor-pointer hover:bg-muted/50 transition-colors gap-0.5"
+                      className="flex flex-col px-3 pt-1.5 pb-0 sm:pt-2 sm:pb-0 cursor-pointer hover:bg-muted/50 transition-colors gap-0.5"
                       onClick={() => setExpandedServiceId(isExpanded ? null : service.id)}
                     >
                       {/* Row 1: Service name */}
@@ -851,7 +851,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                       </div>
 
                       {/* Row 3: Bottom bar for rating + price */}
-                      <div className="mt-1 -mx-3 px-3 py-1.5 bg-muted/10 border-t border-primary/10 flex items-center justify-between">
+                      <div className="mt-1 -mx-3 px-3 py-1 bg-muted/10 border-t border-primary/10 flex items-center justify-between">
                         {/* Rating left */}
                         <div className="flex items-center gap-0.5" style={{ lineHeight: 1 }}>
                           {[1, 2, 3, 4, 5].map((star) => {
