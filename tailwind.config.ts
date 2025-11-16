@@ -112,8 +112,8 @@ export default {
         "luxury-scale": "luxuryScale 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
       },
       fontFamily: {
-        sans: ["Cairo", "system-ui", "sans-serif"],
-        display: ["Cairo", "system-ui", "sans-serif"],
+        sans: ["Poppins", "Cairo", "system-ui", "sans-serif"],
+        display: ["Poppins", "Cairo", "system-ui", "sans-serif"],
       },
       boxShadow: {
         "luxury": "0 10px 30px -10px hsl(var(--primary) / 0.2)",
