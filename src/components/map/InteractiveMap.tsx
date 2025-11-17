@@ -333,8 +333,8 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
         content = `
           <div style="
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-            width: 340px;
-            max-width: 85vw;
+            width: 90vw;
+            max-width: 1200px;
             padding: 0;
             direction: ${isRTL ? 'rtl' : 'ltr'};
             background: transparent;
@@ -471,9 +471,10 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                 const isTopRated = rating >= 4.5;
                 
                 return `
+                                return `
                 <div class="service-card" style="
-                  min-width: 240px;
-                  max-width: 240px;
+                  min-width: 200px;
+                  max-width: 200px;
                   background: ${isDarkMode ? 'rgba(36, 40, 48, 0.92)' : 'rgba(255, 255, 255, 0.92)'};
                   backdrop-filter: blur(12px);
                   -webkit-backdrop-filter: blur(12px);
@@ -490,7 +491,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                   touch-action: pan-x;
                 " 
                 onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(0,0,0,0.2)';"
-                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 20px rgba(0,0,0,0.15)';">
+                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 20px rgba(0,0,0,0.15)';">`
                   
                   ${isTopRated ? `
                     <div style="
