@@ -240,10 +240,13 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
         <div className="flex flex-col gap-4 mb-8">
           <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-start justify-between gap-4 w-full max-w-full">
             <div className="min-w-0 flex-1 w-full max-w-full">
-              <h1 className="dashboard-title text-xl sm:text-2xl lg:text-3xl font-bold text-primary leading-snug truncate max-w-full">
-                {t.customer.welcomeBack}, <span className="provider-name whitespace-normal overflow-wrap-anywhere word-break-break-word">{profile?.full_name || t.ui.noData}</span>!
+              <h1 className="dashboard-title text-xl sm:text-2xl lg:text-3xl font-bold text-primary leading-snug max-w-full">
+                {t.customer.welcomeBack}
               </h1>
-              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed break-words hyphens-auto mt-1 whitespace-normal overflow-wrap-anywhere word-break-break-word w-full max-w-full">
+              <p className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground mt-1">
+                {profile?.full_name || t.ui.noData}
+              </p>
+              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed break-words hyphens-auto mt-2 whitespace-normal overflow-wrap-anywhere word-break-break-word w-full max-w-full">
                 {t.customer.manageBookings}
               </p>
             </div>
@@ -277,7 +280,7 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
         </div>
 
         {/* Stats Overview */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
+        <div className="grid grid-cols-1 gap-3 mb-8">
           <Card className="h-auto">
             <CardContent className="p-4">
               <div className="flex items-start justify-between gap-2">
@@ -286,18 +289,6 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
                   <p className="text-lg sm:text-xl lg:text-2xl font-bold leading-tight break-words mt-1">{reviews.length}</p>
                 </div>
                 <Star className="w-6 h-6 sm:w-8 sm:h-8 text-purple-500 flex-shrink-0" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="h-auto">
-            <CardContent className="p-4">
-              <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs sm:text-sm font-medium text-muted-foreground break-words leading-tight hyphens-auto">{t.customer.profile}</p>
-                  <p className="text-lg sm:text-xl lg:text-2xl font-bold leading-tight break-words mt-1">{profile?.full_name || t.ui.noData}</p>
-                </div>
-                <User className="w-6 h-6 sm:w-8 sm:h-8 text-blue-500 flex-shrink-0" />
               </div>
             </CardContent>
           </Card>
