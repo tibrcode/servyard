@@ -425,6 +425,13 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
         : 0;
       const providerTotalReviews = providerServiceRatings.reduce((sum, r) => sum + r.count, 0);
       
+      console.log(`  Provider "${provider.full_name}" ratings:`, {
+        providerAvgRating,
+        providerTotalReviews,
+        servicesCount: services.length,
+        ratingsFound: providerServiceRatings.length
+      });
+      
       return {
         latitude: provider.latitude!,
         longitude: provider.longitude!,
@@ -433,6 +440,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
         provider_reviews_count: providerTotalReviews,
         services: services.map(service => {
           const rating = serviceRatings[service.id];
+          console.log(`    Service "${service.name}" rating:`, rating);
           return {
             id: service.id,
             name: service.name,
@@ -447,10 +455,12 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
     }).filter((marker): marker is NonNullable<typeof marker> => marker !== null);
     
     console.log('🗺️ useMemo: Calculated mapMarkers:', markers.length);
-    markers.forEach((m, i) => console.log(`  Marker ${i + 1}:`, m.label, `(${m.latitude}, ${m.longitude})`));
+    markers.forEach((m, i) => console.log(`  Marker ${i + 1}:`, m.label, `(${m.latitude}, ${m.longitude})`, 
+      `Provider Rating: ${m.provider_rating?.toFixed(1)}, Services with ratings:`, 
+      m.services.filter(s => s.average_rating > 0).length));
     
     return markers;
-  }, [baseFilteredServices, providers, isRTL]);
+  }, [baseFilteredServices, providers, isRTL, serviceRatings]);
 
   if (loading) {
     return (
