@@ -418,7 +418,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
             </div>
             
             <!-- Horizontal Scrolling Services Cards -->
-            <div id="cards-container" style="
+            <div id="cards-container-${location.latitude}-${location.longitude}" class="cards-container" style="
               display: flex;
               gap: 10px;
               overflow-x: scroll;
@@ -432,13 +432,52 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
               touch-action: pan-x;
             ">
             <style>
-              #cards-container::-webkit-scrollbar {
+              .cards-container::-webkit-scrollbar {
                 display: none;
               }
-              #cards-container:active {
+              .cards-container:active {
                 cursor: grabbing;
               }
             </style>
+            <script>
+              (function() {
+                const container = document.getElementById('cards-container-${location.latitude}-${location.longitude}');
+                if (!container) return;
+                
+                let isDown = false;
+                let startX;
+                let scrollLeft;
+                
+                container.addEventListener('mousedown', (e) => {
+                  // Don't interfere with button clicks
+                  if (e.target.tagName === 'BUTTON') return;
+                  
+                  isDown = true;
+                  container.style.cursor = 'grabbing';
+                  startX = e.pageX - container.offsetLeft;
+                  scrollLeft = container.scrollLeft;
+                  e.preventDefault();
+                });
+                
+                container.addEventListener('mouseleave', () => {
+                  isDown = false;
+                  container.style.cursor = 'grab';
+                });
+                
+                container.addEventListener('mouseup', () => {
+                  isDown = false;
+                  container.style.cursor = 'grab';
+                });
+                
+                container.addEventListener('mousemove', (e) => {
+                  if (!isDown) return;
+                  e.preventDefault();
+                  const x = e.pageX - container.offsetLeft;
+                  const walk = (x - startX) * 2; // Scroll speed
+                  container.scrollLeft = scrollLeft - walk;
+                });
+              })();
+            </script>
               ${location.services.map((service, index) => {
                 const rating = service.average_rating || 0;
                 const reviewCount = service.reviews_count || 0;
