@@ -109,13 +109,14 @@ export const StatsOverview = ({ currentLanguage }: StatsOverviewProps) => {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-6 sm:mb-8">
         {[...Array(4)].map((_, i) => (
-          <Card key={i}>
-            <CardContent className="p-6">
-              <div className="animate-pulse">
-                <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
-                <div className="h-8 bg-gray-200 rounded w-3/4"></div>
+          <Card key={i} className="bg-muted/50">
+            <CardContent className="p-3 sm:p-4 lg:p-6">
+              <div className="animate-pulse flex flex-col items-center gap-2">
+                <div className="h-8 w-8 sm:h-10 sm:w-10 bg-gray-200 rounded-full"></div>
+                <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+                <div className="h-6 bg-gray-200 rounded w-1/2"></div>
               </div>
             </CardContent>
           </Card>
@@ -160,19 +161,22 @@ export const StatsOverview = ({ currentLanguage }: StatsOverviewProps) => {
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-8">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-6 sm:mb-8">
       {statCards.map((stat, index) => {
         const Icon = stat.icon;
         return (
-          <Card key={index}>
-            <CardContent className="p-3 sm:p-6">
-              <div className="flex items-center justify-between">
-                <div className="min-w-0 flex-1">
+          <Card key={index} className="bg-muted/50 hover:bg-muted/70 transition-colors">
+            <CardContent className="p-3 sm:p-4 lg:p-6">
+              <div className="flex flex-col items-center text-center gap-2">
+                <div className={`${stat.bgColor} p-2 sm:p-3 rounded-full`}>
+                  <Icon className={`w-4 h-4 sm:w-5 sm:h-5 ${stat.color}`} />
+                </div>
+                <div className="w-full">
                   <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">
                     {stat.title}
                   </p>
-                  <div className="flex items-center gap-2 mt-1">
-                    <p className="text-xl sm:text-2xl font-bold truncate">
+                  <div className="flex items-center justify-center gap-1 sm:gap-2 mt-1">
+                    <p className="text-lg sm:text-xl lg:text-2xl font-bold">
                       {stat.value}
                     </p>
                     {stat.total !== undefined && (
@@ -186,9 +190,6 @@ export const StatsOverview = ({ currentLanguage }: StatsOverviewProps) => {
                       {stat.subtitle}
                     </p>
                   )}
-                </div>
-                <div className={`${stat.bgColor} p-2 sm:p-3 rounded-full shrink-0`}>
-                  <Icon className={`w-4 h-4 sm:w-5 sm:h-5 ${stat.color}`} />
                 </div>
               </div>
             </CardContent>
