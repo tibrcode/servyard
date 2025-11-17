@@ -600,29 +600,8 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
         ) : viewMode === 'map' ? (
           /* Map View */
           <div className="space-y-4">
-            {/* Map Statistics */}
-            <div className="flex flex-wrap gap-2 items-center justify-between p-4 card-nested rounded-lg">
-              <div className="flex items-center gap-2">
-                <MapPin className="w-5 h-5 text-primary" />
-                <span className="font-semibold">
-                  {isRTL 
-                    ? `${mapMarkers.length} من ${filteredServices.length} خدمة على الخريطة`
-                    : `${mapMarkers.length} of ${filteredServices.length} services on map`
-                  }
-                </span>
-              </div>
-              {(filteredServices.length - mapMarkers.length) > 0 && (
-                <Badge variant="secondary">
-                  {isRTL 
-                    ? `${filteredServices.length - mapMarkers.length} بدون موقع`
-                    : `${filteredServices.length - mapMarkers.length} without location`
-                  }
-                </Badge>
-              )}
-            </div>
-            
             {/* Map */}
-            <div className="w-full h-[600px] rounded-lg overflow-hidden border">
+            <div className="w-full h-[500px] sm:h-[700px] rounded-lg overflow-hidden border">
               <InteractiveMap
                 markers={mapMarkers}
                 center={
@@ -650,6 +629,27 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                   }, 100);
                 }}
               />
+            </div>
+            
+            {/* Map Statistics */}
+            <div className="flex flex-wrap gap-2 items-center justify-between p-4 card-nested rounded-lg">
+              <div className="flex items-center gap-2">
+                <MapPin className="w-5 h-5 text-primary" />
+                <span className="font-semibold">
+                  {isRTL 
+                    ? `${mapMarkers.length} من ${filteredServices.length} خدمة على الخريطة`
+                    : `${mapMarkers.length} of ${filteredServices.length} services on map`
+                  }
+                </span>
+              </div>
+              {(filteredServices.length - mapMarkers.length) > 0 && (
+                <Badge variant="secondary">
+                  {isRTL 
+                    ? `${filteredServices.length - mapMarkers.length} بدون موقع`
+                    : `${filteredServices.length - mapMarkers.length} without location`
+                  }
+                </Badge>
+              )}
             </div>
             
             {/* Selected Service Display */}
