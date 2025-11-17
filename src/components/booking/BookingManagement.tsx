@@ -520,45 +520,69 @@ export function BookingManagement({
 
       {/* Statistics - Moved to bottom */}
       {!showOnlyPending && (
-        <div className="grid gap-4 md:grid-cols-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{translations.totalBookings}</CardTitle>
-              <Calendar className="h-4 w-4 text-muted-foreground" />
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
+          <Card className="bg-muted/50 hover:bg-muted/70 transition-colors">
+            <CardHeader className="pb-2">
+              <div className="flex flex-col items-center text-center gap-2">
+                <div className="bg-blue-100 p-2 sm:p-3 rounded-full">
+                  <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
+                </div>
+                <CardTitle className="text-xs sm:text-sm font-medium">{translations.totalBookings}</CardTitle>
+              </div>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.total_bookings}</div>
+            <CardContent className="pt-0">
+              <div className="text-center">
+                <div className="text-lg sm:text-xl lg:text-2xl font-bold">{stats.total_bookings}</div>
+              </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{translations.pendingBookings}</CardTitle>
-              <AlertCircle className="h-4 w-4 text-muted-foreground" />
+          <Card className="bg-muted/50 hover:bg-muted/70 transition-colors">
+            <CardHeader className="pb-2">
+              <div className="flex flex-col items-center text-center gap-2">
+                <div className="bg-yellow-100 p-2 sm:p-3 rounded-full">
+                  <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-600" />
+                </div>
+                <CardTitle className="text-xs sm:text-sm font-medium">{translations.pendingBookings}</CardTitle>
+              </div>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.pending}</div>
+            <CardContent className="pt-0">
+              <div className="text-center">
+                <div className="text-lg sm:text-xl lg:text-2xl font-bold">{stats.pending}</div>
+              </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{translations.confirmedBookings}</CardTitle>
-              <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
+          <Card className="bg-muted/50 hover:bg-muted/70 transition-colors">
+            <CardHeader className="pb-2">
+              <div className="flex flex-col items-center text-center gap-2">
+                <div className="bg-green-100 p-2 sm:p-3 rounded-full">
+                  <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
+                </div>
+                <CardTitle className="text-xs sm:text-sm font-medium">{translations.confirmedBookings}</CardTitle>
+              </div>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.confirmed}</div>
+            <CardContent className="pt-0">
+              <div className="text-center">
+                <div className="text-lg sm:text-xl lg:text-2xl font-bold">{stats.confirmed}</div>
+              </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{translations.revenue}</CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+          <Card className="bg-muted/50 hover:bg-muted/70 transition-colors">
+            <CardHeader className="pb-2">
+              <div className="flex flex-col items-center text-center gap-2">
+                <div className="bg-purple-100 p-2 sm:p-3 rounded-full">
+                  <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
+                </div>
+                <CardTitle className="text-xs sm:text-sm font-medium">{translations.revenue}</CardTitle>
+              </div>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {stats.total_revenue} {stats.currency}
+            <CardContent className="pt-0">
+              <div className="text-center">
+                <div className="text-lg sm:text-xl lg:text-2xl font-bold">
+                  {stats.total_revenue} {stats.currency}
+                </div>
               </div>
             </CardContent>
           </Card>
