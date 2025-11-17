@@ -24,7 +24,7 @@ import { auth, db } from "@/integrations/firebase/client";
 import { collection, query, where, getDocs, doc, getDoc, updateDoc, addDoc, onSnapshot } from "firebase/firestore";
 import { Review } from "@/lib/firebase/collections";
 import { MyBookings } from "@/components/booking/MyBookings";
-import { NotificationSettings } from "@/components/settings/NotificationSettings";
+import { Settings as SettingsComponent } from "@/components/settings/Settings";
 
 interface CustomerDashboardProps {
   currentLanguage: string;
@@ -349,7 +349,7 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
               <TabsTrigger value="appointments">{t.customer.myBookings}</TabsTrigger>
               <TabsTrigger value="reviews">{t.customer.myReviews}</TabsTrigger>
               <TabsTrigger value="profile">{t.customer.profile}</TabsTrigger>
-              <TabsTrigger value="settings">{t.notificationSettings.title}</TabsTrigger>
+              <TabsTrigger value="settings">{isRTL ? 'إعدادات' : 'Settings'}</TabsTrigger>
             </TabsList>
 
             {/* Bookings Tab - Unified Modern Booking System */}
@@ -483,8 +483,9 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
             {/* Settings Tab - Notification Preferences */}
             <TabsContent value="settings" className="space-y-6">
               {user && (
-                <NotificationSettings
+                <SettingsComponent
                   userId={user.uid}
+                  userType="customer"
                   language={currentLanguage as 'en' | 'ar'}
                 />
               )}

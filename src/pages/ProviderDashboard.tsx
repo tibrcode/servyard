@@ -30,7 +30,7 @@ import { useTranslation } from "@/lib/i18n";
 import { toast } from "@/hooks/use-toast";
 import { ShareProfile } from "@/components/provider/ShareProfile";
 import { BookingManagement } from "@/components/booking/BookingManagement";
-import { NotificationSettings } from "@/components/settings/NotificationSettings";
+import { Settings as SettingsComponent } from "@/components/settings/Settings";
 
 interface ProviderDashboardProps {
   currentLanguage: string;
@@ -420,7 +420,7 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
               <TabsTrigger value="bookings" className="text-xs sm:text-sm">{t.provider.bookings}</TabsTrigger>
               <TabsTrigger value="appointments" className="text-xs sm:text-sm">{t.provider.pendingBookings}</TabsTrigger>
               <TabsTrigger value="share" className="text-xs sm:text-sm">{t.provider.shareProfile}</TabsTrigger>
-              <TabsTrigger value="settings" className="text-xs sm:text-sm">{t.notificationSettings.title}</TabsTrigger>
+              <TabsTrigger value="settings" className="text-xs sm:text-sm">{isRTL ? 'إعدادات' : 'Settings'}</TabsTrigger>
             </TabsList>
 
             {/* Services Tab */}
@@ -466,11 +466,12 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
               />
             </TabsContent>
 
-            {/* Settings Tab - Notification Preferences */}
+            {/* Settings Tab - Notification Preferences & Backup */}
             <TabsContent value="settings" className="space-y-6">
               {providerProfile && (
-                <NotificationSettings
+                <SettingsComponent
                   userId={providerProfile.id}
+                  userType="provider"
                   language={currentLanguage as 'en' | 'ar'}
                 />
               )}
