@@ -184,7 +184,7 @@ export const BookingModal = ({ service, provider, isOpen, onClose, currentLangua
 
     return (
       <div 
-        className="fixed top-16 bottom-0 inset-x-0 lg:inset-x-auto lg:end-0 lg:start-64 z-30 flex items-start justify-center p-4 pt-6" 
+        className="fixed top-16 bottom-0 inset-x-0 lg:inset-x-auto lg:end-0 lg:start-64 z-30 flex items-center justify-center p-4" 
         dir={isRTL ? 'rtl' : 'ltr'}
         onClick={onClose}
       >
@@ -193,7 +193,7 @@ export const BookingModal = ({ service, provider, isOpen, onClose, currentLangua
         
         {/* Modal Content */}
         <div 
-          className="relative z-10 w-full max-w-2xl lg:max-w-3xl h-[calc(100%-2.5rem)] bg-card rounded-lg shadow-2xl overflow-hidden flex flex-col border border-border"
+          className="relative z-10 w-full max-w-2xl lg:max-w-3xl max-h-[calc(100%-2rem)] bg-card rounded-lg shadow-2xl overflow-hidden flex flex-col border border-border"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
