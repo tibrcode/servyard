@@ -433,35 +433,30 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                 -webkit-overflow-scrolling: touch;
                 cursor: grab;
                 touch-action: pan-x;
-                scroll-behavior: smooth;
               "
               onmousedown="
                 if (event.target.tagName === 'BUTTON') return;
-                this.isDragging = false;
-                this.startX = event.pageX - this.offsetLeft;
-                this.scrollLeftStart = this.scrollLeft;
+                this.isDragging = true;
+                this.startX = event.pageX - this.scrollLeft;
                 this.style.cursor = 'grabbing';
-                this.style.scrollBehavior = 'auto';
+                this.style.scrollSnapType = 'none';
               "
               onmouseleave="
                 this.isDragging = false;
                 this.style.cursor = 'grab';
-                this.style.scrollBehavior = 'smooth';
+                this.style.scrollSnapType = 'x mandatory';
               "
               onmouseup="
                 this.isDragging = false;
                 this.style.cursor = 'grab';
-                this.style.scrollBehavior = 'smooth';
+                this.style.scrollSnapType = 'x mandatory';
               "
               onmousemove="
-                if (this.isDragging === false && event.buttons === 1) {
-                  this.isDragging = true;
-                }
                 if (!this.isDragging) return;
                 event.preventDefault();
-                const x = event.pageX - this.offsetLeft;
-                const walk = (x - this.startX) * 1.5;
-                this.scrollLeft = this.scrollLeftStart - walk;
+                const x = event.pageX - this.scrollLeft;
+                const walk = this.startX - x;
+                this.scrollLeft = walk;
               "
             >
             <style>
