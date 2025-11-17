@@ -498,7 +498,6 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                     -webkit-line-clamp: 2;
                     -webkit-box-orient: vertical;
                     padding-${isRTL ? 'left' : 'right'}: ${isTopRated ? '50px' : '0'};
-                    pointer-events: none;
                   ">
                     ${service.name}
                   </div>
@@ -510,7 +509,6 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                       align-items: center;
                       gap: 4px;
                       margin-bottom: 10px;
-                      pointer-events: none;
                     ">
                       <div style="
                         color: ${colors.star};
@@ -540,7 +538,6 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                       color: ${colors.textSecondary};
                       margin-bottom: 10px;
                       height: 16px;
-                      pointer-events: none;
                     ">
                       ⭐ ${isRTL ? 'لا توجد تقييمات' : 'No reviews'}
                     </div>
@@ -552,7 +549,6 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                     color: #f59e0b;
                     font-weight: 700;
                     margin-bottom: 8px;
-                    pointer-events: none;
                   ">
                     ${service.price}
                   </div>
@@ -585,27 +581,6 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
               `;
               }).join('')}
             </div>
-            
-            <!-- Scroll Hint (if multiple services) -->
-            ${servicesCount > 1 ? `
-              <div style="
-                text-align: center;
-                padding: 8px 0 4px 0;
-              ">
-                <div style="
-                  color: ${colors.textSecondary};
-                  font-size: 10px;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  gap: 6px;
-                ">
-                  <span>${isRTL ? '←' : '→'}</span>
-                  <span>${isRTL ? 'مرر لعرض المزيد' : 'Swipe to see more'}</span>
-                  <span>${isRTL ? '→' : '←'}</span>
-                </div>
-              </div>
-            ` : ''}
           </div>
         `;
       } else {
