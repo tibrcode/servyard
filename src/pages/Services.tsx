@@ -869,13 +869,9 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                 return (
                   <div
                     key={service.id}
-                    className="relative transition-all duration-300"
+                    className="relative transition-all duration-300 bg-card border hover:border-primary/40"
                     style={{
-                      background: 'rgba(36, 40, 48, 0.92)',
-                      backdropFilter: 'blur(12px)',
-                      WebkitBackdropFilter: 'blur(12px)',
                       borderRadius: '16px',
-                      border: '1px solid rgba(255,255,255,0.1)',
                       boxShadow: '0 6px 20px rgba(0,0,0,0.15)',
                       overflow: 'hidden'
                     }}
@@ -915,12 +911,12 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                     
                     {/* Compact Header - Always Visible */}
                     <div
-                      className="flex flex-col p-3 cursor-pointer"
+                      className="flex flex-col p-3 cursor-pointer hover:bg-muted/50 transition-colors"
                       onClick={() => setExpandedServiceId(isExpanded ? null : service.id)}
-                      style={{ color: 'white' }}
                     >
                       {/* Service Name */}
                       <div 
+                        className="text-foreground"
                         style={{
                           fontSize: '13px',
                           fontWeight: '700',
@@ -955,17 +951,16 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                               return '☆';
                             }).join('')}
                           </div>
-                          <span style={{ fontSize: '12px', fontWeight: '600', color: 'white' }}>
+                          <span className="text-foreground" style={{ fontSize: '12px', fontWeight: '600' }}>
                             {serviceRatings[service.id].avg.toFixed(1)}
                           </span>
-                          <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.6)' }}>
+                          <span className="text-muted-foreground" style={{ fontSize: '10px' }}>
                             ({serviceRatings[service.id].count})
                           </span>
                         </div>
                       ) : (
-                        <div style={{
+                        <div className="text-muted-foreground" style={{
                           fontSize: '10px',
-                          color: 'rgba(255,255,255,0.6)',
                           marginBottom: '10px',
                           height: '16px'
                         }}>
@@ -982,10 +977,9 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                           }
                         </div>
                         <ChevronDown
-                          className={`h-5 w-5 transition-transform duration-200 ${
+                          className={`h-5 w-5 text-muted-foreground transition-transform duration-200 ${
                             isExpanded ? 'rotate-180' : ''
                           }`}
-                          style={{ color: 'rgba(255,255,255,0.6)' }}
                         />
                       </div>
                     </div>
@@ -994,30 +988,26 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                     {isExpanded && (
                       <div 
                         className="border-t px-3 pb-3 pt-2 animate-in slide-in-from-top-2 duration-200"
-                        style={{ 
-                          borderColor: 'rgba(255,255,255,0.1)',
-                          color: 'white'
-                        }}
                       >
-                        <div className="space-y-2" style={{ color: 'white' }}>
+                        <div className="space-y-2">
                           {/* Description */}
                           {service.description && (
-                            <p style={{ fontSize: '14px', lineHeight: '1.6', margin: 0, color: 'rgba(255,255,255,0.9)' }}>
+                            <p className="text-foreground" style={{ fontSize: '14px', lineHeight: '1.6', margin: 0 }}>
                               {service.description}
                             </p>
                           )}
 
                           {/* Provider */}
-                          <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)' }}>
-                            <span style={{ fontWeight: '600', color: '#f59e0b' }}>
+                          <p className="text-muted-foreground" style={{ fontSize: '12px' }}>
+                            <span className="text-primary" style={{ fontWeight: '600' }}>
                               {isRTL ? 'المزود:' : 'Provider:'}
                             </span> {provider?.full_name || t.ui.noData}
                           </p>
 
                           {/* Duration */}
                           {service.duration_minutes && (
-                            <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)' }}>
-                              <span style={{ fontWeight: '600', color: '#f59e0b' }}>
+                            <p className="text-muted-foreground" style={{ fontSize: '12px' }}>
+                              <span className="text-primary" style={{ fontWeight: '600' }}>
                                 {isRTL ? 'المدة:' : 'Duration:'}
                               </span> {service.duration_minutes} {isRTL ? 'دقيقة' : 'minutes'}
                             </p>
@@ -1025,8 +1015,8 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
 
                           {/* City */}
                           {provider?.city && (
-                            <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)' }}>
-                              <span style={{ fontWeight: '600', color: '#f59e0b' }}>
+                            <p className="text-muted-foreground" style={{ fontSize: '12px' }}>
+                              <span className="text-primary" style={{ fontWeight: '600' }}>
                                 {isRTL ? 'المدينة:' : 'City:'}
                               </span> {provider.city}
                             </p>
@@ -1034,15 +1024,14 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
 
                           {/* Distance */}
                           {(service as any).distance !== undefined && (
-                            <div style={{ 
+                            <div className="text-muted-foreground" style={{ 
                               display: 'flex', 
                               alignItems: 'center', 
                               gap: '6px',
-                              fontSize: '12px',
-                              color: 'rgba(255,255,255,0.7)'
+                              fontSize: '12px'
                             }}>
-                              <MapPin className="h-4 w-4" style={{ color: '#f59e0b' }} />
-                              <span style={{ fontWeight: '600', color: '#f59e0b' }}>
+                              <MapPin className="h-4 w-4 text-primary" />
+                              <span className="text-primary" style={{ fontWeight: '600' }}>
                                 {formatDistance((service as any).distance, currentLanguage === 'ar' ? 'ar' : 'en')}
                               </span>
                               <span>
@@ -1069,38 +1058,19 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                 {isRTL ? 'حجز موعد' : 'Book Appointment'}
                               </Button>
                             )}
-                            <button
-                              style={{
-                                width: '100%',
-                                padding: '8px 16px',
-                                borderRadius: '8px',
-                                border: '1px solid rgba(255,255,255,0.2)',
-                                background: 'transparent',
-                                color: 'white',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '8px',
-                                fontSize: '14px',
-                                fontWeight: '500'
-                              }}
+                            <Button
+                              variant="outline"
+                              className="w-full"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 if (provider?.id) {
                                   window.location.href = `/provider/${provider.id}`;
                                 }
                               }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.background = 'transparent';
-                              }}
                             >
-                              <ExternalLink className="h-4 w-4" />
+                              <ExternalLink className="h-4 w-4 mr-2" />
                               {isRTL ? 'عرض المزود' : 'View Provider'}
-                            </button>
+                            </Button>
                           </div>
                         </div>
                       </div>
