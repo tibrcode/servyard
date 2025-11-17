@@ -1032,6 +1032,25 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                             </p>
                           )}
 
+                          {/* Distance */}
+                          {(service as any).distance !== undefined && (
+                            <div style={{ 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              gap: '6px',
+                              fontSize: '12px',
+                              color: 'rgba(255,255,255,0.7)'
+                            }}>
+                              <MapPin className="h-4 w-4" style={{ color: '#f59e0b' }} />
+                              <span style={{ fontWeight: '600', color: '#f59e0b' }}>
+                                {formatDistance((service as any).distance, currentLanguage === 'ar' ? 'ar' : 'en')}
+                              </span>
+                              <span>
+                                {isRTL ? 'من موقعك' : 'from your location'}
+                              </span>
+                            </div>
+                          )}
+
                           {/* Buttons */}
                           <div className="space-y-2 pt-2">
                             {service.booking_enabled && (
