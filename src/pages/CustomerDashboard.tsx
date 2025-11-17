@@ -321,7 +321,7 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
               </TabsTrigger>
               <TabsTrigger value="settings">
                 <Bell className="w-3 h-3 sm:w-4 sm:h-4 mr-2 flex-shrink-0" />
-                <span className="break-words text-xs sm:text-sm">{t.nav.settings}</span>
+                <span className="break-words text-xs sm:text-sm">{t.notificationSettings.title}</span>
               </TabsTrigger>
             </TabsList>
 
@@ -455,19 +455,12 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
 
             {/* Settings Tab - Notification Preferences */}
             <TabsContent value="settings" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>{t.notificationSettings.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {user && (
-                    <NotificationSettings
-                      userId={user.uid}
-                      language={currentLanguage as 'en' | 'ar'}
-                    />
-                  )}
-                </CardContent>
-              </Card>
+              {user && (
+                <NotificationSettings
+                  userId={user.uid}
+                  language={currentLanguage as 'en' | 'ar'}
+                />
+              )}
             </TabsContent>
           </Tabs>
         </div>

@@ -320,14 +320,7 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
 
   return (
     <Card dir={isRTL ? 'rtl' : 'ltr'}>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Bell className="h-5 w-5" />
-          {t.notificationSettings.title}
-        </CardTitle>
-        <CardDescription>{t.notificationSettings.subtitle}</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-6 pt-6">
         {/* Permission Status Banner */}
         {notificationPermission === 'denied' && (
           <div className="bg-destructive/10 border border-destructive rounded-lg p-4">
