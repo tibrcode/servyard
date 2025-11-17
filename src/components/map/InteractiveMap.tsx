@@ -319,53 +319,90 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
           return stars;
         };
         
+        // حساب تقييم المزود (متوسط تقييمات خدماته)
+        const providerRatings = location.services
+          .map(s => s.average_rating)
+          .filter(r => r > 0);
+        const providerAvgRating = providerRatings.length > 0
+          ? providerRatings.reduce((a, b) => a + b, 0) / providerRatings.length
+          : 0;
+        const totalReviews = location.services
+          .reduce((sum, s) => sum + (s.reviews_count || 0), 0);
+        
         content = `
           <div style="
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-            width: 280px;
-            max-width: 90vw;
+            width: 340px;
+            max-width: 85vw;
             padding: 0;
             direction: ${isRTL ? 'rtl' : 'ltr'};
-            background: ${colors.background};
+            background: transparent;
             color: ${colors.text};
             box-sizing: border-box;
-            border-radius: 12px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.18);
           ">
-            <!-- Header -->
+            <!-- Floating Provider Header -->
             <div style="
-              background: ${colors.headerBg};
-              color: white;
-              padding: 16px;
-              border-radius: 12px 12px 0 0;
+              background: ${isDarkMode ? 'rgba(26, 29, 33, 0.95)' : 'rgba(255, 255, 255, 0.95)'};
+              backdrop-filter: blur(10px);
+              -webkit-backdrop-filter: blur(10px);
+              padding: 12px 16px;
+              border-radius: 12px;
+              margin-bottom: 10px;
+              box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+              border: 1px solid ${colors.border};
             ">
               <div style="
-                font-size: 16px; 
+                font-size: 15px; 
                 font-weight: 700; 
-                margin-bottom: 6px;
+                margin-bottom: 4px;
                 line-height: 1.3;
+                color: ${colors.text};
               ">
                 ${providerName}
               </div>
               <div style="
-                font-size: 12px; 
-                opacity: 0.95;
                 display: flex;
                 align-items: center;
-                gap: 6px;
+                gap: 8px;
+                flex-wrap: wrap;
               ">
-                <span>📍</span>
-                <span>${isRTL ? `${servicesCount} خدمة متوفرة` : `${servicesCount} services available`}</span>
+                <div style="
+                  font-size: 11px;
+                  color: ${colors.textSecondary};
+                  display: flex;
+                  align-items: center;
+                  gap: 4px;
+                ">
+                  <span>📍</span>
+                  <span>${isRTL ? `${servicesCount} خدمة` : `${servicesCount} services`}</span>
+                </div>
+                ${providerAvgRating > 0 ? `
+                  <div style="
+                    font-size: 11px;
+                    display: flex;
+                    align-items: center;
+                    gap: 3px;
+                    color: ${colors.text};
+                  ">
+                    <span style="color: ${colors.star};">⭐</span>
+                    <span style="font-weight: 600;">${providerAvgRating.toFixed(1)}</span>
+                    <span style="color: ${colors.textSecondary};">(${totalReviews})</span>
+                  </div>
+                ` : ''}
               </div>
             </div>
             
-            <!-- Services List -->
+            <!-- Horizontal Scrolling Services Cards -->
             <div style="
-              max-height: 240px; 
-              overflow-y: auto; 
-              overflow-x: hidden; 
-              padding: 10px;
-              background: ${colors.background};
+              display: flex;
+              gap: 10px;
+              overflow-x: auto;
+              overflow-y: hidden;
+              padding: 4px 0 12px 0;
+              scrollbar-width: thin;
+              scrollbar-color: ${colors.border} transparent;
+              scroll-snap-type: x mandatory;
+              -webkit-overflow-scrolling: touch;
             ">
               ${location.services.map((service, index) => {
                 const rating = service.average_rating || 0;
@@ -374,18 +411,24 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                 
                 return `
                 <div style="
-                  background: ${colors.cardBg};
-                  padding: 10px;
-                  margin-bottom: ${index < location.services!.length - 1 ? '8px' : '0'};
-                  border-radius: 8px;
+                  min-width: 240px;
+                  max-width: 240px;
+                  background: ${isDarkMode ? 'rgba(36, 40, 48, 0.95)' : 'rgba(255, 255, 255, 0.95)'};
+                  backdrop-filter: blur(10px);
+                  -webkit-backdrop-filter: blur(10px);
+                  padding: 12px;
+                  border-radius: 12px;
                   cursor: pointer;
                   transition: all 0.3s ease;
-                  border: 2px solid ${colors.border};
+                  border: 1px solid ${colors.border};
+                  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
                   position: relative;
                   overflow: hidden;
+                  scroll-snap-align: start;
+                  flex-shrink: 0;
                 " 
-                onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 16px rgba(0,0,0,0.12)'; this.style.borderColor='#f59e0b';"
-                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'; this.style.borderColor='${colors.border}';"
+                onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 25px rgba(245, 158, 11, 0.3)'; this.style.borderColor='#f59e0b';"
+                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.1)'; this.style.borderColor='${colors.border}';"
                 onclick="window.handleServiceClick?.('${service.id}')">
                   
                   ${isTopRated ? `
@@ -397,11 +440,11 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                       color: white;
                       font-size: 9px;
                       font-weight: 700;
-                      padding: 3px 8px;
-                      border-radius: 12px;
+                      padding: 3px 7px;
+                      border-radius: 10px;
                       display: flex;
                       align-items: center;
-                      gap: 3px;
+                      gap: 2px;
                       box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
                     ">
                       <span>⭐</span>
@@ -412,16 +455,16 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                   <!-- Service Name -->
                   <div style="
                     font-size: 13px;
-                    font-weight: 600;
+                    font-weight: 700;
                     color: ${colors.text};
-                    margin-bottom: 6px;
+                    margin-bottom: 8px;
                     line-height: 1.3;
-                    max-height: 2.6em;
+                    height: 2.6em;
                     overflow: hidden;
                     display: -webkit-box;
                     -webkit-line-clamp: 2;
                     -webkit-box-orient: vertical;
-                    padding-${isRTL ? 'left' : 'right'}: ${isTopRated ? '55px' : '0'};
+                    padding-${isRTL ? 'left' : 'right'}: ${isTopRated ? '50px' : '0'};
                   ">
                     ${service.name}
                   </div>
@@ -432,7 +475,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                       display: flex;
                       align-items: center;
                       gap: 4px;
-                      margin-bottom: 6px;
+                      margin-bottom: 10px;
                     ">
                       <div style="
                         color: ${colors.star};
@@ -460,63 +503,61 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                     <div style="
                       font-size: 10px;
                       color: ${colors.textSecondary};
-                      margin-bottom: 6px;
+                      margin-bottom: 10px;
+                      height: 16px;
                     ">
-                      ${isRTL ? '⭐ لا يوجد تقييمات بعد' : '⭐ No reviews yet'}
+                      ⭐ ${isRTL ? 'لا توجد تقييمات' : 'No reviews'}
                     </div>
                   `}
                   
-                  <!-- Price & Button -->
+                  <!-- Price -->
                   <div style="
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    gap: 6px;
+                    font-size: 18px;
+                    color: #f59e0b;
+                    font-weight: 700;
+                    margin-bottom: 8px;
                   ">
-                    <div style="
-                      font-size: 16px;
-                      color: #f59e0b;
-                      font-weight: 700;
-                    ">
-                      ${service.price}
-                    </div>
-                    <div style="
-                      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-                      color: white;
-                      font-size: 10px;
-                      font-weight: 600;
-                      padding: 5px 10px;
-                      border-radius: 5px;
-                      white-space: nowrap;
-                    ">
-                      ${isRTL ? 'عرض →' : 'View →'}
-                    </div>
+                    ${service.price}
+                  </div>
+                  
+                  <!-- View Button -->
+                  <div style="
+                    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+                    color: white;
+                    font-size: 11px;
+                    font-weight: 600;
+                    padding: 7px 0;
+                    border-radius: 8px;
+                    text-align: center;
+                    width: 100%;
+                  ">
+                    ${isRTL ? 'عرض التفاصيل' : 'View Details'}
                   </div>
                 </div>
               `;
               }).join('')}
             </div>
             
-            <!-- Footer -->
-            <div style="
-              padding: 12px 16px;
-              border-top: 1px solid ${colors.border};
-              background: ${colors.cardBg};
-              border-radius: 0 0 12px 12px;
-              text-align: center;
-            ">
+            <!-- Scroll Hint (if multiple services) -->
+            ${servicesCount > 1 ? `
               <div style="
-                color: ${colors.textSecondary};
-                font-size: 11px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 6px;
+                text-align: center;
+                padding: 8px 0 4px 0;
               ">
-                <span>👆</span>
-                <span>${isRTL ? 'اضغط على أي خدمة لعرض التفاصيل الكاملة' : 'Click any service for full details'}</span>
+                <div style="
+                  color: ${colors.textSecondary};
+                  font-size: 10px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  gap: 6px;
+                ">
+                  <span>${isRTL ? '←' : '→'}</span>
+                  <span>${isRTL ? 'مرر لعرض المزيد' : 'Swipe to see more'}</span>
+                  <span>${isRTL ? '→' : '←'}</span>
+                </div>
               </div>
-            </div>
+            ` : ''}
           </div>
         `;
       } else {
