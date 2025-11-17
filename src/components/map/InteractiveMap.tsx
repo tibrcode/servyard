@@ -449,7 +449,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                   -webkit-backdrop-filter: blur(12px);
                   padding: 12px;
                   border-radius: 16px;
-                  cursor: pointer;
+                  cursor: default;
                   transition: all 0.3s ease;
                   border: 1px solid ${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'};
                   box-shadow: 0 6px 20px rgba(0,0,0,0.15);
@@ -457,12 +457,11 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                   overflow: hidden;
                   scroll-snap-align: start;
                   flex-shrink: 0;
+                  user-select: none;
+                  -webkit-user-select: none;
                 " 
-                onmouseover="this.style.transform='translateY(-6px) scale(1.02)'; this.style.boxShadow='0 12px 30px rgba(245, 158, 11, 0.35)'; this.style.borderColor='rgba(245, 158, 11, 0.5)';"
-                onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 6px 20px rgba(0,0,0,0.15)'; this.style.borderColor='${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}';"
-                onclick="window.handleServiceClick?.('${service.id}')"
-                ontouchstart="this.style.cursor='grabbing';"
-                ontouchend="this.style.cursor='pointer';">
+                onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(0,0,0,0.2)';"
+                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 20px rgba(0,0,0,0.15)';">
                   
                   ${isTopRated ? `
                     <div style="
@@ -486,6 +485,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                   ` : ''}
                   
                   <!-- Service Name -->
+                                    <!-- Service Name -->
                   <div style="
                     font-size: 13px;
                     font-weight: 700;
@@ -498,9 +498,20 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                     -webkit-line-clamp: 2;
                     -webkit-box-orient: vertical;
                     padding-${isRTL ? 'left' : 'right'}: ${isTopRated ? '50px' : '0'};
+                    pointer-events: none;
                   ">
                     ${service.name}
                   </div>
+                  
+                  <!-- Rating & Reviews -->
+                  ${rating > 0 ? `
+                    <div style="
+                      display: flex;
+                      align-items: center;
+                      gap: 4px;
+                      margin-bottom: 10px;
+                      pointer-events: none;
+                    ">`
                   
                   <!-- Rating & Reviews -->
                   ${rating > 0 ? `
@@ -538,6 +549,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                       color: ${colors.textSecondary};
                       margin-bottom: 10px;
                       height: 16px;
+                      pointer-events: none;
                     ">
                       ⭐ ${isRTL ? 'لا توجد تقييمات' : 'No reviews'}
                     </div>
@@ -549,23 +561,35 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                     color: #f59e0b;
                     font-weight: 700;
                     margin-bottom: 8px;
+                    pointer-events: none;
                   ">
                     ${service.price}
                   </div>
                   
                   <!-- View Button -->
-                  <div style="
-                    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-                    color: white;
-                    font-size: 11px;
-                    font-weight: 600;
-                    padding: 7px 0;
-                    border-radius: 8px;
-                    text-align: center;
-                    width: 100%;
-                  ">
+                  <button 
+                    onclick="event.stopPropagation(); window.handleServiceClick?.('${service.id}');"
+                    style="
+                      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+                      color: white;
+                      font-size: 11px;
+                      font-weight: 600;
+                      padding: 7px 0;
+                      border-radius: 8px;
+                      text-align: center;
+                      width: 100%;
+                      border: none;
+                      cursor: pointer;
+                      transition: all 0.2s ease;
+                      font-family: inherit;
+                    "
+                    onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 4px 12px rgba(245, 158, 11, 0.4)';"
+                    onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none';"
+                    ontouchstart="this.style.transform='scale(0.98)';"
+                    ontouchend="this.style.transform='scale(1)';"
+                  >
                     ${isRTL ? 'عرض التفاصيل' : 'View Details'}
-                  </div>
+                  </button>
                 </div>
               `;
               }).join('')}
