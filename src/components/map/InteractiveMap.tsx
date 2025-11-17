@@ -418,10 +418,10 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
             </div>
             
             <!-- Horizontal Scrolling Services Cards -->
-            <div style="
+            <div id="cards-container" style="
               display: flex;
               gap: 10px;
-              overflow-x: auto;
+              overflow-x: scroll;
               overflow-y: hidden;
               padding: 4px 0 12px 0;
               scrollbar-width: none;
@@ -429,10 +429,14 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
               scroll-snap-type: x mandatory;
               -webkit-overflow-scrolling: touch;
               cursor: grab;
+              touch-action: pan-x;
             ">
             <style>
-              ::-webkit-scrollbar {
+              #cards-container::-webkit-scrollbar {
                 display: none;
+              }
+              #cards-container:active {
+                cursor: grabbing;
               }
             </style>
               ${location.services.map((service, index) => {
@@ -441,7 +445,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                 const isTopRated = rating >= 4.5;
                 
                 return `
-                <div style="
+                <div class="service-card" style="
                   min-width: 240px;
                   max-width: 240px;
                   background: ${isDarkMode ? 'rgba(36, 40, 48, 0.92)' : 'rgba(255, 255, 255, 0.92)'};
@@ -457,8 +461,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                   overflow: hidden;
                   scroll-snap-align: start;
                   flex-shrink: 0;
-                  user-select: none;
-                  -webkit-user-select: none;
+                  touch-action: pan-x;
                 " 
                 onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(0,0,0,0.2)';"
                 onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 20px rgba(0,0,0,0.15)';">
