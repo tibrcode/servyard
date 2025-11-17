@@ -415,13 +415,13 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
         {/* Dashboard Tabs - With proper spacing from content */}
         <div className="space-y-4">
           <Tabs defaultValue="services" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6 mb-6">
-              <TabsTrigger value="services">{t.provider.services}</TabsTrigger>
-              <TabsTrigger value="appointments">{t.provider.pendingBookings}</TabsTrigger>
-              <TabsTrigger value="bookings">{t.provider.bookings}</TabsTrigger>
-              <TabsTrigger value="offers">{t.provider.offers}</TabsTrigger>
-              <TabsTrigger value="share">{t.provider.shareProfile}</TabsTrigger>
-              <TabsTrigger value="settings">{t.notificationSettings.title}</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 mb-6">
+              <TabsTrigger value="services" className="text-xs sm:text-sm">{t.provider.services}</TabsTrigger>
+              <TabsTrigger value="offers" className="text-xs sm:text-sm">{t.provider.offers}</TabsTrigger>
+              <TabsTrigger value="bookings" className="text-xs sm:text-sm">{t.provider.bookings}</TabsTrigger>
+              <TabsTrigger value="appointments" className="text-xs sm:text-sm">{t.provider.pendingBookings}</TabsTrigger>
+              <TabsTrigger value="share" className="text-xs sm:text-sm">{t.provider.shareProfile}</TabsTrigger>
+              <TabsTrigger value="settings" className="text-xs sm:text-sm">{t.notificationSettings.title}</TabsTrigger>
             </TabsList>
 
             {/* Services Tab */}
