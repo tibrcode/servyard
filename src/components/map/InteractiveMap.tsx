@@ -271,130 +271,249 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
       let content = '';
       
       if (location.services && location.services.length > 0) {
-        // عرض قائمة الخدمات بتصميم جميل
+        // عرض قائمة الخدمات بتصميم احترافي عصري
         const providerName = location.services[0].provider_name;
         const servicesCount = location.services.length;
         
-        // الكشف عن الوضع الليلي - نستخدم MutationObserver لمراقبة التغييرات
         const checkDarkMode = () => document.documentElement.classList.contains('dark');
         const isDarkMode = checkDarkMode();
         
-        // ألوان تتكيف مع الوضع الليلي/النهاري
+        // ألوان احترافية
         const colors = isDarkMode ? {
-          background: '#1b1f22',
-          text: '#e5e7eb',
+          background: '#1a1d21',
+          cardBg: '#242830',
+          text: '#ffffff',
           textSecondary: '#9ca3af',
-          border: '#374151',
-          hover: '#374151',
+          border: '#2d3139',
+          hover: '#2d3139',
           headerBg: 'linear-gradient(135deg, #d97706 0%, #b45309 100%)',
+          badge: '#065f46',
+          star: '#fbbf24',
         } : {
           background: '#ffffff',
+          cardBg: '#f9fafb',
           text: '#111827',
           textSecondary: '#6b7280',
           border: '#e5e7eb',
           hover: '#f3f4f6',
           headerBg: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+          badge: '#d1fae5',
+          star: '#fbbf24',
+        };
+        
+        // دالة لعرض النجوم
+        const renderStars = (rating: number) => {
+          const fullStars = Math.floor(rating);
+          const hasHalfStar = rating % 1 >= 0.5;
+          let stars = '';
+          
+          for (let i = 0; i < 5; i++) {
+            if (i < fullStars) {
+              stars += '★';
+            } else if (i === fullStars && hasHalfStar) {
+              stars += '⯨';
+            } else {
+              stars += '☆';
+            }
+          }
+          return stars;
         };
         
         content = `
           <div style="
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            width: 280px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            width: 320px;
             padding: 0;
             direction: ${isRTL ? 'rtl' : 'ltr'};
             background: ${colors.background};
             color: ${colors.text};
             box-sizing: border-box;
-            border-radius: 8px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
           ">
             <!-- Header -->
             <div style="
               background: ${colors.headerBg};
               color: white;
-              padding: 12px 0;
-              border-radius: 8px 8px 0 0;
+              padding: 16px;
+              border-radius: 12px 12px 0 0;
             ">
               <div style="
-                font-size: 14px; 
-                font-weight: 600; 
-                margin-bottom: 4px;
-                padding: 0 16px;
-                line-height: 1.4;
-                max-height: 2.8em;
-                overflow: hidden;
-                display: -webkit-box;
-                -webkit-line-clamp: 2;
-                -webkit-box-orient: vertical;
-                word-wrap: break-word;
+                font-size: 16px; 
+                font-weight: 700; 
+                margin-bottom: 6px;
+                line-height: 1.3;
               ">
                 ${providerName}
               </div>
-              <div style="font-size: 11px; opacity: 0.9; padding: 0 16px;">
-                ${isRTL ? `${servicesCount} خدمة متوفرة` : `${servicesCount} services available`}
+              <div style="
+                font-size: 12px; 
+                opacity: 0.95;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+              ">
+                <span>📍</span>
+                <span>${isRTL ? `${servicesCount} خدمة متوفرة` : `${servicesCount} services available`}</span>
               </div>
             </div>
             
             <!-- Services List -->
             <div style="
-              max-height: 250px; 
+              max-height: 320px; 
               overflow-y: auto; 
               overflow-x: hidden; 
-              padding: 10px 14px;
+              padding: 12px;
+              background: ${colors.background};
             ">
-              ${location.services.map((service, index) => `
+              ${location.services.map((service, index) => {
+                const rating = service.average_rating || 0;
+                const reviewCount = service.reviews_count || 0;
+                const isTopRated = rating >= 4.5;
+                
+                return `
                 <div style="
-                  padding: 7px 6px;
-                  border-bottom: ${index < location.services!.length - 1 ? `1px solid ${colors.border}` : 'none'};
+                  background: ${colors.cardBg};
+                  padding: 12px;
+                  margin-bottom: ${index < location.services!.length - 1 ? '10px' : '0'};
+                  border-radius: 10px;
                   cursor: pointer;
-                  transition: background 0.2s;
-                  border-radius: 4px;
+                  transition: all 0.3s ease;
+                  border: 2px solid ${colors.border};
+                  position: relative;
+                  overflow: hidden;
                 " 
-                onmouseover="this.style.background='${colors.hover}'"
-                onmouseout="this.style.background='transparent'"
+                onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(0,0,0,0.15)'; this.style.borderColor='#f59e0b';"
+                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'; this.style.borderColor='${colors.border}';"
                 onclick="window.handleServiceClick?.('${service.id}')">
+                  
+                  ${isTopRated ? `
+                    <div style="
+                      position: absolute;
+                      top: 8px;
+                      ${isRTL ? 'left: 8px;' : 'right: 8px;'}
+                      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                      color: white;
+                      font-size: 9px;
+                      font-weight: 700;
+                      padding: 3px 8px;
+                      border-radius: 12px;
+                      display: flex;
+                      align-items: center;
+                      gap: 3px;
+                      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+                    ">
+                      <span>⭐</span>
+                      <span>${isRTL ? 'ممتاز' : 'TOP'}</span>
+                    </div>
+                  ` : ''}
+                  
+                  <!-- Service Name -->
                   <div style="
-                    font-size: 13px;
-                    font-weight: 500;
+                    font-size: 14px;
+                    font-weight: 600;
                     color: ${colors.text};
-                    margin-bottom: 3px;
-                    line-height: 1.3;
-                    max-height: 2.6em;
+                    margin-bottom: 8px;
+                    line-height: 1.4;
+                    max-height: 2.8em;
                     overflow: hidden;
                     display: -webkit-box;
                     -webkit-line-clamp: 2;
                     -webkit-box-orient: vertical;
-                    word-wrap: break-word;
+                    padding-${isRTL ? 'left' : 'right'}: ${isTopRated ? '60px' : '0'};
                   ">
                     ${service.name}
                   </div>
+                  
+                  <!-- Rating & Reviews -->
+                  ${rating > 0 ? `
+                    <div style="
+                      display: flex;
+                      align-items: center;
+                      gap: 6px;
+                      margin-bottom: 8px;
+                    ">
+                      <div style="
+                        color: ${colors.star};
+                        font-size: 14px;
+                        letter-spacing: 1px;
+                        line-height: 1;
+                      ">
+                        ${renderStars(rating)}
+                      </div>
+                      <span style="
+                        font-size: 13px;
+                        font-weight: 600;
+                        color: ${colors.text};
+                      ">
+                        ${rating.toFixed(1)}
+                      </span>
+                      <span style="
+                        font-size: 11px;
+                        color: ${colors.textSecondary};
+                      ">
+                        (${reviewCount} ${isRTL ? 'تقييم' : 'reviews'})
+                      </span>
+                    </div>
+                  ` : `
+                    <div style="
+                      font-size: 11px;
+                      color: ${colors.textSecondary};
+                      margin-bottom: 8px;
+                    ">
+                      ${isRTL ? '⭐ لا يوجد تقييمات بعد' : '⭐ No reviews yet'}
+                    </div>
+                  `}
+                  
+                  <!-- Price & Button -->
                   <div style="
-                    font-size: 12px;
-                    color: #f59e0b;
-                    font-weight: 600;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 8px;
                   ">
-                    ${service.price}
+                    <div style="
+                      font-size: 18px;
+                      color: #f59e0b;
+                      font-weight: 700;
+                    ">
+                      ${service.price}
+                    </div>
+                    <div style="
+                      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+                      color: white;
+                      font-size: 11px;
+                      font-weight: 600;
+                      padding: 6px 12px;
+                      border-radius: 6px;
+                      white-space: nowrap;
+                    ">
+                      ${isRTL ? 'عرض التفاصيل →' : 'View Details →'}
+                    </div>
                   </div>
                 </div>
-              `).join('')}
+              `;
+              }).join('')}
             </div>
             
             <!-- Footer -->
             <div style="
-              padding: 10px 0 12px 0;
+              padding: 12px 16px;
               border-top: 1px solid ${colors.border};
-              border-radius: 0 0 8px 8px;
+              background: ${colors.cardBg};
+              border-radius: 0 0 12px 12px;
+              text-align: center;
             ">
               <div style="
                 color: ${colors.textSecondary};
-                font-size: 10px;
-                line-height: 1.5;
-                padding: 0 16px;
-                overflow-x: auto;
-                overflow-y: hidden;
+                font-size: 11px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
               ">
-                <div style="white-space: nowrap; min-width: min-content;">
-                  ${isRTL ? '👆 اضغط على أي خدمة لعرض التفاصيل' : '👆 Click any service to view details'}
-                </div>
+                <span>👆</span>
+                <span>${isRTL ? 'اضغط على أي خدمة لعرض التفاصيل الكاملة' : 'Click any service for full details'}</span>
               </div>
             </div>
           </div>
