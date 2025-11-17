@@ -182,7 +182,7 @@ export const BookingModal = ({ service, provider, isOpen, onClose, currentLangua
 
     return (
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="w-full max-w-md sm:max-w-2xl max-h-[90vh] p-0 overflow-hidden flex flex-col" dir={isRTL ? 'rtl' : 'ltr'}>
+        <DialogContent className="w-full max-w-md sm:max-w-2xl max-h-[90vh] p-0 overflow-hidden flex flex-col z-40" dir={isRTL ? 'rtl' : 'ltr'}>
           <DialogHeader className="px-4 sm:px-6 py-3 sm:py-4 border-b">
             <DialogTitle className="flex items-center gap-2 text-base sm:text-lg truncate">
               <Calendar className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
