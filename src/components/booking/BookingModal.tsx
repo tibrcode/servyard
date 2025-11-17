@@ -180,15 +180,39 @@ export const BookingModal = ({ service, provider, isOpen, onClose, currentLangua
       allow_customer_cancellation: service.allow_customer_cancellation !== undefined ? service.allow_customer_cancellation : true,
     };
 
+    if (!isOpen) return null;
+
     return (
-      <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="w-[90vw] sm:w-full sm:max-w-2xl lg:max-w-3xl max-h-[90vh] p-0 overflow-hidden flex flex-col mx-auto" dir={isRTL ? 'rtl' : 'ltr'}>
-          <DialogHeader className="px-4 sm:px-6 py-3 sm:py-4 border-b">
-            <DialogTitle className="flex items-center gap-2 text-base sm:text-lg truncate">
+      <div 
+        className="fixed inset-0 z-40 flex items-start justify-center lg:pt-20 lg:pl-64 lg:pr-4" 
+        dir={isRTL ? 'rtl' : 'ltr'}
+        onClick={onClose}
+      >
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-black/50 lg:top-16" />
+        
+        {/* Modal Content */}
+        <div 
+          className="relative z-50 w-[90vw] sm:w-full sm:max-w-2xl lg:max-w-3xl max-h-[90vh] lg:max-h-[calc(100vh-100px)] bg-background rounded-lg shadow-xl overflow-hidden flex flex-col mt-4 lg:mt-0"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Header */}
+          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b flex items-center justify-between">
+            <div className="flex items-center gap-2 text-base sm:text-lg truncate">
               <Calendar className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-              <span className="truncate">{isRTL ? 'حجز موعد' : 'Book Appointment'}</span>
-            </DialogTitle>
-          </DialogHeader>
+              <span className="truncate font-semibold">{isRTL ? 'حجز موعد' : 'Book Appointment'}</span>
+            </div>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={onClose}
+              className="h-8 w-8 p-0 rounded-full hover:bg-muted"
+            >
+              ×
+            </Button>
+          </div>
+          
+          {/* Body */}
           <div className="flex-1 overflow-y-auto">
             <div className="px-4 sm:px-6 py-4 sm:py-6">
               <ServiceBooking
@@ -214,8 +238,8 @@ export const BookingModal = ({ service, provider, isOpen, onClose, currentLangua
               />
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </div>
+      </div>
     );
   }
 

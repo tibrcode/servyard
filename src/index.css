@@ -741,20 +741,3 @@ All colors MUST be HSL. Premium dark/light theme with gold accents.
   transition: all 0.2s ease-in-out;
 }
 
-/* Booking modal positioning - show below header and beside sidebar on large screens */
-@media (min-width: 1024px) {
-  /* Adjust dialog overlay to not cover header */
-  [data-radix-dialog-overlay] {
-    top: 80px !important; /* Height of header */
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    height: calc(100vh - 80px) !important;
-  }
-  
-  /* Adjust dialog content positioning */
-  [data-radix-dialog-content] {
-    top: calc(50% + 40px) !important; /* Offset by half of header height */
-    max-height: calc(90vh - 100px) !important; /* Account for header space */
-  }
-}
