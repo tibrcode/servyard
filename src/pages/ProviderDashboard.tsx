@@ -349,64 +349,80 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
         </div>
 
         {/* Stats Overview */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-4 gap-3 mb-8">
-          <Card className="h-auto">
+        <div className="grid !grid-cols-2 lg:!grid-cols-4 gap-2 sm:gap-3 mb-6 sm:mb-8">
+          <Card className="h-auto bg-muted/50 hover:bg-muted/70 transition-colors">
             <CardHeader className="pb-2">
-              <div className="flex items-start justify-between gap-2">
-                <CardTitle className="text-xs sm:text-sm font-medium break-words leading-tight min-w-0 flex-1 hyphens-auto">{t.provider.services}</CardTitle>
-                <Settings className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
+              <div className="flex flex-col items-center text-center gap-2">
+                <div className="bg-blue-100 p-2 sm:p-3 rounded-full">
+                  <Settings className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
+                </div>
+                <CardTitle className="text-xs sm:text-sm font-medium">{t.provider.services}</CardTitle>
               </div>
             </CardHeader>
             <CardContent className="pt-0">
-              <div className="text-base sm:text-xl lg:text-2xl font-bold leading-tight break-words mb-1">{activeServices.length}</div>
-              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed break-words hyphens-auto">
-                {t.provider.activeServices}
-              </p>
+              <div className="text-center">
+                <div className="text-lg sm:text-xl lg:text-2xl font-bold mb-1">{activeServices.length}</div>
+                <p className="text-xs text-muted-foreground">
+                  {t.provider.activeServices}
+                </p>
+              </div>
             </CardContent>
           </Card>
 
-          <Card className="h-auto">
+          <Card className="h-auto bg-muted/50 hover:bg-muted/70 transition-colors">
             <CardHeader className="pb-2">
-              <div className="flex items-start justify-between gap-2">
-                <CardTitle className="text-xs sm:text-sm font-medium break-words leading-tight min-w-0 flex-1 hyphens-auto">{t.provider.rating}</CardTitle>
-                <Star className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
+              <div className="flex flex-col items-center text-center gap-2">
+                <div className="bg-purple-100 p-2 sm:p-3 rounded-full">
+                  <Star className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
+                </div>
+                <CardTitle className="text-xs sm:text-sm font-medium">{t.provider.rating}</CardTitle>
               </div>
             </CardHeader>
             <CardContent className="pt-0">
-              <div className="text-base sm:text-xl lg:text-2xl font-bold leading-tight break-words mb-1">{averageRating}</div>
-              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed break-words hyphens-auto">
-                {reviews.length} {t.provider.reviews}
-              </p>
+              <div className="text-center">
+                <div className="text-lg sm:text-xl lg:text-2xl font-bold mb-1">{averageRating}</div>
+                <p className="text-xs text-muted-foreground">
+                  {reviews.length} {t.provider.reviews}
+                </p>
+              </div>
             </CardContent>
           </Card>
 
-          <Card className="h-auto">
+          <Card className="h-auto bg-muted/50 hover:bg-muted/70 transition-colors">
             <CardHeader className="pb-2">
-              <div className="flex items-start justify-between gap-2">
-                <CardTitle className="text-xs sm:text-sm font-medium break-words leading-tight min-w-0 flex-1 hyphens-auto">{isRTL ? 'حجوزات مفعلة' : 'Active'}</CardTitle>
-                <CheckCircle2 className="h-3 w-3 sm:h-4 sm:w-4 text-green-600 flex-shrink-0 mt-0.5" />
+              <div className="flex flex-col items-center text-center gap-2">
+                <div className="bg-green-100 p-2 sm:p-3 rounded-full">
+                  <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
+                </div>
+                <CardTitle className="text-xs sm:text-sm font-medium">{isRTL ? 'حجوزات مفعلة' : 'Active'}</CardTitle>
               </div>
             </CardHeader>
             <CardContent className="pt-0">
-              <div className="text-base sm:text-xl lg:text-2xl font-bold leading-tight break-words mb-1">{confirmedBookingsCount}</div>
-              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed break-words hyphens-auto">
-                {isRTL ? 'حجوزات مفعّلة' : 'Active Bookings'}
-              </p>
+              <div className="text-center">
+                <div className="text-lg sm:text-xl lg:text-2xl font-bold mb-1">{confirmedBookingsCount}</div>
+                <p className="text-xs text-muted-foreground">
+                  {isRTL ? 'حجوزات مفعّلة' : 'Active Bookings'}
+                </p>
+              </div>
             </CardContent>
           </Card>
 
-          <Card className="h-auto">
+          <Card className="h-auto bg-muted/50 hover:bg-muted/70 transition-colors">
             <CardHeader className="pb-2">
-              <div className="flex items-start justify-between gap-2">
-                <CardTitle className="text-xs sm:text-sm font-medium break-words leading-tight min-w-0 flex-1 hyphens-auto">{t.provider.pendingBookings}</CardTitle>
-                <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-600 flex-shrink-0 mt-0.5" />
+              <div className="flex flex-col items-center text-center gap-2">
+                <div className="bg-yellow-100 p-2 sm:p-3 rounded-full">
+                  <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-600" />
+                </div>
+                <CardTitle className="text-xs sm:text-sm font-medium">{t.provider.pendingBookings}</CardTitle>
               </div>
             </CardHeader>
             <CardContent className="pt-0">
-              <div className="text-base sm:text-xl lg:text-2xl font-bold leading-tight break-words mb-1">{pendingBookingsCount}</div>
-              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed break-words hyphens-auto">
-                {isRTL ? 'بانتظار التأكيد' : 'Awaiting Confirmation'}
-              </p>
+              <div className="text-center">
+                <div className="text-lg sm:text-xl lg:text-2xl font-bold mb-1">{pendingBookingsCount}</div>
+                <p className="text-xs text-muted-foreground">
+                  {isRTL ? 'بانتظار التأكيد' : 'Awaiting Confirmation'}
+                </p>
+              </div>
             </CardContent>
           </Card>
         </div>
