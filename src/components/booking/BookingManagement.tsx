@@ -32,6 +32,7 @@ interface BookingManagementProps {
   language?: 'ar' | 'en';
   defaultStatusFilter?: BookingStatus | 'all';
   showOnlyPending?: boolean;
+  currencyCode?: string;
 }
 
 type ViewMode = 'all' | 'today' | 'week' | 'month';
@@ -41,6 +42,7 @@ export function BookingManagement({
   language = 'ar',
   defaultStatusFilter = 'all',
   showOnlyPending = false,
+  currencyCode = 'AED',
 }: BookingManagementProps) {
   const { toast } = useToast();
   const { t, isRTL } = useTranslation(language);
@@ -214,13 +216,13 @@ export function BookingManagement({
           return bookingDate >= now && bookingDate <= weekFromNow;
         });
       } else if (viewMode === 'month') {
-        const monthFromNow = new Date();
-        monthFromNow.setMonth(monthFromNow.getMonth() + 1);
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
         filtered = filtered.filter(b => {
           // Parse date properly
           const [year, month, day] = b.booking_date.split('-').map(Number);
           const bookingDate = new Date(year, month - 1, day);
-          return bookingDate >= now && bookingDate <= monthFromNow;
+          return bookingDate >= startOfMonth && bookingDate <= endOfMonth;
         });
       }
 
@@ -300,7 +302,7 @@ export function BookingManagement({
       total_revenue: filtered
         .filter(b => b.status === 'completed' || b.status === 'confirmed')
         .reduce((sum, b) => sum + b.price, 0),
-      currency: filtered[0]?.currency || 'SAR',
+      currency: currencyCode,
       period: viewMode === 'today' ? 'today' : viewMode === 'week' ? 'week' : viewMode === 'month' ? 'month' : 'all',
     };
   };

@@ -452,6 +452,7 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
                   language={currentLanguage as 'en' | 'ar'}
                   defaultStatusFilter="pending"
                   showOnlyPending={true}
+                  currencyCode={providerProfile.currency_code}
                 />
               )}
             </TabsContent>
@@ -462,6 +463,7 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
                 <BookingManagement
                   providerId={providerProfile.id}
                   language={currentLanguage as 'en' | 'ar'}
+                  currencyCode={providerProfile.currency_code}
                 />
               )}
             </TabsContent>
