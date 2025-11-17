@@ -320,7 +320,7 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
         </div>
 
         {/* Stats Overview */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-4 gap-3 mb-8">
           <Card className="h-auto">
             <CardHeader className="pb-2">
               <div className="flex items-start justify-between gap-2">
@@ -329,7 +329,7 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
               </div>
             </CardHeader>
             <CardContent className="pt-0">
-              <div className="text-lg sm:text-xl lg:text-2xl font-bold leading-tight break-words mb-1">{activeServices.length}</div>
+              <div className="text-base sm:text-xl lg:text-2xl font-bold leading-tight break-words mb-1">{activeServices.length}</div>
               <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed break-words hyphens-auto">
                 {t.provider.activeServices}
               </p>
@@ -344,7 +344,7 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
               </div>
             </CardHeader>
             <CardContent className="pt-0">
-              <div className="text-lg sm:text-xl lg:text-2xl font-bold leading-tight break-words mb-1">{averageRating}</div>
+              <div className="text-base sm:text-xl lg:text-2xl font-bold leading-tight break-words mb-1">{averageRating}</div>
               <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed break-words hyphens-auto">
                 {reviews.length} {t.provider.reviews}
               </p>
