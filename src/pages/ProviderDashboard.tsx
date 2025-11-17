@@ -18,7 +18,9 @@ import {
   Settings,
   Plus,
   LogOut,
-  Bell
+  Bell,
+  CheckCircle2,
+  AlertCircle
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { auth, db } from "@/integrations/firebase/client";
@@ -96,6 +98,8 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
   const [services, setServices] = useState<Service[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [offers, setOffers] = useState<Offer[]>([]);
+  const [confirmedBookingsCount, setConfirmedBookingsCount] = useState(0);
+  const [pendingBookingsCount, setPendingBookingsCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
   // Highlight booking if bookingId query param present (for provider)
@@ -191,6 +195,26 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
           ...doc.data()
         })) as Review[];
         setReviews(reviewsData);
+
+        // Load bookings statistics
+        const bookingsQuery = query(
+          collection(db, 'bookings'),
+          where('provider_id', '==', user.uid)
+        );
+        const bookingsSnapshot = await getDocs(bookingsQuery);
+        const bookingsData = bookingsSnapshot.docs.map(doc => doc.data());
+        
+        // Count confirmed bookings (confirmed status only)
+        const confirmedCount = bookingsData.filter(
+          (booking: any) => booking.status === 'confirmed'
+        ).length;
+        setConfirmedBookingsCount(confirmedCount);
+        
+        // Count pending bookings (pending status)
+        const pendingCount = bookingsData.filter(
+          (booking: any) => booking.status === 'pending'
+        ).length;
+        setPendingBookingsCount(pendingCount);
       }
     } catch (error) {
       console.error('Error loading provider data:', error);
@@ -347,6 +371,36 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
               <div className="text-base sm:text-xl lg:text-2xl font-bold leading-tight break-words mb-1">{averageRating}</div>
               <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed break-words hyphens-auto">
                 {reviews.length} {t.provider.reviews}
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="h-auto">
+            <CardHeader className="pb-2">
+              <div className="flex items-start justify-between gap-2">
+                <CardTitle className="text-xs sm:text-sm font-medium break-words leading-tight min-w-0 flex-1 hyphens-auto">{isRTL ? 'حجوزات مفعلة' : 'Active'}</CardTitle>
+                <CheckCircle2 className="h-3 w-3 sm:h-4 sm:w-4 text-green-600 flex-shrink-0 mt-0.5" />
+              </div>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="text-base sm:text-xl lg:text-2xl font-bold leading-tight break-words mb-1">{confirmedBookingsCount}</div>
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed break-words hyphens-auto">
+                {isRTL ? 'حجوزات مفعّلة' : 'Active Bookings'}
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="h-auto">
+            <CardHeader className="pb-2">
+              <div className="flex items-start justify-between gap-2">
+                <CardTitle className="text-xs sm:text-sm font-medium break-words leading-tight min-w-0 flex-1 hyphens-auto">{t.provider.pendingBookings}</CardTitle>
+                <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-600 flex-shrink-0 mt-0.5" />
+              </div>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="text-base sm:text-xl lg:text-2xl font-bold leading-tight break-words mb-1">{pendingBookingsCount}</div>
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed break-words hyphens-auto">
+                {isRTL ? 'بانتظار التأكيد' : 'Awaiting Confirmation'}
               </p>
             </CardContent>
           </Card>
