@@ -14,7 +14,8 @@ import {
   MapPin,
   MessageCircle,
   Settings,
-  Bell
+  Bell,
+  CheckCircle2
 } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
@@ -57,6 +58,8 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [services, setServices] = useState<{ [key: string]: Service }>({});
   const [providers, setProviders] = useState<{ [key: string]: Profile }>({});
+  const [upcomingBookingsCount, setUpcomingBookingsCount] = useState(0);
+  const [completedBookingsCount, setCompletedBookingsCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [reviewRating, setReviewRating] = useState(5);
@@ -107,6 +110,35 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
         // Load related services and providers from reviews
         const serviceIds = [...new Set(reviewsData.map((r: any) => r.service_id).filter(Boolean))];
         const providerIds = [...new Set(reviewsData.map((r: any) => r.provider_id).filter(Boolean))];
+
+      // Real-time listener for customer bookings
+      const bookingsQuery = query(
+        collection(db, 'bookings'),
+        where('customer_id', '==', user_uid)
+      );
+      
+      onSnapshot(bookingsQuery, (snapshot) => {
+        const bookingsData = snapshot.docs.map(doc => doc.data());
+        const now = new Date();
+        
+        // Count upcoming bookings (confirmed or pending, and in the future)
+        const upcomingCount = bookingsData.filter((booking: any) => {
+          if (booking.status !== 'confirmed' && booking.status !== 'pending') return false;
+          
+          const [year, month, day] = booking.booking_date.split('-').map(Number);
+          const [hour, minute] = booking.start_time.split(':').map(Number);
+          const bookingDate = new Date(year, month - 1, day, hour, minute);
+          
+          return bookingDate > now;
+        }).length;
+        setUpcomingBookingsCount(upcomingCount);
+        
+        // Count completed bookings
+        const completedCount = bookingsData.filter(
+          (booking: any) => booking.status === 'completed'
+        ).length;
+        setCompletedBookingsCount(completedCount);
+      });
 
         // Load services
         const servicesData: { [key: string]: Service } = {};
@@ -280,15 +312,33 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
         </div>
 
         {/* Stats Overview */}
-        <div className="grid grid-cols-1 gap-3 mb-8">
+        <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-8">
           <Card className="h-auto">
-            <CardContent className="p-4">
-              <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs sm:text-sm font-medium text-muted-foreground break-words leading-tight hyphens-auto">{t.customer.reviewsGiven}</p>
-                  <p className="text-lg sm:text-xl lg:text-2xl font-bold leading-tight break-words mt-1">{reviews.length}</p>
-                </div>
-                <Star className="w-6 h-6 sm:w-8 sm:h-8 text-purple-500 flex-shrink-0" />
+            <CardContent className="p-3 sm:p-4">
+              <div className="flex flex-col items-center text-center gap-1 sm:gap-2">
+                <Star className="w-5 h-5 sm:w-6 sm:h-6 text-purple-500 flex-shrink-0" />
+                <p className="text-lg sm:text-xl lg:text-2xl font-bold leading-tight">{reviews.length}</p>
+                <p className="text-[10px] sm:text-xs font-medium text-muted-foreground leading-tight">{isRTL ? 'تقييمات' : 'Reviews'}</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="h-auto">
+            <CardContent className="p-3 sm:p-4">
+              <div className="flex flex-col items-center text-center gap-1 sm:gap-2">
+                <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-blue-500 flex-shrink-0" />
+                <p className="text-lg sm:text-xl lg:text-2xl font-bold leading-tight">{upcomingBookingsCount}</p>
+                <p className="text-[10px] sm:text-xs font-medium text-muted-foreground leading-tight">{isRTL ? 'قادمة' : 'Upcoming'}</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="h-auto">
+            <CardContent className="p-3 sm:p-4">
+              <div className="flex flex-col items-center text-center gap-1 sm:gap-2">
+                <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-green-500 flex-shrink-0" />
+                <p className="text-lg sm:text-xl lg:text-2xl font-bold leading-tight">{completedBookingsCount}</p>
+                <p className="text-[10px] sm:text-xs font-medium text-muted-foreground leading-tight">{isRTL ? 'مكتملة' : 'Completed'}</p>
               </div>
             </CardContent>
           </Card>
