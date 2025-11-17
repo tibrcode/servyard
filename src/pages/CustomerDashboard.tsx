@@ -314,7 +314,7 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
         {/* Stats Overview */}
         <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-8">
           <Card className="h-auto">
-            <CardContent className="p-3 sm:p-4">
+            <CardContent className="p-3 sm:p-4 flex items-center justify-center min-h-[100px]">
               <div className="flex flex-col items-center text-center gap-1 sm:gap-2">
                 <Star className="w-5 h-5 sm:w-6 sm:h-6 text-purple-500 flex-shrink-0" />
                 <p className="text-lg sm:text-xl lg:text-2xl font-bold leading-tight">{reviews.length}</p>
@@ -324,7 +324,7 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
           </Card>
 
           <Card className="h-auto">
-            <CardContent className="p-3 sm:p-4">
+            <CardContent className="p-3 sm:p-4 flex items-center justify-center min-h-[100px]">
               <div className="flex flex-col items-center text-center gap-1 sm:gap-2">
                 <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-blue-500 flex-shrink-0" />
                 <p className="text-lg sm:text-xl lg:text-2xl font-bold leading-tight">{upcomingBookingsCount}</p>
@@ -334,7 +334,7 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
           </Card>
 
           <Card className="h-auto">
-            <CardContent className="p-3 sm:p-4">
+            <CardContent className="p-3 sm:p-4 flex items-center justify-center min-h-[100px]">
               <div className="flex flex-col items-center text-center gap-1 sm:gap-2">
                 <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-green-500 flex-shrink-0" />
                 <p className="text-lg sm:text-xl lg:text-2xl font-bold leading-tight">{completedBookingsCount}</p>
