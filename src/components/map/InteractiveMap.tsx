@@ -322,14 +322,15 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
         content = `
           <div style="
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-            width: 320px;
+            width: 280px;
+            max-width: 90vw;
             padding: 0;
             direction: ${isRTL ? 'rtl' : 'ltr'};
             background: ${colors.background};
             color: ${colors.text};
             box-sizing: border-box;
             border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.18);
           ">
             <!-- Header -->
             <div style="
@@ -360,10 +361,10 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
             
             <!-- Services List -->
             <div style="
-              max-height: 320px; 
+              max-height: 240px; 
               overflow-y: auto; 
               overflow-x: hidden; 
-              padding: 12px;
+              padding: 10px;
               background: ${colors.background};
             ">
               ${location.services.map((service, index) => {
@@ -374,16 +375,16 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                 return `
                 <div style="
                   background: ${colors.cardBg};
-                  padding: 12px;
-                  margin-bottom: ${index < location.services!.length - 1 ? '10px' : '0'};
-                  border-radius: 10px;
+                  padding: 10px;
+                  margin-bottom: ${index < location.services!.length - 1 ? '8px' : '0'};
+                  border-radius: 8px;
                   cursor: pointer;
                   transition: all 0.3s ease;
                   border: 2px solid ${colors.border};
                   position: relative;
                   overflow: hidden;
                 " 
-                onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(0,0,0,0.15)'; this.style.borderColor='#f59e0b';"
+                onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 16px rgba(0,0,0,0.12)'; this.style.borderColor='#f59e0b';"
                 onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'; this.style.borderColor='${colors.border}';"
                 onclick="window.handleServiceClick?.('${service.id}')">
                   
@@ -410,17 +411,17 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                   
                   <!-- Service Name -->
                   <div style="
-                    font-size: 14px;
+                    font-size: 13px;
                     font-weight: 600;
                     color: ${colors.text};
-                    margin-bottom: 8px;
-                    line-height: 1.4;
-                    max-height: 2.8em;
+                    margin-bottom: 6px;
+                    line-height: 1.3;
+                    max-height: 2.6em;
                     overflow: hidden;
                     display: -webkit-box;
                     -webkit-line-clamp: 2;
                     -webkit-box-orient: vertical;
-                    padding-${isRTL ? 'left' : 'right'}: ${isTopRated ? '60px' : '0'};
+                    padding-${isRTL ? 'left' : 'right'}: ${isTopRated ? '55px' : '0'};
                   ">
                     ${service.name}
                   </div>
@@ -430,36 +431,36 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                     <div style="
                       display: flex;
                       align-items: center;
-                      gap: 6px;
-                      margin-bottom: 8px;
+                      gap: 4px;
+                      margin-bottom: 6px;
                     ">
                       <div style="
                         color: ${colors.star};
-                        font-size: 14px;
-                        letter-spacing: 1px;
+                        font-size: 12px;
+                        letter-spacing: 0.5px;
                         line-height: 1;
                       ">
                         ${renderStars(rating)}
                       </div>
                       <span style="
-                        font-size: 13px;
+                        font-size: 12px;
                         font-weight: 600;
                         color: ${colors.text};
                       ">
                         ${rating.toFixed(1)}
                       </span>
                       <span style="
-                        font-size: 11px;
+                        font-size: 10px;
                         color: ${colors.textSecondary};
                       ">
-                        (${reviewCount} ${isRTL ? 'تقييم' : 'reviews'})
+                        (${reviewCount})
                       </span>
                     </div>
                   ` : `
                     <div style="
-                      font-size: 11px;
+                      font-size: 10px;
                       color: ${colors.textSecondary};
-                      margin-bottom: 8px;
+                      margin-bottom: 6px;
                     ">
                       ${isRTL ? '⭐ لا يوجد تقييمات بعد' : '⭐ No reviews yet'}
                     </div>
@@ -470,10 +471,10 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
-                    gap: 8px;
+                    gap: 6px;
                   ">
                     <div style="
-                      font-size: 18px;
+                      font-size: 16px;
                       color: #f59e0b;
                       font-weight: 700;
                     ">
@@ -482,13 +483,13 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                     <div style="
                       background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
                       color: white;
-                      font-size: 11px;
+                      font-size: 10px;
                       font-weight: 600;
-                      padding: 6px 12px;
-                      border-radius: 6px;
+                      padding: 5px 10px;
+                      border-radius: 5px;
                       white-space: nowrap;
                     ">
-                      ${isRTL ? 'عرض التفاصيل →' : 'View Details →'}
+                      ${isRTL ? 'عرض →' : 'View →'}
                     </div>
                   </div>
                 </div>

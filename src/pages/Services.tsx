@@ -420,12 +420,17 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
         latitude: provider.latitude!,
         longitude: provider.longitude!,
         label: `${provider.full_name} - ${services.length} ${isRTL ? 'خدمة' : 'services'}`,
-        services: services.map(service => ({
-          id: service.id,
-          name: service.name,
-          price: service.approximate_price || service.price_range || (isRTL ? 'السعر عند الطلب' : 'Price on request'),
-          provider_name: provider.full_name
-        }))
+        services: services.map(service => {
+          const rating = serviceRatings[service.id];
+          return {
+            id: service.id,
+            name: service.name,
+            price: service.approximate_price || service.price_range || (isRTL ? 'السعر عند الطلب' : 'Price on request'),
+            provider_name: provider.full_name,
+            average_rating: rating?.avg || 0,
+            reviews_count: rating?.count || 0
+          };
+        })
       };
     }).filter((marker): marker is NonNullable<typeof marker> => marker !== null);
     
