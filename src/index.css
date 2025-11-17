@@ -740,36 +740,3 @@ All colors MUST be HSL. Premium dark/light theme with gold accents.
 [role="tablist"] button {
   transition: all 0.2s ease-in-out;
 }
-
-/* Dialog and Modal z-index control - keep below header/navbar */
-@layer components {
-  /* Radix Dialog overlay and content have high z-index, we need to ensure they're below main nav */
-  [role="dialog"] {
-    z-index: 40 !important;
-  }
-
-  /* Dialog overlay (backdrop) */
-  [data-radix-dialog-overlay] {
-    z-index: 40 !important;
-  }
-
-  /* Dialog content */
-  [role="alertdialog"],
-  [role="dialog"] {
-    z-index: 41 !important;
-  }
-
-  /* Ensure main navbar is always above dialogs */
-  nav,
-  .navbar,
-  [data-navbar],
-  header {
-    z-index: 50 !important;
-  }
-
-  /* Fixed/sticky positioning elements */
-  .fixed,
-  .sticky {
-    z-index: auto;
-  }
-}
