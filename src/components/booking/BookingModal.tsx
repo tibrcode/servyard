@@ -184,12 +184,12 @@ export const BookingModal = ({ service, provider, isOpen, onClose, currentLangua
 
     return (
       <div 
-        className="fixed inset-0 z-40 flex items-start justify-center lg:pt-20 lg:pl-64 lg:pr-4" 
+        className="fixed inset-0 z-30 flex items-start justify-center pt-20 lg:pt-24 lg:pl-64 lg:pr-4" 
         dir={isRTL ? 'rtl' : 'ltr'}
         onClick={onClose}
       >
         {/* Overlay */}
-        <div className="absolute inset-0 bg-black/50 lg:top-16" />
+        <div className="absolute inset-0 bg-black/50 top-16" />
         
         {/* Modal Content */}
         <div 
