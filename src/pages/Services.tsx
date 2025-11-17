@@ -416,10 +416,21 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
       const provider = providers[services[0].provider_id];
       if (!provider) return null;
       
+      // حساب تقييم المزود من تقييمات خدماته
+      const providerServiceRatings = services
+        .map(s => serviceRatings[s.id])
+        .filter(r => r && r.avg > 0);
+      const providerAvgRating = providerServiceRatings.length > 0
+        ? providerServiceRatings.reduce((sum, r) => sum + r.avg, 0) / providerServiceRatings.length
+        : 0;
+      const providerTotalReviews = providerServiceRatings.reduce((sum, r) => sum + r.count, 0);
+      
       return {
         latitude: provider.latitude!,
         longitude: provider.longitude!,
         label: `${provider.full_name} - ${services.length} ${isRTL ? 'خدمة' : 'services'}`,
+        provider_rating: providerAvgRating,
+        provider_reviews_count: providerTotalReviews,
         services: services.map(service => {
           const rating = serviceRatings[service.id];
           return {
@@ -428,7 +439,8 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
             price: service.approximate_price || service.price_range || (isRTL ? 'السعر عند الطلب' : 'Price on request'),
             provider_name: provider.full_name,
             average_rating: rating?.avg || 0,
-            reviews_count: rating?.count || 0
+            reviews_count: rating?.count || 0,
+            currency: provider.currency_code || 'AED'
           };
         })
       };

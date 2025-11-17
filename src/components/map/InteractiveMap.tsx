@@ -13,7 +13,12 @@ interface Location {
     name: string;
     price: string;
     provider_name: string;
+    average_rating?: number;
+    reviews_count?: number;
+    currency?: string;
   }>;
+  provider_rating?: number;
+  provider_reviews_count?: number;
 }
 
 interface InteractiveMapProps {
@@ -393,6 +398,22 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
               ">
                 ${providerName}
               </div>
+              ${location.provider_rating && location.provider_rating > 0 ? `
+                <div style="
+                  display: flex;
+                  align-items: center;
+                  gap: 4px;
+                  margin-bottom: 6px;
+                ">
+                  <span style="color: ${colors.star}; font-size: 12px;">⭐</span>
+                  <span style="font-size: 12px; font-weight: 600; color: ${colors.text};">
+                    ${location.provider_rating.toFixed(1)}
+                  </span>
+                  <span style="font-size: 10px; color: ${colors.textSecondary};">
+                    (${location.provider_reviews_count || 0} ${isRTL ? 'تقييم' : 'reviews'})
+                  </span>
+                </div>
+              ` : ''}
               <div style="
                 display: flex;
                 align-items: center;
@@ -409,19 +430,6 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                   <span>📍</span>
                   <span>${isRTL ? `${servicesCount} خدمة` : `${servicesCount} services`}</span>
                 </div>
-                ${providerAvgRating > 0 ? `
-                  <div style="
-                    font-size: 11px;
-                    display: flex;
-                    align-items: center;
-                    gap: 3px;
-                    color: ${colors.text};
-                  ">
-                    <span style="color: ${colors.star};">⭐</span>
-                    <span style="font-weight: 600;">${providerAvgRating.toFixed(1)}</span>
-                    <span style="color: ${colors.textSecondary};">(${totalReviews})</span>
-                  </div>
-                ` : ''}
               </div>
             </div>
             
@@ -587,7 +595,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                     font-weight: 700;
                     margin-bottom: 8px;
                   ">
-                    ${service.price}
+                    ${service.price}${service.currency ? ` ${service.currency}` : ''}
                   </div>
                   
                   <!-- View Button -->
