@@ -498,11 +498,11 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="flex items-center gap-3 flex-wrap">
             <div className="flex items-center gap-2">
-              <MapPin className="w-5 h-5 text-primary" />
-              <CardTitle className="text-xl sm:text-2xl">{t.title}</CardTitle>
+              <MapPin className="w-5 h-5 text-primary shrink-0" />
+              <h3 className="text-xl sm:text-2xl font-semibold leading-none">{t.title}</h3>
             </div>
-            <CardDescription className="hidden sm:block">•</CardDescription>
-            <CardDescription>{t.description}</CardDescription>
+            <span className="hidden sm:inline text-muted-foreground">•</span>
+            <p className="text-sm text-muted-foreground">{t.description}</p>
           </div>
           
           {showCurrentLocation && (
