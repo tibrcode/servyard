@@ -421,10 +421,7 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
               <TabsTrigger value="bookings">{t.provider.bookings}</TabsTrigger>
               <TabsTrigger value="offers">{t.provider.offers}</TabsTrigger>
               <TabsTrigger value="share">{t.provider.shareProfile}</TabsTrigger>
-              <TabsTrigger value="settings">
-                <Bell className="w-3 h-3 sm:w-4 sm:h-4 mr-2 flex-shrink-0" />
-                <span className="break-words text-xs sm:text-sm">{t.notificationSettings.title}</span>
-              </TabsTrigger>
+              <TabsTrigger value="settings">{t.notificationSettings.title}</TabsTrigger>
             </TabsList>
 
             {/* Services Tab */}

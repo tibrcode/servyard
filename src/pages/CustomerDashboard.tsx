@@ -319,10 +319,7 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
                 <User className="w-3 h-3 sm:w-4 sm:h-4 mr-2 flex-shrink-0" />
                 <span className="break-words text-xs sm:text-sm">{t.customer.profile}</span>
               </TabsTrigger>
-              <TabsTrigger value="settings">
-                <Bell className="w-3 h-3 sm:w-4 sm:h-4 mr-2 flex-shrink-0" />
-                <span className="break-words text-xs sm:text-sm">{t.notificationSettings.title}</span>
-              </TabsTrigger>
+              <TabsTrigger value="settings">{t.notificationSettings.title}</TabsTrigger>
             </TabsList>
 
             {/* Bookings Tab - Unified Modern Booking System */}
