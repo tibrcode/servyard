@@ -182,34 +182,38 @@ export const BookingModal = ({ service, provider, isOpen, onClose, currentLangua
 
     return (
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" dir={isRTL ? 'rtl' : 'ltr'}>
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Calendar className="w-5 h-5" />
-              {isRTL ? 'حجز موعد' : 'Book Appointment'}: {service.name}
+        <DialogContent className="w-full max-w-md sm:max-w-2xl max-h-[90vh] p-0 overflow-hidden flex flex-col" dir={isRTL ? 'rtl' : 'ltr'}>
+          <DialogHeader className="px-4 sm:px-6 py-3 sm:py-4 border-b">
+            <DialogTitle className="flex items-center gap-2 text-base sm:text-lg truncate">
+              <Calendar className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+              <span className="truncate">{isRTL ? 'حجز موعد' : 'Book Appointment'}</span>
             </DialogTitle>
           </DialogHeader>
-          <ServiceBooking
-            serviceId={service.id}
-            providerId={service.provider_id}
-            customerId={user.uid}
-            customerName={user.displayName || ''}
-            customerPhone={user.phoneNumber || ''}
-            serviceTitle={service.name}
-            price={parseFloat(service.approximate_price || '0')}
-            currency={provider.currency_code || 'AED'}
-            bookingSettings={bookingSettings}
-            providerTimezone={provider.timezone || 'Asia/Dubai'}
-            language={currentLanguage as 'en' | 'ar'}
-            onBookingComplete={() => {
-              toast({
-                title: isRTL ? 'تم بنجاح!' : 'Success!',
-                description: isRTL ? 'تم حجز موعدك بنجاح' : 'Your appointment has been booked successfully',
-              });
-              onClose();
-            }}
-            onBack={onClose}
-          />
+          <div className="flex-1 overflow-y-auto">
+            <div className="px-4 sm:px-6 py-4 sm:py-6">
+              <ServiceBooking
+                serviceId={service.id}
+                providerId={service.provider_id}
+                customerId={user.uid}
+                customerName={user.displayName || ''}
+                customerPhone={user.phoneNumber || ''}
+                serviceTitle={service.name}
+                price={parseFloat(service.approximate_price || '0')}
+                currency={provider.currency_code || 'AED'}
+                bookingSettings={bookingSettings}
+                providerTimezone={provider.timezone || 'Asia/Dubai'}
+                language={currentLanguage as 'en' | 'ar'}
+                onBookingComplete={() => {
+                  toast({
+                    title: isRTL ? 'تم بنجاح!' : 'Success!',
+                    description: isRTL ? 'تم حجز موعدك بنجاح' : 'Your appointment has been booked successfully',
+                  });
+                  onClose();
+                }}
+                onBack={onClose}
+              />
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     );

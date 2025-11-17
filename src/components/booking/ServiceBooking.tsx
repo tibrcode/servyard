@@ -272,188 +272,203 @@ export function ServiceBooking({
   };
 
   return (
-    <Card dir={isRTL ? 'rtl' : 'ltr'}>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <CalendarIcon className="h-5 w-5" />
-          {t.title}
-        </CardTitle>
-        <CardDescription>{t.subtitle}</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Step 1: Select Date */}
-        {step === 1 && (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <Label>{t.selectDate}</Label>
-              {onBack && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={onBack}
-                  className="flex items-center gap-2"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                  {isRTL ? 'رجوع' : 'Back'}
-                </Button>
-              )}
-            </div>
-            <div className="flex justify-center">
-              <Calendar
-                mode="single"
-                selected={selectedDate}
-                onSelect={handleDateSelect}
-                disabled={(date) => {
-                  const today = new Date();
-                  today.setHours(0, 0, 0, 0);
-                  const dateString = formatDate(date);
-                  return (
-                    date < today ||
-                    !isDateBookable(dateString, bookingSettings.advance_booking_days)
-                  );
-                }}
-                locale={dateLocale}
-                className="rounded-md border"
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Step 2: Select Time */}
-        {step === 2 && selectedDate && (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <Label className="flex items-center gap-2">
-                <Clock className="h-4 w-4" />
-                {t.availableSlots}
-              </Label>
-              <Button variant="ghost" size="sm" onClick={() => setStep(1)}>
-                {t.back}
-              </Button>
-            </div>
-
-            <div className="p-3 bg-muted rounded-lg">
-              <p className="text-sm font-medium">
-                {format(selectedDate, 'PPPP', { locale: dateLocale })}
-              </p>
-            </div>
-
-            {isLoadingSlots ? (
-              <div className="py-8 text-center">
-                <p className="text-muted-foreground">{isRTL ? 'جاري التحميل...' : 'Loading...'}</p>
-              </div>
-            ) : !availability || !availability.is_available ? (
-              <div className="py-8 text-center">
-                <p className="text-muted-foreground">{t.serviceClosed}</p>
-              </div>
-            ) : availability.slots.length === 0 ? (
-              <div className="py-8 text-center">
-                <p className="text-muted-foreground">{t.noAvailableSlots}</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-3 gap-2">
-                {availability.slots.map((slot) => (
+    <div className="w-full" dir={isRTL ? 'rtl' : 'ltr'}>
+      <Card className="w-full border-0 bg-transparent shadow-none">
+        <CardHeader className="px-4 sm:px-6 py-4 sm:py-6">
+          <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+            <CalendarIcon className="h-5 w-5 flex-shrink-0" />
+            <span className="truncate">{t.title}</span>
+          </CardTitle>
+          <CardDescription className="text-xs sm:text-sm mt-2">{t.subtitle}</CardDescription>
+        </CardHeader>
+        <CardContent className="px-4 sm:px-6 py-4 sm:py-6 space-y-6">
+          {/* Step 1: Select Date */}
+          {step === 1 && (
+            <div className="space-y-4 w-full">
+              <div className="flex items-center justify-between gap-2">
+                <Label className="text-sm sm:text-base">{t.selectDate}</Label>
+                {onBack && (
                   <Button
-                    key={slot.time}
-                    variant={slot.available ? 'outline' : 'ghost'}
-                    disabled={!slot.available}
-                    onClick={() => handleTimeSelect(slot.time)}
-                    className="flex flex-col h-auto py-3"
+                    variant="ghost"
+                    size="sm"
+                    onClick={onBack}
+                    className="flex items-center gap-2 text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3"
                   >
-                    <span className="font-medium">
-                      {formatTimeDisplay(slot.time, language)}
-                    </span>
-                    <span className="text-xs mt-1">
-                      {getSlotBadge(slot)}
-                    </span>
+                    <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                    <span className="hidden sm:inline">{isRTL ? 'رجوع' : 'Back'}</span>
                   </Button>
-                ))}
+                )}
               </div>
-            )}
-          </div>
-        )}
-
-        {/* Step 3: Confirm */}
-        {step === 3 && selectedDate && selectedTime && (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <Label>{t.confirmBooking}</Label>
-              <Button variant="ghost" size="sm" onClick={() => setStep(2)}>
-                {t.back}
-              </Button>
+              <div className="w-full overflow-x-auto flex justify-center">
+                <div className="flex-shrink-0">
+                  <Calendar
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={handleDateSelect}
+                    disabled={(date) => {
+                      const today = new Date();
+                      today.setHours(0, 0, 0, 0);
+                      const dateString = formatDate(date);
+                      return (
+                        date < today ||
+                        !isDateBookable(dateString, bookingSettings.advance_booking_days)
+                      );
+                    }}
+                    locale={dateLocale}
+                    className="rounded-md border w-full"
+                  />
+                </div>
+              </div>
             </div>
+          )}
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">{t.bookingDetails}</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">{t.service}:</span>
-                  <span className="font-medium">{serviceTitle}</span>
-                </div>
-                <Separator />
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">{t.date}:</span>
-                  <span className="font-medium">
-                    {format(selectedDate, 'PP', { locale: dateLocale })}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">{t.time}:</span>
-                  <span className="font-medium">
-                    {formatTimeDisplay(selectedTime, language)}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">{t.duration}:</span>
-                  <span className="font-medium">
-                    {bookingSettings.duration_minutes} {t.minutes}
-                  </span>
-                </div>
-                <Separator />
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">{t.price}:</span>
-                  <span className="font-semibold text-lg">
-                    {price} {currency}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
+          {/* Step 2: Select Time */}
+          {step === 2 && selectedDate && (
+            <div className="space-y-4 w-full">
+              <div className="flex items-center justify-between gap-2">
+                <Label className="flex items-center gap-2 text-sm sm:text-base">
+                  <Clock className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                  <span>{t.availableSlots}</span>
+                </Label>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => setStep(1)}
+                  className="text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3"
+                >
+                  {t.back}
+                </Button>
+              </div>
 
-            {/* Notes */}
-            <div className="space-y-2">
-              <Label htmlFor="notes">{t.notes}</Label>
-              <Textarea
-                id="notes"
-                placeholder={t.notesPlaceholder}
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                rows={3}
-              />
-            </div>
-
-            {bookingSettings.require_confirmation && (
-              <div className="p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
-                <p className="text-sm text-blue-900 dark:text-blue-100">
-                  ℹ️ {t.requiresConfirmation}
+              <div className="p-3 sm:p-4 bg-muted rounded-lg w-full">
+                <p className="text-xs sm:text-sm font-medium">
+                  {format(selectedDate, 'PPPP', { locale: dateLocale })}
                 </p>
               </div>
-            )}
 
-            {/* Book Button */}
-            <Button
-              onClick={handleBooking}
-              disabled={isBooking}
-              className="w-full"
-              size="lg"
-            >
-              <CheckCircle className="h-4 w-4 mr-2" />
-              {isBooking ? t.booking : t.book}
-            </Button>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+              {isLoadingSlots ? (
+                <div className="py-8 text-center w-full">
+                  <p className="text-xs sm:text-sm text-muted-foreground">{isRTL ? 'جاري التحميل...' : 'Loading...'}</p>
+                </div>
+              ) : !availability || !availability.is_available ? (
+                <div className="py-8 text-center w-full">
+                  <p className="text-xs sm:text-sm text-muted-foreground">{t.serviceClosed}</p>
+                </div>
+              ) : availability.slots.length === 0 ? (
+                <div className="py-8 text-center w-full">
+                  <p className="text-xs sm:text-sm text-muted-foreground">{t.noAvailableSlots}</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 w-full">
+                  {availability.slots.map((slot) => (
+                    <Button
+                      key={slot.time}
+                      variant={slot.available ? 'outline' : 'ghost'}
+                      disabled={!slot.available}
+                      onClick={() => handleTimeSelect(slot.time)}
+                      className="flex flex-col h-auto py-2 sm:py-3 px-2 text-xs sm:text-sm"
+                    >
+                      <span className="font-medium text-xs sm:text-sm">
+                        {formatTimeDisplay(slot.time, language)}
+                      </span>
+                      <span className="text-[10px] sm:text-xs mt-1">
+                        {getSlotBadge(slot)}
+                      </span>
+                    </Button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Step 3: Confirm */}
+          {step === 3 && selectedDate && selectedTime && (
+            <div className="space-y-4 w-full">
+              <div className="flex items-center justify-between gap-2">
+                <Label className="text-sm sm:text-base">{t.confirmBooking}</Label>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => setStep(2)}
+                  className="text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3"
+                >
+                  {t.back}
+                </Button>
+              </div>
+
+              <Card className="w-full">
+                <CardHeader className="px-3 sm:px-4 py-3 sm:py-4">
+                  <CardTitle className="text-base sm:text-lg">{t.bookingDetails}</CardTitle>
+                </CardHeader>
+                <CardContent className="px-3 sm:px-4 py-3 sm:py-4 space-y-3">
+                  <div className="flex justify-between text-xs sm:text-sm gap-2">
+                    <span className="text-muted-foreground">{t.service}:</span>
+                    <span className="font-medium text-right break-words">{serviceTitle}</span>
+                  </div>
+                  <Separator />
+                  <div className="flex justify-between text-xs sm:text-sm gap-2">
+                    <span className="text-muted-foreground">{t.date}:</span>
+                    <span className="font-medium">
+                      {format(selectedDate, 'PP', { locale: dateLocale })}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs sm:text-sm gap-2">
+                    <span className="text-muted-foreground">{t.time}:</span>
+                    <span className="font-medium">
+                      {formatTimeDisplay(selectedTime, language)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs sm:text-sm gap-2">
+                    <span className="text-muted-foreground">{t.duration}:</span>
+                    <span className="font-medium">
+                      {bookingSettings.duration_minutes} {t.minutes}
+                    </span>
+                  </div>
+                  <Separator />
+                  <div className="flex justify-between text-sm sm:text-base gap-2">
+                    <span className="text-muted-foreground">{t.price}:</span>
+                    <span className="font-semibold">
+                      {price} {currency}
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Notes */}
+              <div className="space-y-2 w-full">
+                <Label htmlFor="notes" className="text-xs sm:text-sm">{t.notes}</Label>
+                <Textarea
+                  id="notes"
+                  placeholder={t.notesPlaceholder}
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  rows={3}
+                  className="text-xs sm:text-sm resize-none"
+                />
+              </div>
+
+              {bookingSettings.require_confirmation && (
+                <div className="p-3 sm:p-4 bg-blue-50 dark:bg-blue-950 rounded-lg w-full">
+                  <p className="text-xs sm:text-sm text-blue-900 dark:text-blue-100">
+                    ℹ️ {t.requiresConfirmation}
+                  </p>
+                </div>
+              )}
+
+              {/* Book Button */}
+              <Button
+                onClick={handleBooking}
+                disabled={isBooking}
+                className="w-full h-10 sm:h-11 text-xs sm:text-sm"
+                size="lg"
+              >
+                <CheckCircle className="h-4 w-4 mr-2 flex-shrink-0" />
+                {isBooking ? t.booking : t.book}
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }
