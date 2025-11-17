@@ -85,24 +85,25 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
     style.innerHTML = `
       .gm-style-iw-c {
         padding: 0 !important;
-        border-radius: 8px !important;
-        box-shadow: 0 2px 7px 1px rgba(0,0,0,0.3) !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        max-width: none !important;
       }
       .gm-style-iw-d {
-        overflow: hidden !important;
+        overflow: visible !important;
+        max-width: none !important;
+      }
+      .gm-style .gm-style-iw {
+        max-width: none !important;
       }
       .gm-ui-hover-effect {
-        top: 2px !important;
-        right: 2px !important;
-        width: 24px !important;
-        height: 24px !important;
-      }
-      .gm-ui-hover-effect > span {
-        margin: 4px !important;
-        width: 16px !important;
-        height: 16px !important;
+        display: none !important;
       }
       .gm-style .gm-style-iw-tc {
+        display: none !important;
+      }
+      .gm-style .gm-style-iw-t::after {
         display: none !important;
       }
     `;
@@ -339,7 +340,31 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
             background: transparent;
             color: ${colors.text};
             box-sizing: border-box;
+            position: relative;
           ">
+            <!-- Close Button -->
+            <button onclick="document.querySelector('.gm-style-iw').parentElement.style.display='none';" style="
+              position: absolute;
+              top: -8px;
+              ${isRTL ? 'left: -8px;' : 'right: -8px;'}
+              width: 28px;
+              height: 28px;
+              border-radius: 50%;
+              background: rgba(255, 255, 255, 0.95);
+              border: none;
+              cursor: pointer;
+              box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 18px;
+              font-weight: bold;
+              color: #666;
+              z-index: 1000;
+            " onmouseover="this.style.background='rgba(255,255,255,1)'; this.style.color='#000';" onmouseout="this.style.background='rgba(255,255,255,0.95)'; this.style.color='#666';">
+              ×
+            </button>
+            
             <!-- Floating Provider Header -->
             <div style="
               background: ${isDarkMode ? 'rgba(26, 29, 33, 0.92)' : 'rgba(255, 255, 255, 0.92)'};
