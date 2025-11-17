@@ -274,10 +274,10 @@ export function ServiceBooking({
   return (
     <div className="w-full" dir={isRTL ? 'rtl' : 'ltr'}>
       <Card className="w-full border-0 bg-transparent shadow-none">
-        <CardContent className="px-4 sm:px-6 py-4 sm:py-6 space-y-6">
+        <CardContent className="px-2 sm:px-6 py-2 sm:py-6 space-y-3 sm:space-y-6">
           {/* Step 1: Select Date */}
           {step === 1 && (
-            <div className="space-y-4 w-full">
+            <div className="space-y-3 sm:space-y-4 w-full">
               <div className="flex items-center justify-between gap-2">
                 <Label className="text-sm sm:text-base">{t.selectDate}</Label>
                 {onBack && (
@@ -292,7 +292,7 @@ export function ServiceBooking({
                   </Button>
                 )}
               </div>
-              <div className="w-full flex justify-center">
+              <div className="w-full flex justify-center scale-90 sm:scale-100">
                 <Calendar
                   mode="single"
                   selected={selectedDate}
