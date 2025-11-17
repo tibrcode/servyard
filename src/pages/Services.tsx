@@ -599,7 +599,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
           </Card>
         ) : viewMode === 'map' ? (
           /* Map View */
-          <div className="space-y-4">
+          <div className="space-y-3">
             {/* Map */}
             <div className="w-full h-[1000px] sm:h-[1400px] rounded-lg overflow-hidden border">
               <InteractiveMap
