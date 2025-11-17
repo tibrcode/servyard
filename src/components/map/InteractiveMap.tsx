@@ -495,13 +495,13 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   return (
     <Card>
       <CardHeader>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div className="flex-1">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+          <div className="flex-1 space-y-2">
             <CardTitle className="flex items-center gap-2">
               <MapPin className="w-5 h-5" />
               {t.title}
             </CardTitle>
-            <CardDescription className="mt-2">{t.description}</CardDescription>
+            <CardDescription>{t.description}</CardDescription>
           </div>
           
           {showCurrentLocation && (

@@ -601,7 +601,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
           /* Map View */
           <div className="space-y-4">
             {/* Map */}
-            <div className="w-full h-[500px] sm:h-[700px] rounded-lg overflow-hidden border">
+            <div className="w-full h-[1000px] sm:h-[1400px] rounded-lg overflow-hidden border">
               <InteractiveMap
                 markers={mapMarkers}
                 center={
