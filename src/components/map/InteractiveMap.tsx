@@ -342,14 +342,14 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
           ">
             <!-- Floating Provider Header -->
             <div style="
-              background: ${isDarkMode ? 'rgba(26, 29, 33, 0.95)' : 'rgba(255, 255, 255, 0.95)'};
-              backdrop-filter: blur(10px);
-              -webkit-backdrop-filter: blur(10px);
+              background: ${isDarkMode ? 'rgba(26, 29, 33, 0.92)' : 'rgba(255, 255, 255, 0.92)'};
+              backdrop-filter: blur(12px);
+              -webkit-backdrop-filter: blur(12px);
               padding: 12px 16px;
-              border-radius: 12px;
+              border-radius: 16px;
               margin-bottom: 10px;
-              box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-              border: 1px solid ${colors.border};
+              box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+              border: 1px solid ${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'};
             ">
               <div style="
                 font-size: 15px; 
@@ -399,11 +399,17 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
               overflow-x: auto;
               overflow-y: hidden;
               padding: 4px 0 12px 0;
-              scrollbar-width: thin;
-              scrollbar-color: ${colors.border} transparent;
+              scrollbar-width: none;
+              -ms-overflow-style: none;
               scroll-snap-type: x mandatory;
               -webkit-overflow-scrolling: touch;
+              cursor: grab;
             ">
+            <style>
+              ::-webkit-scrollbar {
+                display: none;
+              }
+            </style>
               ${location.services.map((service, index) => {
                 const rating = service.average_rating || 0;
                 const reviewCount = service.reviews_count || 0;
@@ -413,23 +419,25 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                 <div style="
                   min-width: 240px;
                   max-width: 240px;
-                  background: ${isDarkMode ? 'rgba(36, 40, 48, 0.95)' : 'rgba(255, 255, 255, 0.95)'};
-                  backdrop-filter: blur(10px);
-                  -webkit-backdrop-filter: blur(10px);
+                  background: ${isDarkMode ? 'rgba(36, 40, 48, 0.92)' : 'rgba(255, 255, 255, 0.92)'};
+                  backdrop-filter: blur(12px);
+                  -webkit-backdrop-filter: blur(12px);
                   padding: 12px;
-                  border-radius: 12px;
+                  border-radius: 16px;
                   cursor: pointer;
                   transition: all 0.3s ease;
-                  border: 1px solid ${colors.border};
-                  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                  border: 1px solid ${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'};
+                  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
                   position: relative;
                   overflow: hidden;
                   scroll-snap-align: start;
                   flex-shrink: 0;
                 " 
-                onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 25px rgba(245, 158, 11, 0.3)'; this.style.borderColor='#f59e0b';"
-                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.1)'; this.style.borderColor='${colors.border}';"
-                onclick="window.handleServiceClick?.('${service.id}')">
+                onmouseover="this.style.transform='translateY(-6px) scale(1.02)'; this.style.boxShadow='0 12px 30px rgba(245, 158, 11, 0.35)'; this.style.borderColor='rgba(245, 158, 11, 0.5)';"
+                onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 6px 20px rgba(0,0,0,0.15)'; this.style.borderColor='${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}';"
+                onclick="window.handleServiceClick?.('${service.id}')"
+                ontouchstart="this.style.cursor='grabbing';"
+                ontouchend="this.style.cursor='pointer';">
                   
                   ${isTopRated ? `
                     <div style="
