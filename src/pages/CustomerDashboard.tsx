@@ -306,20 +306,20 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
         {/* Main Content */}
         <div className="space-y-4">
           <Tabs defaultValue="appointments" className="w-full">
-            <TabsList className="grid w-full grid-cols-4 mb-6">
-              <TabsTrigger value="appointments">
-                <Calendar className="w-3 h-3 sm:w-4 sm:h-4 mr-2 flex-shrink-0" />
-                <span className="break-words text-xs sm:text-sm">{t.customer.myBookings}</span>
+            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 mb-6">
+              <TabsTrigger value="appointments" className="text-xs sm:text-sm">
+                <Calendar className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" />
+                <span className="break-words">{t.customer.myBookings}</span>
               </TabsTrigger>
-              <TabsTrigger value="reviews">
-                <Star className="w-3 h-3 sm:w-4 sm:h-4 mr-2 flex-shrink-0" />
-                <span className="break-words text-xs sm:text-sm">{t.customer.myReviews}</span>
+              <TabsTrigger value="reviews" className="text-xs sm:text-sm">
+                <Star className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" />
+                <span className="break-words">{t.customer.myReviews}</span>
               </TabsTrigger>
-              <TabsTrigger value="profile">
-                <User className="w-3 h-3 sm:w-4 sm:h-4 mr-2 flex-shrink-0" />
-                <span className="break-words text-xs sm:text-sm">{t.customer.profile}</span>
+              <TabsTrigger value="profile" className="text-xs sm:text-sm">
+                <User className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" />
+                <span className="break-words">{t.customer.profile}</span>
               </TabsTrigger>
-              <TabsTrigger value="settings">{t.notificationSettings.title}</TabsTrigger>
+              <TabsTrigger value="settings" className="text-xs sm:text-sm">{t.notificationSettings.title}</TabsTrigger>
             </TabsList>
 
             {/* Bookings Tab - Unified Modern Booking System */}
