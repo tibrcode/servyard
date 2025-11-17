@@ -725,3 +725,18 @@ All colors MUST be HSL. Premium dark/light theme with gold accents.
     transform: scale(1);
   }
 }
+/* Custom styling for active tabs - Gold/Orange primary color */
+[role="tablist"] button[data-state="active"] {
+  background-color: hsl(var(--primary)) !important;
+  color: hsl(var(--primary-foreground)) !important;
+  font-weight: 600;
+  box-shadow: 0 2px 8px -2px hsl(var(--primary) / 0.3);
+}
+
+[role="tablist"] button[data-state="inactive"]:hover {
+  background-color: hsl(var(--primary) / 0.1);
+}
+
+[role="tablist"] button {
+  transition: all 0.2s ease-in-out;
+}
