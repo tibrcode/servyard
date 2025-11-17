@@ -59,6 +59,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
   const markersRef = useRef<google.maps.Marker[]>([]);
+  const currentInfoWindowRef = useRef<google.maps.InfoWindow | null>(null);
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
@@ -649,7 +650,14 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
       }
       
       marker.addListener('click', () => {
+        // إغلاق InfoWindow السابق إذا كان مفتوحاً
+        if (currentInfoWindowRef.current) {
+          currentInfoWindowRef.current.close();
+        }
+        
+        // فتح InfoWindow الجديد وحفظ المرجع
         infoWindow.open(mapInstanceRef.current!, marker);
+        currentInfoWindowRef.current = infoWindow;
       });
     }
 
