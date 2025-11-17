@@ -392,34 +392,34 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
               <div style="
                 font-size: 15px; 
                 font-weight: 700; 
-                margin-bottom: 4px;
+                margin-bottom: 6px;
                 line-height: 1.3;
                 color: ${colors.text};
               ">
                 ${providerName}
               </div>
-              ${location.provider_rating && location.provider_rating > 0 ? `
-                <div style="
-                  display: flex;
-                  align-items: center;
-                  gap: 4px;
-                  margin-bottom: 6px;
-                ">
-                  <span style="color: ${colors.star}; font-size: 12px;">⭐</span>
-                  <span style="font-size: 12px; font-weight: 600; color: ${colors.text};">
-                    ${location.provider_rating.toFixed(1)}
-                  </span>
-                  <span style="font-size: 10px; color: ${colors.textSecondary};">
-                    (${location.provider_reviews_count || 0} ${isRTL ? 'تقييم' : 'reviews'})
-                  </span>
-                </div>
-              ` : ''}
               <div style="
                 display: flex;
                 align-items: center;
                 gap: 8px;
                 flex-wrap: wrap;
               ">
+                ${location.provider_rating && location.provider_rating > 0 ? `
+                  <div style="
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+                  ">
+                    <span style="color: ${colors.star}; font-size: 12px;">⭐</span>
+                    <span style="font-size: 12px; font-weight: 600; color: ${colors.text};">
+                      ${location.provider_rating.toFixed(1)}
+                    </span>
+                    <span style="font-size: 10px; color: ${colors.textSecondary};">
+                      (${location.provider_reviews_count || 0})
+                    </span>
+                  </div>
+                  <span style="color: ${colors.textSecondary}; font-size: 11px;">•</span>
+                ` : ''}
                 <div style="
                   font-size: 11px;
                   color: ${colors.textSecondary};
