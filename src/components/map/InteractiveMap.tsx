@@ -437,7 +437,8 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
               onmousedown="
                 if (event.target.tagName === 'BUTTON') return;
                 this.isDragging = true;
-                this.startX = event.pageX - this.scrollLeft;
+                this.startX = event.pageX;
+                this.scrollLeftStart = this.scrollLeft;
                 this.style.cursor = 'grabbing';
                 this.style.scrollSnapType = 'none';
               "
@@ -454,9 +455,9 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
               onmousemove="
                 if (!this.isDragging) return;
                 event.preventDefault();
-                const x = event.pageX - this.scrollLeft;
-                const walk = this.startX - x;
-                this.scrollLeft = walk;
+                const x = event.pageX;
+                const distance = x - this.startX;
+                this.scrollLeft = this.scrollLeftStart - distance;
               "
             >
             <style>
