@@ -161,7 +161,7 @@ export const StatsOverview = ({ currentLanguage }: StatsOverviewProps) => {
   ];
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-6 sm:mb-8">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-6 mb-6 sm:mb-8">
       {statCards.map((stat, index) => {
         const Icon = stat.icon;
         return (
