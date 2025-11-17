@@ -418,66 +418,53 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
             </div>
             
             <!-- Horizontal Scrolling Services Cards -->
-            <div id="cards-container-${location.latitude}-${location.longitude}" class="cards-container" style="
-              display: flex;
-              gap: 10px;
-              overflow-x: scroll;
-              overflow-y: hidden;
-              padding: 4px 0 12px 0;
-              scrollbar-width: none;
-              -ms-overflow-style: none;
-              scroll-snap-type: x mandatory;
-              -webkit-overflow-scrolling: touch;
-              cursor: grab;
-              touch-action: pan-x;
-            ">
+            <div 
+              id="cards-container-${location.latitude}-${location.longitude}" 
+              class="cards-container" 
+              style="
+                display: flex;
+                gap: 10px;
+                overflow-x: scroll;
+                overflow-y: hidden;
+                padding: 4px 0 12px 0;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+                scroll-snap-type: x mandatory;
+                -webkit-overflow-scrolling: touch;
+                cursor: grab;
+                touch-action: pan-x;
+              "
+              onmousedown="
+                if (event.target.tagName === 'BUTTON') return;
+                this.isDragging = false;
+                this.startX = event.pageX - this.offsetLeft;
+                this.scrollLeftStart = this.scrollLeft;
+                this.style.cursor = 'grabbing';
+              "
+              onmouseleave="
+                this.isDragging = false;
+                this.style.cursor = 'grab';
+              "
+              onmouseup="
+                this.isDragging = false;
+                this.style.cursor = 'grab';
+              "
+              onmousemove="
+                if (this.isDragging === false && event.buttons === 1) {
+                  this.isDragging = true;
+                }
+                if (!this.isDragging) return;
+                event.preventDefault();
+                const x = event.pageX - this.offsetLeft;
+                const walk = (x - this.startX) * 2;
+                this.scrollLeft = this.scrollLeftStart - walk;
+              "
+            >
             <style>
               .cards-container::-webkit-scrollbar {
                 display: none;
               }
-              .cards-container:active {
-                cursor: grabbing;
-              }
             </style>
-            <script>
-              (function() {
-                const container = document.getElementById('cards-container-${location.latitude}-${location.longitude}');
-                if (!container) return;
-                
-                let isDown = false;
-                let startX;
-                let scrollLeft;
-                
-                container.addEventListener('mousedown', (e) => {
-                  // Don't interfere with button clicks
-                  if (e.target.tagName === 'BUTTON') return;
-                  
-                  isDown = true;
-                  container.style.cursor = 'grabbing';
-                  startX = e.pageX - container.offsetLeft;
-                  scrollLeft = container.scrollLeft;
-                  e.preventDefault();
-                });
-                
-                container.addEventListener('mouseleave', () => {
-                  isDown = false;
-                  container.style.cursor = 'grab';
-                });
-                
-                container.addEventListener('mouseup', () => {
-                  isDown = false;
-                  container.style.cursor = 'grab';
-                });
-                
-                container.addEventListener('mousemove', (e) => {
-                  if (!isDown) return;
-                  e.preventDefault();
-                  const x = e.pageX - container.offsetLeft;
-                  const walk = (x - startX) * 2; // Scroll speed
-                  container.scrollLeft = scrollLeft - walk;
-                });
-              })();
-            </script>
               ${location.services.map((service, index) => {
                 const rating = service.average_rating || 0;
                 const reviewCount = service.reviews_count || 0;
