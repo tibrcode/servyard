@@ -495,12 +495,13 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   return (
     <Card>
       <CardHeader>
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-          <div className="flex-1 space-y-2">
-            <CardTitle className="flex items-center gap-2">
-              <MapPin className="w-5 h-5" />
-              {t.title}
-            </CardTitle>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="flex items-center gap-2">
+              <MapPin className="w-5 h-5 text-primary" />
+              <CardTitle className="text-xl sm:text-2xl">{t.title}</CardTitle>
+            </div>
+            <CardDescription className="hidden sm:block">•</CardDescription>
             <CardDescription>{t.description}</CardDescription>
           </div>
           
@@ -509,7 +510,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
               onClick={handleGetCurrentLocation}
               variant="outline"
               size="sm"
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto shrink-0"
             >
               <Navigation className="w-4 h-4 mr-2" />
               {t.getCurrentLocation}
