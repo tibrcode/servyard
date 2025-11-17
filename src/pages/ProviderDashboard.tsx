@@ -4,7 +4,6 @@ import { Footer } from "@/components/layout/Footer";
 import { ProviderLogo } from "@/components/provider/ProviderLogo";
 import { StatsOverview } from "@/components/provider/StatsOverview";
 import { ServiceManagement } from "@/components/provider/ServiceManagement";
-import { AvailabilityManagement } from "@/components/provider/AvailabilityManagement";
 import { OffersManagement } from "@/components/provider/OffersManagement";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -356,12 +355,11 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
         {/* Dashboard Tabs - With proper spacing from content */}
         <div className="space-y-4">
           <Tabs defaultValue="services" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-7 mb-6">
+            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6 mb-6">
               <TabsTrigger value="services">{t.provider.services}</TabsTrigger>
               <TabsTrigger value="appointments">{t.provider.pendingBookings}</TabsTrigger>
               <TabsTrigger value="bookings">{t.provider.bookings}</TabsTrigger>
               <TabsTrigger value="offers">{t.provider.offers}</TabsTrigger>
-              <TabsTrigger value="availability">{t.provider.availability}</TabsTrigger>
               <TabsTrigger value="share">{t.provider.shareProfile}</TabsTrigger>
               <TabsTrigger value="settings">
                 <Bell className="w-3 h-3 sm:w-4 sm:h-4 mr-2 flex-shrink-0" />
@@ -400,14 +398,6 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
             <TabsContent value="offers">
               <OffersManagement
                 currentLanguage={currentLanguage}
-              />
-            </TabsContent>
-
-            {/* Availability Tab */}
-            <TabsContent value="availability">
-              <AvailabilityManagement
-                currentLanguage={currentLanguage}
-                services={services}
               />
             </TabsContent>
 
