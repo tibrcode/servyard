@@ -331,7 +331,15 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
           .reduce((sum, s) => sum + (s.reviews_count || 0), 0);
         
         content = `
-          <div style="
+          <style>
+            @media (max-width: 1024px) {
+              .info-window-main {
+                width: 85vw !important;
+                max-width: 85vw !important;
+              }
+            }
+          </style>
+          <div class="info-window-main" style="
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
             width: calc(100vw - 400px);
             max-width: 1000px;
@@ -342,15 +350,6 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
             box-sizing: border-box;
             position: relative;
           ">
-            <style>
-              @media (max-width: 1024px) {
-                .info-window-container {
-                  width: 85vw !important;
-                  max-width: 85vw !important;
-                }
-              }
-            </style>
-            <div class="info-window-container" style="width: 100%;">
             <!-- Close Button -->
             <button onclick="document.querySelector('.gm-style-iw').parentElement.style.display='none';" style="
               position: absolute;
@@ -618,7 +617,6 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                 </div>
               `;
               }).join('')}
-            </div>
             </div>
           </div>
         `;
