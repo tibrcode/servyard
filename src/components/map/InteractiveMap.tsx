@@ -471,7 +471,6 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                 const isTopRated = rating >= 4.5;
                 
                 return `
-                                return `
                 <div class="service-card" style="
                   min-width: 200px;
                   max-width: 200px;
@@ -491,7 +490,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                   touch-action: pan-x;
                 " 
                 onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(0,0,0,0.2)';"
-                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 20px rgba(0,0,0,0.15)';">`
+                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 20px rgba(0,0,0,0.15)';">
                   
                   ${isTopRated ? `
                     <div style="
