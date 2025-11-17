@@ -292,25 +292,23 @@ export function ServiceBooking({
                   </Button>
                 )}
               </div>
-              <div className="w-full overflow-x-auto flex justify-center">
-                <div className="flex-shrink-0">
-                  <Calendar
-                    mode="single"
-                    selected={selectedDate}
-                    onSelect={handleDateSelect}
-                    disabled={(date) => {
-                      const today = new Date();
-                      today.setHours(0, 0, 0, 0);
-                      const dateString = formatDate(date);
-                      return (
-                        date < today ||
-                        !isDateBookable(dateString, bookingSettings.advance_booking_days)
-                      );
-                    }}
-                    locale={dateLocale}
-                    className="rounded-md border w-full"
-                  />
-                </div>
+              <div className="w-full flex justify-center">
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={handleDateSelect}
+                  disabled={(date) => {
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    const dateString = formatDate(date);
+                    return (
+                      date < today ||
+                      !isDateBookable(dateString, bookingSettings.advance_booking_days)
+                    );
+                  }}
+                  locale={dateLocale}
+                  className="rounded-md border max-w-full"
+                />
               </div>
             </div>
           )}
