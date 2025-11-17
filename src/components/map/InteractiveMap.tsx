@@ -511,15 +511,6 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                       gap: 4px;
                       margin-bottom: 10px;
                       pointer-events: none;
-                    ">`
-                  
-                  <!-- Rating & Reviews -->
-                  ${rating > 0 ? `
-                    <div style="
-                      display: flex;
-                      align-items: center;
-                      gap: 4px;
-                      margin-bottom: 10px;
                     ">
                       <div style="
                         color: ${colors.star};
