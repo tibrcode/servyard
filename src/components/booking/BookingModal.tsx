@@ -184,22 +184,13 @@ export const BookingModal = ({ service, provider, isOpen, onClose, currentLangua
 
     return (
       <div 
-        className="fixed inset-0 z-30 flex items-center justify-center p-4" 
+        className="fixed top-16 left-0 right-0 bottom-0 lg:left-64 z-30 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" 
         dir={isRTL ? 'rtl' : 'ltr'}
-        style={{ 
-          top: 'var(--header-height, 64px)',
-          left: 'var(--sidebar-width, 0px)',
-          width: 'calc(100vw - var(--sidebar-width, 0px))',
-          height: 'calc(100vh - var(--header-height, 64px))'
-        }}
         onClick={onClose}
       >
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
-        
         {/* Modal Content */}
         <div 
-          className="relative z-50 w-full max-w-2xl lg:max-w-3xl max-h-[85vh] bg-card rounded-lg shadow-2xl overflow-hidden flex flex-col border border-border"
+          className="relative w-full max-w-2xl lg:max-w-3xl max-h-[85vh] bg-card rounded-lg shadow-2xl overflow-hidden flex flex-col border border-border"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
