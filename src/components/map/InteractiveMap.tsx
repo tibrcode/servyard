@@ -246,10 +246,48 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   }, [apiLoaded, markers]);
 
   // إضافة علامة محسّنة مع معلومات الخدمات
-  const addMarker = (location: Location, label?: string, draggable = false) => {
+  const addMarker = (location: Location, label?: string, draggable = false, isCurrentLocation = false) => {
     if (!mapInstanceRef.current) return;
 
     const isRTL = currentLanguage === 'ar';
+
+    // إذا كان الموقع الحالي، استخدم أيقونة مخصصة نابضة
+    let markerIcon = undefined;
+    if (isCurrentLocation) {
+      // إنشاء SVG لدائرة نابضة زرقاء مع موجات
+      const pulsingDotSVG = `
+        <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <style>
+              @keyframes pulse {
+                0% { opacity: 1; transform: scale(0.3); }
+                100% { opacity: 0; transform: scale(1); }
+              }
+              .pulse-ring {
+                animation: pulse 2s ease-out infinite;
+                transform-origin: center;
+              }
+            </style>
+          </defs>
+          <!-- Pulsing rings -->
+          <circle class="pulse-ring" cx="20" cy="20" r="15" fill="none" stroke="#2563eb" stroke-width="2" opacity="0"/>
+          <circle class="pulse-ring" cx="20" cy="20" r="15" fill="none" stroke="#2563eb" stroke-width="2" opacity="0" style="animation-delay: 0.5s"/>
+          <circle class="pulse-ring" cx="20" cy="20" r="15" fill="none" stroke="#2563eb" stroke-width="2" opacity="0" style="animation-delay: 1s"/>
+          <!-- Outer glow -->
+          <circle cx="20" cy="20" r="10" fill="#3b82f6" opacity="0.3"/>
+          <!-- Main dot -->
+          <circle cx="20" cy="20" r="6" fill="#2563eb"/>
+          <!-- Center highlight -->
+          <circle cx="20" cy="20" r="3" fill="#60a5fa"/>
+        </svg>
+      `;
+      
+      markerIcon = {
+        url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(pulsingDotSVG),
+        scaledSize: new google.maps.Size(40, 40),
+        anchor: new google.maps.Point(20, 20)
+      };
+    }
 
     // استخدام Marker العادي (AdvancedMarker يحتاج Map ID من Google Console)
     const marker = new google.maps.Marker({
@@ -257,7 +295,8 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
       map: mapInstanceRef.current,
       title: label || `${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)}`,
       draggable: draggable,
-      animation: google.maps.Animation.DROP
+      animation: google.maps.Animation.DROP,
+      icon: markerIcon
     });
 
     // إذا كانت العلامة قابلة للسحب
@@ -696,7 +735,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
         }
         
         // إضافة علامة الموقع الحالي (بدون حذف علامات الخدمات)
-        addMarker(location, t.getCurrentLocation, true);
+        addMarker(location, t.getCurrentLocation, true, true);
         
         if (onLocationSelect) {
           onLocationSelect(location);
