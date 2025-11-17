@@ -867,166 +867,169 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                 const CategoryIcon = category?.icon_name ? iconMap[category.icon_name] || Users : Users;
 
                 return (
-                  <Card
+                  <div
                     key={service.id}
-                    className="w-full transition-all duration-200 overflow-hidden p-0 m-0 border border-primary/20 hover:border-primary/40 hover:shadow-lg rounded-xl"
+                    className="relative transition-all duration-300"
+                    style={{
+                      background: 'rgba(36, 40, 48, 0.92)',
+                      backdropFilter: 'blur(12px)',
+                      WebkitBackdropFilter: 'blur(12px)',
+                      borderRadius: '16px',
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      boxShadow: '0 6px 20px rgba(0,0,0,0.15)',
+                      overflow: 'hidden'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow = '0 8px 25px rgba(0,0,0,0.2)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.15)';
+                    }}
                   >
-                    {/* Compact Header - Always Visible (also acts as closed card body on mobile) */}
+                    {/* TOP Badge */}
+                    {serviceRatings[service.id]?.avg >= 4.5 && (
+                      <div 
+                        style={{
+                          position: 'absolute',
+                          top: '8px',
+                          [isRTL ? 'left' : 'right']: '8px',
+                          background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                          color: 'white',
+                          fontSize: '9px',
+                          fontWeight: '700',
+                          padding: '3px 7px',
+                          borderRadius: '10px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '2px',
+                          boxShadow: '0 2px 8px rgba(16, 185, 129, 0.3)',
+                          zIndex: 10
+                        }}
+                      >
+                        <span>⭐</span>
+                        <span>{isRTL ? 'ممتاز' : 'TOP'}</span>
+                      </div>
+                    )}
+                    
+                    {/* Compact Header - Always Visible */}
                     <div
-                      className="flex flex-col px-3 pt-1.5 pb-0 sm:pt-2 sm:pb-0 cursor-pointer hover:bg-muted/50 transition-colors gap-0.5"
+                      className="flex flex-col p-3 cursor-pointer"
                       onClick={() => setExpandedServiceId(isExpanded ? null : service.id)}
+                      style={{ color: 'white' }}
                     >
-                      {/* Row 1: Category icon + Service name */}
-                      <div className="flex items-center gap-2">
-                        <CategoryIcon className="h-8 w-8 flex-shrink-0 text-primary" />
-                        <h3 className="font-bold text-base sm:text-lg leading-snug m-0 p-0 truncate line-clamp-2">
-                          {service.name}
-                        </h3>
+                      {/* Service Name */}
+                      <div 
+                        style={{
+                          fontSize: '13px',
+                          fontWeight: '700',
+                          marginBottom: '10px',
+                          lineHeight: '1.4',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          paddingRight: serviceRatings[service.id]?.avg >= 4.5 ? '50px' : '0'
+                        }}
+                      >
+                        {service.name}
                       </div>
-
-                      {/* Row 2: Provider name + Rating stars */}
-                      <div className="flex items-center justify-between mt-0.5 gap-2">
-                        <p className="text-xs sm:text-sm text-muted-foreground leading-snug m-0 p-0 truncate">
-                          {provider?.full_name || t.ui.noData}
-                        </p>
-                        
-                        {/* Rating stars on the right */}
-                        <div className="flex items-center gap-0.5 flex-shrink-0" style={{ lineHeight: 1 }}>
-                          {[1, 2, 3, 4, 5].map((star) => {
-                            const rating = serviceRatings[service.id]?.avg || 0;
-                            const isFilled = star <= Math.round(rating);
-                            return (
-                              <Star
-                                key={star}
-                                className={`h-3 w-3 ${
-                                  isFilled
-                                    ? 'fill-yellow-400 text-yellow-400'
-                                    : 'fill-muted text-muted-foreground/30'
-                                }`}
-                              />
-                            );
-                          })}
-                          {serviceRatings[service.id] && (
-                            <span className="text-xs text-muted-foreground ml-1">
-                              ({serviceRatings[service.id].count})
-                            </span>
-                          )}
+                      
+                      {/* Rating & Reviews */}
+                      {serviceRatings[service.id]?.avg > 0 ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '10px' }}>
+                          <div style={{
+                            color: '#fbbf24',
+                            fontSize: '12px',
+                            letterSpacing: '0.5px',
+                            lineHeight: 1
+                          }}>
+                            {[1, 2, 3, 4, 5].map((star) => {
+                              const rating = serviceRatings[service.id]?.avg || 0;
+                              const fullStars = Math.floor(rating);
+                              const hasHalfStar = rating % 1 >= 0.5;
+                              if (star <= fullStars) return '★';
+                              if (star === fullStars + 1 && hasHalfStar) return '⯨';
+                              return '☆';
+                            }).join('')}
+                          </div>
+                          <span style={{ fontSize: '12px', fontWeight: '600', color: 'white' }}>
+                            {serviceRatings[service.id].avg.toFixed(1)}
+                          </span>
+                          <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.6)' }}>
+                            ({serviceRatings[service.id].count})
+                          </span>
                         </div>
-                      </div>
-
-                      {/* Row 3: Price + arrow */}
-                      <div className="flex items-center justify-between w-full mt-0.5" style={{ lineHeight: 1 }}>
-                        {/* Empty left side */}
-                        <div></div>
-
-                        {/* Price + arrow right */}
-                        <div className="flex items-center gap-1 flex-shrink-0">
-                          {service.approximate_price && (
-                            <div className="text-sm font-semibold text-primary whitespace-nowrap">
-                              {provider?.currency_code} {service.approximate_price}
-                            </div>
-                          )}
-                          <ChevronDown
-                            className={`h-4 w-4 text-muted-foreground transition-transform duration-200 flex-shrink-0 ${
-                              isExpanded ? 'rotate-180' : ''
-                            }`}
-                          />
+                      ) : (
+                        <div style={{
+                          fontSize: '10px',
+                          color: 'rgba(255,255,255,0.6)',
+                          marginBottom: '10px',
+                          height: '16px'
+                        }}>
+                          ⭐ {isRTL ? 'لا توجد تقييمات' : 'No reviews'}
                         </div>
+                      )}
+                      
+                      {/* Price + Expand Arrow */}
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <div style={{ fontSize: '18px', color: '#f59e0b', fontWeight: '700' }}>
+                          {service.approximate_price 
+                            ? `${service.approximate_price} ${provider?.currency_code || 'AED'}`
+                            : service.price_range || (isRTL ? 'السعر عند الطلب' : 'Price on request')
+                          }
+                        </div>
+                        <ChevronDown
+                          className={`h-5 w-5 transition-transform duration-200 ${
+                            isExpanded ? 'rotate-180' : ''
+                          }`}
+                          style={{ color: 'rgba(255,255,255,0.6)' }}
+                        />
                       </div>
                     </div>
 
-                    {/* Expanded Content - Shown on Click (separate body with its own padding) */}
+                    {/* Expanded Content */}
                     {isExpanded && (
-                      <CardContent className="pt-2 px-3 pb-3 border border-primary/20 border-t-0 rounded-b-xl">
-                        <div className="space-y-2">
+                      <div 
+                        className="border-t px-3 pb-3 pt-2 animate-in slide-in-from-top-2 duration-200"
+                        style={{ 
+                          borderColor: 'rgba(255,255,255,0.1)',
+                          color: 'white'
+                        }}
+                      >
+                        <div className="space-y-2" style={{ color: 'white' }}>
                           {/* Description */}
                           {service.description && (
-                            <p className="text-foreground text-sm leading-relaxed m-0">{service.description}</p>
+                            <p style={{ fontSize: '14px', lineHeight: '1.6', margin: 0, color: 'rgba(255,255,255,0.9)' }}>
+                              {service.description}
+                            </p>
                           )}
+
+                          {/* Provider */}
+                          <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)' }}>
+                            <span style={{ fontWeight: '600', color: '#f59e0b' }}>
+                              {isRTL ? 'المزود:' : 'Provider:'}
+                            </span> {provider?.full_name || t.ui.noData}
+                          </p>
 
                           {/* Duration */}
                           {service.duration_minutes && (
-                            <p className="text-sm leading-relaxed m-0">
-                              <span className="text-primary font-semibold">Service Duration:</span>{' '}
-                              <span className="text-foreground">{service.duration_minutes} minutes</span>
+                            <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)' }}>
+                              <span style={{ fontWeight: '600', color: '#f59e0b' }}>
+                                {isRTL ? 'المدة:' : 'Duration:'}
+                              </span> {service.duration_minutes} {isRTL ? 'دقيقة' : 'minutes'}
                             </p>
                           )}
-
-                          {/* Service Rating with 5 stars */}
-                          <div className="flex items-center gap-2">
-                            <span className="text-primary font-semibold text-sm">Servis Rating:</span>
-                            <div className="flex items-center gap-0.5">
-                              {[1, 2, 3, 4, 5].map((star) => {
-                                const rating = serviceRatings[service.id]?.avg || 0;
-                                const isFilled = star <= Math.round(rating);
-                                return (
-                                  <Star
-                                    key={star}
-                                    className={`h-4 w-4 ${
-                                      isFilled 
-                                        ? 'fill-yellow-400 text-yellow-400' 
-                                        : 'fill-muted text-muted-foreground/30'
-                                    }`}
-                                  />
-                                );
-                              })}
-                            </div>
-                            {serviceRatings[service.id] ? (
-                              <span className="text-foreground text-sm">
-                                {serviceRatings[service.id].avg.toFixed(1)} ({serviceRatings[service.id].count})
-                              </span>
-                            ) : (
-                              <span className="text-muted-foreground text-sm">{t.booking.noRatingYet}</span>
-                            )}
-                          </div>
-
-                          {/* Client Rating with 5 stars */}
-                          <div className="flex items-center gap-2">
-                            <span className="text-primary font-semibold text-sm">Client Rating:</span>
-                            <div className="flex items-center gap-0.5">
-                              {[1, 2, 3, 4, 5].map((star) => {
-                                const rating = provider && providerRatings[provider.id] ? providerRatings[provider.id].avg : 0;
-                                const isFilled = star <= Math.round(rating);
-                                return (
-                                  <Star
-                                    key={star}
-                                    className={`h-4 w-4 ${
-                                      isFilled 
-                                        ? 'fill-yellow-400 text-yellow-400' 
-                                        : 'fill-muted text-muted-foreground/30'
-                                    }`}
-                                  />
-                                );
-                              })}
-                            </div>
-                            {provider && providerRatings[provider.id] ? (
-                              <span className="text-foreground text-sm">
-                                {providerRatings[provider.id].avg.toFixed(1)} ({providerRatings[provider.id].count})
-                              </span>
-                            ) : (
-                              <span className="text-muted-foreground text-sm">{t.booking.noRatingYet}</span>
-                            )}
-                          </div>
 
                           {/* City */}
                           {provider?.city && (
-                            <p className="text-sm leading-relaxed m-0">
-                              <span className="text-primary font-semibold">City:</span>{' '}
-                              <span className="text-foreground">{provider.city}</span>
+                            <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)' }}>
+                              <span style={{ fontWeight: '600', color: '#f59e0b' }}>
+                                {isRTL ? 'المدينة:' : 'City:'}
+                              </span> {provider.city}
                             </p>
-                          )}
-
-                          {/* Distance if available */}
-                          {(service as any).distance !== undefined && (
-                            <div className="flex items-center gap-1.5">
-                              <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
-                              <span className="text-primary font-semibold text-base">
-                                {formatDistance((service as any).distance, currentLanguage === 'ar' ? 'ar' : 'en')}
-                              </span>
-                              <span className="text-muted-foreground text-sm">
-                                {isRTL ? 'من موقعك' : 'from your location'}
-                              </span>
-                            </div>
                           )}
 
                           {/* Buttons */}
@@ -1034,6 +1037,10 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                             {service.booking_enabled && (
                               <Button
                                 className="w-full"
+                                style={{
+                                  background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                                  border: 'none'
+                                }}
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleServiceClick(service);
@@ -1043,24 +1050,43 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                 {isRTL ? 'حجز موعد' : 'Book Appointment'}
                               </Button>
                             )}
-                            <Button
-                              variant="outline"
-                              className="w-full"
+                            <button
+                              style={{
+                                width: '100%',
+                                padding: '8px 16px',
+                                borderRadius: '8px',
+                                border: '1px solid rgba(255,255,255,0.2)',
+                                background: 'transparent',
+                                color: 'white',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '8px',
+                                fontSize: '14px',
+                                fontWeight: '500'
+                              }}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 if (provider?.id) {
                                   window.location.href = `/provider/${provider.id}`;
                                 }
                               }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.background = 'transparent';
+                              }}
                             >
-                              <ExternalLink className="h-4 w-4 mr-2" />
+                              <ExternalLink className="h-4 w-4" />
                               {isRTL ? 'عرض المزود' : 'View Provider'}
-                            </Button>
+                            </button>
                           </div>
                         </div>
-                      </CardContent>
+                      </div>
                     )}
-                  </Card>
+                  </div>
                 );
               })}
             </div>
