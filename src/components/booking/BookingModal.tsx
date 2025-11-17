@@ -195,11 +195,11 @@ export const BookingModal = ({ service, provider, isOpen, onClose, currentLangua
         onClick={onClose}
       >
         {/* Overlay */}
-        <div className="absolute inset-0 bg-black/50" />
+        <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
         
         {/* Modal Content */}
         <div 
-          className="relative z-50 w-full max-w-2xl lg:max-w-3xl max-h-[85vh] bg-background rounded-lg shadow-xl overflow-hidden flex flex-col"
+          className="relative z-50 w-full max-w-2xl lg:max-w-3xl max-h-[85vh] bg-card rounded-lg shadow-2xl overflow-hidden flex flex-col border border-border"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
