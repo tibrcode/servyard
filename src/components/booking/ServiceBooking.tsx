@@ -274,13 +274,6 @@ export function ServiceBooking({
   return (
     <div className="w-full" dir={isRTL ? 'rtl' : 'ltr'}>
       <Card className="w-full border-0 bg-transparent shadow-none">
-        <CardHeader className="px-4 sm:px-6 py-4 sm:py-6">
-          <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-            <CalendarIcon className="h-5 w-5 flex-shrink-0" />
-            <span className="truncate">{t.title}</span>
-          </CardTitle>
-          <CardDescription className="text-xs sm:text-sm mt-2">{t.subtitle}</CardDescription>
-        </CardHeader>
         <CardContent className="px-4 sm:px-6 py-4 sm:py-6 space-y-6">
           {/* Step 1: Select Date */}
           {step === 1 && (
