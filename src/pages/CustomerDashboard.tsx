@@ -286,7 +286,7 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
               <Button
                 variant="outline"
                 onClick={() => navigate('/services')}
-                className="flex items-center gap-2 whitespace-normal break-words leading-tight min-w-0 flex-1 sm:flex-initial"
+                className="flex items-center gap-2 whitespace-normal break-words leading-tight min-w-0 flex-1 sm:flex-initial bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
               >
                 <Calendar className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
                 <span className="break-words text-xs sm:text-sm">{t.userInterface.browseServices}</span>
@@ -294,7 +294,7 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
               <Button
                 variant="outline"
                 onClick={() => navigate('/edit-profile')}
-                className="flex items-center gap-2 whitespace-normal break-words leading-tight min-w-0 flex-1 sm:flex-initial"
+                className="flex items-center gap-2 whitespace-normal break-words leading-tight min-w-0 flex-1 sm:flex-initial bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
               >
                 <Settings className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
                 <span className="break-words text-xs sm:text-sm">{t.userInterface.editProfile}</span>
@@ -302,7 +302,7 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
               <Button
                 variant="outline"
                 onClick={handleLogout}
-                className="flex items-center gap-2 whitespace-normal break-words leading-tight min-w-0 flex-1 sm:flex-initial"
+                className="flex items-center gap-2 whitespace-normal break-words leading-tight min-w-0 flex-1 sm:flex-initial bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
               >
                 <Settings className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
                 <span className="break-words text-xs sm:text-sm">{t.userInterface.logout}</span>

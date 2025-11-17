@@ -330,7 +330,7 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
                   variant="outline"
                   size="sm"
                   onClick={() => navigate('/edit-profile')}
-                  className="flex items-center gap-2 whitespace-normal break-words leading-tight min-w-0 flex-1 sm:flex-initial"
+                  className="flex items-center gap-2 whitespace-normal break-words leading-tight min-w-0 flex-1 sm:flex-initial bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
                 >
                   <Settings className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
                   <span className="break-words text-xs sm:text-sm">{t.userInterface.editProfile}</span>
@@ -339,7 +339,7 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
                   variant="outline"
                   size="sm"
                   onClick={handleLogout}
-                  className="flex items-center gap-2 whitespace-normal break-words leading-tight min-w-0 flex-1 sm:flex-initial"
+                  className="flex items-center gap-2 whitespace-normal break-words leading-tight min-w-0 flex-1 sm:flex-initial bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
                 >
                   <LogOut className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
                   <span className="break-words text-xs sm:text-sm">{t.userInterface.logout}</span>
