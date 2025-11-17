@@ -270,44 +270,42 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
       <main className="flex-1 container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex flex-col gap-4 mb-8">
-          <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-start justify-between gap-4 w-full max-w-full">
-            <div className="min-w-0 flex-1 w-full max-w-full">
-              <h1 className="dashboard-title text-xl sm:text-2xl lg:text-3xl font-bold text-primary leading-snug max-w-full">
-                {t.customer.welcomeBack}
-              </h1>
-              <p className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground mt-1">
-                {profile?.full_name || t.ui.noData}
-              </p>
-              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed break-words hyphens-auto mt-2 whitespace-normal overflow-wrap-anywhere word-break-break-word w-full max-w-full">
-                {t.customer.manageBookings}
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2 w-full sm:w-auto">
-              <Button
-                variant="outline"
-                onClick={() => navigate('/services')}
-                className="flex items-center gap-2 whitespace-normal break-words leading-tight min-w-0 flex-1 sm:flex-initial bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
-              >
-                <Calendar className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-                <span className="break-words text-xs sm:text-sm">{t.userInterface.browseServices}</span>
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => navigate('/edit-profile')}
-                className="flex items-center gap-2 whitespace-normal break-words leading-tight min-w-0 flex-1 sm:flex-initial bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
-              >
-                <Settings className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-                <span className="break-words text-xs sm:text-sm">{t.userInterface.editProfile}</span>
-              </Button>
-              <Button
-                variant="outline"
-                onClick={handleLogout}
-                className="flex items-center gap-2 whitespace-normal break-words leading-tight min-w-0 flex-1 sm:flex-initial bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
-              >
-                <Settings className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-                <span className="break-words text-xs sm:text-sm">{t.userInterface.logout}</span>
-              </Button>
-            </div>
+          <div className="min-w-0 w-full max-w-full">
+            <h1 className="dashboard-title text-xl sm:text-2xl lg:text-3xl font-bold text-primary leading-snug max-w-full">
+              {t.customer.welcomeBack}
+            </h1>
+            <p className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground mt-1">
+              {profile?.full_name || t.ui.noData}
+            </p>
+            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed break-words hyphens-auto mt-2 whitespace-normal overflow-wrap-anywhere word-break-break-word w-full max-w-full">
+              {t.customer.manageBookings}
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2 w-full">
+            <Button
+              variant="outline"
+              onClick={() => navigate('/services')}
+              className="flex items-center gap-2 whitespace-normal break-words leading-tight min-w-0 flex-1 sm:flex-initial bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
+            >
+              <Calendar className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+              <span className="break-words text-xs sm:text-sm">{t.userInterface.browseServices}</span>
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => navigate('/edit-profile')}
+              className="flex items-center gap-2 whitespace-normal break-words leading-tight min-w-0 flex-1 sm:flex-initial bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
+            >
+              <Settings className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+              <span className="break-words text-xs sm:text-sm">{t.userInterface.editProfile}</span>
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handleLogout}
+              className="flex items-center gap-2 whitespace-normal break-words leading-tight min-w-0 flex-1 sm:flex-initial bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
+            >
+              <Settings className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+              <span className="break-words text-xs sm:text-sm">{t.userInterface.logout}</span>
+            </Button>
           </div>
         </div>
 

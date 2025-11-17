@@ -294,57 +294,56 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
       <main className="flex-1 container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex flex-col gap-4 mb-8">
-          {/* Two-column responsive header: left (logo+texts) grows, right (toggles+buttons) auto */}
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] items-start gap-4 w-full max-w-full">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 min-w-0 flex-1 w-full max-w-full">
-              <ProviderLogo
-                providerName={providerProfile.full_name}
-                size="lg"
+          {/* Logo and title section */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 min-w-0 w-full max-w-full">
+            <ProviderLogo
+              providerName={providerProfile.full_name}
+              size="lg"
+            />
+            <div className="min-w-0 flex-1 w-full max-w-full">
+              <h1 className="dashboard-title text-xl sm:text-2xl lg:text-3xl font-bold leading-snug max-w-full">{t.provider.dashboard}</h1>
+              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mt-1 w-full max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
+                {t.userInterface.welcome},{" "}
+                <span className="provider-name align-baseline">{providerProfile.full_name}</span>
+              </p>
+            </div>
+          </div>
+
+          {/* Online status and buttons row */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full">
+            <div className="flex items-center gap-3">
+              <Switch
+                checked={providerProfile.is_online || false}
+                onCheckedChange={handleOnlineStatusChange}
+                id="online-status"
               />
-              <div className="min-w-0 flex-1 w-full max-w-full">
-                <h1 className="dashboard-title text-xl sm:text-2xl lg:text-3xl font-bold leading-snug max-w-full">{t.provider.dashboard}</h1>
-                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mt-1 w-full max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
-                  {t.userInterface.welcome},{" "}
-                  <span className="provider-name align-baseline">{providerProfile.full_name}</span>
-                </p>
+              <div className="inline-flex items-center gap-2 rounded-full border bg-secondary/20 px-3 py-1 whitespace-nowrap">
+                <span className={`w-2 h-2 rounded-full ${providerProfile.is_online ? 'bg-green-500' : 'bg-gray-400'}`} />
+                <span className="text-xs sm:text-sm font-medium">
+                  {providerProfile.is_online ? t.userInterface.onlineNow : t.userInterface.offline}
+                </span>
               </div>
             </div>
 
-            <div className="flex flex-col gap-3 w-full lg:w-auto lg:justify-self-end min-w-0">
-              <div className="flex items-center gap-3 w-full lg:w-auto">
-                <Switch
-                  checked={providerProfile.is_online || false}
-                  onCheckedChange={handleOnlineStatusChange}
-                  id="online-status"
-                />
-                <div className="inline-flex items-center gap-2 rounded-full border bg-secondary/20 px-3 py-1 whitespace-nowrap">
-                  <span className={`w-2 h-2 rounded-full ${providerProfile.is_online ? 'bg-green-500' : 'bg-gray-400'}`} />
-                  <span className="text-xs sm:text-sm font-medium">
-                    {providerProfile.is_online ? t.userInterface.onlineNow : t.userInterface.offline}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap gap-2 justify-start lg:justify-end">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => navigate('/edit-profile')}
-                  className="flex items-center gap-2 whitespace-normal break-words leading-tight min-w-0 flex-1 sm:flex-initial bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
-                >
-                  <Settings className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-                  <span className="break-words text-xs sm:text-sm">{t.userInterface.editProfile}</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleLogout}
-                  className="flex items-center gap-2 whitespace-normal break-words leading-tight min-w-0 flex-1 sm:flex-initial bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
-                >
-                  <LogOut className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-                  <span className="break-words text-xs sm:text-sm">{t.userInterface.logout}</span>
-                </Button>
-              </div>
+            <div className="flex flex-wrap gap-2 flex-1 sm:justify-end">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate('/edit-profile')}
+                className="flex items-center gap-2 whitespace-normal break-words leading-tight min-w-0 flex-1 sm:flex-initial bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
+              >
+                <Settings className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                <span className="break-words text-xs sm:text-sm">{t.userInterface.editProfile}</span>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleLogout}
+                className="flex items-center gap-2 whitespace-normal break-words leading-tight min-w-0 flex-1 sm:flex-initial bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
+              >
+                <LogOut className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                <span className="break-words text-xs sm:text-sm">{t.userInterface.logout}</span>
+              </Button>
             </div>
           </div>
         </div>
