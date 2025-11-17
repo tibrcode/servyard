@@ -356,29 +356,6 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
             box-sizing: border-box;
             position: relative;
           ">
-            <!-- Close Button -->
-            <button onclick="document.querySelector('.gm-style-iw').parentElement.style.display='none';" style="
-              position: absolute;
-              top: -8px;
-              ${isRTL ? 'left: -8px;' : 'right: -8px;'}
-              width: 28px;
-              height: 28px;
-              border-radius: 50%;
-              background: rgba(255, 255, 255, 0.95);
-              border: none;
-              cursor: pointer;
-              box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              font-size: 18px;
-              font-weight: bold;
-              color: #666;
-              z-index: 1000;
-            " onmouseover="this.style.background='rgba(255,255,255,1)'; this.style.color='#000';" onmouseout="this.style.background='rgba(255,255,255,0.95)'; this.style.color='#666';">
-              ×
-            </button>
-            
             <!-- Floating Provider Header -->
             <div style="
               background: ${isDarkMode ? 'rgba(26, 29, 33, 0.92)' : 'rgba(255, 255, 255, 0.92)'};
@@ -389,13 +366,37 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
               margin-bottom: 10px;
               box-shadow: 0 4px 20px rgba(0,0,0,0.2);
               border: 1px solid ${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'};
+              position: relative;
             ">
+              <!-- Close Button Inside Card -->
+              <button onclick="document.querySelector('.gm-style-iw').parentElement.style.display='none';" style="
+                position: absolute;
+                top: 8px;
+                ${isRTL ? 'left: 8px;' : 'right: 8px;'}
+                width: 24px;
+                height: 24px;
+                border-radius: 50%;
+                background: ${isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)'};
+                border: none;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 16px;
+                font-weight: bold;
+                color: ${isDarkMode ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.4)'};
+                transition: all 0.2s ease;
+              " onmouseover="this.style.background='${isDarkMode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)'}'; this.style.color='${isDarkMode ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.7)'}';" onmouseout="this.style.background='${isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)'}'; this.style.color='${isDarkMode ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.4)'}';">
+                ×
+              </button>
+              
               <div style="
                 font-size: 15px; 
                 font-weight: 700; 
                 margin-bottom: 6px;
                 line-height: 1.3;
                 color: ${colors.text};
+                padding-${isRTL ? 'left' : 'right'}: 32px;
               ">
                 ${providerName}
               </div>
