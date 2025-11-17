@@ -25,7 +25,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { auth, db } from "@/integrations/firebase/client";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { doc, getDoc, collection, getDocs, query, where, updateDoc } from "firebase/firestore";
+import { doc, getDoc, collection, getDocs, query, where, updateDoc, onSnapshot } from "firebase/firestore";
 import { useTranslation } from "@/lib/i18n";
 import { toast } from "@/hooks/use-toast";
 import { ShareProfile } from "@/components/provider/ShareProfile";
@@ -134,6 +134,32 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
       if (user) {
         setCurrentUser(user);
         loadProviderData(user);
+        
+        // Setup real-time listener for bookings
+        const bookingsQuery = query(
+          collection(db, 'bookings'),
+          where('provider_id', '==', user.uid)
+        );
+        
+        const unsubscribeBookings = onSnapshot(bookingsQuery, (snapshot) => {
+          const bookingsData = snapshot.docs.map(doc => doc.data());
+          
+          // Count confirmed bookings
+          const confirmedCount = bookingsData.filter(
+            (booking: any) => booking.status === 'confirmed'
+          ).length;
+          setConfirmedBookingsCount(confirmedCount);
+          
+          // Count pending bookings
+          const pendingCount = bookingsData.filter(
+            (booking: any) => booking.status === 'pending'
+          ).length;
+          setPendingBookingsCount(pendingCount);
+        });
+        
+        return () => {
+          unsubscribeBookings();
+        };
       } else {
         setCurrentUser(null);
         setProviderProfile(null);
@@ -195,26 +221,6 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
           ...doc.data()
         })) as Review[];
         setReviews(reviewsData);
-
-        // Load bookings statistics
-        const bookingsQuery = query(
-          collection(db, 'bookings'),
-          where('provider_id', '==', user.uid)
-        );
-        const bookingsSnapshot = await getDocs(bookingsQuery);
-        const bookingsData = bookingsSnapshot.docs.map(doc => doc.data());
-        
-        // Count confirmed bookings (confirmed status only)
-        const confirmedCount = bookingsData.filter(
-          (booking: any) => booking.status === 'confirmed'
-        ).length;
-        setConfirmedBookingsCount(confirmedCount);
-        
-        // Count pending bookings (pending status)
-        const pendingCount = bookingsData.filter(
-          (booking: any) => booking.status === 'pending'
-        ).length;
-        setPendingBookingsCount(pendingCount);
       }
     } catch (error) {
       console.error('Error loading provider data:', error);
