@@ -169,7 +169,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
       center: { lat: defaultCenter.latitude, lng: defaultCenter.longitude },
       zoom: zoom,
       mapTypeControl: true,
-      streetViewControl: true,
+      streetViewControl: false,
       fullscreenControl: true,
       zoomControl: true,
     });
