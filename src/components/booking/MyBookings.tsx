@@ -134,8 +134,27 @@ export function MyBookings({
     setIsLoading(true);
     
     // Subscribe to real-time updates
-    const unsubscribe = subscribeToCustomerBookings(customerId, (data) => {
+    const unsubscribe = subscribeToCustomerBookings(customerId, async (data) => {
       setBookings(data);
+      
+      // Load cancellation hours for each unique service
+      const uniqueServiceIds = [...new Set(data.map(b => b.service_id))];
+      const hoursCache: Record<string, number> = {};
+      
+      await Promise.all(
+        uniqueServiceIds.map(async (serviceId) => {
+          try {
+            const serviceDoc = await getDoc(doc(db, 'services', serviceId));
+            if (serviceDoc.exists()) {
+              hoursCache[serviceId] = serviceDoc.data().cancellation_policy_hours || 24;
+            }
+          } catch (error) {
+            console.error(`Error loading service ${serviceId}:`, error);
+          }
+        })
+      );
+      
+      setServiceCancellationHours(hoursCache);
       setIsLoading(false);
       
       // Load provider contacts for all bookings
