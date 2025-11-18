@@ -70,40 +70,40 @@ export const MainActions = ({
 
           {/* Action Buttons Grid */}
           <div className="animate-luxury-scale">
-            <div className="grid grid-cols-2 gap-4 max-w-2xl mx-auto">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 max-w-4xl mx-auto">
               {/* Button 1: Services */}
               <Button
                 onClick={handleServicesClick}
-                className="aspect-square text-3xl md:text-4xl font-bold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-4 p-6"
+                className="aspect-square text-xl md:text-2xl font-bold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-3 md:gap-4 p-4 md:p-6"
                 style={{
                   boxShadow: '0 4px 15px rgba(var(--primary-rgb, 217, 165, 82), 0.2)'
                 }}
               >
-                <Search className="h-12 w-12 md:h-14 md:w-14" />
+                <Search className="h-10 w-10 md:h-12 md:w-12" />
                 <span className="text-center leading-tight">{t.home.findServices}</span>
               </Button>
 
               {/* Button 2: Map Services */}
               <Button
                 onClick={handleMapClick}
-                className="aspect-square text-3xl md:text-4xl font-bold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-4 p-6"
+                className="aspect-square text-xl md:text-2xl font-bold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-3 md:gap-4 p-4 md:p-6"
                 style={{
                   boxShadow: '0 4px 15px rgba(var(--primary-rgb, 217, 165, 82), 0.2)'
                 }}
               >
-                <Map className="h-12 w-12 md:h-14 md:w-14" />
+                <Map className="h-10 w-10 md:h-12 md:w-12" />
                 <span className="text-center leading-tight">{t.home.servicesOnMap || (isRTL ? 'الخدمات عبر الخريطة' : 'Services on Map')}</span>
               </Button>
 
               {/* Button 3: Login */}
               <Button
                 onClick={handleAuthClick}
-                className="aspect-square text-3xl md:text-4xl font-bold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-4 p-6"
+                className="aspect-square text-xl md:text-2xl font-bold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-3 md:gap-4 p-4 md:p-6"
                 style={{
                   boxShadow: '0 4px 15px rgba(var(--primary-rgb, 217, 165, 82), 0.2)'
                 }}
               >
-                <LogIn className="h-12 w-12 md:h-14 md:w-14" />
+                <LogIn className="h-10 w-10 md:h-12 md:w-12" />
                 <span className="text-center leading-tight">{t.home.login || (isRTL ? 'تسجيل الدخول' : 'Login')}</span>
               </Button>
 
@@ -111,12 +111,12 @@ export const MainActions = ({
               <Button
                 onClick={handleDashboardClick}
                 disabled={loading}
-                className="aspect-square text-3xl md:text-4xl font-bold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-4 p-6 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="aspect-square text-xl md:text-2xl font-bold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-3 md:gap-4 p-4 md:p-6 disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{
                   boxShadow: '0 4px 15px rgba(var(--primary-rgb, 217, 165, 82), 0.2)'
                 }}
               >
-                <LayoutDashboard className="h-12 w-12 md:h-14 md:w-14" />
+                <LayoutDashboard className="h-10 w-10 md:h-12 md:w-12" />
                 <span className="text-center leading-tight">{t.home.dashboard || (isRTL ? 'لوحة التحكم' : 'Dashboard')}</span>
               </Button>
             </div>
