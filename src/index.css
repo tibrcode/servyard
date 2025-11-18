@@ -879,6 +879,72 @@ Base font size: 15px
     border: 1px solid rgba(0, 0, 0, 0.08) !important;
   }
 
+  /* Glass Button - For homepage action buttons */
+  .glass-button,
+  .dark .glass-button,
+  :not(.light) .glass-button {
+    background: linear-gradient(
+      145deg,
+      rgba(28, 28, 30, 0.8),
+      rgba(10, 10, 12, 0.9)
+    ) !important;
+    border: 1px solid rgba(34, 197, 94, 0.3) !important;
+    color: rgb(34, 197, 94) !important;
+    box-shadow: 
+      0 8px 24px rgba(0, 0, 0, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      0 0 20px rgba(34, 197, 94, 0.15) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transform: perspective(1000px) rotateX(1deg);
+    transition: all 0.4s cubic-bezier(.4,0,.2,1);
+  }
+
+  .glass-button:hover,
+  .dark .glass-button:hover,
+  :not(.light) .glass-button:hover {
+    background: linear-gradient(
+      145deg,
+      rgba(34, 197, 94, 0.2),
+      rgba(22, 163, 74, 0.3)
+    ) !important;
+    border: 1px solid rgba(34, 197, 94, 0.5) !important;
+    color: white !important;
+    box-shadow: 
+      0 16px 32px rgba(0, 0, 0, 0.6),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12),
+      0 0 30px rgba(34, 197, 94, 0.3) !important;
+    transform: perspective(1000px) rotateX(0deg) translateY(-4px) scale(1.02);
+  }
+
+  .glass-button:active,
+  .dark .glass-button:active,
+  :not(.light) .glass-button:active {
+    transform: perspective(1000px) translateY(-1px) scale(1.01);
+  }
+
+  /* Light mode glass buttons */
+  .light .glass-button {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid rgba(34, 197, 94, 0.3) !important;
+    color: rgb(34, 197, 94) !important;
+    box-shadow: 
+      0 4px 12px rgba(0, 0, 0, 0.1),
+      0 0 15px rgba(34, 197, 94, 0.1) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .light .glass-button:hover {
+    background: rgba(34, 197, 94, 0.1) !important;
+    border: 1px solid rgba(34, 197, 94, 0.5) !important;
+    color: rgb(22, 163, 74) !important;
+    box-shadow: 
+      0 8px 16px rgba(0, 0, 0, 0.15),
+      0 0 25px rgba(34, 197, 94, 0.2) !important;
+    transform: translateY(-2px);
+  }
+
   /* RTL Support */
   [dir="rtl"] {
     direction: rtl;
