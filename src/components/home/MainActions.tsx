@@ -74,7 +74,7 @@ export const MainActions = ({
               {/* Button 1: Services */}
               <Button
                 onClick={handleServicesClick}
-                className="aspect-square text-2xl md:text-3xl font-bold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-4 p-6"
+                className="aspect-square text-3xl md:text-4xl font-bold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-4 p-6"
                 style={{
                   boxShadow: '0 4px 15px rgba(var(--primary-rgb, 217, 165, 82), 0.2)'
                 }}
@@ -86,7 +86,7 @@ export const MainActions = ({
               {/* Button 2: Map Services */}
               <Button
                 onClick={handleMapClick}
-                className="aspect-square text-2xl md:text-3xl font-bold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-4 p-6"
+                className="aspect-square text-3xl md:text-4xl font-bold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-4 p-6"
                 style={{
                   boxShadow: '0 4px 15px rgba(var(--primary-rgb, 217, 165, 82), 0.2)'
                 }}
@@ -98,7 +98,7 @@ export const MainActions = ({
               {/* Button 3: Login */}
               <Button
                 onClick={handleAuthClick}
-                className="aspect-square text-2xl md:text-3xl font-bold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-4 p-6"
+                className="aspect-square text-3xl md:text-4xl font-bold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-4 p-6"
                 style={{
                   boxShadow: '0 4px 15px rgba(var(--primary-rgb, 217, 165, 82), 0.2)'
                 }}
@@ -111,7 +111,7 @@ export const MainActions = ({
               <Button
                 onClick={handleDashboardClick}
                 disabled={loading}
-                className="aspect-square text-2xl md:text-3xl font-bold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-4 p-6 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="aspect-square text-3xl md:text-4xl font-bold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-4 p-6 disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{
                   boxShadow: '0 4px 15px rgba(var(--primary-rgb, 217, 165, 82), 0.2)'
                 }}
