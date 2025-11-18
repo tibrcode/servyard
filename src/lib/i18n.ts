@@ -795,7 +795,7 @@ export const translations: Record<string, Translation> = {
     },
     home: {
       title: "ServYard\nPremium Service Marketplace",
-      subtitle: "Connect with verified service providers in your area",
+      subtitle: "Connecting service providers with customers worldwide",
       searchPlaceholder: "Search for services...",
       findServices: "Find Services",
       becomeProvider: "Become a Provider",
@@ -1586,7 +1586,7 @@ export const translations: Record<string, Translation> = {
     },
     home: {
       title: "سيرف يارد\nمنصة الخدمات المتميزة",
-      subtitle: "تواصل مع مقدمي الخدمات المعتمدين في منطقتك",
+      subtitle: "ربط مقدمي الخدمات بالعملاء في جميع أنحاء العالم",
       searchPlaceholder: "البحث عن خدمات...",
       findServices: "العثور على الخدمات",
       becomeProvider: "كن مقدم خدمة",
