@@ -71,38 +71,50 @@ export const MainActions = ({
               {/* Button 1: Services */}
               <Button
                 onClick={handleServicesClick}
-                className="glass-button aspect-square text-3xl md:text-4xl font-bold transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-4 md:gap-6 p-6 md:p-8"
+                className="aspect-square font-bold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center p-6 md:p-8"
+                style={{
+                  boxShadow: '0 4px 15px rgba(34, 197, 94, 0.2)'
+                }}
               >
-                <Search className="h-20 w-20 md:h-24 md:w-24" />
-                <span className="text-center leading-tight">{t.home.findServices}</span>
+                <Search style={{ width: '80px', height: '80px' }} className="mb-3" />
+                <span className="text-center leading-tight" style={{ fontSize: '1.5rem' }}>{t.home.findServices}</span>
               </Button>
 
               {/* Button 2: Map Services */}
               <Button
                 onClick={handleMapClick}
-                className="glass-button aspect-square text-3xl md:text-4xl font-bold transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-4 md:gap-6 p-6 md:p-8"
+                className="aspect-square font-bold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center p-6 md:p-8"
+                style={{
+                  boxShadow: '0 4px 15px rgba(34, 197, 94, 0.2)'
+                }}
               >
-                <Map className="h-20 w-20 md:h-24 md:w-24" />
-                <span className="text-center leading-tight">{t.home.servicesOnMap || (isRTL ? 'الخدمات عبر الخريطة' : 'Services on Map')}</span>
+                <Map style={{ width: '80px', height: '80px' }} className="mb-3" />
+                <span className="text-center leading-tight" style={{ fontSize: '1.5rem' }}>{t.home.servicesOnMap || (isRTL ? 'الخدمات عبر الخريطة' : 'Services on Map')}</span>
               </Button>
 
               {/* Button 3: Login */}
               <Button
                 onClick={handleAuthClick}
-                className="glass-button aspect-square text-3xl md:text-4xl font-bold transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-4 md:gap-6 p-6 md:p-8"
+                className="aspect-square font-bold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center p-6 md:p-8"
+                style={{
+                  boxShadow: '0 4px 15px rgba(34, 197, 94, 0.2)'
+                }}
               >
-                <LogIn className="h-20 w-20 md:h-24 md:w-24" />
-                <span className="text-center leading-tight">{t.home.login || (isRTL ? 'تسجيل الدخول' : 'Login')}</span>
+                <LogIn style={{ width: '80px', height: '80px' }} className="mb-3" />
+                <span className="text-center leading-tight" style={{ fontSize: '1.5rem' }}>{t.home.login || (isRTL ? 'تسجيل الدخول' : 'Login')}</span>
               </Button>
 
               {/* Button 4: Dashboard */}
               <Button
                 onClick={handleDashboardClick}
                 disabled={loading}
-                className="glass-button aspect-square text-3xl md:text-4xl font-bold transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-4 md:gap-6 p-6 md:p-8 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="aspect-square font-bold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center p-6 md:p-8 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  boxShadow: '0 4px 15px rgba(34, 197, 94, 0.2)'
+                }}
               >
-                <LayoutDashboard className="h-20 w-20 md:h-24 md:w-24" />
-                <span className="text-center leading-tight">{t.home.dashboard || (isRTL ? 'لوحة التحكم' : 'Dashboard')}</span>
+                <LayoutDashboard style={{ width: '80px', height: '80px' }} className="mb-3" />
+                <span className="text-center leading-tight" style={{ fontSize: '1.5rem' }}>{t.home.dashboard || (isRTL ? 'لوحة التحكم' : 'Dashboard')}</span>
               </Button>
             </div>
           </div>
