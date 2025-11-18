@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Footer } from "@/components/layout/Footer";
-import { SearchHero } from "@/components/home/SearchHero";
+import { MainActions } from "@/components/home/MainActions";
 import { ServiceCategories } from "@/components/home/ServiceCategories";
 import { useToast } from "@/hooks/use-toast";
 
@@ -23,10 +23,9 @@ const Index = ({ currentLanguage, onLanguageChange, onLocationChange }: {
     <div className="min-h-screen flex flex-col">
       {/* Main Content */}
       <main className="flex-1">
-        {/* Hero Section with Search */}
-        <SearchHero 
+        {/* Main Action Buttons */}
+        <MainActions 
           currentLanguage={currentLanguage}
-          onSearch={handleSearch}
           onLocationClick={onLocationChange}
         />
 

@@ -28,6 +28,10 @@ export interface Translation {
     findServices: string;
     becomeProvider: string;
     featuredCategories: string;
+    servicesOnMap?: string;
+    login?: string;
+    myAccount?: string;
+    dashboard?: string;
   };
 
   // Authentication
@@ -796,6 +800,10 @@ export const translations: Record<string, Translation> = {
       findServices: "Find Services",
       becomeProvider: "Become a Provider",
       featuredCategories: "Featured Categories",
+      servicesOnMap: "Services on Map",
+      login: "Login",
+      myAccount: "My Account",
+      dashboard: "Dashboard",
     },
     ui: {
       languageChanged: "Language Changed",
@@ -1583,6 +1591,10 @@ export const translations: Record<string, Translation> = {
       findServices: "العثور على الخدمات",
       becomeProvider: "كن مقدم خدمة",
       featuredCategories: "الفئات المميزة",
+      servicesOnMap: "الخدمات عبر الخريطة",
+      login: "تسجيل الدخول",
+      myAccount: "حسابي",
+      dashboard: "لوحة التحكم",
     },
     ui: {
       languageChanged: "تم تغيير اللغة",
