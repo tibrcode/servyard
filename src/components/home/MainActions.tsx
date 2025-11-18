@@ -71,50 +71,38 @@ export const MainActions = ({
               {/* Button 1: Services */}
               <Button
                 onClick={handleServicesClick}
-                className="aspect-square font-bold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center p-6 md:p-8"
-                style={{
-                  boxShadow: '0 4px 15px rgba(34, 197, 94, 0.2)'
-                }}
+                className="glass-card aspect-square font-medium border border-white/10 hover:border-white/20 transition-all duration-300 rounded-2xl flex flex-col items-center justify-center p-6 md:p-8"
               >
-                <Search style={{ width: '80px', height: '80px' }} className="mb-3" />
-                <span className="text-center leading-tight" style={{ fontSize: '1.5rem' }}>{t.home.findServices}</span>
+                <Search style={{ width: '48px', height: '48px' }} className="mb-2 text-blue-400" />
+                <span className="text-center leading-tight text-white text-base">{t.home.findServices}</span>
               </Button>
 
               {/* Button 2: Map Services */}
               <Button
                 onClick={handleMapClick}
-                className="aspect-square font-bold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center p-6 md:p-8"
-                style={{
-                  boxShadow: '0 4px 15px rgba(34, 197, 94, 0.2)'
-                }}
+                className="glass-card aspect-square font-medium border border-white/10 hover:border-white/20 transition-all duration-300 rounded-2xl flex flex-col items-center justify-center p-6 md:p-8"
               >
-                <Map style={{ width: '80px', height: '80px' }} className="mb-3" />
-                <span className="text-center leading-tight" style={{ fontSize: '1.5rem' }}>{t.home.servicesOnMap || (isRTL ? 'الخدمات عبر الخريطة' : 'Services on Map')}</span>
+                <Map style={{ width: '48px', height: '48px' }} className="mb-2 text-green-400" />
+                <span className="text-center leading-tight text-white text-base">{t.home.servicesOnMap || (isRTL ? 'الخدمات عبر الخريطة' : 'Services on Map')}</span>
               </Button>
 
               {/* Button 3: Login */}
               <Button
                 onClick={handleAuthClick}
-                className="aspect-square font-bold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center p-6 md:p-8"
-                style={{
-                  boxShadow: '0 4px 15px rgba(34, 197, 94, 0.2)'
-                }}
+                className="glass-card aspect-square font-medium border border-white/10 hover:border-white/20 transition-all duration-300 rounded-2xl flex flex-col items-center justify-center p-6 md:p-8"
               >
-                <LogIn style={{ width: '80px', height: '80px' }} className="mb-3" />
-                <span className="text-center leading-tight" style={{ fontSize: '1.5rem' }}>{t.home.login || (isRTL ? 'تسجيل الدخول' : 'Login')}</span>
+                <LogIn style={{ width: '48px', height: '48px' }} className="mb-2 text-purple-400" />
+                <span className="text-center leading-tight text-white text-base">{t.home.login || (isRTL ? 'تسجيل الدخول' : 'Login')}</span>
               </Button>
 
               {/* Button 4: Dashboard */}
               <Button
                 onClick={handleDashboardClick}
                 disabled={loading}
-                className="aspect-square font-bold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center p-6 md:p-8 disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{
-                  boxShadow: '0 4px 15px rgba(34, 197, 94, 0.2)'
-                }}
+                className="glass-card aspect-square font-medium border border-white/10 hover:border-white/20 transition-all duration-300 rounded-2xl flex flex-col items-center justify-center p-6 md:p-8 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <LayoutDashboard style={{ width: '80px', height: '80px' }} className="mb-3" />
-                <span className="text-center leading-tight" style={{ fontSize: '1.5rem' }}>{t.home.dashboard || (isRTL ? 'لوحة التحكم' : 'Dashboard')}</span>
+                <LayoutDashboard style={{ width: '48px', height: '48px' }} className="mb-2 text-orange-400" />
+                <span className="text-center leading-tight text-white text-base">{t.home.dashboard || (isRTL ? 'لوحة التحكم' : 'Dashboard')}</span>
               </Button>
             </div>
           </div>
