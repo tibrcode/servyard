@@ -60,13 +60,10 @@ export const MainActions = ({
         <div className="max-w-4xl mx-auto text-center">
           {/* Hero Content */}
           <div className="animate-luxury-fade mb-12">
-            <div className="flex justify-center items-center mb-6">
-              <MapPin className="h-16 w-16 text-primary" />
-            </div>
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-bold mb-6 bg-gradient-to-r from-primary via-primary-glow to-primary bg-clip-text text-transparent">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-bold mb-4 bg-gradient-to-r from-primary via-primary-glow to-primary bg-clip-text text-transparent whitespace-pre-line">
               {t.home.title}
             </h1>
-            <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-sm md:text-base text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed">
               {t.home.subtitle}
             </p>
           </div>
