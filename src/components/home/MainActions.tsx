@@ -14,7 +14,7 @@ export const MainActions = ({
   onLocationClick 
 }: MainActionsProps) => {
   const { t, isRTL } = useTranslation(currentLanguage);
-  const { user, role } = useAuth();
+  const { user, role, loading } = useAuth();
 
   const handleServicesClick = () => {
     window.location.href = '/services';
@@ -31,6 +31,11 @@ export const MainActions = ({
   };
 
   const handleDashboardClick = () => {
+    // If still loading auth state, wait
+    if (loading) {
+      return;
+    }
+
     if (!user) {
       window.location.href = '/auth';
       return;
@@ -41,7 +46,8 @@ export const MainActions = ({
     } else if (role === 'customer') {
       window.location.href = '/customer/dashboard';
     } else {
-      window.location.href = '/customer/dashboard'; // default
+      // If role is not set yet, go to customer dashboard as default
+      window.location.href = '/customer/dashboard';
     }
   };
 
@@ -71,48 +77,49 @@ export const MainActions = ({
               {/* Button 1: Services */}
               <Button
                 onClick={handleServicesClick}
-                className="aspect-square text-lg md:text-xl font-semibold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-3 p-4"
+                className="aspect-square text-xl md:text-2xl font-bold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-4 p-6"
                 style={{
                   boxShadow: '0 4px 15px rgba(var(--primary-rgb, 217, 165, 82), 0.2)'
                 }}
               >
-                <Search className="h-8 w-8 md:h-10 md:w-10" />
+                <Search className="h-12 w-12 md:h-14 md:w-14" />
                 <span className="text-center leading-tight">{t.home.findServices}</span>
               </Button>
 
               {/* Button 2: Map Services */}
               <Button
                 onClick={handleMapClick}
-                className="aspect-square text-lg md:text-xl font-semibold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-3 p-4"
+                className="aspect-square text-xl md:text-2xl font-bold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-4 p-6"
                 style={{
                   boxShadow: '0 4px 15px rgba(var(--primary-rgb, 217, 165, 82), 0.2)'
                 }}
               >
-                <Map className="h-8 w-8 md:h-10 md:w-10" />
+                <Map className="h-12 w-12 md:h-14 md:w-14" />
                 <span className="text-center leading-tight">{t.home.servicesOnMap || (isRTL ? 'الخدمات عبر الخريطة' : 'Services on Map')}</span>
               </Button>
 
               {/* Button 3: Login */}
               <Button
                 onClick={handleAuthClick}
-                className="aspect-square text-lg md:text-xl font-semibold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-3 p-4"
+                className="aspect-square text-xl md:text-2xl font-bold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-4 p-6"
                 style={{
                   boxShadow: '0 4px 15px rgba(var(--primary-rgb, 217, 165, 82), 0.2)'
                 }}
               >
-                <LogIn className="h-8 w-8 md:h-10 md:w-10" />
+                <LogIn className="h-12 w-12 md:h-14 md:w-14" />
                 <span className="text-center leading-tight">{t.home.login || (isRTL ? 'تسجيل الدخول' : 'Login')}</span>
               </Button>
 
               {/* Button 4: Dashboard */}
               <Button
                 onClick={handleDashboardClick}
-                className="aspect-square text-lg md:text-xl font-semibold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-3 p-4"
+                disabled={loading}
+                className="aspect-square text-xl md:text-2xl font-bold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-4 p-6 disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{
                   boxShadow: '0 4px 15px rgba(var(--primary-rgb, 217, 165, 82), 0.2)'
                 }}
               >
-                <LayoutDashboard className="h-8 w-8 md:h-10 md:w-10" />
+                <LayoutDashboard className="h-12 w-12 md:h-14 md:w-14" />
                 <span className="text-center leading-tight">{t.home.dashboard || (isRTL ? 'لوحة التحكم' : 'Dashboard')}</span>
               </Button>
             </div>
