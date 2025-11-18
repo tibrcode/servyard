@@ -53,19 +53,16 @@ export const MainActions = ({
 
   return (
     <section 
-      className="relative py-20 md:py-32"
+      className="relative py-12 md:py-16"
       dir={isRTL ? 'rtl' : 'ltr'}
     >
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
           {/* Hero Content */}
-          <div className="animate-luxury-fade mb-12">
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-bold mb-4 bg-gradient-to-r from-primary via-primary-glow to-primary bg-clip-text text-transparent whitespace-pre-line">
+          <div className="animate-luxury-fade mb-8">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-bold bg-gradient-to-r from-primary via-primary-glow to-primary bg-clip-text text-transparent whitespace-pre-line">
               {t.home.title}
             </h1>
-            <p className="text-sm md:text-base text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed">
-              {t.home.subtitle}
-            </p>
           </div>
 
           {/* Action Buttons Grid */}
@@ -74,7 +71,7 @@ export const MainActions = ({
               {/* Button 1: Services */}
               <Button
                 onClick={handleServicesClick}
-                className="aspect-square text-xl md:text-2xl font-bold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-3 md:gap-4 p-4 md:p-6"
+                className="aspect-square text-2xl md:text-3xl font-bold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-3 md:gap-4 p-4 md:p-6"
                 style={{
                   boxShadow: '0 4px 15px rgba(var(--primary-rgb, 217, 165, 82), 0.2)'
                 }}
@@ -86,7 +83,7 @@ export const MainActions = ({
               {/* Button 2: Map Services */}
               <Button
                 onClick={handleMapClick}
-                className="aspect-square text-xl md:text-2xl font-bold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-3 md:gap-4 p-4 md:p-6"
+                className="aspect-square text-2xl md:text-3xl font-bold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-3 md:gap-4 p-4 md:p-6"
                 style={{
                   boxShadow: '0 4px 15px rgba(var(--primary-rgb, 217, 165, 82), 0.2)'
                 }}
@@ -98,7 +95,7 @@ export const MainActions = ({
               {/* Button 3: Login */}
               <Button
                 onClick={handleAuthClick}
-                className="aspect-square text-xl md:text-2xl font-bold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-3 md:gap-4 p-4 md:p-6"
+                className="aspect-square text-2xl md:text-3xl font-bold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-3 md:gap-4 p-4 md:p-6"
                 style={{
                   boxShadow: '0 4px 15px rgba(var(--primary-rgb, 217, 165, 82), 0.2)'
                 }}
@@ -111,7 +108,7 @@ export const MainActions = ({
               <Button
                 onClick={handleDashboardClick}
                 disabled={loading}
-                className="aspect-square text-xl md:text-2xl font-bold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-3 md:gap-4 p-4 md:p-6 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="aspect-square text-2xl md:text-3xl font-bold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-3 md:gap-4 p-4 md:p-6 disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{
                   boxShadow: '0 4px 15px rgba(var(--primary-rgb, 217, 165, 82), 0.2)'
                 }}
