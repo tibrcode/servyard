@@ -586,7 +586,27 @@ export function MyBookings({
                 {localT.edit}
               </Button>
 
-              {/* Cancel Button */}
+              {/* Phone Button */}
+              {providerContacts[booking.provider_id]?.phone && providerContacts[booking.provider_id]?.phone.length > 0 && (
+                <Button variant="outline" size="sm" className="flex-1 min-w-[120px]" asChild>
+                  <a href={`tel:${providerContacts[booking.provider_id].phone[0]}`}>
+                    <Phone className="h-4 w-4 mr-1" />
+                    {localT.contactProvider}
+                  </a>
+                </Button>
+              )}
+
+              {/* WhatsApp Button */}
+              {providerContacts[booking.provider_id]?.whatsapp && (
+                <Button variant="outline" size="sm" className="flex-1 min-w-[120px]" asChild>
+                  <a href={`https://wa.me/${providerContacts[booking.provider_id].whatsapp.replace(/[^\d]/g, '')}`} target="_blank" rel="noopener noreferrer">
+                    <MessageSquare className="h-4 w-4 mr-1" />
+                    {isRTL ? 'واتساب' : 'WhatsApp'}
+                  </a>
+                </Button>
+              )}
+
+              {/* Cancel Button - Last */}
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button
@@ -625,26 +645,6 @@ export function MyBookings({
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
-
-              {/* Phone Button */}
-              {providerContacts[booking.provider_id]?.phone && providerContacts[booking.provider_id]?.phone.length > 0 && (
-                <Button variant="outline" size="sm" className="flex-1 min-w-[120px]" asChild>
-                  <a href={`tel:${providerContacts[booking.provider_id].phone[0]}`}>
-                    <Phone className="h-4 w-4 mr-1" />
-                    {localT.contactProvider}
-                  </a>
-                </Button>
-              )}
-
-              {/* WhatsApp Button */}
-              {providerContacts[booking.provider_id]?.whatsapp && (
-                <Button variant="outline" size="sm" className="flex-1 min-w-[120px]" asChild>
-                  <a href={`https://wa.me/${providerContacts[booking.provider_id].whatsapp.replace(/[^\d]/g, '')}`} target="_blank" rel="noopener noreferrer">
-                    <MessageSquare className="h-4 w-4 mr-1" />
-                    {isRTL ? 'واتساب' : 'WhatsApp'}
-                  </a>
-                </Button>
-              )}
             </div>
 
             {/* Cancellation Policy Info - Always show */}
