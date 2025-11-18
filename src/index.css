@@ -2,8 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ServYard Design System - Luxurious Service Marketplace
-All colors MUST be HSL. Premium dark/light theme with gold accents.
+/* ServYard Design System - MemoTrack Pro Style
+Premium dark/light theme with green accents (#22c55e).
+Base font size: 15px
 */
 
 @layer base {
@@ -13,14 +14,11 @@ All colors MUST be HSL. Premium dark/light theme with gold accents.
   
   .page, .screen { padding-bottom: max(16px, var(--safe-bottom)); }
 
-  /* Global responsive foundation */
+  /* Base Font Size - 15px */
   html {
+    font-size: 15px;
     box-sizing: border-box;
     overflow-x: clip;
-  }
-
-  /* Mobile-friendly text sizing */
-  html {
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
   }
@@ -37,11 +35,8 @@ All colors MUST be HSL. Premium dark/light theme with gold accents.
     line-height: 1.3;
     letter-spacing: normal;
     white-space: normal;
-    /* Do NOT break inside words */
     word-break: keep-all;
-    /* Break long tokens if needed */
     overflow-wrap: break-word;
-    /* Only hyphenate when explicitly present */
     hyphens: manual;
   }
 
@@ -57,7 +52,6 @@ All colors MUST be HSL. Premium dark/light theme with gold accents.
     box-sizing: inherit;
   }
 
-  /* Prevent flex/grid children from forcing overflow; apply locally where relevant */
   .grid > *,
   .card,
   .category-card,
@@ -79,114 +73,106 @@ All colors MUST be HSL. Premium dark/light theme with gold accents.
   }
 
   :root {
-    /* Light theme - Premium white */
-    --background: 0 0% 99%;
-    --foreground: 220 13% 9%;
+    /* Light theme - Premium white background #f0f2f5 */
+    --background: 0 0% 94%;
+    --foreground: 0 0% 20%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 13% 9%;
-    --card-nested: 220 8% 97%;
+    --card-foreground: 0 0% 20%;
+    --card-nested: 0 0% 97%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 13% 9%;
+    --popover-foreground: 0 0% 20%;
 
-    /* Luxury gold primary */
-    --primary: 41 92% 45%;
+    /* Green primary #22c55e RGB(34, 197, 94) */
+    --primary: 142 76% 45%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 41 92% 55%;
+    --primary-glow: 142 76% 55%;
 
-    /* Elegant secondary */
-    --secondary: 220 8% 95%;
-    --secondary-foreground: 220 13% 9%;
+    --secondary: 0 0% 95%;
+    --secondary-foreground: 0 0% 20%;
 
-    --muted: 220 8% 95%;
-    --muted-foreground: 220 9% 46%;
+    --muted: 0 0% 95%;
+    --muted-foreground: 0 0% 46%;
 
-    --accent: 41 92% 97%;
-    --accent-foreground: 220 13% 9%;
+    --accent: 0 0% 97%;
+    --accent-foreground: 0 0% 20%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 8% 91%;
-    --input: 220 8% 91%;
-    --ring: 41 92% 45%;
+    --border: 0 0% 91%;
+    --input: 0 0% 91%;
+    --ring: 142 76% 45%;
 
     --radius: 0.75rem;
 
-    /* Custom ServYard tokens */
-    --luxury-gradient: linear-gradient(135deg, hsl(41 92% 45%), hsl(41 92% 55%));
+    /* Custom ServYard tokens - Green theme */
+    --luxury-gradient: linear-gradient(135deg, hsl(142 76% 45%), hsl(142 76% 55%));
     --surface-elevation: 0 0% 100%;
-    --shadow-luxury: 0 10px 30px -10px hsl(41 92% 45% / 0.2);
-    --shadow-soft: 0 4px 12px -4px hsl(220 13% 9% / 0.1);
+    --shadow-luxury: 0 10px 30px -10px hsl(142 76% 45% / 0.2);
+    --shadow-soft: 0 4px 12px -4px hsl(0 0% 20% / 0.1);
 
     /* Premium animations */
     --transition-luxury: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
+    --sidebar-foreground: 0 0% 26%;
+    --sidebar-primary: 0 0% 10%;
     --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 0 0% 96%;
+    --sidebar-accent-foreground: 0 0% 10%;
+    --sidebar-border: 0 0% 91%;
+    --sidebar-ring: 142 76% 45%;
   }
 
   .dark {
-    /* Dark theme - Very dark teal background with dark teal cards */
-    --background: 171 86% 5%;
-    --foreground: 220 9% 96%;
+    /* Dark theme - Radial gradient background #1a1a1d → #0e0e10 */
+    --background: 0 0% 8%;
+    --foreground: 0 0% 96%;
 
-    --card: 171 86% 7%;
-    --card-foreground: 220 9% 96%;
-    --card-nested: 171 86% 10%;
+    --card: 0 0% 11%;
+    --card-foreground: 0 0% 96%;
+    --card-nested: 0 0% 14%;
 
-    --popover: 171 86% 7%;
-    --popover-foreground: 220 9% 96%;
+    --popover: 0 0% 11%;
+    --popover-foreground: 0 0% 96%;
 
-    /* Gold primary remains consistent */
-    --primary: 41 92% 55%;
-    --primary-foreground: 220 27% 8%;
-    --primary-glow: 41 92% 65%;
+    /* Green primary #22c55e RGB(34, 197, 94) */
+    --primary: 142 76% 45%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 142 76% 55%;
 
-    --secondary: 171 86% 9%;
-    --secondary-foreground: 220 9% 96%;
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 0 0% 96%;
 
-    --muted: 171 86% 9%;
-    --muted-foreground: 220 9% 85%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 85%;
 
-    --accent: 171 86% 9%;
-    --accent-foreground: 220 9% 96%;
+    --accent: 0 0% 12%;
+    --accent-foreground: 0 0% 96%;
 
     --destructive: 0 84% 60%;
-    --destructive-foreground: 220 9% 96%;
+    --destructive-foreground: 0 0% 96%;
 
-    --border: 171 86% 6%;
-    --input: 171 86% 6%;
-    --ring: 41 92% 55%;
+    --border: 0 0% 19%;
+    --input: 0 0% 19%;
+    --ring: 142 76% 45%;
 
     /* Dark theme custom tokens */
-    --luxury-gradient: linear-gradient(135deg, hsl(41 92% 55%), hsl(41 92% 65%));
-    --surface-elevation: 171 86% 9%;
-    --shadow-luxury: 0 10px 30px -10px hsl(41 92% 55% / 0.3);
-    --shadow-soft: 0 4px 12px -4px hsl(171 86% 5% / 0.4);
-    --sidebar-background: 171 86% 7%;
-    --sidebar-foreground: 220 9% 96%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --luxury-gradient: linear-gradient(135deg, hsl(142 76% 45%), hsl(142 76% 55%));
+    --surface-elevation: 0 0% 12%;
+    --shadow-luxury: 0 10px 30px -10px hsl(142 76% 45% / 0.3);
+    --shadow-soft: 0 4px 12px -4px hsl(0 0% 8% / 0.4);
+    --sidebar-background: 0 0% 11%;
+    --sidebar-foreground: 0 0% 96%;
+    --sidebar-primary: 142 76% 45%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 171 86% 10%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 171 86% 6%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 0 0% 14%;
+    --sidebar-accent-foreground: 0 0% 96%;
+    --sidebar-border: 0 0% 19%;
+    --sidebar-ring: 142 76% 45%;
   }
 }
 
@@ -207,8 +193,44 @@ All colors MUST be HSL. Premium dark/light theme with gold accents.
     max-width: 100%;
   }
 }
+
 /* Component utilities */
 @layer components {
+  /* Glass Card with radial gradient and 3D effects */
+  .glass-card {
+    background: linear-gradient(
+      145deg,
+      rgba(28, 28, 30, 0.8),
+      rgba(10, 10, 12, 0.9)
+    );
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 
+      0 8px 24px rgba(0, 0, 0, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    transform: perspective(1000px) rotateX(2deg) rotateY(0deg);
+    transition: transform 0.4s cubic-bezier(.4,0,.2,1), box-shadow 0.4s ease;
+    transform-style: preserve-3d;
+  }
+
+  .glass-card:hover {
+    transform: perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(-6px) scale(1.02);
+    box-shadow: 
+      0 16px 32px rgba(0, 0, 0, 0.6),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  }
+
+  /* Light mode glass cards */
+  .light .glass-card {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    color: #333 !important;
+  }
+
+  .light .glass-card:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15) !important;
+  }
 
   /* Nested card styling - lighter background for cards inside cards */
   .card-nested {
@@ -228,22 +250,52 @@ All colors MUST be HSL. Premium dark/light theme with gold accents.
   .glow-card:hover,
   .glow-card:focus-visible {
     box-shadow:
-      /* subtler ring */
       0 0 0 1px hsl(var(--primary) / 0.12),
-      /* lighter elevation */
       0 6px 16px -8px hsl(var(--primary) / 0.10),
-      /* softer ambient */
       0 0 12px 4px hsl(var(--primary) / 0.10);
     border-color: hsl(var(--primary) / 0.20) !important;
   }
 
-  /* Mobile tap */
   .glow-card:active {
     box-shadow:
       0 0 0 1px hsl(var(--primary) / 0.16),
       0 4px 12px -6px hsl(var(--primary) / 0.12),
       0 0 10px 6px hsl(var(--primary) / 0.12);
     transform: translateY(0.5px);
+  }
+}
+
+/* Scrollbar styling - Dark mode */
+@layer base {
+  *::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: rgba(30, 30, 30, 0.3);
+    border-radius: 4px;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  /* Light mode scrollbar */
+  .light *::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+  }
+
+  .light *::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.3);
+  }
+
+  .light *::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.4);
   }
 }
 
@@ -259,6 +311,82 @@ All colors MUST be HSL. Premium dark/light theme with gold accents.
     max-width: 100%;
     margin: 0;
     padding: 0;
+  }
+
+  /* Dark mode radial gradient background */
+  html.dark {
+    background: radial-gradient(
+      ellipse at 50% 50%, 
+      #1a1a1d 0%,
+      #0e0e10 100%
+    ) fixed;
+    color: white;
+    color-scheme: dark;
+  }
+
+  /* Light mode background */
+  html.light {
+    background: #f0f2f5 fixed;
+    color: #333;
+    color-scheme: light;
+  }
+
+  /* Text colors for light mode */
+  .light .text-white {
+    color: #333 !important;
+  }
+
+  .light .text-gray-300 {
+    color: #666 !important;
+  }
+
+  .light .text-gray-400 {
+    color: #888 !important;
+  }
+
+  .light .text-gray-600 {
+    color: #6b7280 !important;
+  }
+
+  /* Backgrounds for light mode */
+  .light .bg-black {
+    background: #fff !important;
+  }
+
+  .light .bg-gray-800 {
+    background-color: #ffffff !important;
+    color: #333 !important;
+  }
+
+  .light .bg-gray-900 {
+    background-color: #ffffff !important;
+  }
+
+  .light .bg-black\.bg-opacity-30 {
+    background-color: #f8f8f8 !important;
+  }
+
+  /* Borders for light mode */
+  .light .border-gray-700 {
+    border-color: #ddd !important;
+  }
+
+  /* Inputs for light mode */
+  .light input,
+  .light select,
+  .light textarea {
+    color: #333 !important;
+    background: #f8f8f8 !important;
+    border-color: rgba(0, 0, 0, 0.2) !important;
+  }
+
+  /* Hover states for light mode */
+  .light .hover\:bg-gray-700:hover {
+    background-color: #e2e8f0 !important;
+  }
+
+  .light .hover\:bg-gray-200:hover {
+    background-color: #e5e7eb;
   }
 
   /* Comprehensive text wrapping and accessibility-safe typography */
@@ -278,7 +406,6 @@ All colors MUST be HSL. Premium dark/light theme with gold accents.
   a,
   label {
     white-space: normal;
-    /* Prefer breaking at spaces; avoid per-letter wrapping */
     overflow-wrap: break-word;
     word-break: normal;
     hyphens: auto;
@@ -326,9 +453,6 @@ All colors MUST be HSL. Premium dark/light theme with gold accents.
     line-height: 1.45;
   }
 
-  /* Prevent flex overflow - crucial for text wrapping */
-  /* Removed global min-width:0 to avoid collapsing text columns under zoom.
-     Apply min-w-0 only where needed via utility classes. */
   /* All containers must allow natural text growth - NO fixed heights */
   .card,
   .hero,
@@ -435,7 +559,6 @@ All colors MUST be HSL. Premium dark/light theme with gold accents.
     line-height: 1.4;
     padding: 0.5rem 1rem;
     transform: none !important;
-    /* Prevent transform issues under zoom */
   }
 
   /* Keep badges on a single line (e.g., "Active") */
@@ -467,8 +590,6 @@ All colors MUST be HSL. Premium dark/light theme with gold accents.
 
   /* Media queries using em units for better zoom support */
   @media (max-width: 30em) {
-
-    /* ~480px */
     h1,
     h2,
     h3 {
@@ -533,7 +654,6 @@ All colors MUST be HSL. Premium dark/light theme with gold accents.
   }
 
   @media (min-width: 768px) {
-
     form input,
     form textarea,
     form select {
@@ -609,7 +729,6 @@ All colors MUST be HSL. Premium dark/light theme with gold accents.
 }
 
 @layer components {
-
   /* Luxury animations */
   .animate-luxury-fade {
     animation: luxuryFade 0.6s cubic-bezier(0.4, 0, 0.2, 1);
@@ -619,16 +738,13 @@ All colors MUST be HSL. Premium dark/light theme with gold accents.
     animation: luxuryScale 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  /* Status chips - remove problematic toggle-chip */
+  /* Status chips */
   .status-chip {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    /* 8px */
     padding: 0.375rem 0.75rem;
-    /* 6px 12px */
     height: 2.5rem;
-    /* 40px - meets tap target */
     line-height: 1.2;
     border-radius: 9999px;
     white-space: nowrap;
@@ -638,7 +754,6 @@ All colors MUST be HSL. Premium dark/light theme with gold accents.
   .status-chip .icon {
     flex-shrink: 0;
     width: 0.625rem;
-    /* 10px */
     height: 0.625rem;
     border-radius: 9999px;
   }
@@ -680,7 +795,6 @@ All colors MUST be HSL. Premium dark/light theme with gold accents.
     text-orientation: mixed !important;
     white-space: normal !important;
     overflow-wrap: break-word !important;
-    /* wrap at word boundaries */
     word-break: normal !important;
     letter-spacing: normal !important;
     width: 100% !important;
@@ -728,7 +842,8 @@ All colors MUST be HSL. Premium dark/light theme with gold accents.
     transform: scale(1);
   }
 }
-/* Custom styling for active tabs - Gold/Orange primary color */
+
+/* Custom styling for active tabs - Green primary color */
 [role="tablist"] button[data-state="active"] {
   background-color: hsl(var(--primary)) !important;
   color: hsl(var(--primary-foreground)) !important;
