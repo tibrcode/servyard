@@ -210,9 +210,6 @@ export const ServiceCategories = ({
             <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">
               {t.home.featuredCategories}
             </h2>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              {t.home.subtitle}
-            </p>
           </div>
           <div className="grid grid-cols-2 xs:grid-cols-3 gap-3 px-3 md:[grid-template-columns:repeat(auto-fit,minmax(180px,1fr))] md:gap-4 md:px-4 lg:[grid-template-columns:repeat(auto-fit,minmax(200px,1fr))] lg:gap-5 lg:px-6">
             {[...Array(6)].map((_, i) => (
@@ -238,9 +235,6 @@ export const ServiceCategories = ({
           <h2 className="text-2xl md:text-4xl font-display font-bold mb-4">
             {t.home.featuredCategories}
           </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            {t.home.subtitle}
-          </p>
         </div>
 
   {/* Categories Grid: 2 cols on very narrow phones, 3 cols otherwise; auto-fit on desktop */}

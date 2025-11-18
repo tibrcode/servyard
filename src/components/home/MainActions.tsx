@@ -120,20 +120,6 @@ export const MainActions = ({
                 <span className="text-center leading-tight">{t.home.dashboard || (isRTL ? 'لوحة التحكم' : 'Dashboard')}</span>
               </Button>
             </div>
-
-            {/* Location Button */}
-            {onLocationClick && (
-              <div className="mt-8">
-                <Button
-                  variant="ghost"
-                  onClick={onLocationClick}
-                  className="text-muted-foreground hover:text-primary"
-                >
-                  <MapPin className="h-5 w-5 mr-2" />
-                  <span>{t.nav.location}</span>
-                </Button>
-              </div>
-            )}
           </div>
         </div>
       </div>
