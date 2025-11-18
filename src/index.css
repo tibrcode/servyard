@@ -220,6 +220,17 @@ Base font size: 15px
       inset 0 1px 0 rgba(255, 255, 255, 0.12);
   }
 
+  /* Apply glass effect to all cards in dark mode */
+  .dark .bg-card:hover,
+  .dark [class*="Card"]:hover,
+  :not(.light) .bg-card:hover,
+  :not(.light) [class*="Card"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+      0 12px 32px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  }
+
   /* Light mode glass cards */
   .light .glass-card {
     background: rgba(255, 255, 255, 0.9) !important;
@@ -228,8 +239,11 @@ Base font size: 15px
     color: #333 !important;
   }
 
-  .light .glass-card:hover {
+  .light .glass-card:hover,
+  .light .bg-card:hover,
+  .light [class*="Card"]:hover {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15) !important;
+    transform: translateY(-2px);
   }
 
   /* Nested card styling - lighter background for cards inside cards */
@@ -314,21 +328,91 @@ Base font size: 15px
   }
 
   /* Dark mode radial gradient background */
-  html.dark {
+  html.dark,
+  html.dark body,
+  html:not(.light),
+  html:not(.light) body {
     background: radial-gradient(
       ellipse at 50% 50%, 
       #1a1a1d 0%,
       #0e0e10 100%
-    ) fixed;
+    ) fixed !important;
     color: white;
     color-scheme: dark;
   }
 
   /* Light mode background */
-  html.light {
-    background: #f0f2f5 fixed;
+  html.light,
+  html.light body {
+    background: #f0f2f5 fixed !important;
     color: #333;
     color-scheme: light;
+  }
+
+  /* Override Tailwind's default card backgrounds with glass effect */
+  .dark .bg-card,
+  .dark [class*="Card"],
+  :not(.light) .bg-card,
+  :not(.light) [class*="Card"] {
+    background: linear-gradient(
+      145deg,
+      rgba(28, 28, 30, 0.8),
+      rgba(10, 10, 12, 0.9)
+    ) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 
+      0 8px 24px rgba(0, 0, 0, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  /* Glass effect for muted backgrounds */
+  .dark .bg-muted,
+  :not(.light) .bg-muted {
+    background: linear-gradient(
+      145deg,
+      rgba(28, 28, 30, 0.6),
+      rgba(10, 10, 12, 0.7)
+    ) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  }
+
+  /* Glass effect with transparency variations */
+  .dark .bg-muted\/50,
+  :not(.light) .bg-muted\/50 {
+    background: linear-gradient(
+      145deg,
+      rgba(28, 28, 30, 0.4),
+      rgba(10, 10, 12, 0.5)
+    ) !important;
+  }
+
+  .dark .bg-muted\/70,
+  :not(.light) .bg-muted\/70 {
+    background: linear-gradient(
+      145deg,
+      rgba(28, 28, 30, 0.55),
+      rgba(10, 10, 12, 0.65)
+    ) !important;
+  }
+
+  /* Modals and popovers with glass effect */
+  .dark .bg-popover,
+  .dark [role="dialog"],
+  :not(.light) .bg-popover,
+  :not(.light) [role="dialog"] {
+    background: linear-gradient(
+      145deg,
+      rgba(30, 30, 32, 0.85),
+      rgba(16, 16, 18, 0.95)
+    ) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 
+      0 16px 48px rgba(0, 0, 0, 0.6),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
   }
 
   /* Text colors for light mode */
@@ -348,6 +432,29 @@ Base font size: 15px
     color: #6b7280 !important;
   }
 
+  /* Light mode glass cards */
+  .light .bg-card,
+  .light [class*="Card"] {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .light .bg-muted {
+    background: rgba(248, 248, 248, 0.8) !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  }
+
+  .light .bg-muted\/50 {
+    background: rgba(248, 248, 248, 0.5) !important;
+  }
+
+  .light .bg-muted\/70 {
+    background: rgba(248, 248, 248, 0.7) !important;
+  }
+
   /* Backgrounds for light mode */
   .light .bg-black {
     background: #fff !important;
@@ -363,7 +470,7 @@ Base font size: 15px
   }
 
   .light .bg-black\.bg-opacity-30 {
-    background-color: #f8f8f8 !important;
+    background-color: rgba(248, 248, 248, 0.3) !important;
   }
 
   /* Borders for light mode */
@@ -376,7 +483,7 @@ Base font size: 15px
   .light select,
   .light textarea {
     color: #333 !important;
-    background: #f8f8f8 !important;
+    background: rgba(248, 248, 248, 0.8) !important;
     border-color: rgba(0, 0, 0, 0.2) !important;
   }
 
@@ -387,6 +494,25 @@ Base font size: 15px
 
   .light .hover\:bg-gray-200:hover {
     background-color: #e5e7eb;
+  }
+
+  /* Modal overlays */
+  .dark .bg-black\/30,
+  :not(.light) .bg-black\/30 {
+    background-color: rgba(0, 0, 0, 0.7) !important;
+  }
+
+  .dark .bg-black\/50,
+  :not(.light) .bg-black\/50 {
+    background-color: rgba(0, 0, 0, 0.5) !important;
+  }
+
+  .light .bg-black\/30 {
+    background-color: rgba(0, 0, 0, 0.5) !important;
+  }
+
+  .light .bg-black\/50 {
+    background-color: rgba(0, 0, 0, 0.5) !important;
   }
 
   /* Comprehensive text wrapping and accessibility-safe typography */
@@ -683,9 +809,25 @@ Base font size: 15px
   /* Custom ServYard components - ensure no height constraints */
   .luxury-card {
     @apply bg-card border border-border rounded-xl shadow-soft;
-    background: hsl(var(--surface-elevation));
+    background: linear-gradient(
+      145deg,
+      rgba(28, 28, 30, 0.8),
+      rgba(10, 10, 12, 0.9)
+    ) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 
+      0 8px 24px rgba(0, 0, 0, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     height: auto !important;
     min-height: auto !important;
+  }
+
+  .light .luxury-card {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
   }
 
   .luxury-button {
@@ -716,6 +858,25 @@ Base font size: 15px
 
   .service-card:hover {
     transform: translateY(-2px);
+  }
+
+  /* Card nested with glass effect */
+  .card-nested,
+  .dark .card-nested,
+  :not(.light) .card-nested {
+    background: linear-gradient(
+      145deg,
+      rgba(35, 35, 38, 0.6),
+      rgba(18, 18, 20, 0.7)
+    ) !important;
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .light .card-nested {
+    background: rgba(252, 252, 252, 0.8) !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
   }
 
   /* RTL Support */
