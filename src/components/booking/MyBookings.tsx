@@ -171,6 +171,33 @@ export function MyBookings({
     return () => unsubscribe();
   }, [customerId]);
 
+  // Refresh cancellation hours every 10 seconds
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      if (bookings.length === 0) return;
+      
+      const uniqueServiceIds = [...new Set(bookings.map(b => b.service_id))];
+      const hoursCache: Record<string, number> = {};
+      
+      await Promise.all(
+        uniqueServiceIds.map(async (serviceId) => {
+          try {
+            const serviceDoc = await getDoc(doc(db, 'services', serviceId));
+            if (serviceDoc.exists()) {
+              hoursCache[serviceId] = serviceDoc.data().cancellation_policy_hours || 24;
+            }
+          } catch (error) {
+            console.error(`Error loading service ${serviceId}:`, error);
+          }
+        })
+      );
+      
+      setServiceCancellationHours(hoursCache);
+    }, 10000); // Refresh every 10 seconds
+    
+    return () => clearInterval(interval);
+  }, [bookings]);
+
   const loadCustomerLocation = async () => {
     try {
       const customerDoc = await getDoc(doc(db, 'profiles', customerId));
