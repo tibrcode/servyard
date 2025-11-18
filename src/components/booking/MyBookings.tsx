@@ -647,16 +647,21 @@ export function MyBookings({
               )}
             </div>
 
-            {!canCancel && (
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <AlertCircle className="h-3 w-3" />
-                <span>
-                  {isRTL
-                    ? `يجب إلغاء الحجز قبل ${bookingCancellationHours} ${bookingCancellationHours === 1 ? 'ساعة' : 'ساعات'} على الأقل من الموعد`
-                    : `Booking must be cancelled at least ${bookingCancellationHours} ${bookingCancellationHours === 1 ? 'hour' : 'hours'} before`}
-                </span>
-              </div>
-            )}
+            {/* Cancellation Policy Info - Always show */}
+            <div className={`flex items-start gap-2 text-xs p-3 rounded-md ${canCancel ? 'bg-green-500/10 text-green-700 dark:text-green-400' : 'bg-red-500/10 text-red-700 dark:text-red-400'}`}>
+              <AlertCircle className="h-3 w-3 mt-0.5 flex-shrink-0" />
+              <span>
+                {canCancel ? (
+                  isRTL
+                    ? `يمكنك إلغاء الحجز حتى ${bookingCancellationHours} ${bookingCancellationHours === 1 ? 'ساعة' : 'ساعات'} قبل الموعد`
+                    : `You can cancel until ${bookingCancellationHours} ${bookingCancellationHours === 1 ? 'hour' : 'hours'} before`
+                ) : (
+                  isRTL
+                    ? `لا يمكن إلغاء الحجز - يجب إلغاء قبل ${bookingCancellationHours} ${bookingCancellationHours === 1 ? 'ساعة' : 'ساعات'} من الموعد`
+                    : `Cannot cancel - Booking must be cancelled at least ${bookingCancellationHours} ${bookingCancellationHours === 1 ? 'hour' : 'hours'} before`
+                )}
+              </span>
+            </div>
           </>
         )}
 
