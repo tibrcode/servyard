@@ -374,10 +374,14 @@ export function MyBookings({
   };
 
   const handleCancelBooking = async (booking: Booking) => {
-    if (!canCancelBooking(booking, cancellationPolicyHours)) {
+    const bookingCancellationHours = booking.cancellation_policy_hours || cancellationPolicyHours;
+    
+    if (!canCancelBooking(booking, bookingCancellationHours)) {
       toast({
         title: localT.cannotCancel,
-        description: localT.cannotCancelDesc,
+        description: isRTL
+          ? `يجب إلغاء الحجز قبل ${bookingCancellationHours} ${bookingCancellationHours === 1 ? 'ساعة' : 'ساعات'} على الأقل من الموعد`
+          : `Booking must be cancelled at least ${bookingCancellationHours} ${bookingCancellationHours === 1 ? 'hour' : 'hours'} before`,
         variant: 'destructive',
       });
       return;
@@ -464,7 +468,9 @@ export function MyBookings({
   const pastBookings = bookings.filter(b => !isUpcoming(b));
 
   const renderBookingCard = (booking: Booking) => {
-    const canCancel = canCancelBooking(booking, cancellationPolicyHours);
+    // استخدام cancellation_policy_hours من الحجز نفسه بدلاً من القيمة الثابتة
+    const bookingCancellationHours = booking.cancellation_policy_hours || cancellationPolicyHours;
+    const canCancel = canCancelBooking(booking, bookingCancellationHours);
     const bookingDate = new Date(booking.booking_date);
 
     return (
@@ -603,7 +609,11 @@ export function MyBookings({
             {!canCancel && (
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <AlertCircle className="h-3 w-3" />
-                <span>{localT.cannotCancelDesc}</span>
+                <span>
+                  {isRTL
+                    ? `يجب إلغاء الحجز قبل ${bookingCancellationHours} ${bookingCancellationHours === 1 ? 'ساعة' : 'ساعات'} على الأقل من الموعد`
+                    : `Booking must be cancelled at least ${bookingCancellationHours} ${bookingCancellationHours === 1 ? 'hour' : 'hours'} before`}
+                </span>
               </div>
             )}
           </>
