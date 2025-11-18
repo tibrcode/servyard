@@ -21,22 +21,13 @@ export const MainActions = ({
   };
 
   const handleMapClick = () => {
+    // Open services page in map view mode
     window.location.href = '/services?view=map';
   };
 
   const handleAuthClick = () => {
-    if (user) {
-      // If logged in, go to appropriate dashboard
-      if (role === 'provider') {
-        window.location.href = '/provider/dashboard';
-      } else if (role === 'customer') {
-        window.location.href = '/customer/dashboard';
-      } else {
-        window.location.href = '/customer/dashboard'; // default
-      }
-    } else {
-      window.location.href = '/auth';
-    }
+    // Always go to login/auth page
+    window.location.href = '/auth';
   };
 
   const handleDashboardClick = () => {
@@ -76,53 +67,53 @@ export const MainActions = ({
 
           {/* Action Buttons Grid */}
           <div className="animate-luxury-scale">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+            <div className="grid grid-cols-2 gap-4 max-w-2xl mx-auto">
               {/* Button 1: Services */}
               <Button
                 onClick={handleServicesClick}
-                className="h-24 md:h-28 text-lg md:text-xl font-semibold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex items-center justify-center gap-3"
+                className="aspect-square text-lg md:text-xl font-semibold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-3 p-4"
                 style={{
                   boxShadow: '0 4px 15px rgba(var(--primary-rgb, 217, 165, 82), 0.2)'
                 }}
               >
-                <Search className="h-6 w-6 md:h-8 md:w-8" />
-                <span>{t.home.findServices}</span>
+                <Search className="h-8 w-8 md:h-10 md:w-10" />
+                <span className="text-center leading-tight">{t.home.findServices}</span>
               </Button>
 
               {/* Button 2: Map Services */}
               <Button
                 onClick={handleMapClick}
-                className="h-24 md:h-28 text-lg md:text-xl font-semibold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex items-center justify-center gap-3"
+                className="aspect-square text-lg md:text-xl font-semibold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-3 p-4"
                 style={{
                   boxShadow: '0 4px 15px rgba(var(--primary-rgb, 217, 165, 82), 0.2)'
                 }}
               >
-                <Map className="h-6 w-6 md:h-8 md:w-8" />
-                <span>{t.home.servicesOnMap || (isRTL ? 'الخدمات عبر الخريطة' : 'Services on Map')}</span>
+                <Map className="h-8 w-8 md:h-10 md:w-10" />
+                <span className="text-center leading-tight">{t.home.servicesOnMap || (isRTL ? 'الخدمات عبر الخريطة' : 'Services on Map')}</span>
               </Button>
 
-              {/* Button 3: Login/Account */}
+              {/* Button 3: Login */}
               <Button
                 onClick={handleAuthClick}
-                className="h-24 md:h-28 text-lg md:text-xl font-semibold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex items-center justify-center gap-3"
+                className="aspect-square text-lg md:text-xl font-semibold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-3 p-4"
                 style={{
                   boxShadow: '0 4px 15px rgba(var(--primary-rgb, 217, 165, 82), 0.2)'
                 }}
               >
-                <LogIn className="h-6 w-6 md:h-8 md:w-8" />
-                <span>{user ? (t.home.myAccount || (isRTL ? 'حسابي' : 'My Account')) : (t.home.login || (isRTL ? 'تسجيل الدخول' : 'Login'))}</span>
+                <LogIn className="h-8 w-8 md:h-10 md:w-10" />
+                <span className="text-center leading-tight">{t.home.login || (isRTL ? 'تسجيل الدخول' : 'Login')}</span>
               </Button>
 
               {/* Button 4: Dashboard */}
               <Button
                 onClick={handleDashboardClick}
-                className="h-24 md:h-28 text-lg md:text-xl font-semibold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex items-center justify-center gap-3"
+                className="aspect-square text-lg md:text-xl font-semibold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 rounded-2xl flex flex-col items-center justify-center gap-3 p-4"
                 style={{
                   boxShadow: '0 4px 15px rgba(var(--primary-rgb, 217, 165, 82), 0.2)'
                 }}
               >
-                <LayoutDashboard className="h-6 w-6 md:h-8 md:w-8" />
-                <span>{t.home.dashboard || (isRTL ? 'لوحة التحكم' : 'Dashboard')}</span>
+                <LayoutDashboard className="h-8 w-8 md:h-10 md:w-10" />
+                <span className="text-center leading-tight">{t.home.dashboard || (isRTL ? 'لوحة التحكم' : 'Dashboard')}</span>
               </Button>
             </div>
 

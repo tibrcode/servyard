@@ -64,6 +64,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
   const [searchParams] = useSearchParams();
   const categoryParam = searchParams.get('category');
   const qParam = searchParams.get('q');
+  const viewParam = searchParams.get('view'); // Get view parameter
 
   const [searchQuery, setSearchQuery] = useState(qParam || '');
   const [selectedCategory, setSelectedCategory] = useState(categoryParam || 'all');
@@ -83,8 +84,10 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
   const [radiusKm, setRadiusKm] = useState(DEFAULT_RADIUS_KM);
   const [locationLoading, setLocationLoading] = useState(false);
   
-  // View toggle: 'list' or 'map'
-  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
+  // View toggle: 'list' or 'map' - initialize from URL parameter
+  const [viewMode, setViewMode] = useState<'list' | 'map'>(
+    viewParam === 'map' ? 'map' : 'list'
+  );
   
   // Selected service from map
   const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
