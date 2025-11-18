@@ -42,12 +42,12 @@ export const MainActions = ({
     }
 
     if (role === 'provider') {
-      window.location.href = '/provider/dashboard';
+      window.location.href = '/provider-dashboard';
     } else if (role === 'customer') {
-      window.location.href = '/customer/dashboard';
+      window.location.href = '/customer-dashboard';
     } else {
       // If role is not set yet, go to customer dashboard as default
-      window.location.href = '/customer/dashboard';
+      window.location.href = '/customer-dashboard';
     }
   };
 
