@@ -76,6 +76,9 @@ export function MyBookings({
   // Provider contact info + location
   const [providerContacts, setProviderContacts] = useState<Record<string, {phone?: string[], whatsapp?: string, latitude?: number, longitude?: number}>>({});
   const [customerLocation, setCustomerLocation] = useState<{latitude: number, longitude: number} | null>(null);
+  
+  // Cache for service cancellation hours
+  const [serviceCancellationHours, setServiceCancellationHours] = useState<Record<string, number>>({});
 
   const isRTL = isRTLFromHook;
   const dateLocale = language === 'ar' ? ar : enUS;
@@ -231,6 +234,25 @@ export function MyBookings({
     try {
       const data = await getCustomerBookings(customerId);
       setBookings(data);
+      
+      // Load cancellation hours for each unique service
+      const uniqueServiceIds = [...new Set(data.map(b => b.service_id))];
+      const hoursCache: Record<string, number> = {};
+      
+      await Promise.all(
+        uniqueServiceIds.map(async (serviceId) => {
+          try {
+            const serviceDoc = await getDoc(doc(db, 'services', serviceId));
+            if (serviceDoc.exists()) {
+              hoursCache[serviceId] = serviceDoc.data().cancellation_policy_hours || 24;
+            }
+          } catch (error) {
+            console.error(`Error loading service ${serviceId}:`, error);
+          }
+        })
+      );
+      
+      setServiceCancellationHours(hoursCache);
     } catch (error) {
       console.error('Error loading bookings:', error);
       toast({
@@ -374,7 +396,7 @@ export function MyBookings({
   };
 
   const handleCancelBooking = async (booking: Booking) => {
-    const bookingCancellationHours = booking.cancellation_policy_hours || cancellationPolicyHours;
+    const bookingCancellationHours = booking.cancellation_policy_hours || serviceCancellationHours[booking.service_id] || cancellationPolicyHours;
     
     if (!canCancelBooking(booking, bookingCancellationHours)) {
       toast({
@@ -468,8 +490,8 @@ export function MyBookings({
   const pastBookings = bookings.filter(b => !isUpcoming(b));
 
   const renderBookingCard = (booking: Booking) => {
-    // استخدام cancellation_policy_hours من الحجز نفسه بدلاً من القيمة الثابتة
-    const bookingCancellationHours = booking.cancellation_policy_hours || cancellationPolicyHours;
+    // استخدام cancellation_policy_hours من الحجز، أو من الخدمة، أو القيمة الافتراضية
+    const bookingCancellationHours = booking.cancellation_policy_hours || serviceCancellationHours[booking.service_id] || cancellationPolicyHours;
     const canCancel = canCancelBooking(booking, bookingCancellationHours);
     const bookingDate = new Date(booking.booking_date);
 
