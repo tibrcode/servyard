@@ -311,126 +311,209 @@ export default function Favorites() {
 
                 if (!service) return null;
 
+                const provider = service.provider_id ? providerDetails[service.provider_id] : null;
+
                 return (
                   <Card 
                     key={favorite.favorite_id} 
-                    className="overflow-hidden border hover:border-primary/40 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer"
+                    className="overflow-hidden border hover:border-primary/40 transition-all duration-300 hover:shadow-lg relative"
                   >
+                    {/* TOP Badge */}
+                    {isTopService && (
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: '8px',
+                          right: isRTL ? 'auto' : '8px',
+                          left: isRTL ? '8px' : 'auto',
+                          zIndex: 10
+                        }}
+                      >
+                        <Badge className="bg-amber-500 text-white text-xs px-2 py-0.5">
+                          {isRTL ? 'الأفضل' : 'TOP'}
+                        </Badge>
+                      </div>
+                    )}
+
+                    {/* Favorite Button */}
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '8px',
+                        right: isRTL ? '8px' : 'auto',
+                        left: isRTL ? 'auto' : '8px',
+                        zIndex: 10
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-8 w-8 bg-background/80 backdrop-blur-sm hover:bg-background"
+                        onClick={() => handleRemove(favorite.item_id)}
+                        disabled={removingId === favorite.item_id}
+                      >
+                        {removingId === favorite.item_id ? (
+                          <div className="h-4 w-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <Heart className="h-4 w-4 text-red-500 fill-red-500" />
+                        )}
+                      </Button>
+                    </div>
+                    
                     <CardContent className="p-0 flex flex-col h-full">
-                      {/* Card Header */}
-                      <div 
-                        className="p-4 flex items-start justify-between gap-3"
+                      {/* Compact Header - Always Visible */}
+                      <div
+                        className="flex flex-col p-3 cursor-pointer hover:bg-muted/50 transition-colors"
                         onClick={() => setExpandedServiceId(isExpanded ? null : favorite.item_id)}
                       >
-                        <div className="flex-1 min-w-0">
-                          {/* Service Name */}
-                          <h3 className="font-semibold text-base line-clamp-2 mb-2">
-                            {service.name}
-                          </h3>
-
-                          {/* Compact Info Row */}
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                            {/* Category Icon */}
-                            <div className={`p-1 rounded-md ${categoryColor.bg} flex-shrink-0`}>
-                              <CategoryIcon className={`h-4 w-4 ${categoryColor.text}`} />
-                            </div>
-
-                            {/* Rating */}
-                            {rating.count > 0 && (
-                              <>
-                                <span className="text-yellow-500">★</span>
-                                <span className="font-medium">{rating.avg.toFixed(1)}</span>
-                                <span className="text-xs">({rating.count})</span>
-                              </>
-                            )}
-
-                            {/* TOP Badge */}
-                            {isTopService && (
-                              <Badge className="ml-auto bg-amber-500 text-white text-xs">
-                                {isRTL ? 'الأفضل' : 'TOP'}
-                              </Badge>
-                            )}
+                        {/* Service Name with Category Icon */}
+                        <div 
+                          className="text-foreground flex items-center gap-2"
+                          style={{
+                            fontSize: '13px',
+                            fontWeight: '700',
+                            marginBottom: '10px',
+                            lineHeight: '1.4',
+                            paddingRight: isTopService ? '50px' : '0'
+                          }}
+                        >
+                          <div className={`${categoryColor.bg} p-2 rounded-md flex-shrink-0`}>
+                            <CategoryIcon className={`w-5 h-5 ${categoryColor.text}`} />
                           </div>
-
-                          {/* Price */}
-                          {(service.approximate_price || service.price_range) && (
-                            <div className="text-base font-bold text-primary">
-                              {service.approximate_price || service.price_range}
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Right Side: Favorite Button + Expand Arrow */}
-                        <div className="flex items-start gap-2 flex-shrink-0">
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            className="h-8 w-8"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleRemove(favorite.item_id);
+                          <span
+                            style={{
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              display: '-webkit-box',
+                              WebkitLineClamp: 2,
+                              WebkitBoxOrient: 'vertical',
                             }}
-                            disabled={removingId === favorite.item_id}
                           >
-                            {removingId === favorite.item_id ? (
-                              <div className="h-4 w-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
-                            ) : (
-                              <Heart className="h-4 w-4 text-red-500 fill-red-500" />
-                            )}
-                          </Button>
-
-                          <ChevronDown 
-                            className={`h-5 w-5 text-muted-foreground transition-transform duration-300 mt-0.5 ${isExpanded ? 'rotate-180' : ''}`}
+                            {service.name}
+                          </span>
+                        </div>
+                        
+                        {/* Rating & Reviews */}
+                        {rating.avg > 0 ? (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '10px' }}>
+                            <div style={{
+                              color: '#fbbf24',
+                              fontSize: '12px',
+                              letterSpacing: '0.5px',
+                              lineHeight: 1
+                            }}>
+                              {[1, 2, 3, 4, 5].map((star) => {
+                                const fullStars = Math.floor(rating.avg);
+                                const hasHalfStar = rating.avg % 1 >= 0.5;
+                                if (star <= fullStars) return '★';
+                                if (star === fullStars + 1 && hasHalfStar) return '⯨';
+                                return '☆';
+                              }).join('')}
+                            </div>
+                            <span className="text-foreground" style={{ fontSize: '12px', fontWeight: '600' }}>
+                              {rating.avg.toFixed(1)}
+                            </span>
+                            <span className="text-muted-foreground" style={{ fontSize: '10px' }}>
+                              ({rating.count})
+                            </span>
+                          </div>
+                        ) : (
+                          <div className="text-muted-foreground" style={{
+                            fontSize: '10px',
+                            marginBottom: '10px',
+                            height: '16px'
+                          }}>
+                            ⭐ {isRTL ? 'لا توجد تقييمات' : 'No reviews'}
+                          </div>
+                        )}
+                        
+                        {/* Price + Expand Arrow */}
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <div style={{ fontSize: '18px', color: '#f59e0b', fontWeight: '700' }}>
+                            {service.approximate_price 
+                              ? `${service.approximate_price} ${provider?.currency_code || 'AED'}`
+                              : service.price_range || (isRTL ? 'السعر عند الطلب' : 'Price on request')
+                            }
+                          </div>
+                          <ChevronDown
+                            className={`h-5 w-5 text-muted-foreground transition-transform duration-200 ${
+                              isExpanded ? 'rotate-180' : ''
+                            }`}
                           />
                         </div>
                       </div>
 
                       {/* Expanded Content */}
                       {isExpanded && (
-                        <div className="border-t pt-4 pb-4 px-4 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                          {/* Description */}
-                          {service.description && (
-                            <p className="text-sm text-muted-foreground">
-                              {service.description}
-                            </p>
-                          )}
-
-                          {/* Metadata Row */}
+                        <div 
+                          className="border-t px-3 pb-3 pt-2 animate-in slide-in-from-top-2 duration-200"
+                        >
                           <div className="space-y-2">
+                            {/* Description */}
+                            {service.description && (
+                              <p className="text-foreground" style={{ fontSize: '14px', lineHeight: '1.6', margin: 0 }}>
+                                {service.description}
+                              </p>
+                            )}
+
                             {/* Provider */}
-                            {service.provider_id && providerDetails[service.provider_id] && (
-                              <div className="flex items-center gap-2 text-sm">
-                                <Users className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                                <span>{providerDetails[service.provider_id]?.full_name}</span>
-                              </div>
+                            {provider?.full_name && (
+                              <p className="text-muted-foreground" style={{ fontSize: '12px' }}>
+                                <span className="text-primary" style={{ fontWeight: '600' }}>
+                                  {isRTL ? 'المزود:' : 'Provider:'}
+                                </span> {provider.full_name}
+                              </p>
                             )}
 
                             {/* Duration */}
                             {service.duration_minutes && (
-                              <div className="flex items-center gap-2 text-sm">
-                                <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                                <span>{service.duration_minutes} {isRTL ? 'دقيقة' : 'min'}</span>
-                              </div>
+                              <p className="text-muted-foreground" style={{ fontSize: '12px' }}>
+                                <span className="text-primary" style={{ fontWeight: '600' }}>
+                                  {isRTL ? 'المدة:' : 'Duration:'}
+                                </span> {service.duration_minutes} {isRTL ? 'دقيقة' : 'minutes'}
+                              </p>
                             )}
-                          </div>
 
-                          {/* Action Buttons */}
-                          <div className="space-y-2 pt-2">
-                            <Button
-                              className="w-full"
-                              onClick={() => handleBookingClick(service)}
-                              disabled={!service.is_active}
-                            >
-                              {isRTL ? 'احجز الآن' : 'Book Now'}
-                            </Button>
-                            <Button
-                              variant="outline"
-                              className="w-full"
-                              onClick={() => handleViewProvider(service.provider_id)}
-                            >
-                              {isRTL ? 'عرض المزود' : 'View Provider'}
-                              <ExternalLink className={`h-4 w-4 ${isRTL ? 'mr-2' : 'ml-2'}`} />
-                            </Button>
+                            {/* City */}
+                            {provider?.city && (
+                              <p className="text-muted-foreground" style={{ fontSize: '12px' }}>
+                                <span className="text-primary" style={{ fontWeight: '600' }}>
+                                  {isRTL ? 'المدينة:' : 'City:'}
+                                </span> {provider.city}
+                              </p>
+                            )}
+
+                            {/* Buttons */}
+                            <div className="space-y-2 pt-2">
+                              {service.booking_enabled && (
+                                <Button
+                                  className="w-full"
+                                  style={{
+                                    background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                                    border: 'none'
+                                  }}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleBookingClick(service);
+                                  }}
+                                >
+                                  <Calendar className="h-4 w-4 mr-2" />
+                                  {isRTL ? 'حجز موعد' : 'Book Appointment'}
+                                </Button>
+                              )}
+                              <Button
+                                variant="outline"
+                                className="w-full"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleViewProvider(service.provider_id);
+                                }}
+                              >
+                                <ExternalLink className="h-4 w-4 mr-2" />
+                                {isRTL ? 'عرض المزود' : 'View Provider'}
+                              </Button>
+                            </div>
                           </div>
                         </div>
                       )}
