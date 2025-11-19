@@ -398,7 +398,7 @@ export default function Favorites() {
                             <Button
                               size="icon"
                               variant="ghost"
-                              className="h-7 w-7 hover:bg-red-50 dark:hover:bg-red-950/20"
+                              className="h-8 w-8 hover:bg-red-100 dark:hover:bg-red-950/30 flex-shrink-0 bg-red-50 dark:bg-red-950/20"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleRemove(favorite.item_id);
@@ -406,9 +406,9 @@ export default function Favorites() {
                               disabled={removingId === favorite.item_id}
                             >
                               {removingId === favorite.item_id ? (
-                                <div className="h-3.5 w-3.5 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
+                                <div className="h-4 w-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
                               ) : (
-                                <Heart className="h-4 w-4 text-red-500 fill-red-500" />
+                                <Heart className="h-5 w-5 text-red-500 fill-red-500" />
                               )}
                             </Button>
                           </div>
@@ -422,7 +422,7 @@ export default function Favorites() {
                             <Button
                               size="icon"
                               variant="ghost"
-                              className="h-7 w-7 hover:bg-red-50 dark:hover:bg-red-950/20"
+                              className="h-8 w-8 hover:bg-red-100 dark:hover:bg-red-950/30 flex-shrink-0 bg-red-50 dark:bg-red-950/20"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleRemove(favorite.item_id);
@@ -430,9 +430,9 @@ export default function Favorites() {
                               disabled={removingId === favorite.item_id}
                             >
                               {removingId === favorite.item_id ? (
-                                <div className="h-3.5 w-3.5 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
+                                <div className="h-4 w-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
                               ) : (
-                                <Heart className="h-4 w-4 text-red-500 fill-red-500" />
+                                <Heart className="h-5 w-5 text-red-500 fill-red-500" />
                               )}
                             </Button>
                           </div>
