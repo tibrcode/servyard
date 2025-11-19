@@ -13,7 +13,8 @@ import {
   LogOut,
   Moon,
   Sun,
-  Clock
+  Clock,
+  Heart
 } from "lucide-react";
 import { Bell } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
@@ -73,6 +74,7 @@ export function AppSidebar({ currentLanguage = 'en', onLanguageChange, onLocatio
     { title: t.nav.home, url: "/", icon: Home },
     { title: t.nav.services, url: "/services", icon: Search },
     { title: t.nav.notifications || 'Notifications', url: "/notifications", icon: Bell, badge: unreadCount },
+    { title: isRTL ? 'المفضلة' : 'Favorites', url: "/favorites", icon: Heart },
     { title: isRTL ? 'المنطقة الزمنية' : 'Timezone', url: "/timezone", icon: Clock },
   ];
 

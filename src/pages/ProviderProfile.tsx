@@ -30,6 +30,7 @@ import { BookingModal } from "@/components/booking/BookingModal";
 import { auth, db } from "@/integrations/firebase/client";
 import { doc, getDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { useTranslation } from "@/lib/i18n";
+import { FavoriteButton } from "@/components/common/FavoriteButton";
 // Currency shown as Latin code (e.g., AED) per requirement; symbol helper not used here
 
 interface ProviderProfileProps {
@@ -268,6 +269,18 @@ const ProviderProfile = ({ currentLanguage, onLanguageChange }: ProviderProfileP
                             {t.ui.verified}
                           </Badge>
                         )}
+                        <FavoriteButton
+                          type="provider"
+                          itemId={profile.user_id}
+                          itemData={{
+                            title: profile.full_name,
+                            image: profile.avatar_url,
+                            rating: profile.rating,
+                            location: `${profile.city}, ${profile.country}`
+                          }}
+                          variant="ghost"
+                          size="sm"
+                        />
                       </div>
 
                       <div className="flex flex-wrap items-center gap-3 text-muted-foreground mb-3 min-w-0">

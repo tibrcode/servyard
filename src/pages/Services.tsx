@@ -24,6 +24,7 @@ import { upsertDefaultServiceCategories } from "@/lib/firebase/defaultCategories
 import { getCategoryLabel } from "@/lib/categoriesLocale";
 import { filterByRadius, formatDistance, calculateDistance, RADIUS_OPTIONS, DEFAULT_RADIUS_KM, Coordinates } from "@/lib/geolocation";
 import { Slider } from "@/components/ui/slider";
+import { FavoriteButton } from "@/components/common/FavoriteButton";
 
 interface ServicesProps {
   currentLanguage: string;
@@ -728,14 +729,24 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                   {service.description || (isRTL ? 'لا يوجد وصف' : 'No description')}
                                 </p>
                               </div>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setSelectedServiceId(null)}
-                                className="shrink-0"
-                              >
-                                ✕
-                              </Button>
+                              <div className="flex gap-2 shrink-0">
+                                <FavoriteButton
+                                  type="service"
+                                  itemId={service.id}
+                                  itemData={{
+                                    title: service.name,
+                                    category: categories.find(c => c.id === service.category_id)?.[isRTL ? 'name_ar' : 'name_en'],
+                                  }}
+                                  size="sm"
+                                />
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setSelectedServiceId(null)}
+                                >
+                                  ✕
+                                </Button>
+                              </div>
                             </div>
                           </CardHeader>
                           <CardContent className="pt-4 sm:pt-6">
@@ -929,6 +940,29 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                         <span>{isRTL ? 'ممتاز' : 'TOP'}</span>
                       </div>
                     )}
+                    
+                    {/* Favorite Button */}
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '8px',
+                        [isRTL ? 'right' : 'left']: '8px',
+                        zIndex: 10
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <FavoriteButton
+                        type="service"
+                        itemId={service.id}
+                        itemData={{
+                          title: service.name,
+                          category: category?.[isRTL ? 'name_ar' : 'name_en'],
+                          rating: serviceRatings[service.id]?.avg
+                        }}
+                        variant="ghost"
+                        size="sm"
+                      />
+                    </div>
                     
                     {/* Compact Header - Always Visible */}
                     <div

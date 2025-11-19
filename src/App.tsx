@@ -37,6 +37,7 @@ import ContactUs from "@/pages/ContactUs";
 import NotFound from "@/pages/NotFound";
 import DebugNotifications from "@/pages/DebugNotifications";
 import NotificationsHistory from "@/pages/NotificationsHistory";
+import Favorites from "@/pages/Favorites";
 import { NotificationLogProvider, useNotificationLog } from "@/contexts/NotificationLogContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
@@ -325,6 +326,11 @@ const AppContent = () => {
                       <Route path="/provider-signup" element={<ProviderSignup currentLanguage={currentLanguage} onLanguageChange={handleLanguageChange} />} />
                       <Route path="/customer-signup" element={<CustomerSignup currentLanguage={currentLanguage} onLanguageChange={handleLanguageChange} />} />
                       <Route path="/services" element={<Services currentLanguage={currentLanguage} />} />
+                      <Route path="/favorites" element={
+                        <ProtectedRoute requireRole="customer">
+                          <Favorites />
+                        </ProtectedRoute>
+                      } />
                       <Route path="/provider-dashboard" element={
                         <ProtectedRoute requireRole="provider">
                           <React.Suspense fallback={<div className="p-6 text-center text-sm text-muted-foreground">Loading dashboard…</div>}>
