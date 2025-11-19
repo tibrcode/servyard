@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { MapPin, Navigation, Loader2 } from "lucide-react";
+import { getCategoryIcon, getCategoryColor } from "@/lib/categoryIcons";
 
 interface Location {
   latitude: number;
@@ -16,6 +17,9 @@ interface Location {
     average_rating?: number;
     reviews_count?: number;
     currency?: string;
+    category_id?: string;
+    icon_name?: string;
+    color_scheme?: string;
   }>;
   provider_rating?: number;
   provider_reviews_count?: number;
@@ -576,6 +580,28 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                 const reviewCount = service.reviews_count || 0;
                 const isTopRated = rating >= 4.5;
                 
+                // الحصول على تفاصيل الفئة للأيقونة
+                let categoryIcon = '';
+                let categoryBgColor = '';
+                if (service.icon_name && service.color_scheme) {
+                  const colors = getCategoryColor(service.color_scheme);
+                  categoryBgColor = colors.bg;
+                  // تحويل اسم الأيقونة إلى SVG بسيط
+                  const iconSvgMap: { [key: string]: string } = {
+                    'sparkles': '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><path d="M12 1v6m6.16-1.86l-4.24 4.24m6.84 6.02l-6-6m0 12l6-6m-12 0l-6 6m0-12l6 6m-6-6l6-6"/></svg>',
+                    'wrench': '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 1 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>',
+                    'heart': '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
+                    'home': '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+                    'shopping-bag': '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>',
+                    'book': '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
+                    'users': '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+                    'camera': '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>',
+                    'truck': '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="6" width="15" height="12" rx="2"/><path d="M17 6h-3V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v12"/><circle cx="5.5" cy="20.5" r="1.5"/><circle cx="18.5" cy="20.5" r="1.5"/></svg>',
+                    'phone': '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
+                  };
+                  categoryIcon = iconSvgMap[service.icon_name] || '';
+                }
+                
                 return `
                 <div class="service-card" style="
                   min-width: 200px;
@@ -619,22 +645,59 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                     </div>
                   ` : ''}
                   
-                  <!-- Service Name -->
-                                    <!-- Service Name -->
+                  
+                  <!-- Service Name with Icon -->
                   <div style="
-                    font-size: 13px;
-                    font-weight: 700;
-                    color: ${colors.text};
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 8px;
                     margin-bottom: 8px;
-                    line-height: 1.3;
-                    height: 2.6em;
-                    overflow: hidden;
-                    display: -webkit-box;
-                    -webkit-line-clamp: 2;
-                    -webkit-box-orient: vertical;
-                    padding-${isRTL ? 'left' : 'right'}: ${isTopRated ? '50px' : '0'};
                   ">
-                    ${service.name}
+                    ${categoryIcon ? `
+                      <div style="
+                        background: ${categoryBgColor.replace('bg-', '').includes('blue') ? '#dbeafe' : 
+                                       categoryBgColor.includes('orange') ? '#fed7aa' :
+                                       categoryBgColor.includes('red') ? '#fecaca' :
+                                       categoryBgColor.includes('green') ? '#dcfce7' :
+                                       categoryBgColor.includes('pink') ? '#fbcfe8' :
+                                       categoryBgColor.includes('purple') ? '#e9d5ff' :
+                                       categoryBgColor.includes('yellow') ? '#fef3c7' :
+                                       '#f3f4f6'};
+                        padding: 6px;
+                        border-radius: 8px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        flex-shrink: 0;
+                        color: ${categoryBgColor.includes('blue') ? '#0369a1' : 
+                                 categoryBgColor.includes('orange') ? '#b45309' :
+                                 categoryBgColor.includes('red') ? '#b91c1c' :
+                                 categoryBgColor.includes('green') ? '#166534' :
+                                 categoryBgColor.includes('pink') ? '#be185d' :
+                                 categoryBgColor.includes('purple') ? '#6b21a8' :
+                                 categoryBgColor.includes('yellow') ? '#92400e' :
+                                 '#4b5563'};
+                        width: 32px;
+                        height: 32px;
+                      ">
+                        ${categoryIcon}
+                      </div>
+                    ` : ''}
+                    <div style="
+                      font-size: 13px;
+                      font-weight: 700;
+                      color: ${colors.text};
+                      line-height: 1.3;
+                      height: 2.6em;
+                      overflow: hidden;
+                      display: -webkit-box;
+                      -webkit-line-clamp: 2;
+                      -webkit-box-orient: vertical;
+                      flex: 1;
+                      padding-${isRTL ? 'left' : 'right'}: ${isTopRated ? '50px' : '0'};
+                    ">
+                      ${service.name}
+                    </div>
                   </div>
                   
                   <!-- Rating & Reviews -->
