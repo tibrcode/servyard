@@ -83,6 +83,9 @@ export function ServiceBooking({
 
   const isRTL = language === 'ar';
   const dateLocale = language === 'ar' ? ar : enUS;
+  
+  // Debug price
+  console.log('💰 ServiceBooking price prop:', price);
 
   // Translation
   const t = {
@@ -281,9 +284,11 @@ export function ServiceBooking({
       
       if (allAvailable) {
         // Add to end of selection
-        const sortedTimes = [...selectedTimes, time].map(t => slots.findIndex(s => s.time === t))
-          .sort((a, b) => a - b)
-          .map(idx => slots[idx].time);
+        const sortedTimes = [...selectedTimes, time]
+          .map(t => ({ time: t, index: slots.findIndex(s => s.time === t) }))
+          .filter(item => item.index !== -1)
+          .sort((a, b) => a.index - b.index)
+          .map(item => item.time);
         setSelectedTimes(sortedTimes);
       } else {
         // Start new selection
@@ -301,9 +306,11 @@ export function ServiceBooking({
       
       if (allAvailable) {
         // Add to start of selection
-        const sortedTimes = [time, ...selectedTimes].map(t => slots.findIndex(s => s.time === t))
-          .sort((a, b) => a - b)
-          .map(idx => slots[idx].time);
+        const sortedTimes = [time, ...selectedTimes]
+          .map(t => ({ time: t, index: slots.findIndex(s => s.time === t) }))
+          .filter(item => item.index !== -1)
+          .sort((a, b) => a.index - b.index)
+          .map(item => item.time);
         setSelectedTimes(sortedTimes);
       } else {
         // Start new selection
@@ -326,7 +333,7 @@ export function ServiceBooking({
       const startTime = sortedTimes[0];
       const lastTime = sortedTimes[sortedTimes.length - 1];
       const endTime = calculateEndTime(lastTime, bookingSettings.duration_minutes);
-      const totalPrice = price * selectedTimes.length;
+      const totalPrice = (price || 0) * selectedTimes.length;
 
       if (existingBookingId) {
         // Update existing booking
@@ -577,7 +584,7 @@ export function ServiceBooking({
                   <div className="flex justify-between text-sm sm:text-base gap-2">
                     <span className="text-muted-foreground">{t.price}:</span>
                     <span className="font-semibold">
-                      {price * selectedTimes.length} {currency}
+                      {((price || 0) * selectedTimes.length).toFixed(2)} {currency}
                     </span>
                   </div>
                 </CardContent>

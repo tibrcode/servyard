@@ -378,6 +378,8 @@ export function MyBookings({
       if (serviceDoc.exists()) {
         const serviceData = serviceDoc.data();
         
+        console.log('📋 Service data loaded for edit:', serviceData);
+        
         // Load provider timezone
         let providerTimezone = 'Asia/Dubai';
         try {
@@ -404,9 +406,12 @@ export function MyBookings({
         setServiceDetails({
           ...serviceData,
           id: booking.service_id,
+          price: serviceData.price || 0, // Ensure price is set
           bookingSettings,
           providerTimezone,
         });
+        
+        console.log('✅ Service details set with price:', serviceData.price);
         
         setEditDialogOpen(true);
       }
