@@ -598,6 +598,7 @@ export default function Favorites() {
           currentLanguage="en"
         />
       )}
+      </main>
     </div>
   );
 }
