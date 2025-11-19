@@ -209,7 +209,7 @@ export function ServiceBooking({
 
     const slots = availability.slots;
     const clickedIndex = slots.findIndex(s => s.time === time);
-    if (clickedIndex === -1) return;
+    if (clickedIndex === -1 || !slots[clickedIndex].available) return;
 
     // If already selected, deselect it
     if (selectedTimes.includes(time)) {
@@ -220,7 +220,7 @@ export function ServiceBooking({
         return;
       }
 
-      // Check continuity
+      // Check continuity after removal
       const indices = newSelection.map(t => slots.findIndex(s => s.time === t)).sort((a, b) => a - b);
       let isConsecutive = true;
       for (let i = 0; i < indices.length - 1; i++) {
@@ -233,28 +233,64 @@ export function ServiceBooking({
       if (isConsecutive) {
         setSelectedTimes(newSelection);
       } else {
+        // If removing causes discontinuity, clear selection
         setSelectedTimes([]);
       }
       return;
     }
 
-    // If not selected
+    // If no slots selected yet, start fresh
     if (selectedTimes.length === 0) {
       setSelectedTimes([time]);
       return;
     }
 
-    // Check adjacency
+    // Get current selection indices (sorted)
     const selectedIndices = selectedTimes.map(t => slots.findIndex(s => s.time === t)).sort((a, b) => a - b);
     const firstIndex = selectedIndices[0];
     const lastIndex = selectedIndices[selectedIndices.length - 1];
 
+    // Check if clicked slot is adjacent to current selection
     if (clickedIndex === lastIndex + 1) {
-      // Append to end
-      setSelectedTimes([...selectedTimes, time]);
+      // Check all slots between last and clicked are available
+      let allAvailable = true;
+      for (let i = lastIndex + 1; i <= clickedIndex; i++) {
+        if (!slots[i].available) {
+          allAvailable = false;
+          break;
+        }
+      }
+      
+      if (allAvailable) {
+        // Add to end of selection
+        const sortedTimes = [...selectedTimes, time].map(t => slots.findIndex(s => s.time === t))
+          .sort((a, b) => a - b)
+          .map(idx => slots[idx].time);
+        setSelectedTimes(sortedTimes);
+      } else {
+        // Start new selection
+        setSelectedTimes([time]);
+      }
     } else if (clickedIndex === firstIndex - 1) {
-      // Prepend to start
-      setSelectedTimes([time, ...selectedTimes]);
+      // Check all slots between clicked and first are available
+      let allAvailable = true;
+      for (let i = clickedIndex; i < firstIndex; i++) {
+        if (!slots[i].available) {
+          allAvailable = false;
+          break;
+        }
+      }
+      
+      if (allAvailable) {
+        // Add to start of selection
+        const sortedTimes = [time, ...selectedTimes].map(t => slots.findIndex(s => s.time === t))
+          .sort((a, b) => a - b)
+          .map(idx => slots[idx].time);
+        setSelectedTimes(sortedTimes);
+      } else {
+        // Start new selection
+        setSelectedTimes([time]);
+      }
     } else {
       // Not adjacent, start new selection
       setSelectedTimes([time]);
