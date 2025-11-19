@@ -11,13 +11,14 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, Filter, MapPin, Star, Clock, ExternalLink, Calendar, Map as MapIcon, List, ChevronDown, Sparkles, Wrench, Heart, Dumbbell, Scissors, GraduationCap, Stethoscope, Home, Car, Laptop, Scale, DollarSign, Users, Cog, Palette, Shirt, Code, Building, Megaphone, Camera, Languages, Briefcase, Sofa, PenTool, Music, Plane } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from "@/hooks/use-toast";
 import { getCategoryIcon, getCategoryColor } from "@/lib/categoryIcons";
 // Currency display uses Latin currency code (e.g., AED) instead of symbol
 import { db } from "@/integrations/firebase/client";
 import InteractiveMap from "@/components/map/InteractiveMap";
 import { collection, getDocs, doc, getDoc, query as fsQuery, where } from "firebase/firestore";
-import { ServiceCategory, initializeServiceCategories } from "@/lib/firebase/collections";
+import { ServiceCategory, initializeServiceCategories, Offer } from "@/lib/firebase/collections";
 import { getServiceCategoriesCached } from "@/lib/categoriesCache";
 import { getServicesCached, invalidateServicesCache } from "@/lib/servicesCache";
 import { upsertDefaultServiceCategories } from "@/lib/firebase/defaultCategories";
@@ -74,6 +75,8 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
   const [services, setServices] = useState<Service[]>([]);
   const [categories, setCategories] = useState<ServiceCategory[]>([]);
   const [providers, setProviders] = useState<{ [key: string]: Provider }>({});
+  const [offersByProvider, setOffersByProvider] = useState<Record<string, Offer[]>>({});
+  const [offersList, setOffersList] = useState<Offer[]>([]);
   const [providerRatings, setProviderRatings] = useState<{ [key: string]: { avg: number; count: number } }>({});
   const [serviceRatings, setServiceRatings] = useState<{ [key: string]: { avg: number; count: number } }>({});
   const [loading, setLoading] = useState(true);
@@ -90,6 +93,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
   const [viewMode, setViewMode] = useState<'list' | 'map'>(
     viewParam === 'map' ? 'map' : 'list'
   );
+  const [activeTab, setActiveTab] = useState<'services' | 'offers'>('services');
   
   // Selected service from map
   const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
@@ -180,6 +184,48 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
             if (count > 0) finalRatings[pid] = { avg: sum / count, count };
           });
           setProviderRatings(finalRatings);
+        
+        // Load active offers for these providers
+        try {
+          const offersMap: Record<string, Offer[]> = {};
+          const offersArr: Offer[] = [];
+          const chunksOffers: string[][] = [];
+          for (let i = 0; i < providerIds.length; i += 10) chunksOffers.push(providerIds.slice(i, i + 10));
+
+          for (const chunk of chunksOffers) {
+            try {
+              const offersRef = collection(db, 'offers');
+              const q = fsQuery(offersRef, where('provider_id', 'in', chunk), where('is_active', '==', true));
+              const snap = await getDocs(q);
+              snap.forEach(d => {
+                const data: any = d.data();
+                const offer: Offer = {
+                  id: d.id,
+                  provider_id: data.provider_id,
+                  title: data.title,
+                  description: data.description,
+                  discount_percentage: data.discount_percentage,
+                  discount_amount: data.discount_amount,
+                  valid_from: data.valid_from,
+                  valid_until: data.valid_until,
+                  is_active: data.is_active,
+                  created_at: data.created_at,
+                  updated_at: data.updated_at
+                } as Offer;
+                offersArr.push(offer);
+                if (!offersMap[offer.provider_id]) offersMap[offer.provider_id] = [];
+                offersMap[offer.provider_id].push(offer);
+              });
+            } catch (err) {
+              console.warn('Error loading offers chunk', err);
+            }
+          }
+
+          setOffersByProvider(offersMap);
+          setOffersList(offersArr);
+        } catch (err) {
+          console.warn('Failed to load offers for providers', err);
+        }
         }
 
         // Load per-service ratings in chunks as well
@@ -624,6 +670,54 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
           </div>
         </div>
 
+        {/* Services / Offers Tabs */}
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
+          <TabsList className="grid w-full grid-cols-2 mb-4">
+            <TabsTrigger value="services" className="flex items-center justify-center">
+              {isRTL ? 'الخدمات' : 'Services'}
+            </TabsTrigger>
+            <TabsTrigger value="offers" className="flex items-center justify-center">
+              {isRTL ? 'العروض' : 'Offers'}
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+
+        {activeTab === 'offers' ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+            {offersList.length === 0 ? (
+              <div className="col-span-full text-center text-sm text-muted-foreground">
+                {isRTL ? 'لا توجد عروض حالياً' : 'No offers available right now.'}
+              </div>
+            ) : (
+              offersList.map((offer) => (
+                <Card key={offer.id} className="shadow-sm">
+                  <CardHeader className="flex items-start justify-between">
+                    <CardTitle className="text-sm font-medium">
+                      {offer.title || (isRTL ? 'عرض' : 'Offer')}
+                    </CardTitle>
+                    {(offer.discount_percentage || offer.discount_amount) ? (
+                      <Badge variant="secondary" className="ml-2 whitespace-nowrap">
+                        {offer.discount_percentage ? `${offer.discount_percentage}%` : `${offer.discount_amount}`}
+                      </Badge>
+                    ) : null}
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground mb-2">{offer.description}</p>
+                    <div className="flex items-center justify-between">
+                      <div className="text-xs text-muted-foreground">
+                        {providers[offer.provider_id]?.full_name || (isRTL ? 'مزود' : 'Provider')}
+                      </div>
+                      <a href={`/provider/${offer.provider_id}`} className="text-xs text-primary hover:underline">
+                        {isRTL ? 'عرض الملف' : 'View Provider'}
+                      </a>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </div>
+        ) : null}
+
         {/* Services Grid or Map */}
         {filteredServices.length === 0 ? (
           <Card>
@@ -977,10 +1071,24 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                             display: '-webkit-box',
                             WebkitLineClamp: 2,
                             WebkitBoxOrient: 'vertical',
+                            flex: 1
                           }}
                         >
                           {service.name}
                         </span>
+                        {/* Offer Badge */}
+                        {offersByProvider[service.provider_id]?.length > 0 && (() => {
+                          const offer = offersByProvider[service.provider_id][0];
+                          return (
+                            <Badge 
+                              variant="secondary" 
+                              className="ml-2 bg-green-500 text-white hover:bg-green-600 shrink-0 whitespace-nowrap"
+                              style={{ fontSize: '10px', padding: '2px 6px' }}
+                            >
+                              {offer.discount_percentage ? `🎉 ${offer.discount_percentage}%` : '🎉'}
+                            </Badge>
+                          );
+                        })()}
                       </div>
                       
                       {/* Rating & Reviews with Favorite Button */}
