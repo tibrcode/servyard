@@ -262,14 +262,29 @@ export function OffersManagement({ currentLanguage }: OffersManagementProps) {
           <h2 className="text-2xl font-bold">{t.offers.offersManagement}</h2>
           <p className="text-muted-foreground">{t.offers.createManageOffers}</p>
         </div>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <Dialog open={isDialogOpen} onOpenChange={(open) => {
+          if (open) {
+            handleOpenDialog();
+          } else {
+            setIsDialogOpen(false);
+            setEditingOffer(null);
+          }
+        }}>
           <DialogTrigger asChild>
-            <Button onClick={() => handleOpenDialog()}>
+            <Button>
               <Plus className="h-4 w-4 mr-2" />
               {t.offers.addNewOffer}
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+          <DialogContent 
+            className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto"
+            onInteractOutside={(e) => {
+              // Prevent closing on mobile when tapping outside
+              if (window.innerWidth < 640) {
+                e.preventDefault();
+              }
+            }}
+          >
             <DialogHeader>
               <DialogTitle>{editingOffer ? t.offers.editOffer : t.offers.addNewOffer}</DialogTitle>
               <DialogDescription>
@@ -301,26 +316,28 @@ export function OffersManagement({ currentLanguage }: OffersManagementProps) {
 
               <div className="space-y-4">
                 <Label>{t.offers.discountType}</Label>
-                <div className="flex gap-4">
-                  <div className="flex items-center space-x-2">
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                  <div className="flex items-center gap-2">
                     <input
                       type="radio"
                       id="percentage"
                       name="discountType"
                       checked={formData.discount_type === "percentage"}
                       onChange={() => setFormData({ ...formData, discount_type: "percentage" })}
+                      className="w-4 h-4"
                     />
-                    <label htmlFor="percentage">{t.offers.percentage}</label>
+                    <label htmlFor="percentage" className="cursor-pointer">{t.offers.percentage}</label>
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center gap-2">
                     <input
                       type="radio"
                       id="amount"
                       name="discountType"
                       checked={formData.discount_type === "amount"}
                       onChange={() => setFormData({ ...formData, discount_type: "amount" })}
+                      className="w-4 h-4"
                     />
-                    <label htmlFor="amount">{t.offers.fixedAmount}</label>
+                    <label htmlFor="amount" className="cursor-pointer">{t.offers.fixedAmount}</label>
                   </div>
                 </div>
 
