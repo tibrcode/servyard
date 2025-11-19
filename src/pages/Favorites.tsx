@@ -398,7 +398,7 @@ export default function Favorites() {
                             <Button
                               size="icon"
                               variant="ghost"
-                              className="h-8 w-8 hover:bg-green-100 dark:hover:bg-green-950/30 flex-shrink-0 bg-green-50 dark:bg-green-950/20"
+                              className="h-8 w-8 hover:bg-green-200 dark:hover:bg-green-900/40 flex-shrink-0 bg-green-100 dark:bg-green-900/30"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleRemove(favorite.item_id);
@@ -406,9 +406,9 @@ export default function Favorites() {
                               disabled={removingId === favorite.item_id}
                             >
                               {removingId === favorite.item_id ? (
-                                <div className="h-4 w-4 border-2 border-green-600 border-t-transparent rounded-full animate-spin" />
+                                <div className="h-4 w-4 border-2 border-green-700 border-t-transparent rounded-full animate-spin" />
                               ) : (
-                                <span style={{ fontSize: '20px', color: '#10b981', lineHeight: 1 }}>💚</span>
+                                <span style={{ fontSize: '20px', color: '#15803d', lineHeight: 1 }}>💚</span>
                               )}
                             </Button>
                           </div>
@@ -422,7 +422,7 @@ export default function Favorites() {
                             <Button
                               size="icon"
                               variant="ghost"
-                              className="h-8 w-8 hover:bg-green-100 dark:hover:bg-green-950/30 flex-shrink-0 bg-green-50 dark:bg-green-950/20"
+                              className="h-8 w-8 hover:bg-green-200 dark:hover:bg-green-900/40 flex-shrink-0 bg-green-100 dark:bg-green-900/30"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleRemove(favorite.item_id);
@@ -430,9 +430,9 @@ export default function Favorites() {
                               disabled={removingId === favorite.item_id}
                             >
                               {removingId === favorite.item_id ? (
-                                <div className="h-4 w-4 border-2 border-green-600 border-t-transparent rounded-full animate-spin" />
+                                <div className="h-4 w-4 border-2 border-green-700 border-t-transparent rounded-full animate-spin" />
                               ) : (
-                                <span style={{ fontSize: '20px', color: '#10b981', lineHeight: 1 }}>💚</span>
+                                <span style={{ fontSize: '20px', color: '#15803d', lineHeight: 1 }}>💚</span>
                               )}
                             </Button>
                           </div>
