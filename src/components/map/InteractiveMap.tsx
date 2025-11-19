@@ -407,10 +407,14 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
           ">
             <!-- Floating Provider Header -->
             <div style="
-              background: transparent;
+              background: ${isDarkMode ? 'rgba(28, 28, 30, 0.95)' : 'rgba(255, 255, 255, 0.95)'};
+              backdrop-filter: blur(16px);
+              -webkit-backdrop-filter: blur(16px);
               padding: 12px 16px;
               border-radius: 16px;
               margin-bottom: 10px;
+              box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+              border: 1px solid ${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'};
               position: relative;
             ">
               <!-- Close Button Inside Card -->
