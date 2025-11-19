@@ -217,13 +217,15 @@ export async function updateBooking(
   // Send notification to provider about booking update
   try {
     const updatedBooking = { ...oldBooking, ...updates, updated_at: Timestamp.now() };
-    await fetch('https://us-central1-servyard-de527.cloudfunctions.net/notifyBookingUpdate', withTrace({
+    // Use the existing notifyBookingStatusChange function with 'updated' status
+    await fetch('https://notifybookingstatuschange-btfczcxdyq-uc.a.run.app', withTrace({
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         bookingId: bookingId,
         booking: updatedBooking,
-        oldBooking: oldBooking,
+        oldStatus: oldBooking.status,
+        newStatus: 'updated', // Custom status to indicate update
         updates: updates
       })
     }));

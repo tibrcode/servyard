@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.pruneOldRequestTraces = exports.monitorDuplicateCategories = exports.snapshotSystemStats = exports.sendScheduledReminders = exports.notifyBookingStatusChange = exports.notifyNewBooking = exports.getLocationStats = exports.findNearbyProviders = exports.sendTestNotification = exports.adminDeleteUser = exports.onAuthDeleteUser = exports.dedupeServiceCategories = void 0;
+exports.pruneOldRequestTraces = exports.monitorDuplicateCategories = exports.snapshotSystemStats = exports.sendScheduledReminders = exports.notifyBookingStatusChange = exports.notifyBookingUpdate = exports.notifyNewBooking = exports.getLocationStats = exports.findNearbyProviders = exports.sendTestNotification = exports.adminDeleteUser = exports.onAuthDeleteUser = exports.dedupeServiceCategories = void 0;
 const admin = __importStar(require("firebase-admin"));
 const https_1 = require("firebase-functions/v2/https");
 const scheduler_1 = require("firebase-functions/v2/scheduler");
@@ -898,6 +898,76 @@ exports.notifyNewBooking = (0, https_1.onRequest)({ cors: true, invoker: 'public
     }
 });
 /**
+ * HTTP Function: Send notification when booking is updated (time/date changed)
+ * Call this from frontend after updating booking details
+ */
+exports.notifyBookingUpdate = (0, https_1.onRequest)({ cors: true, invoker: 'public' }, async (req, res) => {
+    if (req.method !== 'POST') {
+        return errorResponse(res, 405, 'method_not_allowed', 'POST required', req.get('x-trace-id'));
+    }
+    try {
+        const trace = req.get('x-trace-id');
+        const started = Date.now();
+        logTrace(trace, 'notifyBookingUpdate:start');
+        const { bookingId, booking, oldBooking, updates } = req.body;
+        if (!bookingId || !booking || !oldBooking) {
+            logTrace(trace, 'notifyBookingUpdate:skip', { reason: 'missing_data' });
+            return errorResponse(res, 400, 'missing_parameters', 'Missing required data', trace);
+        }
+        // Get provider's FCM token
+        const providerToken = await getUserFCMToken(booking.provider_id);
+        const providerProfile = await db.collection('profiles').doc(booking.provider_id).get();
+        const prefs = providerProfile.data()?.notification_settings || {};
+        const enabled = prefs.enabled !== false;
+        if (!enabled) {
+            logTrace(trace, 'notifyBookingUpdate:skip', { reason: 'user_prefs_disabled' });
+            return errorResponse(res, 200, 'user_prefs_disabled', 'Notifications disabled by user preferences', trace);
+        }
+        if (!providerToken) {
+            console.log('Provider FCM token not found');
+            logTrace(trace, 'notifyBookingUpdate:skip', { reason: 'no_provider_token' });
+            return errorResponse(res, 200, 'no_provider_token', 'No FCM token for provider', trace);
+        }
+        // Get service name
+        const serviceDoc = await db.collection('services').doc(booking.service_id).get();
+        const serviceName = serviceDoc.data()?.title || 'الخدمة';
+        // Get customer name
+        const customerName = booking.customer_name || 'العميل';
+        // Build update message
+        const changes = [];
+        if (updates.booking_date && updates.booking_date !== oldBooking.booking_date) {
+            changes.push(`التاريخ: ${updates.booking_date}`);
+        }
+        if (updates.start_time && updates.start_time !== oldBooking.start_time) {
+            changes.push(`الوقت: ${updates.start_time}`);
+        }
+        if (updates.end_time && updates.end_time !== oldBooking.end_time) {
+            changes.push(`وقت الانتهاء: ${updates.end_time}`);
+        }
+        const title = '📝 تم تعديل حجز';
+        const body = `قام ${customerName} بتعديل حجز ${serviceName}${changes.length > 0 ? ': ' + changes.join(', ') : ''}`;
+        try {
+            await sendNotification(providerToken, title, body, {
+                type: 'booking_updated',
+                booking_id: bookingId,
+                link: `/provider-dashboard?bookingId=${bookingId}`,
+            });
+            console.log(`✅ Booking update notification sent to provider`);
+        }
+        catch (fcmError) {
+            console.error('❌ Failed to send FCM notification:', fcmError.message);
+        }
+        logTrace(trace, 'notifyBookingUpdate:done', { duration_ms: Date.now() - started });
+        return res.status(200).json({ success: true });
+    }
+    catch (error) {
+        console.error('Error in notifyBookingUpdate:', error);
+        const trace = req.get('x-trace-id');
+        logTrace(trace, 'notifyBookingUpdate:error', { message: error?.message });
+        return errorResponse(res, 500, 'internal_error', 'Internal server error', trace);
+    }
+});
+/**
  * HTTP Function: Send notification when booking status changes
  * Call this from frontend after updating booking status
  */
@@ -983,9 +1053,12 @@ exports.notifyBookingStatusChange = (0, https_1.onRequest)({ cors: true, invoker
                 logTrace(trace, 'notifyBookingStatusChange:skip', { reason: 'no_notification_for_status' });
                 return errorResponse(res, 200, 'no_notification_for_status', 'No notification for this status', trace);
         }
-        // Respect quiet hours if configured (Asia/Dubai by default)
+        // Respect quiet hours if configured (using provider's timezone)
         if (quiet.enabled) {
-            const currentHM = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Asia/Dubai' });
+            // Get provider timezone from database (already fetched above as providerDoc)
+            const providerData = providerDoc.data();
+            const providerTimezone = providerData?.timezone || 'Asia/Dubai';
+            const currentHM = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: providerTimezone });
             const [ch, cm] = currentHM.split(':').map(Number);
             const nowMin = ch * 60 + cm;
             const parseHM = (s) => {
@@ -1080,9 +1153,10 @@ exports.sendScheduledReminders = (0, scheduler_1.onSchedule)({
                     batch.update(reminderDoc.ref, { sent: true });
                     continue;
                 }
-                // Quiet hours suppression
+                // Quiet hours suppression (using customer's timezone)
                 if (quiet2.enabled) {
-                    const currentHM = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Asia/Dubai' });
+                    const customerTimezone = customerProfile2.data()?.timezone || 'Asia/Dubai';
+                    const currentHM = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: customerTimezone });
                     const [ch, cm] = currentHM.split(':').map(Number);
                     const nowMin = ch * 60 + cm;
                     const parseHM = (s) => {
