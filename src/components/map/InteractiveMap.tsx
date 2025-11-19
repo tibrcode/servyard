@@ -715,21 +715,42 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
       
       // إزالة الخلفية بعد فتح InfoWindow
       google.maps.event.addListener(infoWindow, 'domready', () => {
+        // البحث عن جميع عناصر InfoWindow وإزالة خلفياتها
+        const iwContainer = document.querySelector('.gm-style-iw-c');
+        const iwContent = document.querySelector('.gm-style-iw-d');
         const iwOuter = document.querySelector('.gm-style-iw');
-        const iwBackground = document.querySelector('.gm-style-iw + div');
         
-        if (iwOuter) {
-          (iwOuter as HTMLElement).style.background = 'transparent';
-        }
+        // إخفاء عنصر الخلفية الرئيسي (الذي يحتوي السهم)
+        const iwBackground = document.querySelector('.gm-style-iw + div');
         if (iwBackground) {
           (iwBackground as HTMLElement).style.display = 'none';
         }
         
-        // إزالة كل عناصر الخلفية
-        const allDivs = document.querySelectorAll('.gm-style-iw-c, .gm-style-iw-d, .gm-style-iw');
-        allDivs.forEach(el => {
-          (el as HTMLElement).style.background = 'transparent';
-          (el as HTMLElement).style.boxShadow = 'none';
+        // جعل الحاويات شفافة
+        if (iwContainer) {
+          (iwContainer as HTMLElement).style.background = 'transparent';
+          (iwContainer as HTMLElement).style.boxShadow = 'none';
+          (iwContainer as HTMLElement).style.padding = '0';
+        }
+        
+        if (iwContent) {
+          (iwContent as HTMLElement).style.background = 'transparent';
+          (iwContent as HTMLElement).style.boxShadow = 'none';
+          (iwContent as HTMLElement).style.overflow = 'visible';
+        }
+        
+        if (iwOuter) {
+          (iwOuter as HTMLElement).style.background = 'transparent';
+        }
+        
+        // البحث عن العنصر الأب الذي يحتوي على الخلفية
+        const parentDivs = document.querySelectorAll('.gm-style > div > div');
+        parentDivs.forEach(el => {
+          const htmlEl = el as HTMLElement;
+          if (htmlEl.style.backgroundColor || window.getComputedStyle(htmlEl).backgroundColor !== 'rgba(0, 0, 0, 0)') {
+            htmlEl.style.background = 'transparent !important';
+            htmlEl.style.backgroundColor = 'transparent !important';
+          }
         });
       });
       
