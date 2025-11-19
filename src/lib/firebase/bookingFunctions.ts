@@ -205,10 +205,32 @@ export async function updateBooking(
 ): Promise<void> {
   const docRef = doc(db, 'bookings', bookingId);
   
+  // Get old booking data before update
+  const bookingSnap = await getDoc(docRef);
+  const oldBooking = bookingSnap.data() as Booking;
+  
   await updateDoc(docRef, {
     ...updates,
     updated_at: Timestamp.now()
   });
+
+  // Send notification to provider about booking update
+  try {
+    const updatedBooking = { ...oldBooking, ...updates, updated_at: Timestamp.now() };
+    await fetch('https://notifybookingupdate-btfczcxdyq-uc.a.run.app', withTrace({
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        bookingId: bookingId,
+        booking: updatedBooking,
+        oldBooking: oldBooking,
+        updates: updates
+      })
+    }));
+  } catch (notifError) {
+    console.error('Error sending booking update notification:', notifError);
+    // Don't fail the update if notification fails
+  }
 }
 
 /**
