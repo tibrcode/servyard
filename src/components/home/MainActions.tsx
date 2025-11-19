@@ -73,7 +73,7 @@ export const MainActions = ({
                 onClick={handleServicesClick}
                 className="glass-card aspect-square font-medium border border-white/10 hover:border-white/20 transition-all duration-300 rounded-2xl flex flex-col items-center justify-center p-6 md:p-8"
               >
-                <Search style={{ width: '48px', height: '48px' }} className="mb-2 text-blue-400" />
+                <Search style={{ width: '48px', height: '48px' }} className="mb-2 text-cyan-300" />
                 <span className="text-center leading-tight text-white text-base">{t.home.findServices}</span>
               </Button>
 
@@ -82,7 +82,7 @@ export const MainActions = ({
                 onClick={handleMapClick}
                 className="glass-card aspect-square font-medium border border-white/10 hover:border-white/20 transition-all duration-300 rounded-2xl flex flex-col items-center justify-center p-6 md:p-8"
               >
-                <Map style={{ width: '48px', height: '48px' }} className="mb-2 text-green-400" />
+                <Map style={{ width: '48px', height: '48px' }} className="mb-2 text-emerald-300" />
                 <span className="text-center leading-tight text-white text-base">{t.home.servicesOnMap || (isRTL ? 'الخدمات عبر الخريطة' : 'Services on Map')}</span>
               </Button>
 
@@ -91,7 +91,7 @@ export const MainActions = ({
                 onClick={handleAuthClick}
                 className="glass-card aspect-square font-medium border border-white/10 hover:border-white/20 transition-all duration-300 rounded-2xl flex flex-col items-center justify-center p-6 md:p-8"
               >
-                <LogIn style={{ width: '48px', height: '48px' }} className="mb-2 text-purple-400" />
+                <LogIn style={{ width: '48px', height: '48px' }} className="mb-2 text-violet-300" />
                 <span className="text-center leading-tight text-white text-base">{t.home.login || (isRTL ? 'تسجيل الدخول' : 'Login')}</span>
               </Button>
 
@@ -101,7 +101,7 @@ export const MainActions = ({
                 disabled={loading}
                 className="glass-card aspect-square font-medium border border-white/10 hover:border-white/20 transition-all duration-300 rounded-2xl flex flex-col items-center justify-center p-6 md:p-8 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <LayoutDashboard style={{ width: '48px', height: '48px' }} className="mb-2 text-orange-400" />
+                <LayoutDashboard style={{ width: '48px', height: '48px' }} className="mb-2 text-amber-300" />
                 <span className="text-center leading-tight text-white text-base">{t.home.dashboard || (isRTL ? 'لوحة التحكم' : 'Dashboard')}</span>
               </Button>
             </div>
