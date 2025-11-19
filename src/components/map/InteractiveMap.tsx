@@ -622,6 +622,13 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                   categoryBgColor = colorValues.bg;
                   categoryTextColor = colorValues.text;
                   
+                  // Helper function to replace currentColor with actual hex color in SVG
+                  const getSvgIcon = (svgString: string, hexColor: string) => {
+                    return svgString
+                      .replace(/stroke="currentColor"/g, `stroke="${hexColor}"`)
+                      .replace(/fill="currentColor"/g, `fill="${hexColor}"`);
+                  };
+                  
                   // خريطة الأيقونات SVG - مطابقة مع أسماء الأيقونات من categoryIcons.tsx
                   const iconSvgMap: { [key: string]: string } = {
                     'Sparkles': '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>',
@@ -652,7 +659,8 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                     'Music': '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>',
                     'Plane': '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-2.1c.6-.4.7-1.2.2-1.8l-1.8-2.3c-.5-.7-1.6-.8-2.2-.2L5 9 3.2 4.8c-.3-.7-1.1-.8-1.5-.2L.3 6.5c-.3.5-.1 1.3.4 1.5L7 11 3.8 16c-.3.5-.1 1.3.4 1.5l2.9 1.7c.5.3 1.3.1 1.5-.4L11 19l4.8 3c.5.3 1.3.1 1.5-.4z"/></svg>',
                   };
-                  categoryIcon = iconSvgMap[service.icon_name] || '';
+                  const baseSvg = iconSvgMap[service.icon_name] || '';
+                  categoryIcon = baseSvg ? getSvgIcon(baseSvg, categoryTextColor) : '';
                 }
                 
                 return `
