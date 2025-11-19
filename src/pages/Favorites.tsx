@@ -8,14 +8,15 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Heart, MapPin, Star, Trash2, ArrowRight, Package, Users, Clock, AlertCircle, ExternalLink } from 'lucide-react';
+import { Heart, MapPin, Star, Trash2, ArrowRight, Package, Users, Clock, AlertCircle, ExternalLink, ChevronDown, Calendar } from 'lucide-react';
 import { getUserFavoritesByType, removeFavorite } from '@/lib/firebase/favoriteFunctions';
 import { Favorite } from '@/types/favorites';
 import { useToast } from '@/hooks/use-toast';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/integrations/firebase/client';
 import { BookingModal } from '@/components/booking/BookingModal';
 import { useTranslation } from '@/lib/i18n';
+import { getCategoryIcon, getCategoryColor } from '@/lib/categoryIcons';
 
 interface ServiceData {
   id: string;
@@ -27,6 +28,7 @@ interface ServiceData {
   is_active: boolean;
   provider_id: string;
   category_id?: string;
+  booking_enabled?: boolean;
 }
 
 interface ProviderData {
@@ -38,6 +40,12 @@ interface ProviderData {
   avatar_url?: string;
   rating?: number;
   total_reviews?: number;
+  currency_code?: string;
+}
+
+interface ServiceRating {
+  avg: number;
+  count: number;
 }
 
 export default function Favorites() {
@@ -51,8 +59,11 @@ export default function Favorites() {
   const [providerFavorites, setProviderFavorites] = useState<Favorite[]>([]);
   const [serviceDetails, setServiceDetails] = useState<{ [key: string]: ServiceData | null }>({});
   const [providerDetails, setProviderDetails] = useState<{ [key: string]: ProviderData | null }>({});
+  const [serviceRatings, setServiceRatings] = useState<{ [key: string]: ServiceRating }>({});
+  const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [removingId, setRemovingId] = useState<string | null>(null);
+  const [expandedServiceId, setExpandedServiceId] = useState<string | null>(null);
   const [bookingModalOpen, setBookingModalOpen] = useState(false);
   const [selectedService, setSelectedService] = useState<(ServiceData & { provider_id: string }) | null>(null);
   const [selectedProvider, setSelectedProvider] = useState<ProviderData | null>(null);
@@ -68,6 +79,18 @@ export default function Favorites() {
 
     setLoading(true);
     try {
+      // Load categories first
+      const categoriesQuery = query(
+        collection(db, 'service_categories'),
+        where('is_active', '==', true)
+      );
+      const categoriesSnapshot = await getDocs(categoriesQuery);
+      const categoriesData = categoriesSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setCategories(categoriesData);
+
       const [services, providers] = await Promise.all([
         getUserFavoritesByType(user.uid, 'service'),
         getUserFavoritesByType(user.uid, 'provider'),
@@ -78,18 +101,38 @@ export default function Favorites() {
 
       // Load service details
       const serviceDetailsMap: { [key: string]: ServiceData | null } = {};
+      const serviceRatingsMap: { [key: string]: ServiceRating } = {};
+      
       for (const fav of services) {
         try {
           const serviceDoc = await getDoc(doc(db, 'services', fav.item_id));
-          serviceDetailsMap[fav.item_id] = serviceDoc.exists() 
-            ? { id: serviceDoc.id, ...serviceDoc.data() } as ServiceData
-            : null;
+          if (serviceDoc.exists()) {
+            serviceDetailsMap[fav.item_id] = { id: serviceDoc.id, ...serviceDoc.data() } as ServiceData;
+            
+            // Load ratings
+            const reviewsQuery = query(
+              collection(db, 'reviews'),
+              where('service_id', '==', fav.item_id)
+            );
+            const reviewsSnapshot = await getDocs(reviewsQuery);
+            const reviews = reviewsSnapshot.docs.map(d => d.data());
+            const avgRating = reviews.length > 0
+              ? reviews.reduce((sum, r: any) => sum + (r.rating || 0), 0) / reviews.length
+              : 0;
+            serviceRatingsMap[fav.item_id] = {
+              avg: avgRating,
+              count: reviews.length
+            };
+          } else {
+            serviceDetailsMap[fav.item_id] = null;
+          }
         } catch (error) {
           console.error(`Error loading service ${fav.item_id}:`, error);
           serviceDetailsMap[fav.item_id] = null;
         }
       }
       setServiceDetails(serviceDetailsMap);
+      setServiceRatings(serviceRatingsMap);
 
       // Load provider details
       const providerDetailsMap: { [key: string]: ProviderData | null } = {};
@@ -172,30 +215,31 @@ export default function Favorites() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-6 max-w-7xl" dir={isRTL ? 'rtl' : 'ltr'}>
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
-          <Heart className="h-6 w-6 sm:h-8 sm:w-8 text-red-500 fill-red-500" />
-          {isRTL ? 'المفضلة' : 'Favorites'}
-        </h1>
-      </div>
+    <div className="min-h-screen flex flex-col" dir={isRTL ? 'rtl' : 'ltr'}>
+      <main className="flex-1 container mx-auto px-4 py-6 max-w-6xl">
+        {/* Header */}
+        <div className="mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
+            <Heart className="h-6 w-6 sm:h-8 sm:w-8 text-red-500 fill-red-500" />
+            {isRTL ? 'المفضلة' : 'Favorites'}
+          </h1>
+        </div>
 
-      {/* Tabs */}
-      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
-        <TabsList className="grid w-full grid-cols-2 mb-6">
-          <TabsTrigger value="services" className="flex items-center gap-2">
-            <Package className="h-4 w-4" />
-            {isRTL ? 'الخدمات' : 'Services'} ({serviceFavorites.length})
-          </TabsTrigger>
-          <TabsTrigger value="providers" className="flex items-center gap-2">
-            <Users className="h-4 w-4" />
-            {isRTL ? 'مزودو الخدمة' : 'Providers'} ({providerFavorites.length})
-          </TabsTrigger>
-        </TabsList>
+        {/* Tabs */}
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="services" className="flex items-center gap-2">
+              <Package className="h-4 w-4" />
+              {isRTL ? 'الخدمات' : 'Services'} ({serviceFavorites.length})
+            </TabsTrigger>
+            <TabsTrigger value="providers" className="flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              {isRTL ? 'مزودو الخدمة' : 'Providers'} ({providerFavorites.length})
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Services Tab */}
-        <TabsContent value="services" className="space-y-4">
+          {/* Services Tab */}
+          <TabsContent value="services" className="space-y-4">
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {[1, 2, 3].map((i) => (
@@ -229,6 +273,11 @@ export default function Favorites() {
               {serviceFavorites.map((favorite) => {
                 const service = serviceDetails[favorite.item_id];
                 const isDeleted = service === null;
+                const isExpanded = expandedServiceId === favorite.item_id;
+                const categoryIcon = getCategoryIcon(favorite.item_category);
+                const categoryColor = getCategoryColor(favorite.item_category);
+                const rating = serviceRatings[favorite.item_id] || { avg: 0, count: 0 };
+                const isTopService = rating.avg >= 4.5;
 
                 if (isDeleted) {
                   return (
@@ -263,88 +312,128 @@ export default function Favorites() {
                 if (!service) return null;
 
                 return (
-                  <Card key={favorite.favorite_id} className="hover:shadow-lg transition-all duration-300 overflow-hidden border hover:border-primary/40">
+                  <Card 
+                    key={favorite.favorite_id} 
+                    className="overflow-hidden border hover:border-primary/40 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer"
+                  >
                     <CardContent className="p-0 flex flex-col h-full">
-                      {/* Service Header with Delete Button */}
-                      <div className="p-4 border-b flex items-center justify-between">
-                        <h3 className="font-semibold line-clamp-2 flex-1">
-                          {service.name}
-                        </h3>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="h-8 w-8 shrink-0 ml-2"
-                          onClick={() => handleRemove(favorite.item_id)}
-                          disabled={removingId === favorite.item_id}
-                        >
-                          {removingId === favorite.item_id ? (
-                            <div className="h-4 w-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
-                          ) : (
-                            <Heart className="h-4 w-4 text-red-500 fill-red-500" />
+                      {/* Card Header */}
+                      <div 
+                        className="p-4 flex items-start justify-between gap-3"
+                        onClick={() => setExpandedServiceId(isExpanded ? null : favorite.item_id)}
+                      >
+                        <div className="flex-1 min-w-0">
+                          {/* Service Name */}
+                          <h3 className="font-semibold text-base line-clamp-2 mb-2">
+                            {service.name}
+                          </h3>
+
+                          {/* Compact Info Row */}
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                            {/* Category Icon */}
+                            <div className={`p-1 rounded-md ${categoryColor} flex-shrink-0`}>
+                              {categoryIcon}
+                            </div>
+
+                            {/* Rating */}
+                            {rating.count > 0 && (
+                              <>
+                                <span className="text-yellow-500">★</span>
+                                <span className="font-medium">{rating.avg.toFixed(1)}</span>
+                                <span className="text-xs">({rating.count})</span>
+                              </>
+                            )}
+
+                            {/* TOP Badge */}
+                            {isTopService && (
+                              <Badge className="ml-auto bg-amber-500 text-white text-xs">
+                                {isRTL ? 'الأفضل' : 'TOP'}
+                              </Badge>
+                            )}
+                          </div>
+
+                          {/* Price */}
+                          {(service.approximate_price || service.price_range) && (
+                            <div className="text-base font-bold text-primary">
+                              {service.approximate_price || service.price_range}
+                            </div>
                           )}
-                        </Button>
+                        </div>
+
+                        {/* Right Side: Favorite Button + Expand Arrow */}
+                        <div className="flex items-start gap-2 flex-shrink-0">
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-8 w-8"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRemove(favorite.item_id);
+                            }}
+                            disabled={removingId === favorite.item_id}
+                          >
+                            {removingId === favorite.item_id ? (
+                              <div className="h-4 w-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
+                            ) : (
+                              <Heart className="h-4 w-4 text-red-500 fill-red-500" />
+                            )}
+                          </Button>
+
+                          <ChevronDown 
+                            className={`h-5 w-5 text-muted-foreground transition-transform duration-300 mt-0.5 ${isExpanded ? 'rotate-180' : ''}`}
+                          />
+                        </div>
                       </div>
 
-                      {/* Service Details */}
-                      <div className="p-4 flex-1 space-y-3">
-                        {/* Category */}
-                        {favorite.item_category && (
-                          <div className="flex items-center gap-2">
-                            <Badge variant="outline" className="text-xs">
-                              {favorite.item_category}
-                            </Badge>
+                      {/* Expanded Content */}
+                      {isExpanded && (
+                        <div className="border-t pt-4 pb-4 px-4 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                          {/* Description */}
+                          {service.description && (
+                            <p className="text-sm text-muted-foreground">
+                              {service.description}
+                            </p>
+                          )}
+
+                          {/* Metadata Row */}
+                          <div className="space-y-2">
+                            {/* Provider */}
+                            {service.provider_id && providerDetails[service.provider_id] && (
+                              <div className="flex items-center gap-2 text-sm">
+                                <Users className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                                <span>{providerDetails[service.provider_id]?.full_name}</span>
+                              </div>
+                            )}
+
+                            {/* Duration */}
+                            {service.duration_minutes && (
+                              <div className="flex items-center gap-2 text-sm">
+                                <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                                <span>{service.duration_minutes} {isRTL ? 'دقيقة' : 'min'}</span>
+                              </div>
+                            )}
                           </div>
-                        )}
 
-                        {/* Description */}
-                        {service.description && (
-                          <p className="text-sm text-muted-foreground line-clamp-2">
-                            {service.description}
-                          </p>
-                        )}
-
-                        {/* Duration */}
-                        {service.duration_minutes && (
-                          <div className="flex items-center gap-2 text-sm">
-                            <Clock className="h-4 w-4 text-muted-foreground" />
-                            <span>{service.duration_minutes} {isRTL ? 'دقيقة' : 'minutes'}</span>
+                          {/* Action Buttons */}
+                          <div className="space-y-2 pt-2">
+                            <Button
+                              className="w-full"
+                              onClick={() => handleBookingClick(service)}
+                              disabled={!service.is_active}
+                            >
+                              {isRTL ? 'احجز الآن' : 'Book Now'}
+                            </Button>
+                            <Button
+                              variant="outline"
+                              className="w-full"
+                              onClick={() => handleViewProvider(service.provider_id)}
+                            >
+                              {isRTL ? 'عرض المزود' : 'View Provider'}
+                              <ExternalLink className={`h-4 w-4 ${isRTL ? 'mr-2' : 'ml-2'}`} />
+                            </Button>
                           </div>
-                        )}
-
-                        {/* Price */}
-                        {(service.approximate_price || service.price_range) && (
-                          <div className="text-lg font-bold text-primary">
-                            {service.approximate_price || service.price_range}
-                          </div>
-                        )}
-
-                        {/* Rating */}
-                        {favorite.item_rating && (
-                          <div className="flex items-center gap-2">
-                            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                            <span className="text-sm font-medium">{favorite.item_rating.toFixed(1)}</span>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Action Buttons */}
-                      <div className="p-4 border-t space-y-2">
-                        <Button
-                          className="w-full"
-                          onClick={() => handleBookingClick(service)}
-                          disabled={!service.is_active}
-                        >
-                          {isRTL ? 'احجز الآن' : 'Book Now'}
-                        </Button>
-                        <Button
-                          variant="outline"
-                          className="w-full"
-                          onClick={() => handleViewProvider(service.provider_id)}
-                        >
-                          {isRTL ? 'عرض المزود' : 'View Provider'}
-                          <ExternalLink className={`h-4 w-4 ${isRTL ? 'mr-2' : 'ml-2'}`} />
-                        </Button>
-                      </div>
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 );
