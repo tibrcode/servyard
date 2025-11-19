@@ -580,88 +580,9 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                 const reviewCount = service.reviews_count || 0;
                 const isTopRated = rating >= 4.5;
                 
-                // Debug: طباعة بيانات الخدمة
-                console.log('🗺️ Map Service:', { 
-                  name: service.name, 
-                  icon_name: service.icon_name, 
-                  color_scheme: service.color_scheme,
-                  allKeys: Object.keys(service)
-                });
-                
                 // الحصول على تفاصيل الفئة للأيقونة
-                let categoryIcon = '';
                 let categoryBgColor = '#f3f4f6';
                 let categoryTextColor = '#4b5563';
-                if (service.icon_name && service.color_scheme) {
-                  const colors = getCategoryColor(service.color_scheme);
-                  // تحويل اسم الكلاس إلى قيمة اللون
-                  const colorMap: { [key: string]: { bg: string; text: string } } = {
-                    'blue': { bg: '#dbeafe', text: '#0369a1' },
-                    'orange': { bg: '#fed7aa', text: '#b45309' },
-                    'red': { bg: '#fecaca', text: '#b91c1c' },
-                    'green': { bg: '#dcfce7', text: '#166534' },
-                    'pink': { bg: '#fbcfe8', text: '#be185d' },
-                    'purple': { bg: '#e9d5ff', text: '#6b21a8' },
-                    'slate': { bg: '#f1f5f9', text: '#475569' },
-                    'gray': { bg: '#f3f4f6', text: '#4b5563' },
-                    'violet': { bg: '#ede9fe', text: '#5b21b6' },
-                    'rose': { bg: '#ffe4e6', text: '#be123c' },
-                    'emerald': { bg: '#d1fae5', text: '#065f46' },
-                    'amber': { bg: '#fef3c7', text: '#b45309' },
-                    'cyan': { bg: '#cffafe', text: '#0e7490' },
-                    'indigo': { bg: '#e0e7ff', text: '#4338ca' },
-                    'teal': { bg: '#ccfbf1', text: '#115e59' },
-                    'stone': { bg: '#f5f5f4', text: '#5a5450' },
-                    'lime': { bg: '#ecfccb', text: '#3f6212' },
-                    'sky': { bg: '#e0f2fe', text: '#0369a1' },
-                    'yellow': { bg: '#fef3c7', text: '#b45309' },
-                  };
-                  
-                  const colorKey = service.color_scheme?.toLowerCase() || 'gray';
-                  const colorValues = colorMap[colorKey] || { bg: '#f3f4f6', text: '#4b5563' };
-                  categoryBgColor = colorValues.bg;
-                  categoryTextColor = colorValues.text;
-                  
-                  // Helper function to replace currentColor with actual hex color in SVG
-                  const getSvgIcon = (svgString: string, hexColor: string) => {
-                    return svgString
-                      .replace(/stroke="currentColor"/g, `stroke="${hexColor}"`)
-                      .replace(/fill="currentColor"/g, `fill="${hexColor}"`);
-                  };
-                  
-                  // خريطة الأيقونات SVG - مطابقة مع أسماء الأيقونات من categoryIcons.tsx
-                  const iconSvgMap: { [key: string]: string } = {
-                    'Sparkles': '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>',
-                    'Wrench': '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>',
-                    'Heart': '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>',
-                    'Dumbbell': '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h-1v16h1M9 4h-1v16h1M15 4h1v16h-1M18 4h1v16h-1M5 20h14M5 4h14"/></svg>',
-                    'Scissors': '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><path d="M8.12 8.12 12 12"/><path d="M20 4 8.12 15.88"/><circle cx="6" cy="18" r="3"/><path d="M14.8 14.8 20 20"/></svg>',
-                    'GraduationCap': '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>',
-                    'Stethoscope': '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 0 0 .2.3"/><path d="M12 12c0 1.1.9 2 2 2s2-.9 2-2M12 12c0-1.1.9-2 2-2s2 .9 2 2"/></svg>',
-                    'Home': '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
-                    'Car': '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>',
-                    'Laptop': '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 3H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2Z"/><path d="M2 20h20"/></svg>',
-                    'Scale': '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3.5 6.5h17M10 12.5h4M8.5 20h7"/></svg>',
-                    'DollarSign': '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
-                    'Users': '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
-                    'Cog': '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m4.22-7.22-4.24 4.24M20 12h-6m5.22 4.22-4.24-4.24M12 20v-6M4.78 16.22l4.24-4.24M4 12h6M4.78 7.78l4.24 4.24"/></svg>',
-                    'Palette': '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="11" r="1"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2Z"/><circle cx="16" cy="7" r="1"/><circle cx="8" cy="14" r="1"/><circle cx="16" cy="17" r="1"/></svg>',
-                    'Shirt': '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h-3V2h-2v1H8L6 8h1l1 14h8l1-14h1L16 3Z"/></svg>',
-                    'Code': '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
-                    'Building': '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
-                    'Megaphone': '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13c0 1 0 2 .02 3 .02 1 .118 3 .338 4.464.11.724.628 1.694 1.194 2.036.566.342 1.266 0 1.266-.804V2.804c0-.804-.7-1.146-1.266-.804-.566.342-1.084 1.312-1.194 2.036C4.118 6 4.02 7 4.02 8 4 9 4 11 4 13z"/><path d="M20.5 2v20M4 13h16M16.5 2v20"/></svg>',
-                    'Camera': '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>',
-                    'Languages': '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 8 6 6M4 14l6-6M12 3h7a2 2 0 0 1 2 2v7M3 12h7m7 0h4M21 3h-2v8"/></svg>',
-                    'Briefcase': '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>',
-                    'Calendar': '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4M16 2v4M3 4h18v17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4Z"/><path d="M3 10h18"/></svg>',
-                    'Sofa': '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12H3a2 2 0 0 1-2-2V5h6M19 12h2a2 2 0 0 0 2-2V5h-6M3 19v-4h18v4a2 2 0 0 1-2 2h-14a2 2 0 0 1-2-2Z"/></svg>',
-                    'PenTool': '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19 7-7 3-3-7-7-3-3-7 7M5 12l-2-2"/></svg>',
-                    'Music': '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>',
-                    'Plane': '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-2.1c.6-.4.7-1.2.2-1.8l-1.8-2.3c-.5-.7-1.6-.8-2.2-.2L5 9 3.2 4.8c-.3-.7-1.1-.8-1.5-.2L.3 6.5c-.3.5-.1 1.3.4 1.5L7 11 3.8 16c-.3.5-.1 1.3.4 1.5l2.9 1.7c.5.3 1.3.1 1.5-.4L11 19l4.8 3c.5.3 1.3.1 1.5-.4z"/></svg>',
-                  };
-                  const baseSvg = iconSvgMap[service.icon_name] || '';
-                  categoryIcon = baseSvg ? getSvgIcon(baseSvg, categoryTextColor) : '';
-                }
                 
                 return `
                 <div class="service-card" style="
@@ -707,42 +628,21 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                   ` : ''}
                   
                   
-                  <!-- Service Name with Icon -->
+                  <!-- Service Name -->
                   <div style="
-                    display: flex;
-                    align-items: flex-start;
-                    gap: 8px;
+                    font-size: 13px;
+                    font-weight: 700;
+                    color: ${colors.text};
+                    line-height: 1.3;
+                    height: 2.6em;
+                    overflow: hidden;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 2;
+                    -webkit-box-orient: vertical;
                     margin-bottom: 8px;
+                    padding-${isRTL ? 'left' : 'right'}: ${isTopRated ? '50px' : '0'};
                   ">
-                    <div style="
-                      background: ${categoryBgColor};
-                      padding: 8px;
-                      border-radius: 8px;
-                      display: flex;
-                      align-items: center;
-                      justify-content: center;
-                      flex-shrink: 0;
-                      color: ${categoryTextColor};
-                      width: 36px;
-                      height: 36px;
-                    ">
-                      ${categoryIcon || '⚙️'}
-                    </div>
-                    <div style="
-                      font-size: 13px;
-                      font-weight: 700;
-                      color: ${colors.text};
-                      line-height: 1.3;
-                      height: 2.6em;
-                      overflow: hidden;
-                      display: -webkit-box;
-                      -webkit-line-clamp: 2;
-                      -webkit-box-orient: vertical;
-                      flex: 1;
-                      padding-${isRTL ? 'left' : 'right'}: ${isTopRated ? '50px' : '0'};
-                    ">
-                      ${service.name}
-                    </div>
+                    ${service.name}
                   </div>
                   
                   <!-- Rating & Reviews -->
