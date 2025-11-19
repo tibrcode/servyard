@@ -445,7 +445,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
         services: services.map(service => {
           const rating = serviceRatings[service.id];
           const category = categories.find(c => c.id === service.category_id);
-          console.log(`    Service "${service.name}" rating:`, rating);
+          console.log(`    Service "${service.name}" - category:`, { category_id: service.category_id, icon_name: category?.icon_name, color_scheme: category?.color_scheme });
           return {
             id: service.id,
             name: service.name,

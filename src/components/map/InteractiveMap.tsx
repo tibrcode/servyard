@@ -580,10 +580,13 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                 const reviewCount = service.reviews_count || 0;
                 const isTopRated = rating >= 4.5;
                 
+                // Debug: طباعة بيانات الخدمة
+                console.log('Service data:', { name: service.name, icon_name: service.icon_name, color_scheme: service.color_scheme });
+                
                 // الحصول على تفاصيل الفئة للأيقونة
                 let categoryIcon = '';
-                let categoryBgColor = '';
-                let categoryTextColor = '';
+                let categoryBgColor = '#f3f4f6';
+                let categoryTextColor = '#4b5563';
                 if (service.icon_name && service.color_scheme) {
                   const colors = getCategoryColor(service.color_scheme);
                   // تحويل اسم الكلاس إلى قيمة اللون
@@ -692,22 +695,20 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                     gap: 8px;
                     margin-bottom: 8px;
                   ">
-                    ${categoryIcon ? `
-                      <div style="
-                        background: ${categoryBgColor};
-                        padding: 8px;
-                        border-radius: 8px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        flex-shrink: 0;
-                        color: ${categoryTextColor};
-                        width: 36px;
-                        height: 36px;
-                      ">
-                        ${categoryIcon}
-                      </div>
-                    ` : ''}
+                    <div style="
+                      background: ${categoryBgColor};
+                      padding: 8px;
+                      border-radius: 8px;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      flex-shrink: 0;
+                      color: ${categoryTextColor};
+                      width: 36px;
+                      height: 36px;
+                    ">
+                      ${categoryIcon || '⚙️'}
+                    </div>
                     <div style="
                       font-size: 13px;
                       font-weight: 700;
