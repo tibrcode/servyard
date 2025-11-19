@@ -850,12 +850,30 @@ export function MyBookings({
                 customerName={selectedBookingForEdit.customer_name}
                 customerPhone={selectedBookingForEdit.customer_phone}
                 serviceTitle={selectedBookingForEdit.service_title}
-                price={selectedBookingForEdit.price}
+                price={serviceDetails.price}
                 currency={selectedBookingForEdit.currency}
                 bookingSettings={serviceDetails.bookingSettings}
                 providerTimezone={serviceDetails.providerTimezone || 'Asia/Dubai'}
                 language={language}
                 onBookingComplete={handleEditBookingComplete}
+                existingBookingId={selectedBookingForEdit.booking_id}
+                initialDate={new Date(selectedBookingForEdit.booking_date + 'T00:00:00')}
+                initialTimes={(() => {
+                  const start = selectedBookingForEdit.start_time;
+                  const end = selectedBookingForEdit.end_time;
+                  const duration = serviceDetails.bookingSettings?.duration_minutes || 60;
+                  const times: string[] = [];
+                  let current = start;
+                  while (current < end) {
+                    times.push(current);
+                    const [hours, minutes] = current.split(':').map(Number);
+                    const totalMinutes = hours * 60 + minutes + duration;
+                    const newHours = Math.floor(totalMinutes / 60);
+                    const newMinutes = totalMinutes % 60;
+                    current = `${String(newHours).padStart(2, '0')}:${String(newMinutes).padStart(2, '0')}`;
+                  }
+                  return times;
+                })()}
               />
             )}
           </div>

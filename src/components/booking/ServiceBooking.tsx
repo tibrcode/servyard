@@ -30,6 +30,7 @@ import {
   getServiceSchedule,
   getServiceBookings,
   createBooking,
+  updateBooking,
 } from '@/lib/firebase/bookingFunctions';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
@@ -48,6 +49,9 @@ interface ServiceBookingProps {
   language?: 'ar' | 'en';
   onBookingComplete?: (bookingId: string) => void;
   onBack?: () => void;
+  existingBookingId?: string; // For edit mode
+  initialDate?: Date; // Pre-selected date for edit
+  initialTimes?: string[]; // Pre-selected times for edit
 }
 
 export function ServiceBooking({
@@ -64,10 +68,13 @@ export function ServiceBooking({
   language = 'ar',
   onBookingComplete,
   onBack,
+  existingBookingId,
+  initialDate,
+  initialTimes = [],
 }: ServiceBookingProps) {
   const { toast } = useToast();
-  const [selectedDate, setSelectedDate] = useState<Date>();
-  const [selectedTimes, setSelectedTimes] = useState<string[]>([]);
+  const [selectedDate, setSelectedDate] = useState<Date>(initialDate || undefined);
+  const [selectedTimes, setSelectedTimes] = useState<string[]>(initialTimes);
   const [availability, setAvailability] = useState<DailyAvailability | null>(null);
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const [isBooking, setIsBooking] = useState(false);
@@ -115,11 +122,14 @@ export function ServiceBooking({
     if (selectedDate) {
       loadAvailability(selectedDate);
     }
-  }, [selectedDate]);
+  }, [selectedDate, existingBookingId]);
 
   const loadAvailability = async (date: Date) => {
     setIsLoadingSlots(true);
-    setSelectedTimes([]);
+    // Only clear selected times if not in edit mode on first load
+    if (!existingBookingId || availability) {
+      setSelectedTimes([]);
+    }
     
     try {
       const dateString = formatDate(date);
@@ -160,11 +170,16 @@ export function ServiceBooking({
       
       console.log('📋 Bookings loaded:', bookings.length);
 
+      // Filter out current booking if in edit mode
+      const filteredBookings = existingBookingId 
+        ? bookings.filter(b => b.booking_id !== existingBookingId)
+        : bookings;
+
       // Calculate availability
       const dailyAvailability = getDailyAvailability(
         dateString,
         schedule,
-        bookings,
+        filteredBookings,
         bookingSettings,
         providerTimezone
       );
@@ -310,39 +325,62 @@ export function ServiceBooking({
       const endTime = calculateEndTime(lastTime, bookingSettings.duration_minutes);
       const totalPrice = price * selectedTimes.length;
 
-      const bookingData = {
-        service_id: serviceId,
-        provider_id: providerId,
-        customer_id: customerId,
-        customer_name: customerName,
-        customer_phone: customerPhone,
-        service_title: serviceTitle,
-        booking_date: dateString,
-        start_time: startTime,
-        end_time: endTime,
-        status: bookingSettings.require_confirmation ? ('pending' as const) : ('confirmed' as const),
-        price: totalPrice,
-        currency,
-        notes,
-      };
+      if (existingBookingId) {
+        // Update existing booking
+        await updateBooking(existingBookingId, {
+          booking_date: dateString,
+          start_time: startTime,
+          end_time: endTime,
+          price: totalPrice,
+          notes,
+        });
 
-      const bookingId = await createBooking(bookingData);
+        toast({
+          title: isRTL ? 'تم التحديث' : 'Updated',
+          description: isRTL ? 'تم تحديث الحجز بنجاح' : 'Booking updated successfully',
+        });
 
-      toast({
-        title: t.success,
-        description: bookingSettings.require_confirmation
-          ? (isRTL ? 'سيتم تأكيد حجزك قريباً' : 'Your booking will be confirmed soon')
-          : t.successDesc,
-      });
+        if (onBookingComplete) {
+          onBookingComplete(existingBookingId);
+        }
+      } else {
+        // Create new booking
+        const bookingData = {
+          service_id: serviceId,
+          provider_id: providerId,
+          customer_id: customerId,
+          customer_name: customerName,
+          customer_phone: customerPhone,
+          service_title: serviceTitle,
+          booking_date: dateString,
+          start_time: startTime,
+          end_time: endTime,
+          status: bookingSettings.require_confirmation ? ('pending' as const) : ('confirmed' as const),
+          price: totalPrice,
+          currency,
+          notes,
+        };
 
-      if (onBookingComplete) {
-        onBookingComplete(bookingId);
+        const bookingId = await createBooking(bookingData);
+
+        toast({
+          title: t.success,
+          description: bookingSettings.require_confirmation
+            ? (isRTL ? 'سيتم تأكيد حجزك قريباً' : 'Your booking will be confirmed soon')
+            : t.successDesc,
+        });
+
+        if (onBookingComplete) {
+          onBookingComplete(bookingId);
+        }
       }
     } catch (error) {
-      console.error('Error creating booking:', error);
+      console.error('Error creating/updating booking:', error);
       toast({
         title: t.failed,
-        description: isRTL ? 'حدث خطأ أثناء إنشاء الحجز' : 'An error occurred while creating booking',
+        description: isRTL 
+          ? 'حدث خطأ أثناء ' + (existingBookingId ? 'تحديث' : 'إنشاء') + ' الحجز' 
+          : 'An error occurred while ' + (existingBookingId ? 'updating' : 'creating') + ' booking',
         variant: 'destructive',
       });
     } finally {

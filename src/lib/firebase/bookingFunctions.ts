@@ -196,6 +196,22 @@ export async function updateBookingStatus(
 }
 
 /**
+ * Update booking details (date, time, price)
+ * تحديث تفاصيل الحجز (التاريخ، الوقت، السعر)
+ */
+export async function updateBooking(
+  bookingId: string,
+  updates: Partial<Pick<Booking, 'booking_date' | 'start_time' | 'end_time' | 'price' | 'notes'>>
+): Promise<void> {
+  const docRef = doc(db, 'bookings', bookingId);
+  
+  await updateDoc(docRef, {
+    ...updates,
+    updated_at: Timestamp.now()
+  });
+}
+
+/**
  * Cancel booking
  * إلغاء الحجز
  */
