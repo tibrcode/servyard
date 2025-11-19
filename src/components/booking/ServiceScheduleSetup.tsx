@@ -336,11 +336,11 @@ export function ServiceScheduleSetup({
                 {getDayName(schedule.day_of_week, language)}
               </span>
               {schedule.is_active ? (
-                <span className="text-[9px] md:text-[10px] text-muted-foreground mt-1 truncate w-full">
+                <span className="text-[9px] md:text-[10px] text-muted-foreground mt-1 md:truncate w-full writing-mode-vertical-rl md:writing-mode-horizontal rotate-180 md:rotate-0 whitespace-nowrap">
                   {schedule.start_time}
                 </span>
               ) : (
-                <span className="text-[9px] md:text-[10px] text-destructive mt-1">{t.closed}</span>
+                <span className="text-[9px] md:text-[10px] text-destructive mt-1 writing-mode-vertical-rl md:writing-mode-horizontal rotate-180 md:rotate-0">{t.closed}</span>
               )}
             </Button>
           ))}
