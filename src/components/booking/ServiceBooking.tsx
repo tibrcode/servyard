@@ -67,7 +67,7 @@ export function ServiceBooking({
 }: ServiceBookingProps) {
   const { toast } = useToast();
   const [selectedDate, setSelectedDate] = useState<Date>();
-  const [selectedTime, setSelectedTime] = useState<string>();
+  const [selectedTimes, setSelectedTimes] = useState<string[]>([]);
   const [availability, setAvailability] = useState<DailyAvailability | null>(null);
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const [isBooking, setIsBooking] = useState(false);
@@ -119,7 +119,7 @@ export function ServiceBooking({
 
   const loadAvailability = async (date: Date) => {
     setIsLoadingSlots(true);
-    setSelectedTime(undefined);
+    setSelectedTimes([]);
     
     try {
       const dateString = formatDate(date);
@@ -205,17 +205,74 @@ export function ServiceBooking({
   };
 
   const handleTimeSelect = (time: string) => {
-    setSelectedTime(time);
-    setStep(3);
+    if (!availability) return;
+
+    const slots = availability.slots;
+    const clickedIndex = slots.findIndex(s => s.time === time);
+    if (clickedIndex === -1) return;
+
+    // If already selected, deselect it
+    if (selectedTimes.includes(time)) {
+      const newSelection = selectedTimes.filter(t => t !== time);
+      
+      if (newSelection.length === 0) {
+        setSelectedTimes([]);
+        return;
+      }
+
+      // Check continuity
+      const indices = newSelection.map(t => slots.findIndex(s => s.time === t)).sort((a, b) => a - b);
+      let isConsecutive = true;
+      for (let i = 0; i < indices.length - 1; i++) {
+        if (indices[i+1] !== indices[i] + 1) {
+          isConsecutive = false;
+          break;
+        }
+      }
+
+      if (isConsecutive) {
+        setSelectedTimes(newSelection);
+      } else {
+        setSelectedTimes([]);
+      }
+      return;
+    }
+
+    // If not selected
+    if (selectedTimes.length === 0) {
+      setSelectedTimes([time]);
+      return;
+    }
+
+    // Check adjacency
+    const selectedIndices = selectedTimes.map(t => slots.findIndex(s => s.time === t)).sort((a, b) => a - b);
+    const firstIndex = selectedIndices[0];
+    const lastIndex = selectedIndices[selectedIndices.length - 1];
+
+    if (clickedIndex === lastIndex + 1) {
+      // Append to end
+      setSelectedTimes([...selectedTimes, time]);
+    } else if (clickedIndex === firstIndex - 1) {
+      // Prepend to start
+      setSelectedTimes([time, ...selectedTimes]);
+    } else {
+      // Not adjacent, start new selection
+      setSelectedTimes([time]);
+    }
   };
 
   const handleBooking = async () => {
-    if (!selectedDate || !selectedTime) return;
+    if (!selectedDate || selectedTimes.length === 0) return;
 
     setIsBooking(true);
     try {
       const dateString = formatDate(selectedDate);
-      const endTime = calculateEndTime(selectedTime, bookingSettings.duration_minutes);
+      // Sort times to be safe
+      const sortedTimes = [...selectedTimes].sort();
+      const startTime = sortedTimes[0];
+      const lastTime = sortedTimes[sortedTimes.length - 1];
+      const endTime = calculateEndTime(lastTime, bookingSettings.duration_minutes);
+      const totalPrice = price * selectedTimes.length;
 
       const bookingData = {
         service_id: serviceId,
@@ -225,10 +282,10 @@ export function ServiceBooking({
         customer_phone: customerPhone,
         service_title: serviceTitle,
         booking_date: dateString,
-        start_time: selectedTime,
+        start_time: startTime,
         end_time: endTime,
         status: bookingSettings.require_confirmation ? ('pending' as const) : ('confirmed' as const),
-        price,
+        price: totalPrice,
         currency,
         notes,
       };
@@ -350,30 +407,49 @@ export function ServiceBooking({
                   <p className="text-xs sm:text-sm text-muted-foreground">{t.noAvailableSlots}</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 w-full">
-                  {availability.slots.map((slot) => (
-                    <Button
-                      key={slot.time}
-                      variant={slot.available ? 'outline' : 'ghost'}
-                      disabled={!slot.available}
-                      onClick={() => handleTimeSelect(slot.time)}
-                      className="flex flex-col h-auto py-2 sm:py-3 px-2 text-xs sm:text-sm"
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 w-full">
+                    {availability.slots.map((slot) => {
+                      const isSelected = selectedTimes.includes(slot.time);
+                      return (
+                        <Button
+                          key={slot.time}
+                          variant={isSelected ? 'default' : (slot.available ? 'outline' : 'ghost')}
+                          disabled={!slot.available}
+                          onClick={() => handleTimeSelect(slot.time)}
+                          className={cn(
+                            "flex flex-col h-auto py-2 sm:py-3 px-2 text-xs sm:text-sm transition-all",
+                            isSelected && "ring-2 ring-primary ring-offset-2"
+                          )}
+                        >
+                          <span className="font-medium text-xs sm:text-sm">
+                            {formatTimeDisplay(slot.time, language)}
+                          </span>
+                          <span className="text-[10px] sm:text-xs mt-1">
+                            {getSlotBadge(slot)}
+                          </span>
+                        </Button>
+                      );
+                    })}
+                  </div>
+                  
+                  <div className="flex justify-end pt-4">
+                    <Button 
+                      onClick={() => setStep(3)} 
+                      disabled={selectedTimes.length === 0}
+                      className="w-full sm:w-auto"
                     >
-                      <span className="font-medium text-xs sm:text-sm">
-                        {formatTimeDisplay(slot.time, language)}
-                      </span>
-                      <span className="text-[10px] sm:text-xs mt-1">
-                        {getSlotBadge(slot)}
-                      </span>
+                      {isRTL ? 'التالي' : 'Next'}
+                      {selectedTimes.length > 0 && ` (${selectedTimes.length})`}
                     </Button>
-                  ))}
+                  </div>
                 </div>
               )}
             </div>
           )}
 
           {/* Step 3: Confirm */}
-          {step === 3 && selectedDate && selectedTime && (
+          {step === 3 && selectedDate && selectedTimes.length > 0 && (
             <div className="space-y-4 w-full">
               <div className="flex items-center justify-between gap-2">
                 <Label className="text-sm sm:text-base">{t.confirmBooking}</Label>
@@ -406,20 +482,25 @@ export function ServiceBooking({
                   <div className="flex justify-between text-xs sm:text-sm gap-2">
                     <span className="text-muted-foreground">{t.time}:</span>
                     <span className="font-medium">
-                      {formatTimeDisplay(selectedTime, language)}
+                      {(() => {
+                        const sortedTimes = [...selectedTimes].sort();
+                        const start = sortedTimes[0];
+                        const end = calculateEndTime(sortedTimes[sortedTimes.length - 1], bookingSettings.duration_minutes);
+                        return `${formatTimeDisplay(start, language)} - ${formatTimeDisplay(end, language)}`;
+                      })()}
                     </span>
                   </div>
                   <div className="flex justify-between text-xs sm:text-sm gap-2">
                     <span className="text-muted-foreground">{t.duration}:</span>
                     <span className="font-medium">
-                      {bookingSettings.duration_minutes} {t.minutes}
+                      {bookingSettings.duration_minutes * selectedTimes.length} {t.minutes}
                     </span>
                   </div>
                   <Separator />
                   <div className="flex justify-between text-sm sm:text-base gap-2">
                     <span className="text-muted-foreground">{t.price}:</span>
                     <span className="font-semibold">
-                      {price} {currency}
+                      {price * selectedTimes.length} {currency}
                     </span>
                   </div>
                 </CardContent>
