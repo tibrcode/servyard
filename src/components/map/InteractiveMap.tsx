@@ -581,7 +581,12 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                 const isTopRated = rating >= 4.5;
                 
                 // Debug: طباعة بيانات الخدمة
-                console.log('Service data:', { name: service.name, icon_name: service.icon_name, color_scheme: service.color_scheme });
+                console.log('🗺️ Map Service:', { 
+                  name: service.name, 
+                  icon_name: service.icon_name, 
+                  color_scheme: service.color_scheme,
+                  allKeys: Object.keys(service)
+                });
                 
                 // الحصول على تفاصيل الفئة للأيقونة
                 let categoryIcon = '';
