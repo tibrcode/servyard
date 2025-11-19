@@ -128,6 +128,62 @@ Base font size: 15px
     --sidebar-ring: 142 76% 45%;
   }
 
+  .light {
+    /* Light theme - Premium white background #f0f2f5 */
+    --background: 0 0% 94%;
+    --foreground: 0 0% 20%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 20%;
+    --card-nested: 0 0% 97%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 20%;
+
+    /* Green primary #22c55e RGB(34, 197, 94) */
+    --primary: 142 76% 45%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 142 76% 55%;
+
+    --secondary: 0 0% 95%;
+    --secondary-foreground: 0 0% 20%;
+
+    --muted: 0 0% 95%;
+    --muted-foreground: 0 0% 46%;
+
+    --accent: 0 0% 97%;
+    --accent-foreground: 0 0% 20%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 91%;
+    --input: 0 0% 91%;
+    --ring: 142 76% 45%;
+
+    --radius: 0.75rem;
+
+    /* Custom ServYard tokens - Green theme */
+    --luxury-gradient: linear-gradient(135deg, hsl(142 76% 45%), hsl(142 76% 55%));
+    --surface-elevation: 0 0% 100%;
+    --shadow-luxury: 0 10px 30px -10px hsl(142 76% 45% / 0.2);
+    --shadow-soft: 0 4px 12px -4px hsl(0 0% 20% / 0.1);
+
+    /* Premium animations */
+    --transition-luxury: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Light mode sidebar - matches card background with proper contrast */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 0 0% 20%;
+    --sidebar-primary: 142 76% 45%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 94%;
+    --sidebar-accent-foreground: 0 0% 20%;
+    --sidebar-border: 0 0% 91%;
+    --sidebar-ring: 142 76% 45%;
+  }
+
   .dark {
     /* Dark theme - Radial gradient background #1a1a1d → #0e0e10 */
     --background: 0 0% 8%;
