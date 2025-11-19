@@ -402,6 +402,12 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
             .gm-style-iw-tc::after {
               display: none !important;
             }
+            div[role="dialog"] {
+              background: transparent !important;
+            }
+            .gm-style > div > div {
+              background: transparent !important;
+            }
             @media (max-width: 1024px) {
               .info-window-main {
                 width: 85vw !important;
