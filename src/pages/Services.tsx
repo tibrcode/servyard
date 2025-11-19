@@ -1104,19 +1104,6 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                         >
                           {service.name}
                         </span>
-                        {/* Offer Badge */}
-                        {offersByProvider[service.provider_id]?.length > 0 && (() => {
-                          const offer = offersByProvider[service.provider_id][0];
-                          return (
-                            <Badge 
-                              variant="secondary" 
-                              className="ml-2 bg-green-500 text-white hover:bg-green-600 shrink-0 whitespace-nowrap"
-                              style={{ fontSize: '10px', padding: '2px 6px' }}
-                            >
-                              {offer.discount_percentage ? `🎉 ${offer.discount_percentage}%` : '🎉'}
-                            </Badge>
-                          );
-                        })()}
                       </div>
                       
                       {/* Rating & Reviews with Favorite Button */}
