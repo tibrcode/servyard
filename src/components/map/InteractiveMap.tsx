@@ -377,6 +377,16 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
         
         content = `
           <style>
+            .gm-style-iw-d {
+              background: transparent !important;
+              box-shadow: none !important;
+              overflow: visible !important;
+            }
+            .gm-style-iw-c {
+              background: transparent !important;
+              box-shadow: none !important;
+              padding: 0 !important;
+            }
             @media (max-width: 1024px) {
               .info-window-main {
                 width: 85vw !important;
