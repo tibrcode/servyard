@@ -318,30 +318,13 @@ export default function Favorites() {
                     key={favorite.favorite_id} 
                     className="overflow-hidden border hover:border-primary/40 transition-all duration-300 hover:shadow-lg relative"
                   >
-                    {/* TOP Badge */}
-                    {isTopService && (
-                      <div
-                        style={{
-                          position: 'absolute',
-                          top: '8px',
-                          right: isRTL ? 'auto' : '8px',
-                          left: isRTL ? '8px' : 'auto',
-                          zIndex: 10
-                        }}
-                      >
-                        <Badge className="bg-amber-500 text-white text-xs px-2 py-0.5">
-                          {isRTL ? 'الأفضل' : 'TOP'}
-                        </Badge>
-                      </div>
-                    )}
-
-                    {/* Favorite Button */}
+                    {/* Favorite Button - Left Side */}
                     <div
                       style={{
                         position: 'absolute',
                         top: '8px',
-                        right: isRTL ? '8px' : 'auto',
                         left: isRTL ? 'auto' : '8px',
+                        right: isRTL ? '8px' : 'auto',
                         zIndex: 10
                       }}
                       onClick={(e) => e.stopPropagation()}
@@ -360,6 +343,23 @@ export default function Favorites() {
                         )}
                       </Button>
                     </div>
+
+                    {/* TOP Badge - Right Side */}
+                    {isTopService && (
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: '8px',
+                          right: isRTL ? 'auto' : '8px',
+                          left: isRTL ? '8px' : 'auto',
+                          zIndex: 10
+                        }}
+                      >
+                        <Badge className="bg-amber-500 text-white text-xs px-2 py-0.5">
+                          {isRTL ? 'الأفضل' : 'TOP'}
+                        </Badge>
+                      </div>
+                    )}
                     
                     <CardContent className="p-0 flex flex-col h-full">
                       {/* Compact Header - Always Visible */}
