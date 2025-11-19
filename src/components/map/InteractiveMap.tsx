@@ -709,7 +709,28 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
       }
       
       const infoWindow = new google.maps.InfoWindow({
-        content: content
+        content: content,
+        disableAutoPan: false
+      });
+      
+      // إزالة الخلفية بعد فتح InfoWindow
+      google.maps.event.addListener(infoWindow, 'domready', () => {
+        const iwOuter = document.querySelector('.gm-style-iw');
+        const iwBackground = document.querySelector('.gm-style-iw + div');
+        
+        if (iwOuter) {
+          (iwOuter as HTMLElement).style.background = 'transparent';
+        }
+        if (iwBackground) {
+          (iwBackground as HTMLElement).style.display = 'none';
+        }
+        
+        // إزالة كل عناصر الخلفية
+        const allDivs = document.querySelectorAll('.gm-style-iw-c, .gm-style-iw-d, .gm-style-iw');
+        allDivs.forEach(el => {
+          (el as HTMLElement).style.background = 'transparent';
+          (el as HTMLElement).style.boxShadow = 'none';
+        });
       });
       
       // تفعيل callback للخدمات
