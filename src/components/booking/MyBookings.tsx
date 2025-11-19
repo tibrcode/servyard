@@ -421,24 +421,16 @@ export function MyBookings({
   };
 
   // Handle booking complete (from ServiceBooking component)
-  const handleEditBookingComplete = async (newBookingId: string) => {
-    // Delete the old booking
-    if (selectedBookingForEdit) {
-      try {
-        await deleteDoc(doc(db, 'bookings', selectedBookingForEdit.booking_id));
-        
-        toast({
-          title: localT.editSuccess,
-          description: localT.editSuccessDesc,
-        });
-        
-        setEditDialogOpen(false);
-        setSelectedBookingForEdit(null);
-        setServiceDetails(null);
-      } catch (error) {
-        console.error('Error deleting old booking:', error);
-      }
-    }
+  const handleEditBookingComplete = async (bookingId: string) => {
+    // Just close the dialog - booking is already updated
+    toast({
+      title: localT.editSuccess,
+      description: localT.editSuccessDesc,
+    });
+    
+    setEditDialogOpen(false);
+    setSelectedBookingForEdit(null);
+    setServiceDetails(null);
   };
 
   const handleCancelBooking = async (booking: Booking) => {

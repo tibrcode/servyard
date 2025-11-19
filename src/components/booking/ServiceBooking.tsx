@@ -79,7 +79,7 @@ export function ServiceBooking({
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const [isBooking, setIsBooking] = useState(false);
   const [notes, setNotes] = useState('');
-  const [step, setStep] = useState<1 | 2 | 3>(1); // 1: date, 2: time, 3: confirm
+  const [step, setStep] = useState<1 | 2 | 3>(initialDate ? 2 : 1); // Start at step 2 if editing
 
   const isRTL = language === 'ar';
   const dateLocale = language === 'ar' ? ar : enUS;
@@ -126,10 +126,8 @@ export function ServiceBooking({
 
   const loadAvailability = async (date: Date) => {
     setIsLoadingSlots(true);
-    // Only clear selected times if not in edit mode on first load
-    if (!existingBookingId || availability) {
-      setSelectedTimes([]);
-    }
+    // Clear selected times when loading new date
+    setSelectedTimes([]);
     
     try {
       const dateString = formatDate(date);
@@ -187,6 +185,11 @@ export function ServiceBooking({
       console.log('✅ Availability calculated:', dailyAvailability);
 
       setAvailability(dailyAvailability);
+      
+      // Restore initial times if in edit mode and same date
+      if (existingBookingId && initialDate && formatDate(date) === formatDate(initialDate) && initialTimes.length > 0) {
+        setSelectedTimes(initialTimes);
+      }
     } catch (error) {
       console.error('❌ Error loading availability:', error);
       toast({
