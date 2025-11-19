@@ -397,7 +397,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
           ">
             <!-- Floating Provider Header -->
             <div style="
-              background: ${isDarkMode ? 'rgba(26, 29, 33, 0.92)' : 'rgba(255, 255, 255, 0.92)'};
+              background: transparent;
               backdrop-filter: blur(12px);
               -webkit-backdrop-filter: blur(12px);
               padding: 12px 16px;
