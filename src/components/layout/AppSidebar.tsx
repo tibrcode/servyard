@@ -299,17 +299,6 @@ export function AppSidebar({ currentLanguage = 'en', onLanguageChange, onLocatio
                   </SidebarMenuButton>
                 </SidebarMenuItem>
 
-                {/* Theme Toggle (labeled for consistency) */}
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
-                    <button onClick={handleThemeToggle} className="relative inline-flex items-center w-full">
-                      <Sun className="h-4 w-4 mr-2 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                      <Moon className="h-4 w-4 mr-2 -ml-6 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-                      <span className="ml-0">{t.nav.theme || 'Theme'}</span>
-                    </button>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild>
                     <button onClick={handleLogout} className="flex items-center w-full">
