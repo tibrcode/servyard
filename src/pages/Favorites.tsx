@@ -408,7 +408,7 @@ export default function Favorites() {
                               {removingId === favorite.item_id ? (
                                 <div className="h-4 w-4 border-2 border-green-700 border-t-transparent rounded-full animate-spin" />
                               ) : (
-                                <span style={{ fontSize: '20px', color: '#15803d', lineHeight: 1 }}>💚</span>
+                                <span style={{ fontSize: '22px', color: '#15803d', fontWeight: 'bold', lineHeight: 1 }}>✓</span>
                               )}
                             </Button>
                           </div>
@@ -432,7 +432,7 @@ export default function Favorites() {
                               {removingId === favorite.item_id ? (
                                 <div className="h-4 w-4 border-2 border-green-700 border-t-transparent rounded-full animate-spin" />
                               ) : (
-                                <span style={{ fontSize: '20px', color: '#15803d', lineHeight: 1 }}>💚</span>
+                                <span style={{ fontSize: '22px', color: '#15803d', fontWeight: 'bold', lineHeight: 1 }}>✓</span>
                               )}
                             </Button>
                           </div>
