@@ -274,7 +274,7 @@ export default function Favorites() {
                 const service = serviceDetails[favorite.item_id];
                 const isDeleted = service === null;
                 const isExpanded = expandedServiceId === favorite.item_id;
-                const categoryIcon = getCategoryIcon(favorite.item_category);
+                const CategoryIcon = getCategoryIcon(favorite.item_category);
                 const categoryColor = getCategoryColor(favorite.item_category);
                 const rating = serviceRatings[favorite.item_id] || { avg: 0, count: 0 };
                 const isTopService = rating.avg >= 4.5;
@@ -331,8 +331,8 @@ export default function Favorites() {
                           {/* Compact Info Row */}
                           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                             {/* Category Icon */}
-                            <div className={`p-1 rounded-md ${categoryColor} flex-shrink-0`}>
-                              {categoryIcon}
+                            <div className={`p-1 rounded-md ${categoryColor.bg} flex-shrink-0`}>
+                              <CategoryIcon className={`h-4 w-4 ${categoryColor.text}`} />
                             </div>
 
                             {/* Rating */}
