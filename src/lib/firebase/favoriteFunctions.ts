@@ -40,17 +40,20 @@ export async function addFavorite(
     return existing;
   }
 
-  const favoriteData: Omit<Favorite, 'favorite_id'> = {
+  // Build favorite data, only including defined fields
+  const favoriteData: any = {
     user_id: userId,
     type,
     item_id: itemId,
-    item_title: cachedData?.title,
-    item_image: cachedData?.image,
-    item_category: cachedData?.category,
-    item_rating: cachedData?.rating,
-    item_location: cachedData?.location,
     created_at: Timestamp.now(),
   };
+
+  // Add cached data only if defined
+  if (cachedData?.title) favoriteData.item_title = cachedData.title;
+  if (cachedData?.image) favoriteData.item_image = cachedData.image;
+  if (cachedData?.category) favoriteData.item_category = cachedData.category;
+  if (cachedData?.rating !== undefined && cachedData?.rating !== null) favoriteData.item_rating = cachedData.rating;
+  if (cachedData?.location) favoriteData.item_location = cachedData.location;
 
   const docRef = await addDoc(favoritesCollection, favoriteData);
 

@@ -15,7 +15,8 @@ import {
   MessageCircle,
   Settings,
   Bell,
-  CheckCircle2
+  CheckCircle2,
+  Heart
 } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
@@ -25,6 +26,7 @@ import { collection, query, where, getDocs, doc, getDoc, updateDoc, addDoc, onSn
 import { Review } from "@/lib/firebase/collections";
 import { MyBookings } from "@/components/booking/MyBookings";
 import { Settings as SettingsComponent } from "@/components/settings/Settings";
+import Favorites from "@/pages/Favorites";
 
 interface CustomerDashboardProps {
   currentLanguage: string;
@@ -60,6 +62,7 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
   const [providers, setProviders] = useState<{ [key: string]: Profile }>({});
   const [upcomingBookingsCount, setUpcomingBookingsCount] = useState(0);
   const [completedBookingsCount, setCompletedBookingsCount] = useState(0);
+  const [favoritesCount, setFavoritesCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [reviewRating, setReviewRating] = useState(5);
@@ -159,6 +162,14 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
           }
         }
         setProviders(providersData);
+
+        // Count favorites
+        const favoritesQuery = query(
+          collection(db, 'favorites'),
+          where('user_id', '==', user_uid)
+        );
+        const favoritesSnapshot = await getDocs(favoritesQuery);
+        setFavoritesCount(favoritesSnapshot.size);
       });
 
     } catch (error) {
@@ -345,8 +356,17 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
         {/* Main Content */}
         <div className="space-y-4">
           <Tabs defaultValue="appointments" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 mb-6">
+            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 mb-6">
               <TabsTrigger value="appointments">{t.customer.myBookings}</TabsTrigger>
+              <TabsTrigger value="favorites">
+                <Heart className="w-4 h-4 mr-2" />
+                <span className="hidden xs:inline">{isRTL ? 'المفضلة' : 'Favorites'}</span>
+                {favoritesCount > 0 && (
+                  <span className="ml-1 text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full">
+                    {favoritesCount}
+                  </span>
+                )}
+              </TabsTrigger>
               <TabsTrigger value="reviews">{t.customer.myReviews}</TabsTrigger>
               <TabsTrigger value="profile">{t.customer.profile}</TabsTrigger>
               <TabsTrigger value="settings">{isRTL ? 'إعدادات' : 'Settings'}</TabsTrigger>
@@ -368,6 +388,11 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
                   )}
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            {/* Favorites Tab */}
+            <TabsContent value="favorites" className="space-y-6">
+              <Favorites />
             </TabsContent>
 
             {/* Reviews Tab */}

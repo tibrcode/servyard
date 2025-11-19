@@ -946,7 +946,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                       style={{
                         position: 'absolute',
                         top: '8px',
-                        [isRTL ? 'right' : 'left']: '8px',
+                        [isRTL ? 'left' : 'right']: '8px',
                         zIndex: 10
                       }}
                       onClick={(e) => e.stopPropagation()}
