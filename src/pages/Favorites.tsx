@@ -408,7 +408,7 @@ export default function Favorites() {
                               {removingId === favorite.item_id ? (
                                 <div className="h-4 w-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
                               ) : (
-                                <Heart className="h-5 w-5 text-red-500 fill-red-500" />
+                                <span style={{ fontSize: '20px', color: '#ef4444', lineHeight: 1 }}>❤️</span>
                               )}
                             </Button>
                           </div>
@@ -432,7 +432,7 @@ export default function Favorites() {
                               {removingId === favorite.item_id ? (
                                 <div className="h-4 w-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
                               ) : (
-                                <Heart className="h-5 w-5 text-red-500 fill-red-500" />
+                                <span style={{ fontSize: '20px', color: '#ef4444', lineHeight: 1 }}>❤️</span>
                               )}
                             </Button>
                           </div>
