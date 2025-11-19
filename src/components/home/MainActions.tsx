@@ -72,7 +72,7 @@ export const MainActions = ({
               <Button
                 variant="ghost"
                 onClick={handleServicesClick}
-                className="aspect-square font-medium transition-all duration-300 flex flex-col items-center justify-center p-6 md:p-8 hover:bg-transparent"
+                className="homepage-button aspect-square font-medium transition-all duration-300 flex flex-col items-center justify-center p-6 md:p-8 hover:bg-transparent"
                 style={{
                   background: 'linear-gradient(145deg, rgba(28, 28, 30, 0.8), rgba(10, 10, 12, 0.9))',
                   borderRadius: '20px',
@@ -90,7 +90,7 @@ export const MainActions = ({
               <Button
                 variant="ghost"
                 onClick={handleMapClick}
-                className="aspect-square font-medium transition-all duration-300 flex flex-col items-center justify-center p-6 md:p-8 hover:bg-transparent"
+                className="homepage-button aspect-square font-medium transition-all duration-300 flex flex-col items-center justify-center p-6 md:p-8 hover:bg-transparent"
                 style={{
                   background: 'linear-gradient(145deg, rgba(28, 28, 30, 0.8), rgba(10, 10, 12, 0.9))',
                   borderRadius: '20px',
@@ -108,7 +108,7 @@ export const MainActions = ({
               <Button
                 variant="ghost"
                 onClick={handleAuthClick}
-                className="aspect-square font-medium transition-all duration-300 flex flex-col items-center justify-center p-6 md:p-8 hover:bg-transparent"
+                className="homepage-button aspect-square font-medium transition-all duration-300 flex flex-col items-center justify-center p-6 md:p-8 hover:bg-transparent"
                 style={{
                   background: 'linear-gradient(145deg, rgba(28, 28, 30, 0.8), rgba(10, 10, 12, 0.9))',
                   borderRadius: '20px',
@@ -127,7 +127,7 @@ export const MainActions = ({
                 variant="ghost"
                 onClick={handleDashboardClick}
                 disabled={loading}
-                className="aspect-square font-medium transition-all duration-300 flex flex-col items-center justify-center p-6 md:p-8 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-transparent"
+                className="homepage-button aspect-square font-medium transition-all duration-300 flex flex-col items-center justify-center p-6 md:p-8 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-transparent"
                 style={{
                   background: 'linear-gradient(145deg, rgba(28, 28, 30, 0.8), rgba(10, 10, 12, 0.9))',
                   borderRadius: '20px',
