@@ -711,8 +711,8 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                       const IconComponent = getCategoryIcon(category.icon_name);
                                       const colors = getCategoryColor(category.color_scheme);
                                       return (
-                                        <div className={`${colors.bg} p-2 rounded-lg`}>
-                                          <IconComponent className={`w-6 h-6 ${colors.text}`} />
+                                        <div className={`${colors.bg} p-3 rounded-lg`}>
+                                          <IconComponent className={`w-8 h-8 ${colors.text}`} />
                                         </div>
                                       );
                                     }
@@ -948,8 +948,8 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                             const IconComponent = getCategoryIcon(category.icon_name);
                             const colors = getCategoryColor(category.color_scheme);
                             return (
-                              <div className={`${colors.bg} p-1.5 rounded-md flex-shrink-0`}>
-                                <IconComponent className={`w-4 h-4 ${colors.text}`} />
+                              <div className={`${colors.bg} p-2 rounded-md flex-shrink-0`}>
+                                <IconComponent className={`w-5 h-5 ${colors.text}`} />
                               </div>
                             );
                           }
