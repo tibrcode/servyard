@@ -381,20 +381,30 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
               background: transparent !important;
               box-shadow: none !important;
               overflow: visible !important;
+              backdrop-filter: none !important;
+              -webkit-backdrop-filter: none !important;
             }
             .gm-style-iw-c {
               background: transparent !important;
               box-shadow: none !important;
               padding: 0 !important;
+              backdrop-filter: none !important;
+              -webkit-backdrop-filter: none !important;
             }
             .gm-style-iw {
               background: transparent !important;
+              backdrop-filter: none !important;
+              -webkit-backdrop-filter: none !important;
             }
             .gm-style .gm-style-iw-c {
               background: transparent !important;
+              backdrop-filter: none !important;
+              -webkit-backdrop-filter: none !important;
             }
             .gm-style .gm-style-iw-d {
               background: transparent !important;
+              backdrop-filter: none !important;
+              -webkit-backdrop-filter: none !important;
             }
             .gm-style-iw-tc {
               display: none !important;
@@ -404,9 +414,17 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
             }
             div[role="dialog"] {
               background: transparent !important;
+              backdrop-filter: none !important;
+              -webkit-backdrop-filter: none !important;
             }
             .gm-style > div > div {
               background: transparent !important;
+              backdrop-filter: none !important;
+              -webkit-backdrop-filter: none !important;
+            }
+            .info-window-main {
+              backdrop-filter: none !important;
+              -webkit-backdrop-filter: none !important;
             }
             @media (max-width: 1024px) {
               .info-window-main {
