@@ -71,27 +71,39 @@ export const MainActions = ({
               {/* Button 1: Services */}
               <Button
                 onClick={handleServicesClick}
-                className="glass-card aspect-square font-medium border border-white/10 hover:border-white/20 transition-all duration-300 rounded-2xl flex flex-col items-center justify-center p-6 md:p-8"
+                className="aspect-square font-medium border-0 transition-all duration-300 rounded-2xl flex flex-col items-center justify-center p-6 md:p-8"
+                style={{
+                  background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                  boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)'
+                }}
               >
-                <Search className="mb-2 text-blue-500" style={{ width: '48px', height: '48px' }} />
+                <Search className="mb-2 text-white" style={{ width: '48px', height: '48px' }} />
                 <span className="text-center leading-tight text-white text-base">{t.home.findServices}</span>
               </Button>
 
               {/* Button 2: Map Services */}
               <Button
                 onClick={handleMapClick}
-                className="glass-card aspect-square font-medium border border-white/10 hover:border-white/20 transition-all duration-300 rounded-2xl flex flex-col items-center justify-center p-6 md:p-8"
+                className="aspect-square font-medium border-0 transition-all duration-300 rounded-2xl flex flex-col items-center justify-center p-6 md:p-8"
+                style={{
+                  background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                  boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)'
+                }}
               >
-                <Map className="mb-2 text-orange-500" style={{ width: '48px', height: '48px' }} />
+                <Map className="mb-2 text-white" style={{ width: '48px', height: '48px' }} />
                 <span className="text-center leading-tight text-white text-base">{t.home.servicesOnMap || (isRTL ? 'الخدمات عبر الخريطة' : 'Services on Map')}</span>
               </Button>
 
               {/* Button 3: Login */}
               <Button
                 onClick={handleAuthClick}
-                className="glass-card aspect-square font-medium border border-white/10 hover:border-white/20 transition-all duration-300 rounded-2xl flex flex-col items-center justify-center p-6 md:p-8"
+                className="aspect-square font-medium border-0 transition-all duration-300 rounded-2xl flex flex-col items-center justify-center p-6 md:p-8"
+                style={{
+                  background: 'linear-gradient(135deg, #a855f7 0%, #9333ea 100%)',
+                  boxShadow: '0 4px 12px rgba(168, 85, 247, 0.3)'
+                }}
               >
-                <LogIn className="mb-2 text-purple-500" style={{ width: '48px', height: '48px' }} />
+                <LogIn className="mb-2 text-white" style={{ width: '48px', height: '48px' }} />
                 <span className="text-center leading-tight text-white text-base">{t.home.login || (isRTL ? 'تسجيل الدخول' : 'Login')}</span>
               </Button>
 
@@ -99,9 +111,13 @@ export const MainActions = ({
               <Button
                 onClick={handleDashboardClick}
                 disabled={loading}
-                className="glass-card aspect-square font-medium border border-white/10 hover:border-white/20 transition-all duration-300 rounded-2xl flex flex-col items-center justify-center p-6 md:p-8 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="aspect-square font-medium border-0 transition-all duration-300 rounded-2xl flex flex-col items-center justify-center p-6 md:p-8 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                  boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)'
+                }}
               >
-                <LayoutDashboard className="mb-2 text-yellow-500" style={{ width: '48px', height: '48px' }} />
+                <LayoutDashboard className="mb-2 text-white" style={{ width: '48px', height: '48px' }} />
                 <span className="text-center leading-tight text-white text-base">{t.home.dashboard || (isRTL ? 'لوحة التحكم' : 'Dashboard')}</span>
               </Button>
             </div>
