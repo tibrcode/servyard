@@ -151,6 +151,9 @@ const Sidebar = React.forwardRef<
   }
 
   if (isMobile) {
+    // Get current theme to apply correct colors
+    const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
+    
     return (
       <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
         <SheetContent
@@ -160,8 +163,8 @@ const Sidebar = React.forwardRef<
           style={
             {
               "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
-              backgroundColor: "hsl(var(--sidebar-background))",
-              color: "hsl(var(--sidebar-foreground))",
+              backgroundColor: isDark ? 'hsl(0 0% 11%)' : 'hsl(0 0% 100%)',
+              color: isDark ? 'hsl(0 0% 96%)' : 'hsl(0 0% 20%)',
             } as React.CSSProperties
           }
           side={side}
