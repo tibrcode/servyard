@@ -280,8 +280,8 @@ Base font size: 15px
   /* Apply glass effect to all cards in dark mode */
   .dark .bg-card:hover,
   .dark [class*="Card"]:hover,
-  :not(.light) .bg-card:hover,
-  :not(.light) [class*="Card"]:hover {
+  html:not(.light) .bg-card:hover,
+  html:not(.light) [class*="Card"]:hover {
     transform: translateY(-2px);
     box-shadow: 
       0 12px 32px rgba(0, 0, 0, 0.5),
@@ -424,8 +424,8 @@ Base font size: 15px
   /* Override Tailwind's default card backgrounds with glass effect */
   .dark .bg-card,
   .dark [class*="Card"],
-  :not(.light) .bg-card,
-  :not(.light) [class*="Card"] {
+  html:not(.light) .bg-card,
+  html:not(.light) [class*="Card"] {
     background: linear-gradient(
       145deg,
       rgba(28, 28, 30, 0.8),
@@ -441,7 +441,7 @@ Base font size: 15px
 
   /* Glass effect for muted backgrounds */
   .dark .bg-muted,
-  :not(.light) .bg-muted {
+  html:not(.light) .bg-muted {
     background: linear-gradient(
       145deg,
       rgba(28, 28, 30, 0.6),
@@ -452,7 +452,7 @@ Base font size: 15px
 
   /* Glass effect with transparency variations */
   .dark .bg-muted\/50,
-  :not(.light) .bg-muted\/50 {
+  html:not(.light) .bg-muted\/50 {
     background: linear-gradient(
       145deg,
       rgba(28, 28, 30, 0.4),
@@ -461,7 +461,7 @@ Base font size: 15px
   }
 
   .dark .bg-muted\/70,
-  :not(.light) .bg-muted\/70 {
+  html:not(.light) .bg-muted\/70 {
     background: linear-gradient(
       145deg,
       rgba(28, 28, 30, 0.55),
@@ -472,8 +472,8 @@ Base font size: 15px
   /* Modals and popovers with glass effect */
   .dark .bg-popover,
   .dark [role="dialog"],
-  :not(.light) .bg-popover,
-  :not(.light) [role="dialog"] {
+  html:not(.light) .bg-popover,
+  html:not(.light) [role="dialog"] {
     background: linear-gradient(
       145deg,
       rgba(30, 30, 32, 0.85),
@@ -570,12 +570,12 @@ Base font size: 15px
 
   /* Modal overlays */
   .dark .bg-black\/30,
-  :not(.light) .bg-black\/30 {
+  html:not(.light) .bg-black\/30 {
     background-color: rgba(0, 0, 0, 0.7) !important;
   }
 
   .dark .bg-black\/50,
-  :not(.light) .bg-black\/50 {
+  html:not(.light) .bg-black\/50 {
     background-color: rgba(0, 0, 0, 0.5) !important;
   }
 
@@ -935,7 +935,7 @@ Base font size: 15px
   /* Card nested with glass effect */
   .card-nested,
   .dark .card-nested,
-  :not(.light) .card-nested {
+  html:not(.light) .card-nested {
     background: linear-gradient(
       145deg,
       rgba(35, 35, 38, 0.6),
