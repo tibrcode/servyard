@@ -715,43 +715,48 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
       
       // إزالة الخلفية بعد فتح InfoWindow
       google.maps.event.addListener(infoWindow, 'domready', () => {
-        // البحث عن جميع عناصر InfoWindow وإزالة خلفياتها
-        const iwContainer = document.querySelector('.gm-style-iw-c');
-        const iwContent = document.querySelector('.gm-style-iw-d');
-        const iwOuter = document.querySelector('.gm-style-iw');
-        
-        // إخفاء عنصر الخلفية الرئيسي (الذي يحتوي السهم)
-        const iwBackground = document.querySelector('.gm-style-iw + div');
-        if (iwBackground) {
-          (iwBackground as HTMLElement).style.display = 'none';
-        }
-        
-        // جعل الحاويات شفافة
-        if (iwContainer) {
-          (iwContainer as HTMLElement).style.background = 'transparent';
-          (iwContainer as HTMLElement).style.boxShadow = 'none';
-          (iwContainer as HTMLElement).style.padding = '0';
-        }
-        
-        if (iwContent) {
-          (iwContent as HTMLElement).style.background = 'transparent';
-          (iwContent as HTMLElement).style.boxShadow = 'none';
-          (iwContent as HTMLElement).style.overflow = 'visible';
-        }
-        
-        if (iwOuter) {
-          (iwOuter as HTMLElement).style.background = 'transparent';
-        }
-        
-        // البحث عن العنصر الأب الذي يحتوي على الخلفية
-        const parentDivs = document.querySelectorAll('.gm-style > div > div');
-        parentDivs.forEach(el => {
-          const htmlEl = el as HTMLElement;
-          if (htmlEl.style.backgroundColor || window.getComputedStyle(htmlEl).backgroundColor !== 'rgba(0, 0, 0, 0)') {
-            htmlEl.style.background = 'transparent !important';
-            htmlEl.style.backgroundColor = 'transparent !important';
+        // استخدام setTimeout للتأكد من تحميل جميع العناصر
+        setTimeout(() => {
+          // البحث عن جميع عناصر InfoWindow
+          const iwContainer = document.querySelector('.gm-style-iw-c');
+          const iwContent = document.querySelector('.gm-style-iw-d');
+          const iwOuter = document.querySelector('.gm-style-iw');
+          
+          // إخفاء عنصر الخلفية والسهم
+          const iwBackground = document.querySelector('.gm-style-iw + div');
+          if (iwBackground) {
+            (iwBackground as HTMLElement).style.display = 'none';
           }
-        });
+          
+          // إزالة جميع الخلفيات
+          [iwContainer, iwContent, iwOuter].forEach(el => {
+            if (el) {
+              const htmlEl = el as HTMLElement;
+              htmlEl.style.setProperty('background', 'transparent', 'important');
+              htmlEl.style.setProperty('background-color', 'transparent', 'important');
+              htmlEl.style.setProperty('box-shadow', 'none', 'important');
+            }
+          });
+          
+          // البحث عن كل div داخل gm-style وإزالة خلفيته
+          const gmStyleDivs = document.querySelectorAll('.gm-style div');
+          gmStyleDivs.forEach(el => {
+            const htmlEl = el as HTMLElement;
+            const bgColor = window.getComputedStyle(htmlEl).backgroundColor;
+            
+            // إذا كان له خلفية غير شفافة
+            if (bgColor && bgColor !== 'rgba(0, 0, 0, 0)' && bgColor !== 'transparent') {
+              // تحقق إذا لم يكن من البطاقات الداخلية
+              if (!htmlEl.classList.contains('service-card') && 
+                  !htmlEl.closest('.service-card') &&
+                  !htmlEl.closest('[style*="background: rgba(28"]') &&
+                  !htmlEl.closest('[style*="background: rgba(255"]')) {
+                htmlEl.style.setProperty('background', 'transparent', 'important');
+                htmlEl.style.setProperty('background-color', 'transparent', 'important');
+              }
+            }
+          });
+        }, 50);
       });
       
       // تفعيل callback للخدمات
