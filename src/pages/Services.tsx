@@ -941,29 +941,6 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                       </div>
                     )}
                     
-                    {/* Favorite Button */}
-                    <div
-                      style={{
-                        position: 'absolute',
-                        top: '8px',
-                        [isRTL ? 'left' : 'right']: '8px',
-                        zIndex: 10
-                      }}
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <FavoriteButton
-                        type="service"
-                        itemId={service.id}
-                        itemData={{
-                          title: service.name,
-                          category: category?.[isRTL ? 'name_ar' : 'name_en'],
-                          rating: serviceRatings[service.id]?.avg
-                        }}
-                        variant="ghost"
-                        size="sm"
-                      />
-                    </div>
-                    
                     {/* Compact Header - Always Visible */}
                     <div
                       className="flex flex-col p-3 cursor-pointer hover:bg-muted/50 transition-colors"
@@ -1006,38 +983,68 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                         </span>
                       </div>
                       
-                      {/* Rating & Reviews */}
+                      {/* Rating & Reviews with Favorite Button */}
                       {serviceRatings[service.id]?.avg > 0 ? (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '10px' }}>
-                          <div style={{
-                            color: '#fbbf24',
-                            fontSize: '12px',
-                            letterSpacing: '0.5px',
-                            lineHeight: 1
-                          }}>
-                            {[1, 2, 3, 4, 5].map((star) => {
-                              const rating = serviceRatings[service.id]?.avg || 0;
-                              const fullStars = Math.floor(rating);
-                              const hasHalfStar = rating % 1 >= 0.5;
-                              if (star <= fullStars) return '★';
-                              if (star === fullStars + 1 && hasHalfStar) return '⯨';
-                              return '☆';
-                            }).join('')}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '10px', justifyContent: 'space-between' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <div style={{
+                              color: '#fbbf24',
+                              fontSize: '12px',
+                              letterSpacing: '0.5px',
+                              lineHeight: 1
+                            }}>
+                              {[1, 2, 3, 4, 5].map((star) => {
+                                const rating = serviceRatings[service.id]?.avg || 0;
+                                const fullStars = Math.floor(rating);
+                                const hasHalfStar = rating % 1 >= 0.5;
+                                if (star <= fullStars) return '★';
+                                if (star === fullStars + 1 && hasHalfStar) return '⯨';
+                                return '☆';
+                              }).join('')}
+                            </div>
+                            <span className="text-foreground" style={{ fontSize: '12px', fontWeight: '600' }}>
+                              {serviceRatings[service.id].avg.toFixed(1)}
+                            </span>
+                            <span className="text-muted-foreground" style={{ fontSize: '10px' }}>
+                              ({serviceRatings[service.id].count})
+                            </span>
                           </div>
-                          <span className="text-foreground" style={{ fontSize: '12px', fontWeight: '600' }}>
-                            {serviceRatings[service.id].avg.toFixed(1)}
-                          </span>
-                          <span className="text-muted-foreground" style={{ fontSize: '10px' }}>
-                            ({serviceRatings[service.id].count})
-                          </span>
+                          
+                          {/* Favorite Button */}
+                          <div onClick={(e) => e.stopPropagation()}>
+                            <FavoriteButton
+                              type="service"
+                              itemId={service.id}
+                              itemData={{
+                                title: service.name,
+                                category: category?.[isRTL ? 'name_ar' : 'name_en'],
+                                rating: serviceRatings[service.id]?.avg
+                              }}
+                              variant="ghost"
+                              size="sm"
+                            />
+                          </div>
                         </div>
                       ) : (
-                        <div className="text-muted-foreground" style={{
-                          fontSize: '10px',
-                          marginBottom: '10px',
-                          height: '16px'
-                        }}>
-                          ⭐ {isRTL ? 'لا توجد تقييمات' : 'No reviews'}
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px', height: '16px' }}>
+                          <div className="text-muted-foreground" style={{ fontSize: '10px' }}>
+                            ⭐ {isRTL ? 'لا توجد تقييمات' : 'No reviews'}
+                          </div>
+                          
+                          {/* Favorite Button */}
+                          <div onClick={(e) => e.stopPropagation()}>
+                            <FavoriteButton
+                              type="service"
+                              itemId={service.id}
+                              itemData={{
+                                title: service.name,
+                                category: category?.[isRTL ? 'name_ar' : 'name_en'],
+                                rating: serviceRatings[service.id]?.avg
+                              }}
+                              variant="ghost"
+                              size="sm"
+                            />
+                          </div>
                         </div>
                       )}
                       
