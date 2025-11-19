@@ -372,6 +372,14 @@ export function MyBookings({
   const handleOpenEditDialog = async (booking: Booking) => {
     setSelectedBookingForEdit(booking);
     
+    // Calculate slot count from booking duration
+    const calculateSlotCount = (booking: Booking, durationMinutes: number = 60) => {
+      const [startHours, startMinutes] = booking.start_time.split(':').map(Number);
+      const [endHours, endMinutes] = booking.end_time.split(':').map(Number);
+      const totalMinutes = (endHours * 60 + endMinutes) - (startHours * 60 + startMinutes);
+      return Math.max(1, Math.floor(totalMinutes / durationMinutes));
+    };
+    
     // Load service details including booking settings
     try {
       const serviceDoc = await getDoc(doc(db, 'services', booking.service_id));
@@ -406,12 +414,12 @@ export function MyBookings({
         setServiceDetails({
           ...serviceData,
           id: booking.service_id,
-          price: serviceData.price || 0, // Ensure price is set
+          price: serviceData.approximate_price || (booking.price / calculateSlotCount(booking, serviceData.duration_minutes || 60)) || 0,
           bookingSettings,
           providerTimezone,
         });
         
-        console.log('✅ Service details set with price:', serviceData.price);
+        console.log('✅ Service details set with price:', serviceData.approximate_price || booking.price);
         
         setEditDialogOpen(true);
       }
