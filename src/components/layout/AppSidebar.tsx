@@ -258,47 +258,6 @@ export function AppSidebar({ currentLanguage = 'en', onLanguageChange, onLocatio
                   </SidebarMenuItem>
                 )}
 
-                {/* Language Selector */}
-                <SidebarMenuItem>
-                  <DropdownMenu open={langOpen} onOpenChange={setLangOpen}>
-                    <DropdownMenuTrigger asChild>
-                      <SidebarMenuButton className="justify-start">
-                        <Globe className="h-4 w-4 mr-2" />
-                        <span>{t.nav.language}</span>
-                      </SidebarMenuButton>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent portalled={false} align={isRTL ? 'start' : 'end'} className="w-48">
-                      {languages.map((language) => (
-                        <DropdownMenuItem
-                          key={language.code}
-                          onClick={() => {
-                            setLangOpen(false);
-                            if (language.code !== currentLanguage) {
-                              setTimeout(() => {
-                                onLanguageChange?.(language.code);
-                                if (isMobile) setOpenMobile(false);
-                              }, 0);
-                            }
-                          }}
-                          className={currentLanguage === language.code ? 'bg-accent' : ''}
-                        >
-                          <span className="truncate">{language.name}</span>
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </SidebarMenuItem>
-
-                {/* Location Button */}
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
-                    <button onClick={onLocationChange} className="flex items-center w-full">
-                      <MapPin className="h-4 w-4 mr-2" />
-                      <span>{t.nav.location}</span>
-                    </button>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild>
                     <button onClick={handleLogout} className="flex items-center w-full">
