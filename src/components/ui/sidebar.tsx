@@ -151,20 +151,20 @@ const Sidebar = React.forwardRef<
   }
 
   if (isMobile) {
-    // Get current theme to apply correct colors
-    const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
+    // Get the current theme class from documentElement
+    const themeClass = typeof document !== 'undefined' 
+      ? document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+      : 'light';
     
     return (
       <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
         <SheetContent
           data-sidebar="sidebar"
           data-mobile="true"
-          className="w-[--sidebar-width] p-0 [&>button]:hidden"
+          className={`w-[--sidebar-width] p-0 [&>button]:hidden bg-sidebar text-sidebar-foreground ${themeClass}`}
           style={
             {
               "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
-              backgroundColor: isDark ? 'hsl(0 0% 11%)' : 'hsl(0 0% 100%)',
-              color: isDark ? 'hsl(0 0% 96%)' : 'hsl(0 0% 20%)',
             } as React.CSSProperties
           }
           side={side}
