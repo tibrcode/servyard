@@ -444,6 +444,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
         provider_reviews_count: providerTotalReviews,
         services: services.map(service => {
           const rating = serviceRatings[service.id];
+          const category = categories.find(c => c.id === service.category_id);
           console.log(`    Service "${service.name}" rating:`, rating);
           return {
             id: service.id,
@@ -452,7 +453,10 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
             provider_name: provider.full_name,
             average_rating: rating?.avg || 0,
             reviews_count: rating?.count || 0,
-            currency: provider.currency_code || 'AED'
+            currency: provider.currency_code || 'AED',
+            category_id: service.category_id,
+            icon_name: category?.icon_name,
+            color_scheme: category?.color_scheme
           };
         })
       };
