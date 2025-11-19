@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Search, Filter, MapPin, Star, Clock, ExternalLink, Calendar, Map as MapIcon, List, ChevronDown, Sparkles, Wrench, Heart, Dumbbell, Scissors, GraduationCap, Stethoscope, Home, Car, Laptop, Scale, DollarSign, Users, Cog, Palette, Shirt, Code, Building, Megaphone, Camera, Languages, Briefcase, Sofa, PenTool, Music, Plane } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
+import { getCategoryIcon, getCategoryColor } from "@/lib/categoryIcons";
 // Currency display uses Latin currency code (e.g., AED) instead of symbol
 import { db } from "@/integrations/firebase/client";
 import InteractiveMap from "@/components/map/InteractiveMap";
@@ -703,7 +704,20 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                     {isRTL ? '✨ مختار من الخريطة' : '✨ Selected from map'}
                                   </Badge>
                                 </div>
-                                <CardTitle className="text-2xl">
+                                <CardTitle className="text-2xl flex items-center gap-3">
+                                  {(() => {
+                                    const category = categories.find(c => c.id === service.category_id);
+                                    if (category?.icon_name && category?.color_scheme) {
+                                      const IconComponent = getCategoryIcon(category.icon_name);
+                                      const colors = getCategoryColor(category.color_scheme);
+                                      return (
+                                        <div className={`${colors.bg} p-2 rounded-lg`}>
+                                          <IconComponent className={`w-6 h-6 ${colors.text}`} />
+                                        </div>
+                                      );
+                                    }
+                                    return null;
+                                  })()}
                                   {service.name}
                                 </CardTitle>
                                 <p className="text-sm text-muted-foreground mt-2">
@@ -917,23 +931,41 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                       className="flex flex-col p-3 cursor-pointer hover:bg-muted/50 transition-colors"
                       onClick={() => setExpandedServiceId(isExpanded ? null : service.id)}
                     >
-                      {/* Service Name */}
+                      {/* Service Name with Category Icon */}
                       <div 
-                        className="text-foreground"
+                        className="text-foreground flex items-center gap-2"
                         style={{
                           fontSize: '13px',
                           fontWeight: '700',
                           marginBottom: '10px',
                           lineHeight: '1.4',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          display: '-webkit-box',
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: 'vertical',
                           paddingRight: serviceRatings[service.id]?.avg >= 4.5 ? '50px' : '0'
                         }}
                       >
-                        {service.name}
+                        {(() => {
+                          const category = categories.find(c => c.id === service.category_id);
+                          if (category?.icon_name && category?.color_scheme) {
+                            const IconComponent = getCategoryIcon(category.icon_name);
+                            const colors = getCategoryColor(category.color_scheme);
+                            return (
+                              <div className={`${colors.bg} p-1.5 rounded-md flex-shrink-0`}>
+                                <IconComponent className={`w-4 h-4 ${colors.text}`} />
+                              </div>
+                            );
+                          }
+                          return null;
+                        })()}
+                        <span
+                          style={{
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                          }}
+                        >
+                          {service.name}
+                        </span>
                       </div>
                       
                       {/* Rating & Reviews */}
