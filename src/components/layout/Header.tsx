@@ -83,10 +83,13 @@ export const Header = ({
     try {
       const root = document.documentElement;
       const isDark = root.classList.contains('dark');
+      const newTheme = isDark ? 'light' : 'dark';
       root.classList.remove('light', 'dark');
-      root.classList.add(isDark ? 'light' : 'dark');
-      try { localStorage.setItem('servyard-theme', isDark ? 'light' : 'dark'); } catch { }
-    } catch { }
+      root.classList.add(newTheme);
+      localStorage.setItem('servyard-theme', newTheme);
+    } catch (err) {
+      console.error('Theme toggle error:', err);
+    }
   }, []);
   // Native handler: ensure the theme toggle works even if React click is intercepted
   React.useEffect(() => {

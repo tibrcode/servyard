@@ -93,8 +93,10 @@ export function AppSidebar({ currentLanguage = 'en', onLanguageChange, onLocatio
     try {
       const root = document.documentElement;
       const isDark = root.classList.contains('dark');
+      const newTheme = isDark ? 'light' : 'dark';
       root.classList.remove('light', 'dark');
-      root.classList.add(isDark ? 'light' : 'dark');
+      root.classList.add(newTheme);
+      localStorage.setItem('servyard-theme', newTheme);
     } catch { }
   };
 

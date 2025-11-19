@@ -11,9 +11,9 @@ try {
     // Apply initial theme and language BEFORE React mounts to avoid FOUC
     try {
         const root = document.documentElement;
-        // Theme: default to dark only if no saved preference exists
+        // Theme: default to light if no saved preference exists
         const savedTheme = localStorage.getItem('servyard-theme');
-        const theme = savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : 'dark';
+        const theme = savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : 'light';
         root.classList.remove('light', 'dark');
         root.classList.add(theme);
         if (!savedTheme) localStorage.setItem('servyard-theme', theme);
