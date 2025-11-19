@@ -269,14 +269,14 @@ export function OffersManagement({ currentLanguage }: OffersManagementProps) {
               {t.offers.addNewOffer}
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[600px]">
+          <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{editingOffer ? t.offers.editOffer : t.offers.addNewOffer}</DialogTitle>
               <DialogDescription>
                 {editingOffer ? t.offers.editOfferDetails : t.offers.fillDetailsCreateOffer}
               </DialogDescription>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4 pb-2">
               <div className="space-y-2">
                 <Label htmlFor="title">{t.offers.offerTitle}</Label>
                 <Input
@@ -355,7 +355,7 @@ export function OffersManagement({ currentLanguage }: OffersManagementProps) {
                 )}
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="valid_from">{t.offers.startDate}</Label>
                   <Input
@@ -387,11 +387,11 @@ export function OffersManagement({ currentLanguage }: OffersManagementProps) {
                 <Label htmlFor="active">{t.offers.activeOffer}</Label>
               </div>
 
-              <div className="flex justify-end space-x-2">
-                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} disabled={loading}>
+              <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-2 sm:space-x-2">
+                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} disabled={loading} className="w-full sm:w-auto">
                   {t.actions.cancel}
                 </Button>
-                <Button type="submit" disabled={loading}>
+                <Button type="submit" disabled={loading} className="w-full sm:w-auto">
                   {loading ? (editingOffer ? t.offers.updating : t.offers.adding) : (editingOffer ? t.offers.update : t.offers.add)}
                 </Button>
               </div>
