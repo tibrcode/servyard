@@ -318,33 +318,7 @@ export default function Favorites() {
                     key={favorite.favorite_id} 
                     className="overflow-hidden border hover:border-primary/40 transition-all duration-300 hover:shadow-lg relative"
                   >
-                    {/* Favorite Button - Left Side */}
-                    <div
-                      style={{
-                        position: 'absolute',
-                        top: '8px',
-                        left: isRTL ? 'auto' : '8px',
-                        right: isRTL ? '8px' : 'auto',
-                        zIndex: 10
-                      }}
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="h-8 w-8 bg-background/80 backdrop-blur-sm hover:bg-background"
-                        onClick={() => handleRemove(favorite.item_id)}
-                        disabled={removingId === favorite.item_id}
-                      >
-                        {removingId === favorite.item_id ? (
-                          <div className="h-4 w-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
-                        ) : (
-                          <Heart className="h-4 w-4 text-red-500 fill-red-500" />
-                        )}
-                      </Button>
-                    </div>
-
-                    {/* TOP Badge - Right Side */}
+                    {/* TOP Badge - Top Right Corner */}
                     {isTopService && (
                       <div
                         style={{
@@ -394,37 +368,73 @@ export default function Favorites() {
                           </span>
                         </div>
                         
-                        {/* Rating & Reviews */}
+                        {/* Rating & Reviews with Favorite Button */}
                         {rating.avg > 0 ? (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '10px' }}>
-                            <div style={{
-                              color: '#fbbf24',
-                              fontSize: '12px',
-                              letterSpacing: '0.5px',
-                              lineHeight: 1
-                            }}>
-                              {[1, 2, 3, 4, 5].map((star) => {
-                                const fullStars = Math.floor(rating.avg);
-                                const hasHalfStar = rating.avg % 1 >= 0.5;
-                                if (star <= fullStars) return '★';
-                                if (star === fullStars + 1 && hasHalfStar) return '⯨';
-                                return '☆';
-                              }).join('')}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '10px', justifyContent: 'space-between' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              <div style={{
+                                color: '#fbbf24',
+                                fontSize: '12px',
+                                letterSpacing: '0.5px',
+                                lineHeight: 1
+                              }}>
+                                {[1, 2, 3, 4, 5].map((star) => {
+                                  const fullStars = Math.floor(rating.avg);
+                                  const hasHalfStar = rating.avg % 1 >= 0.5;
+                                  if (star <= fullStars) return '★';
+                                  if (star === fullStars + 1 && hasHalfStar) return '⯨';
+                                  return '☆';
+                                }).join('')}
+                              </div>
+                              <span className="text-foreground" style={{ fontSize: '12px', fontWeight: '600' }}>
+                                {rating.avg.toFixed(1)}
+                              </span>
+                              <span className="text-muted-foreground" style={{ fontSize: '10px' }}>
+                                ({rating.count})
+                              </span>
                             </div>
-                            <span className="text-foreground" style={{ fontSize: '12px', fontWeight: '600' }}>
-                              {rating.avg.toFixed(1)}
-                            </span>
-                            <span className="text-muted-foreground" style={{ fontSize: '10px' }}>
-                              ({rating.count})
-                            </span>
+                            
+                            {/* Favorite Button */}
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="h-7 w-7 hover:bg-red-50 dark:hover:bg-red-950/20"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleRemove(favorite.item_id);
+                              }}
+                              disabled={removingId === favorite.item_id}
+                            >
+                              {removingId === favorite.item_id ? (
+                                <div className="h-3.5 w-3.5 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
+                              ) : (
+                                <Heart className="h-4 w-4 text-red-500 fill-red-500" />
+                              )}
+                            </Button>
                           </div>
                         ) : (
-                          <div className="text-muted-foreground" style={{
-                            fontSize: '10px',
-                            marginBottom: '10px',
-                            height: '16px'
-                          }}>
-                            ⭐ {isRTL ? 'لا توجد تقييمات' : 'No reviews'}
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px', height: '16px' }}>
+                            <div className="text-muted-foreground" style={{ fontSize: '10px' }}>
+                              ⭐ {isRTL ? 'لا توجد تقييمات' : 'No reviews'}
+                            </div>
+                            
+                            {/* Favorite Button */}
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="h-7 w-7 hover:bg-red-50 dark:hover:bg-red-950/20"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleRemove(favorite.item_id);
+                              }}
+                              disabled={removingId === favorite.item_id}
+                            >
+                              {removingId === favorite.item_id ? (
+                                <div className="h-3.5 w-3.5 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
+                              ) : (
+                                <Heart className="h-4 w-4 text-red-500 fill-red-500" />
+                              )}
+                            </Button>
                           </div>
                         )}
                         
