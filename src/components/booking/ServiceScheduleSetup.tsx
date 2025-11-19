@@ -323,24 +323,24 @@ export function ServiceScheduleSetup({
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Day Selector */}
-        <div className="grid grid-cols-7 gap-2">
+        <div className="grid grid-cols-7 gap-1 md:gap-2">
           {schedules.map((schedule) => (
             <Button
               key={schedule.day_of_week}
               variant={selectedDay === schedule.day_of_week ? 'default' : 'outline'}
               size="sm"
               onClick={() => setSelectedDay(schedule.day_of_week)}
-              className="flex flex-col h-auto py-2"
+              className="flex flex-col h-auto py-2 px-1 md:px-3 min-w-0"
             >
-              <span className="text-xs font-normal">
-                {getDayName(schedule.day_of_week, language).substring(0, 3)}
+              <span className="text-[10px] md:text-xs font-normal truncate w-full">
+                {getDayName(schedule.day_of_week, language)}
               </span>
               {schedule.is_active ? (
-                <span className="text-[10px] text-muted-foreground mt-1">
+                <span className="text-[9px] md:text-[10px] text-muted-foreground mt-1 truncate w-full">
                   {schedule.start_time}
                 </span>
               ) : (
-                <span className="text-[10px] text-destructive mt-1">{t.closed}</span>
+                <span className="text-[9px] md:text-[10px] text-destructive mt-1">{t.closed}</span>
               )}
             </Button>
           ))}
@@ -368,12 +368,12 @@ export function ServiceScheduleSetup({
               <>
                 {/* Working Hours */}
                 <div className="space-y-4">
-                  <Label className="flex items-center gap-2">
+                  <Label className="flex items-center gap-2 text-sm md:text-base">
                     <Clock className="h-4 w-4" />
                     {t.workingHours}
                   </Label>
                   
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                     <div className="space-y-2">
                       <Label className="text-sm text-muted-foreground">{t.startTime}</Label>
                       <Input
@@ -455,11 +455,11 @@ export function ServiceScheduleSetup({
 
                 {/* Copy Actions */}
                 <div className="space-y-2">
-                  <Label className="flex items-center gap-2">
+                  <Label className="flex items-center gap-2 text-sm md:text-base">
                     <Copy className="h-4 w-4" />
                     {t.copyTo}
                   </Label>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <Button
                       variant="outline"
                       size="sm"
