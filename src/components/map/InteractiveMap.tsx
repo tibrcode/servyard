@@ -531,7 +531,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                 <div class="service-card" style="
                   min-width: 200px;
                   max-width: 200px;
-                  background: ${isDarkMode ? 'rgba(36, 40, 48, 0.92)' : 'rgba(255, 255, 255, 0.92)'};
+                  background: transparent;
                   backdrop-filter: blur(12px);
                   -webkit-backdrop-filter: blur(12px);
                   padding: 12px;
