@@ -70,8 +70,10 @@ export const MainActions = ({
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 max-w-4xl mx-auto">
               {/* Button 1: Services */}
               <Button
+                variant="ghost"
                 onClick={handleServicesClick}
-                className="glass-card aspect-square font-medium transition-all duration-300 flex flex-col items-center justify-center p-6 md:p-8"
+                className="glass-card aspect-square font-medium transition-all duration-300 flex flex-col items-center justify-center p-6 md:p-8 hover:bg-transparent"
+                style={{ background: 'none' }}
               >
                 <Search className="mb-2 text-blue-400" style={{ width: '48px', height: '48px' }} />
                 <span className="text-center leading-tight text-white text-base">{t.home.findServices}</span>
@@ -79,8 +81,10 @@ export const MainActions = ({
 
               {/* Button 2: Map Services */}
               <Button
+                variant="ghost"
                 onClick={handleMapClick}
-                className="glass-card aspect-square font-medium transition-all duration-300 flex flex-col items-center justify-center p-6 md:p-8"
+                className="glass-card aspect-square font-medium transition-all duration-300 flex flex-col items-center justify-center p-6 md:p-8 hover:bg-transparent"
+                style={{ background: 'none' }}
               >
                 <Map className="mb-2 text-orange-400" style={{ width: '48px', height: '48px' }} />
                 <span className="text-center leading-tight text-white text-base">{t.home.servicesOnMap || (isRTL ? 'الخدمات عبر الخريطة' : 'Services on Map')}</span>
@@ -88,8 +92,10 @@ export const MainActions = ({
 
               {/* Button 3: Login */}
               <Button
+                variant="ghost"
                 onClick={handleAuthClick}
-                className="glass-card aspect-square font-medium transition-all duration-300 flex flex-col items-center justify-center p-6 md:p-8"
+                className="glass-card aspect-square font-medium transition-all duration-300 flex flex-col items-center justify-center p-6 md:p-8 hover:bg-transparent"
+                style={{ background: 'none' }}
               >
                 <LogIn className="mb-2 text-purple-400" style={{ width: '48px', height: '48px' }} />
                 <span className="text-center leading-tight text-white text-base">{t.home.login || (isRTL ? 'تسجيل الدخول' : 'Login')}</span>
@@ -97,9 +103,11 @@ export const MainActions = ({
 
               {/* Button 4: Dashboard */}
               <Button
+                variant="ghost"
                 onClick={handleDashboardClick}
                 disabled={loading}
-                className="glass-card aspect-square font-medium transition-all duration-300 flex flex-col items-center justify-center p-6 md:p-8 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="glass-card aspect-square font-medium transition-all duration-300 flex flex-col items-center justify-center p-6 md:p-8 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-transparent"
+                style={{ background: 'none' }}
               >
                 <LayoutDashboard className="mb-2 text-green-400" style={{ width: '48px', height: '48px' }} />
                 <span className="text-center leading-tight text-white text-base">{t.home.dashboard || (isRTL ? 'لوحة التحكم' : 'Dashboard')}</span>
