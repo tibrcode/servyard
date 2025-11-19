@@ -217,7 +217,7 @@ export async function updateBooking(
   // Send notification to provider about booking update
   try {
     const updatedBooking = { ...oldBooking, ...updates, updated_at: Timestamp.now() };
-    await fetch('https://notifybookingupdate-btfczcxdyq-uc.a.run.app', withTrace({
+    await fetch('https://us-central1-servyard-de527.cloudfunctions.net/notifyBookingUpdate', withTrace({
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
