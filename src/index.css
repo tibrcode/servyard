@@ -1035,3 +1035,21 @@ Base font size: 15px
   transition: all 0.2s ease-in-out;
 }
 
+/* Vertical text for mobile schedule */
+@layer utilities {
+  .writing-mode-vertical-rl {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+  }
+  
+  .writing-mode-horizontal {
+    writing-mode: horizontal-tb;
+  }
+  
+  @media (min-width: 768px) {
+    .md\:writing-mode-horizontal {
+      writing-mode: horizontal-tb !important;
+    }
+  }
+}
+

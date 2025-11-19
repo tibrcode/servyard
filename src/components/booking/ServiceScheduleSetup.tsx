@@ -330,9 +330,9 @@ export function ServiceScheduleSetup({
               variant={selectedDay === schedule.day_of_week ? 'default' : 'outline'}
               size="sm"
               onClick={() => setSelectedDay(schedule.day_of_week)}
-              className="flex flex-col h-auto py-2 px-1 md:px-3 min-w-0"
+              className="flex flex-col h-auto py-3 md:py-2 px-1 md:px-3 min-w-0"
             >
-              <span className="text-[10px] md:text-xs font-normal truncate w-full">
+              <span className="text-[10px] md:text-xs font-normal md:truncate w-full writing-mode-vertical-rl md:writing-mode-horizontal rotate-180 md:rotate-0 whitespace-nowrap">
                 {getDayName(schedule.day_of_week, language)}
               </span>
               {schedule.is_active ? (
