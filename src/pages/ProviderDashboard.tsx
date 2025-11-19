@@ -59,6 +59,9 @@ interface Service {
   specialty_description?: string;
   created_at?: any;
   updated_at?: any;
+  has_discount?: boolean;
+  discount_price?: string;
+  discount_percentage?: number;
 }
 
 interface Profile {

@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
 import { ArrowLeft, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { auth, db } from "@/integrations/firebase/client";
@@ -43,6 +44,10 @@ interface Service {
   cancellation_policy_hours?: number;
   require_confirmation?: boolean;
   allow_customer_cancellation?: boolean;
+  // Discount fields
+  has_discount?: boolean;
+  discount_price?: string;
+  discount_percentage?: number;
 }
 
 const EditService: React.FC<EditServiceProps> = ({ currentLanguage }) => {
@@ -63,7 +68,10 @@ const EditService: React.FC<EditServiceProps> = ({ currentLanguage }) => {
     approximate_price: '',
     duration_minutes: 60,
     specialty_description: '',
-    price_range: 'budget'
+    price_range: 'budget',
+    has_discount: false,
+    discount_price: '',
+    discount_percentage: 0
   });
 
   const [bookingSettings, setBookingSettings] = useState<BookingSettings>({
@@ -170,7 +178,10 @@ const EditService: React.FC<EditServiceProps> = ({ currentLanguage }) => {
           approximate_price: serviceData.approximate_price || '',
           duration_minutes: serviceData.duration_minutes || 60,
           specialty_description: serviceData.specialty_description || '',
-          price_range: serviceData.price_range || 'budget'
+          price_range: serviceData.price_range || 'budget',
+          has_discount: serviceData.has_discount || false,
+          discount_price: serviceData.discount_price || '',
+          discount_percentage: serviceData.discount_percentage || 0
         });
 
         // Load booking settings
@@ -236,6 +247,10 @@ const EditService: React.FC<EditServiceProps> = ({ currentLanguage }) => {
         specialty_description: formData.specialty_description,
         price_range: formData.price_range,
         updated_at: new Date(),
+        // Discount fields
+        has_discount: formData.has_discount,
+        discount_price: formData.has_discount ? formData.discount_price : null,
+        discount_percentage: formData.has_discount ? formData.discount_percentage : null,
         // Booking settings
         ...bookingSettings
       });
@@ -383,6 +398,64 @@ const EditService: React.FC<EditServiceProps> = ({ currentLanguage }) => {
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+
+            {/* Discount Section */}
+            <div className="mt-6 p-4 border rounded-lg bg-gradient-to-br from-amber-50/50 to-orange-50/50 dark:from-amber-950/20 dark:to-orange-950/20">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h4 className="font-semibold text-base">{isRTL ? '🎉 عرض تخفيض' : '🎉 Discount Offer'}</h4>
+                  <p className="text-sm text-muted-foreground">
+                    {isRTL ? 'أضف عرض تخفيض لجذب المزيد من العملاء' : 'Add a discount to attract more customers'}
+                  </p>
+                </div>
+                <Switch
+                  checked={formData.has_discount}
+                  onCheckedChange={(checked) => setFormData(prev => ({ 
+                    ...prev, 
+                    has_discount: checked,
+                    discount_price: checked ? prev.discount_price : '',
+                    discount_percentage: checked ? prev.discount_percentage : 0
+                  }))}
+                />
+              </div>
+
+              {formData.has_discount && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="discountPrice">
+                      {isRTL ? 'السعر بعد التخفيض' : 'Discounted Price'}
+                    </Label>
+                    <Input
+                      id="discountPrice"
+                      value={formData.discount_price}
+                      onChange={(e) => handleInputChange('discount_price', e.target.value)}
+                      placeholder={isRTL ? 'مثال: 80' : 'e.g., 80'}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      {isRTL ? 'السعر الأصلي: ' : 'Original price: '}{formData.approximate_price || '---'}
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="discountPercentage">
+                      {isRTL ? 'نسبة التخفيض (%)' : 'Discount Percentage (%)'}
+                    </Label>
+                    <Input
+                      id="discountPercentage"
+                      type="number"
+                      value={formData.discount_percentage}
+                      onChange={(e) => handleInputChange('discount_percentage', parseInt(e.target.value) || 0)}
+                      placeholder={isRTL ? 'مثال: 20' : 'e.g., 20'}
+                      min="1"
+                      max="99"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      {isRTL ? 'سيظهر badge التخفيض على بطاقة الخدمة' : 'Discount badge will appear on service card'}
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="space-y-2">

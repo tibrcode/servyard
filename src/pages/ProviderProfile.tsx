@@ -449,15 +449,17 @@ const ProviderProfile = ({ currentLanguage, onLanguageChange }: ProviderProfileP
                     <div className="grid gap-3 sm:gap-4">
                       {offers.map((offer) => (
                         <div key={offer.id} className="p-3 sm:p-4 bg-gradient-to-r from-primary/5 to-primary-glow/5 rounded-lg border">
-                          <div className="flex justify-between items-start mb-1 sm:mb-2">
-                            <h3 className="font-semibold text-lg">{offer.title}</h3>
-                            <Badge className="bg-green-100 text-green-800">
-                              {offer.discount_percentage != null && offer.discount_percentage !== undefined
-                                ? `${offer.discount_percentage}%`
-                                : `${offer.discount_amount} ${t.offers.currencySar || ''}`}
-                            </Badge>
+                          <div className="flex flex-col sm:flex-row sm:justify-between items-start gap-2 mb-1 sm:mb-2">
+                            <h3 className="font-semibold text-lg break-words sm:truncate sm:pr-4">{offer.title}</h3>
+                            <div className="flex items-center gap-2 shrink-0">
+                              <Badge className="bg-green-100 text-green-800 whitespace-nowrap">
+                                {offer.discount_percentage != null && offer.discount_percentage !== undefined
+                                  ? `${offer.discount_percentage}%`
+                                  : `${offer.discount_amount} ${t.offers.currencySar || ''}`}
+                              </Badge>
+                            </div>
                           </div>
-                          <p className="text-muted-foreground mb-2 sm:mb-3">{offer.description}</p>
+                          {offer.description && <p className="text-muted-foreground mb-2 sm:mb-3 break-words">{offer.description}</p>}
                           <p className="text-sm text-muted-foreground">
                             {new Date(offer.valid_until.seconds ? offer.valid_until.toDate() : offer.valid_until).toLocaleDateString(currentLanguage)}
                           </p>

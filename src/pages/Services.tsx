@@ -49,6 +49,10 @@ interface Service {
   cancellation_policy_hours?: number;
   require_confirmation?: boolean;
   allow_customer_cancellation?: boolean;
+  // Discount fields
+  has_discount?: boolean;
+  discount_price?: string;
+  discount_percentage?: number;
 }
 
 interface Provider {
@@ -503,7 +507,10 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
             currency: provider.currency_code || 'AED',
             category_id: service.category_id,
             icon_name: category?.icon_name,
-            color_scheme: category?.color_scheme
+            color_scheme: category?.color_scheme,
+            has_discount: service.has_discount,
+            discount_price: service.discount_price,
+            discount_percentage: service.discount_percentage
           };
         })
       };
@@ -852,11 +859,32 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                 </h3>
                                 
                                 {/* السعر */}
-                                <div className="flex items-center gap-2">
-                                  <span className="text-muted-foreground">{isRTL ? 'السعر:' : 'Price:'}</span>
-                                  <span className="text-xl font-bold text-primary">
-                                    {service.approximate_price || service.price_range || (isRTL ? 'السعر عند الطلب' : 'Price on request')}
-                                  </span>
+                                <div className="flex flex-col gap-1">
+                                  <span className="text-muted-foreground text-sm">{isRTL ? 'السعر:' : 'Price:'}</span>
+                                  {service.has_discount && service.discount_price ? (
+                                    <div className="flex items-center gap-3">
+                                      <div className="flex flex-col">
+                                        <span className="text-2xl font-bold text-red-600">
+                                          {service.discount_price} {provider?.currency_code || 'AED'}
+                                        </span>
+                                        <span className="text-base text-muted-foreground line-through decoration-red-500 decoration-2">
+                                          {service.approximate_price} {provider?.currency_code || 'AED'}
+                                        </span>
+                                      </div>
+                                      {service.discount_percentage && (
+                                        <Badge variant="destructive" className="bg-red-500 text-white">
+                                          {isRTL ? `خصم ${service.discount_percentage}%` : `${service.discount_percentage}% OFF`}
+                                        </Badge>
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <span className="text-xl font-bold text-primary">
+                                      {service.approximate_price 
+                                        ? `${service.approximate_price} ${provider?.currency_code || 'AED'}`
+                                        : service.price_range || (isRTL ? 'السعر عند الطلب' : 'Price on request')
+                                      }
+                                    </span>
+                                  )}
                                 </div>
                                 
                                 {/* المدة */}
@@ -1158,11 +1186,49 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                       
                       {/* Price + Expand Arrow */}
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <div style={{ fontSize: '18px', color: '#f59e0b', fontWeight: '700' }}>
-                          {service.approximate_price 
-                            ? `${service.approximate_price} ${provider?.currency_code || 'AED'}`
-                            : service.price_range || (isRTL ? 'السعر عند الطلب' : 'Price on request')
-                          }
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          {service.has_discount && service.discount_price ? (
+                            <>
+                              {/* Discounted Price */}
+                              <div style={{ 
+                                fontSize: '18px', 
+                                color: '#dc2626', 
+                                fontWeight: '700',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px'
+                              }}>
+                                {service.discount_price} {provider?.currency_code || 'AED'}
+                                {service.discount_percentage && (
+                                  <Badge 
+                                    variant="destructive" 
+                                    className="bg-red-500 text-white text-[10px] px-1.5 py-0.5"
+                                  >
+                                    -{service.discount_percentage}%
+                                  </Badge>
+                                )}
+                              </div>
+                              {/* Original Price - Strikethrough */}
+                              <div style={{ 
+                                fontSize: '14px', 
+                                color: '#6b7280', 
+                                fontWeight: '500',
+                                textDecoration: 'line-through',
+                                textDecorationColor: '#dc2626',
+                                textDecorationThickness: '2px'
+                              }}>
+                                {service.approximate_price} {provider?.currency_code || 'AED'}
+                              </div>
+                            </>
+                          ) : (
+                            /* Regular Price */
+                            <div style={{ fontSize: '18px', color: '#f59e0b', fontWeight: '700' }}>
+                              {service.approximate_price 
+                                ? `${service.approximate_price} ${provider?.currency_code || 'AED'}`
+                                : service.price_range || (isRTL ? 'السعر عند الطلب' : 'Price on request')
+                              }
+                            </div>
+                          )}
                         </div>
                         <ChevronDown
                           className={`h-5 w-5 text-muted-foreground transition-transform duration-200 ${

@@ -37,55 +37,46 @@ export function OffersManagement({ currentLanguage }: OffersManagementProps) {
     is_active: true
   });
 
-  useEffect(() => {
-    if (user) {
-      loadOffers();
-    }
-  }, [user]);
-
   const loadOffers = async () => {
     if (!user) return;
-
     try {
-      // First try to load offers with orderBy
-      let offersQuery;
-      try {
-        offersQuery = query(
-          collection(db, 'offers'),
-          where('provider_id', '==', user.uid),
-          orderBy('created_at', 'desc')
-        );
-        const querySnapshot = await getDocs(offersQuery);
-        const offersData = querySnapshot.docs.map(doc => {
-          const data = doc.data() as any;
-          return {
-            id: doc.id,
-            provider_id: data.provider_id,
-            title: data.title,
-            description: data.description,
-            discount_percentage: data.discount_percentage,
-            discount_amount: data.discount_amount,
-            valid_from: data.valid_from,
-            valid_until: data.valid_until,
-            is_active: data.is_active,
-            created_at: data.created_at,
-            updated_at: data.updated_at
-          } as Offer;
-        });
+      let offersQuery = query(
+        collection(db, 'offers'),
+        where('provider_id', '==', user.uid),
+        orderBy('created_at', 'desc')
+      );
 
-        setOffers(offersData);
-      } catch (indexError) {
-        console.log('Index not available, fetching without order:', indexError);
-        // Fallback: fetch without orderBy
+      const querySnapshot = await getDocs(offersQuery);
+      const offersData = querySnapshot.docs.map(docSnap => {
+        const data = docSnap.data() as any;
+        return {
+          id: docSnap.id,
+          provider_id: data.provider_id,
+          title: data.title,
+          description: data.description,
+          discount_percentage: data.discount_percentage,
+          discount_amount: data.discount_amount,
+          valid_from: data.valid_from,
+          valid_until: data.valid_until,
+          is_active: data.is_active,
+          created_at: data.created_at,
+          updated_at: data.updated_at
+        } as Offer;
+      });
+
+      setOffers(offersData);
+    } catch (error) {
+      // Fallback without orderBy
+      try {
         const simpleQuery = query(
           collection(db, 'offers'),
           where('provider_id', '==', user.uid)
         );
         const querySnapshot = await getDocs(simpleQuery);
-        const offersData = querySnapshot.docs.map(doc => {
-          const data = doc.data() as any;
+        const offersData = querySnapshot.docs.map(docSnap => {
+          const data = docSnap.data() as any;
           return {
-            id: doc.id,
+            id: docSnap.id,
             provider_id: data.provider_id,
             title: data.title,
             description: data.description,
@@ -99,7 +90,7 @@ export function OffersManagement({ currentLanguage }: OffersManagementProps) {
           } as Offer;
         });
 
-        // Sort client-side
+        // Sort client-side if dates available
         offersData.sort((a, b) => {
           const dateA = a.created_at?.toDate ? a.created_at.toDate() : new Date(a.created_at);
           const dateB = b.created_at?.toDate ? b.created_at.toDate() : new Date(b.created_at);
@@ -107,10 +98,10 @@ export function OffersManagement({ currentLanguage }: OffersManagementProps) {
         });
 
         setOffers(offersData);
+      } catch (e) {
+        console.error('Error loading offers:', e);
+        toast.error(t.offers.messages?.loadError || t.toast.error);
       }
-    } catch (error) {
-      console.error('Error loading offers:', error);
-      toast.error(t.offers.messages?.loadError || t.toast.error);
     }
   };
 

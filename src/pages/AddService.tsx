@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { ArrowLeft, Plus } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
@@ -33,7 +34,10 @@ const AddService = ({ currentLanguage }: AddServiceProps) => {
     approximatePrice: '',
     durationMinutes: '',
     priceRange: '',
-    specialtyDescription: ''
+    specialtyDescription: '',
+    hasDiscount: false,
+    discountPrice: '',
+    discountPercentage: ''
   });
 
   const [bookingSettings, setBookingSettings] = useState<BookingSettings>({
@@ -144,6 +148,10 @@ const AddService = ({ currentLanguage }: AddServiceProps) => {
         is_active: true,
         created_at: new Date(),
         updated_at: new Date(),
+        // Discount fields
+        has_discount: formData.hasDiscount,
+        discount_price: formData.hasDiscount ? formData.discountPrice : null,
+        discount_percentage: formData.hasDiscount && formData.discountPercentage ? parseInt(formData.discountPercentage) : null,
         // Booking settings
         ...bookingSettings
       };
@@ -163,7 +171,10 @@ const AddService = ({ currentLanguage }: AddServiceProps) => {
         approximatePrice: '',
         durationMinutes: '',
         priceRange: '',
-        specialtyDescription: ''
+        specialtyDescription: '',
+        hasDiscount: false,
+        discountPrice: '',
+        discountPercentage: ''
       });
 
       // Navigate back to dashboard
@@ -314,6 +325,67 @@ const AddService = ({ currentLanguage }: AddServiceProps) => {
                       disabled={loading}
                     />
                   </div>
+                </div>
+
+                {/* Discount Section */}
+                <div className="mt-6 p-4 border rounded-lg bg-gradient-to-br from-amber-50/50 to-orange-50/50 dark:from-amber-950/20 dark:to-orange-950/20">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h4 className="font-semibold text-base">{isRTL ? '🎉 عرض تخفيض' : '🎉 Discount Offer'}</h4>
+                      <p className="text-sm text-muted-foreground">
+                        {isRTL ? 'أضف عرض تخفيض لجذب المزيد من العملاء' : 'Add a discount to attract more customers'}
+                      </p>
+                    </div>
+                    <Switch
+                      checked={formData.hasDiscount}
+                      onCheckedChange={(checked) => setFormData(prev => ({ 
+                        ...prev, 
+                        hasDiscount: checked,
+                        discountPrice: checked ? prev.discountPrice : '',
+                        discountPercentage: checked ? prev.discountPercentage : ''
+                      }))}
+                      disabled={loading}
+                    />
+                  </div>
+
+                  {formData.hasDiscount && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="discountPrice">
+                          {isRTL ? 'السعر بعد التخفيض' : 'Discounted Price'}
+                        </Label>
+                        <Input
+                          id="discountPrice"
+                          value={formData.discountPrice}
+                          onChange={handleInputChange('discountPrice')}
+                          placeholder={isRTL ? 'مثال: 80' : 'e.g., 80'}
+                          disabled={loading}
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          {isRTL ? 'السعر الأصلي: ' : 'Original price: '}{formData.approximatePrice || '---'}
+                        </p>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="discountPercentage">
+                          {isRTL ? 'نسبة التخفيض (%)' : 'Discount Percentage (%)'}
+                        </Label>
+                        <Input
+                          id="discountPercentage"
+                          type="number"
+                          value={formData.discountPercentage}
+                          onChange={handleInputChange('discountPercentage')}
+                          placeholder={isRTL ? 'مثال: 20' : 'e.g., 20'}
+                          min="1"
+                          max="99"
+                          disabled={loading}
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          {isRTL ? 'سيظهر badge التخفيض على بطاقة الخدمة' : 'Discount badge will appear on service card'}
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 

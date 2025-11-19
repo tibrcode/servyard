@@ -18,6 +18,10 @@ export interface Service {
   cancellation_policy_hours?: number;
   require_confirmation?: boolean;
   allow_customer_cancellation?: boolean;
+  // Discount fields
+  has_discount?: boolean;
+  discount_price?: string;
+  discount_percentage?: number;
   created_at?: any;
   updated_at?: any;
 }

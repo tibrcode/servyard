@@ -27,6 +27,9 @@ interface Service {
   updated_at: any;
   averageRating?: number;
   reviewCount?: number;
+  has_discount?: boolean;
+  discount_price?: string;
+  discount_percentage?: number;
 }
 
 interface ServiceManagementProps {
@@ -256,11 +259,25 @@ export const ServiceManagement = ({ currentLanguage, currencyCode }: ServiceMana
                       )}
 
                       <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-muted-foreground">
-                        {service.approximate_price && (
+                        {service.has_discount && service.discount_price ? (
+                          <div className="flex items-center gap-2">
+                            <span className="break-words bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 px-2 py-1 rounded text-xs leading-tight text-red-600 dark:text-red-400 font-semibold">
+                              {t.provider.price}: {currencyCode ? `${currencyCode} ` : ''}{service.discount_price}
+                            </span>
+                            <span className="break-words bg-muted/50 px-2 py-1 rounded text-xs leading-tight line-through text-muted-foreground">
+                              {currencyCode ? `${currencyCode} ` : ''}{service.approximate_price}
+                            </span>
+                            {service.discount_percentage && (
+                              <span className="bg-red-500 text-white px-2 py-1 rounded text-[10px] font-bold">
+                                -{service.discount_percentage}%
+                              </span>
+                            )}
+                          </div>
+                        ) : service.approximate_price ? (
                           <span className="break-words bg-muted/50 px-2 py-1 rounded text-xs leading-tight">
                             {t.provider.price}: {currencyCode ? `${currencyCode} ` : ''}{service.approximate_price}
                           </span>
-                        )}
+                        ) : null}
                         {service.duration_minutes && (
                           <span className="break-words bg-muted/50 px-2 py-1 rounded text-xs leading-tight">{t.provider.duration}: {service.duration_minutes} {t.ui.minutes || 'minutes'}</span>
                         )}

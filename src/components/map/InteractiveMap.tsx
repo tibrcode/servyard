@@ -20,6 +20,9 @@ interface Location {
     category_id?: string;
     icon_name?: string;
     color_scheme?: string;
+    has_discount?: boolean;
+    discount_price?: string;
+    discount_percentage?: number;
   }>;
   provider_rating?: number;
   provider_reviews_count?: number;
@@ -687,13 +690,47 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                   `}
                   
                   <!-- Price -->
-                  <div style="
-                    font-size: 18px;
-                    color: #f59e0b;
-                    font-weight: 700;
-                    margin-bottom: 8px;
-                  ">
-                    ${service.price}${service.currency ? ` ${service.currency}` : ''}
+                  <div style="margin-bottom: 8px;">
+                    ${service.has_discount && service.discount_price ? `
+                      <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                        <div style="
+                          font-size: 18px;
+                          color: #dc2626;
+                          font-weight: 700;
+                        ">
+                          ${service.discount_price}${service.currency ? ` ${service.currency}` : ''}
+                        </div>
+                        ${service.discount_percentage ? `
+                          <span style="
+                            background: #dc2626;
+                            color: white;
+                            font-size: 9px;
+                            font-weight: 700;
+                            padding: 2px 5px;
+                            border-radius: 4px;
+                          ">
+                            -${service.discount_percentage}%
+                          </span>
+                        ` : ''}
+                      </div>
+                      <div style="
+                        font-size: 13px;
+                        color: #9ca3af;
+                        text-decoration: line-through;
+                        text-decoration-color: #dc2626;
+                        text-decoration-thickness: 1.5px;
+                      ">
+                        ${service.price}${service.currency ? ` ${service.currency}` : ''}
+                      </div>
+                    ` : `
+                      <div style="
+                        font-size: 18px;
+                        color: #f59e0b;
+                        font-weight: 700;
+                      ">
+                        ${service.price}${service.currency ? ` ${service.currency}` : ''}
+                      </div>
+                    `}
                   </div>
                   
                   <!-- View Button -->
