@@ -72,8 +72,15 @@ export const MainActions = ({
               <Button
                 variant="ghost"
                 onClick={handleServicesClick}
-                className="glass-card aspect-square font-medium transition-all duration-300 flex flex-col items-center justify-center p-6 md:p-8 hover:bg-transparent"
-                style={{ background: 'none' }}
+                className="aspect-square font-medium transition-all duration-300 flex flex-col items-center justify-center p-6 md:p-8 hover:bg-transparent"
+                style={{
+                  background: 'linear-gradient(145deg, rgba(28, 28, 30, 0.8), rgba(10, 10, 12, 0.9))',
+                  borderRadius: '20px',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
+                  transform: 'perspective(1000px) rotateX(2deg) rotateY(0deg)',
+                  transformStyle: 'preserve-3d'
+                }}
               >
                 <Search className="mb-2 text-blue-400" style={{ width: '48px', height: '48px' }} />
                 <span className="text-center leading-tight text-white text-base">{t.home.findServices}</span>
@@ -83,8 +90,15 @@ export const MainActions = ({
               <Button
                 variant="ghost"
                 onClick={handleMapClick}
-                className="glass-card aspect-square font-medium transition-all duration-300 flex flex-col items-center justify-center p-6 md:p-8 hover:bg-transparent"
-                style={{ background: 'none' }}
+                className="aspect-square font-medium transition-all duration-300 flex flex-col items-center justify-center p-6 md:p-8 hover:bg-transparent"
+                style={{
+                  background: 'linear-gradient(145deg, rgba(28, 28, 30, 0.8), rgba(10, 10, 12, 0.9))',
+                  borderRadius: '20px',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
+                  transform: 'perspective(1000px) rotateX(2deg) rotateY(0deg)',
+                  transformStyle: 'preserve-3d'
+                }}
               >
                 <Map className="mb-2 text-orange-400" style={{ width: '48px', height: '48px' }} />
                 <span className="text-center leading-tight text-white text-base">{t.home.servicesOnMap || (isRTL ? 'الخدمات عبر الخريطة' : 'Services on Map')}</span>
@@ -94,8 +108,15 @@ export const MainActions = ({
               <Button
                 variant="ghost"
                 onClick={handleAuthClick}
-                className="glass-card aspect-square font-medium transition-all duration-300 flex flex-col items-center justify-center p-6 md:p-8 hover:bg-transparent"
-                style={{ background: 'none' }}
+                className="aspect-square font-medium transition-all duration-300 flex flex-col items-center justify-center p-6 md:p-8 hover:bg-transparent"
+                style={{
+                  background: 'linear-gradient(145deg, rgba(28, 28, 30, 0.8), rgba(10, 10, 12, 0.9))',
+                  borderRadius: '20px',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
+                  transform: 'perspective(1000px) rotateX(2deg) rotateY(0deg)',
+                  transformStyle: 'preserve-3d'
+                }}
               >
                 <LogIn className="mb-2 text-purple-400" style={{ width: '48px', height: '48px' }} />
                 <span className="text-center leading-tight text-white text-base">{t.home.login || (isRTL ? 'تسجيل الدخول' : 'Login')}</span>
@@ -106,8 +127,15 @@ export const MainActions = ({
                 variant="ghost"
                 onClick={handleDashboardClick}
                 disabled={loading}
-                className="glass-card aspect-square font-medium transition-all duration-300 flex flex-col items-center justify-center p-6 md:p-8 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-transparent"
-                style={{ background: 'none' }}
+                className="aspect-square font-medium transition-all duration-300 flex flex-col items-center justify-center p-6 md:p-8 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-transparent"
+                style={{
+                  background: 'linear-gradient(145deg, rgba(28, 28, 30, 0.8), rgba(10, 10, 12, 0.9))',
+                  borderRadius: '20px',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
+                  transform: 'perspective(1000px) rotateX(2deg) rotateY(0deg)',
+                  transformStyle: 'preserve-3d'
+                }}
               >
                 <LayoutDashboard className="mb-2 text-green-400" style={{ width: '48px', height: '48px' }} />
                 <span className="text-center leading-tight text-white text-base">{t.home.dashboard || (isRTL ? 'لوحة التحكم' : 'Dashboard')}</span>
