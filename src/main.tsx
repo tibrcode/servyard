@@ -11,6 +11,14 @@ try {
     // Apply initial theme and language BEFORE React mounts to avoid FOUC
     try {
         const root = document.documentElement;
+        // Force light theme as default - migration for existing users
+        // Check if this is first load after update (no migration flag)
+        const migrated = localStorage.getItem('theme-migrated-v2');
+        if (!migrated) {
+            // Force all users to light theme and mark as migrated
+            localStorage.setItem('servyard-theme', 'light');
+            localStorage.setItem('theme-migrated-v2', 'true');
+        }
         // Theme: default to light if no saved preference exists
         const savedTheme = localStorage.getItem('servyard-theme');
         const theme = savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : 'light';
