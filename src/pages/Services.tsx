@@ -805,7 +805,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
         ) : null}
 
         {/* Services Grid or Map */}
-        {filteredServices.length === 0 ? (
+        {activeTab === 'services' && (filteredServices.length === 0 ? (
           <Card>
             <CardContent className="p-12 text-center">
               <Search className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
@@ -1400,10 +1400,10 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
               })}
             </div>
           </div>
-        )}
+        ))}
 
         {/* Load More */}
-        {filteredServices.length > 0 && (
+        {activeTab === 'services' && filteredServices.length > 0 && (
           <div className="text-center mt-12">
             <Button variant="outline" onClick={() => toast({ title: t.ui.loading, description: t.ui.loadingMoreServices })}>
               {t.ui.loadMore}
