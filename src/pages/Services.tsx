@@ -65,8 +65,8 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
   const [radiusKm, setRadiusKm] = useState(DEFAULT_RADIUS_KM);
   const [locationLoading, setLocationLoading] = useState(false);
   
-  // View toggle: 'services', 'map', or 'offers'
-  const [activeView, setActiveView] = useState<'services' | 'map' | 'offers'>(
+  // View toggle: 'services', 'map', 'offers', or 'appointments'
+  const [activeView, setActiveView] = useState<'services' | 'map' | 'offers' | 'appointments'>(
     viewParam === 'map' ? 'map' : 'services'
   );
   
@@ -258,9 +258,16 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
       });
 
       // فلترة حسب النطاق الجغرافي (فقط في وضع القائمة أو العروض)
-      if (radiusKm > 0 && (activeView === 'services' || activeView === 'offers')) {
+      if (radiusKm > 0 && (activeView === 'services' || activeView === 'offers' || activeView === 'appointments')) {
         filtered = filtered.filter(s => (s as any).distance !== undefined && (s as any).distance <= radiusKm);
       }
+    }
+
+    // Filter by type based on activeView
+    if (activeView === 'services') {
+      filtered = filtered.filter(s => s.type !== 'booking');
+    } else if (activeView === 'appointments') {
+      filtered = filtered.filter(s => s.type === 'booking');
     }
 
     // تطبيق الترتيب
@@ -448,8 +455,8 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
           )}
         </div>
 
-        {/* 2. Main Navigation Buttons (Services, Map, Offers) */}
-        <div className="grid grid-cols-3 gap-2 mb-4">
+        {/* 2. Main Navigation Buttons (Services, Map, Offers, Appointments) */}
+        <div className="grid grid-cols-4 gap-2 mb-4">
           <Button
             variant={activeView === 'services' ? 'default' : 'outline'}
             className={`h-16 flex flex-col items-center justify-center gap-1 rounded-xl border-2 ${
@@ -487,6 +494,19 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
           >
             <Sparkles className="w-5 h-5" />
             <span className="text-xs font-bold">{isRTL ? 'العروض' : 'Offers'}</span>
+          </Button>
+
+          <Button
+            variant={activeView === 'appointments' ? 'default' : 'outline'}
+            className={`h-16 flex flex-col items-center justify-center gap-1 rounded-xl border-2 ${
+              activeView === 'appointments' 
+                ? 'border-primary bg-primary text-primary-foreground shadow-md' 
+                : 'border-muted bg-card hover:bg-muted/50 hover:border-primary/50'
+            }`}
+            onClick={() => setActiveView('appointments')}
+          >
+            <Calendar className="w-5 h-5" />
+            <span className="text-xs font-bold">{isRTL ? 'مواعيد' : 'Bookings'}</span>
           </Button>
         </div>
 
@@ -694,8 +714,13 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                             {/* Price */}
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                {service.has_discount && service.discount_price ? (
+                                {service.type === 'booking' ? (
+                                  <div style={{ fontSize: '14px', fontWeight: '600', color: 'hsl(var(--primary))' }}>
+                                    {isRTL ? 'حجز موعد' : 'Appointment'}
+                                  </div>
+                                ) : service.has_discount && service.discount_price ? (
                                   <>
+                                    {/* Discounted Price */}
                                     <div style={{ 
                                       fontSize: '18px', 
                                       color: '#dc2626', 
@@ -714,6 +739,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                         </Badge>
                                       )}
                                     </div>
+                                    {/* Original Price - Strikethrough */}
                                     <div style={{ 
                                       fontSize: '14px', 
                                       color: '#6b7280', 
@@ -731,6 +757,11 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                   </div>
                                 )}
                               </div>
+                              <ChevronDown
+                                className={`h-5 w-5 text-muted-foreground transition-transform duration-200 ${
+                                  isExpanded ? 'rotate-180' : ''
+                                }`}
+                              />
                             </div>
                           </div>
 
@@ -949,7 +980,11 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                           {/* Price + Expand Arrow */}
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                              {service.has_discount && service.discount_price ? (
+                              {service.type === 'booking' ? (
+                                <div style={{ fontSize: '14px', fontWeight: '600', color: 'hsl(var(--primary))' }}>
+                                  {isRTL ? 'حجز موعد' : 'Appointment'}
+                                </div>
+                              ) : service.has_discount && service.discount_price ? (
                                 <>
                                   {/* Discounted Price */}
                                   <div style={{ 
@@ -1238,7 +1273,11 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                             {/* Price + Expand Arrow */}
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                {service.has_discount && service.discount_price ? (
+                                {service.type === 'booking' ? (
+                                  <div style={{ fontSize: '14px', fontWeight: '600', color: 'hsl(var(--primary))' }}>
+                                    {isRTL ? 'حجز موعد' : 'Appointment'}
+                                  </div>
+                                ) : service.has_discount && service.discount_price ? (
                                   <>
                                     {/* Discounted Price */}
                                     <div style={{ 
@@ -1271,7 +1310,11 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                       {service.approximate_price} {provider?.currency_code || 'AED'}
                                     </div>
                                   </>
-                                ) : null}
+                                ) : (
+                                  <div style={{ fontSize: '16px', fontWeight: '700', color: '#111827' }}>
+                                    {service.approximate_price} {provider?.currency_code || 'AED'}
+                                  </div>
+                                )}
                               </div>
                               <ChevronDown
                                 className={`h-5 w-5 text-muted-foreground transition-transform duration-200 ${

@@ -287,7 +287,7 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
         <div className="space-y-4">
           <Tabs defaultValue="services" className="w-full">
             <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 mb-6">
-              <TabsTrigger value="services" className="text-xs sm:text-sm">{t.provider.services}</TabsTrigger>
+              <TabsTrigger value="services" className="text-xs sm:text-sm">{t.provider.services} & {isRTL ? 'مواعيد' : 'Appointments'}</TabsTrigger>
               <TabsTrigger value="offers" className="text-xs sm:text-sm">{t.provider.offers}</TabsTrigger>
               <TabsTrigger value="bookings" className="text-xs sm:text-sm">{t.provider.bookings}</TabsTrigger>
               <TabsTrigger value="appointments" className="text-xs sm:text-sm">{t.provider.pendingBookings}</TabsTrigger>

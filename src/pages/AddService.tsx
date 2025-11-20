@@ -38,7 +38,8 @@ const AddService = ({ currentLanguage }: AddServiceProps) => {
     specialtyDescription: '',
     hasDiscount: false,
     discountPrice: '',
-    discountPercentage: ''
+    discountPercentage: '',
+    type: 'service' as 'service' | 'booking'
   });
 
   const [bookingSettings, setBookingSettings] = useState<BookingSettings>({
@@ -90,7 +91,8 @@ const AddService = ({ currentLanguage }: AddServiceProps) => {
         discount_price: formData.hasDiscount ? formData.discountPrice : null,
         discount_percentage: formData.hasDiscount && formData.discountPercentage ? parseInt(formData.discountPercentage) : null,
         // Booking settings
-        ...bookingSettings
+        ...bookingSettings,
+        type: formData.type
       };
 
       await addDoc(collection(db, 'services'), serviceData);
@@ -111,7 +113,8 @@ const AddService = ({ currentLanguage }: AddServiceProps) => {
         specialtyDescription: '',
         hasDiscount: false,
         discountPrice: '',
-        discountPercentage: ''
+        discountPercentage: '',
+        type: 'service'
       });
 
       // Navigate back to dashboard
@@ -164,6 +167,46 @@ const AddService = ({ currentLanguage }: AddServiceProps) => {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Service Type Selection */}
+              <div className="space-y-4 p-4 bg-muted/30 rounded-lg border">
+                <h3 className="text-lg font-semibold">{isRTL ? 'نوع الخدمة' : 'Service Type'}</h3>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                    <input
+                      type="radio"
+                      id="type-service"
+                      name="serviceType"
+                      value="service"
+                      checked={formData.type === 'service'}
+                      onChange={() => setFormData(prev => ({ ...prev, type: 'service' }))}
+                      className="h-4 w-4 border-gray-300 text-primary focus:ring-primary"
+                    />
+                    <Label htmlFor="type-service" className="cursor-pointer font-medium">
+                      {isRTL ? 'خدمة عامة' : 'General Service'}
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                    <input
+                      type="radio"
+                      id="type-booking"
+                      name="serviceType"
+                      value="booking"
+                      checked={formData.type === 'booking'}
+                      onChange={() => setFormData(prev => ({ ...prev, type: 'booking' }))}
+                      className="h-4 w-4 border-gray-300 text-primary focus:ring-primary"
+                    />
+                    <Label htmlFor="type-booking" className="cursor-pointer font-medium">
+                      {isRTL ? 'موعد / حجز' : 'Appointment / Booking'}
+                    </Label>
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {formData.type === 'service' 
+                    ? (isRTL ? 'خدمة عادية مع عرض السعر والتفاصيل' : 'Standard service with price display and details')
+                    : (isRTL ? 'حجز موعد فقط بدون عرض سعر (مثل: استشارة طبية)' : 'Appointment booking only without price display (e.g., Medical Consultation)')}
+                </p>
+              </div>
+
               {/* Basic Information */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">{t.addService.basicInfo}</h3>
@@ -220,34 +263,38 @@ const AddService = ({ currentLanguage }: AddServiceProps) => {
                 <h3 className="text-lg font-semibold">{t.addService.pricingDuration}</h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="approximatePrice">{t.addService.approximatePrice}</Label>
-                    <Input
-                      id="approximatePrice"
-                      value={formData.approximatePrice}
-                      onChange={handleInputChange('approximatePrice')}
-                      placeholder={t.addService.approximatePrice}
-                      disabled={loading}
-                    />
-                  </div>
+                  {formData.type === 'service' && (
+                    <>
+                      <div className="space-y-2">
+                        <Label htmlFor="approximatePrice">{t.addService.approximatePrice}</Label>
+                        <Input
+                          id="approximatePrice"
+                          value={formData.approximatePrice}
+                          onChange={handleInputChange('approximatePrice')}
+                          placeholder={t.addService.approximatePrice}
+                          disabled={loading}
+                        />
+                      </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="priceRange">{t.addService.priceRange}</Label>
-                    <Select
-                      value={formData.priceRange}
-                      onValueChange={(value) => setFormData(prev => ({ ...prev, priceRange: value }))}
-                      disabled={loading}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder={t.addService.selectRange} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="budget">{t.addService.priceRangeBudget || 'Budget'}</SelectItem>
-                        <SelectItem value="moderate">{t.addService.priceRangeStandard || 'Standard'}</SelectItem>
-                        <SelectItem value="premium">{t.addService.priceRangePremium || 'Premium'}</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="priceRange">{t.addService.priceRange}</Label>
+                        <Select
+                          value={formData.priceRange}
+                          onValueChange={(value) => setFormData(prev => ({ ...prev, priceRange: value }))}
+                          disabled={loading}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder={t.addService.selectRange} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="budget">{t.addService.priceRangeBudget || 'Budget'}</SelectItem>
+                            <SelectItem value="moderate">{t.addService.priceRangeStandard || 'Standard'}</SelectItem>
+                            <SelectItem value="premium">{t.addService.priceRangePremium || 'Premium'}</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </>
+                  )}
 
                   <div className="space-y-2">
                     <Label htmlFor="durationMinutes">{t.addService.durationMinutes}</Label>
@@ -257,8 +304,6 @@ const AddService = ({ currentLanguage }: AddServiceProps) => {
                       value={formData.durationMinutes}
                       onChange={handleInputChange('durationMinutes')}
                       placeholder={t.addService.durationMinutes}
-                      min="15"
-                      max="480"
                       disabled={loading}
                     />
                   </div>

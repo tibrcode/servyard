@@ -48,6 +48,9 @@ export interface Service {
   require_confirmation?: boolean;
   price_range?: string;
   allow_customer_cancellation?: boolean;
+  type?: 'service' | 'booking'; // New field to distinguish between regular services and appointment-only bookings
+
+  // Discount fields
   has_discount?: boolean;
   discount_price?: string;
   discount_percentage?: number;

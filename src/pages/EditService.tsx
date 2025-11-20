@@ -53,7 +53,8 @@ const EditService: React.FC<EditServiceProps> = ({ currentLanguage }) => {
     price_range: 'budget',
     has_discount: false,
     discount_price: '',
-    discount_percentage: 0
+    discount_percentage: 0,
+    type: 'service' as 'service' | 'booking'
   });
 
   const [bookingSettings, setBookingSettings] = useState<BookingSettings>({
@@ -113,7 +114,8 @@ const EditService: React.FC<EditServiceProps> = ({ currentLanguage }) => {
             price_range: serviceData.price_range || 'budget',
             has_discount: serviceData.has_discount || false,
             discount_price: serviceData.discount_price || '',
-            discount_percentage: serviceData.discount_percentage || 0
+            discount_percentage: serviceData.discount_percentage || 0,
+            type: serviceData.type || 'service'
           });
 
           setBookingSettings({
@@ -190,7 +192,8 @@ const EditService: React.FC<EditServiceProps> = ({ currentLanguage }) => {
         discount_price: formData.has_discount ? formData.discount_price : null,
         discount_percentage: formData.has_discount ? formData.discount_percentage : null,
         // Booking settings
-        ...bookingSettings
+        ...bookingSettings,
+        type: formData.type
       });
 
       // Invalidate cached client service lists so updates appear immediately
@@ -272,6 +275,46 @@ const EditService: React.FC<EditServiceProps> = ({ currentLanguage }) => {
             {/* Basic Info Tab */}
             <TabsContent value="basic">
               <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Service Type Selection */}
+                <div className="space-y-4 p-4 bg-muted/30 rounded-lg border">
+                  <h3 className="text-lg font-semibold">{isRTL ? 'نوع الخدمة' : 'Service Type'}</h3>
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                      <input
+                        type="radio"
+                        id="type-service"
+                        name="serviceType"
+                        value="service"
+                        checked={formData.type === 'service'}
+                        onChange={() => setFormData(prev => ({ ...prev, type: 'service' }))}
+                        className="h-4 w-4 border-gray-300 text-primary focus:ring-primary"
+                      />
+                      <Label htmlFor="type-service" className="cursor-pointer font-medium">
+                        {isRTL ? 'خدمة عامة' : 'General Service'}
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                      <input
+                        type="radio"
+                        id="type-booking"
+                        name="serviceType"
+                        value="booking"
+                        checked={formData.type === 'booking'}
+                        onChange={() => setFormData(prev => ({ ...prev, type: 'booking' }))}
+                        className="h-4 w-4 border-gray-300 text-primary focus:ring-primary"
+                      />
+                      <Label htmlFor="type-booking" className="cursor-pointer font-medium">
+                        {isRTL ? 'موعد / حجز' : 'Appointment / Booking'}
+                      </Label>
+                    </div>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    {formData.type === 'service' 
+                      ? (isRTL ? 'خدمة عادية مع عرض السعر والتفاصيل' : 'Standard service with price display and details')
+                      : (isRTL ? 'حجز موعد فقط بدون عرض سعر (مثل: استشارة طبية)' : 'Appointment booking only without price display (e.g., Medical Consultation)')}
+                  </p>
+                </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="name">{t.addService.serviceName} *</Label>
@@ -300,15 +343,17 @@ const EditService: React.FC<EditServiceProps> = ({ currentLanguage }) => {
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="price">{t.addService.approximatePrice}</Label>
-                <Input
-                  id="price"
-                  value={formData.approximate_price}
-                  onChange={(e) => handleInputChange('approximate_price', e.target.value)}
-                  placeholder="100"
-                />
-              </div>
+              {formData.type === 'service' && (
+                <div className="space-y-2">
+                  <Label htmlFor="price">{t.addService.approximatePrice}</Label>
+                  <Input
+                    id="price"
+                    value={formData.approximate_price}
+                    onChange={(e) => handleInputChange('approximate_price', e.target.value)}
+                    placeholder="100"
+                  />
+                </div>
+              )}
 
               <div className="space-y-2">
                 <Label htmlFor="duration">{t.addService.durationMinutes}</Label>
@@ -323,19 +368,21 @@ const EditService: React.FC<EditServiceProps> = ({ currentLanguage }) => {
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="price_range">{t.addService.priceRange}</Label>
-                <Select value={formData.price_range} onValueChange={(value) => handleInputChange('price_range', value)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="budget">{t.addService.priceRangeBudget || 'Budget'}</SelectItem>
-                    <SelectItem value="standard">{t.addService.priceRangeStandard || 'Standard'}</SelectItem>
-                    <SelectItem value="premium">{t.addService.priceRangePremium || 'Premium'}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              {formData.type === 'service' && (
+                <div className="space-y-2">
+                  <Label htmlFor="price_range">{t.addService.priceRange}</Label>
+                  <Select value={formData.price_range} onValueChange={(value) => handleInputChange('price_range', value)}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="budget">{t.addService.priceRangeBudget || 'Budget'}</SelectItem>
+                      <SelectItem value="standard">{t.addService.priceRangeStandard || 'Standard'}</SelectItem>
+                      <SelectItem value="premium">{t.addService.priceRangePremium || 'Premium'}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
             </div>
 
             {/* Discount Section */}
