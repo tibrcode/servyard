@@ -1,5 +1,6 @@
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, getDocs, onSnapshot } from 'firebase/firestore';
 import { db } from '@/integrations/firebase/client';
 import { Service, Offer, Review, ProviderProfile } from '@/types/service';
 
@@ -20,47 +21,72 @@ export const useProviderData = (providerId: string | undefined) => {
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
-  // Fetch Services
-  const servicesQuery = useQuery({
-    queryKey: ['provider-services', providerId],
-    queryFn: async () => {
-      if (!providerId) return [];
-      const q = query(
-        collection(db, 'services'),
-        where('provider_id', '==', providerId),
-        where('is_active', '==', true)
-      );
-      const snapshot = await getDocs(q);
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Service[];
-    },
-    enabled,
-    staleTime: 1000 * 60 * 5, // 5 minutes
-  });
+  // Real-time Services
+  const [services, setServices] = useState<Service[]>([]);
+  const [servicesLoading, setServicesLoading] = useState(true);
 
-  // Fetch Offers
-  const offersQuery = useQuery({
-    queryKey: ['provider-offers', providerId],
-    queryFn: async () => {
-      if (!providerId) return [];
-      const q = query(
-        collection(db, 'offers'),
-        where('provider_id', '==', providerId),
-        where('is_active', '==', true)
-      );
-      const snapshot = await getDocs(q);
-      const offers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Offer[];
+  useEffect(() => {
+    if (!providerId) {
+      setServices([]);
+      setServicesLoading(false);
+      return;
+    }
+
+    const q = query(
+      collection(db, 'services'),
+      where('provider_id', '==', providerId),
+      where('is_active', '==', true)
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Service[];
+      setServices(data);
+      setServicesLoading(false);
+    }, (error) => {
+      console.error("Error fetching provider services:", error);
+      setServicesLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [providerId]);
+
+  // Real-time Offers
+  const [offers, setOffers] = useState<Offer[]>([]);
+  const [offersLoading, setOffersLoading] = useState(true);
+
+  useEffect(() => {
+    if (!providerId) {
+      setOffers([]);
+      setOffersLoading(false);
+      return;
+    }
+
+    const q = query(
+      collection(db, 'offers'),
+      where('provider_id', '==', providerId),
+      where('is_active', '==', true)
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const rawOffers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Offer[];
       
       // Filter valid offers
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      return offers.filter(offer => {
+      const validOffers = rawOffers.filter(offer => {
         const validUntilDate = new Date(offer.valid_until.seconds ? offer.valid_until.toDate() : offer.valid_until);
         return validUntilDate >= today;
       });
-    },
-    enabled,
-    staleTime: 1000 * 60 * 5, // 5 minutes
-  });
+      
+      setOffers(validOffers);
+      setOffersLoading(false);
+    }, (error) => {
+      console.error("Error fetching provider offers:", error);
+      setOffersLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [providerId]);
 
   // Fetch Reviews
   const reviewsQuery = useQuery({
@@ -94,16 +120,15 @@ export const useProviderData = (providerId: string | undefined) => {
 
   return {
     profile: profileQuery.data,
-    services: servicesQuery.data || [],
-    offers: offersQuery.data || [],
+    services,
+    offers,
     reviews: reviewsQuery.data || [],
     mainCategory: mainCategoryQuery.data,
-    isLoading: profileQuery.isLoading || servicesQuery.isLoading || offersQuery.isLoading || reviewsQuery.isLoading || mainCategoryQuery.isLoading,
-    error: profileQuery.error || servicesQuery.error || offersQuery.error || reviewsQuery.error || mainCategoryQuery.error,
+    isLoading: profileQuery.isLoading || servicesLoading || offersLoading || reviewsQuery.isLoading || mainCategoryQuery.isLoading,
+    error: profileQuery.error || reviewsQuery.error || mainCategoryQuery.error,
     refetch: () => {
       profileQuery.refetch();
-      servicesQuery.refetch();
-      offersQuery.refetch();
+      // services and offers are real-time, no need to refetch manually
       reviewsQuery.refetch();
       mainCategoryQuery.refetch();
     }

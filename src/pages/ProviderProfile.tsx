@@ -33,6 +33,7 @@ import { FavoriteButton } from "@/components/common/FavoriteButton";
 import { iconMap, colorMap } from "@/lib/categoryIcons";
 import { useProviderData } from "@/hooks/useProviderData";
 import { Service, ProviderProfile as ProviderProfileType } from "@/types/service";
+import { ShareButton } from "@/components/common/ShareButton";
 
 interface ProviderProfileProps {
   currentLanguage: string;
@@ -400,6 +401,28 @@ const ProviderProfile = ({ currentLanguage, onLanguageChange }: ProviderProfileP
                                   </div>
                                 )}
                               </div>
+                            </div>
+                            <div className="flex items-center gap-1 ml-2 rtl:mr-2 rtl:ml-0">
+                              <ShareButton
+                                title={service.name}
+                                text={`${isRTL ? 'احجز' : 'Book'} ${service.name} ${isRTL ? 'من' : 'from'} ${profile.full_name}`}
+                                url={`${window.location.origin}/services?serviceId=${service.id}`}
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 text-muted-foreground hover:text-blue-600"
+                              />
+                              <FavoriteButton
+                                type="service"
+                                itemId={service.id}
+                                itemData={{
+                                  title: service.name,
+                                  category: mainCategory?.[isRTL ? 'name_ar' : 'name_en'],
+                                  rating: 0
+                                }}
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8"
+                              />
                             </div>
                           </div>
                           <Button

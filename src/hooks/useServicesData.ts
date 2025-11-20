@@ -1,5 +1,6 @@
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { collection, getDocs, query, where, doc, getDoc, documentId } from 'firebase/firestore';
+import { collection, getDocs, query, where, doc, getDoc, documentId, onSnapshot } from 'firebase/firestore';
 import { db } from '@/integrations/firebase/client';
 import { Service, Offer, ProviderProfile } from '@/types/service';
 import { ServiceCategory } from '@/lib/firebase/collections';
@@ -11,6 +12,7 @@ export interface ServicesData {
   providers: Record<string, ProviderProfile>;
   offers: Record<string, Offer[]>;
   providerRatings: Record<string, { avg: number; count: number }>;
+  serviceRatings: Record<string, { avg: number; count: number }>;
   isLoading: boolean;
   isError: boolean;
 }
@@ -19,20 +21,30 @@ export const useServicesData = () => {
     // 1. Fetch Categories
   const categoriesQuery = useServiceCategories();
 
-  // 2. Fetch Services
-  const servicesQuery = useQuery({
-    queryKey: ['services'],
-    queryFn: async () => {
-      const colRef = collection(db, 'services');
-      const q = query(colRef, where('is_active', '==', true));
-      const snapshot = await getDocs(q);
-      return snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Service));
-    },
-    staleTime: 1000 * 60 * 5, // 5 minutes
-  });
+  // 2. Fetch Services (Real-time)
+  const [services, setServices] = useState<Service[]>([]);
+  const [servicesLoading, setServicesLoading] = useState(true);
+  const [servicesError, setServicesError] = useState(false);
 
-  const providerIds = servicesQuery.data 
-    ? [...new Set(servicesQuery.data.map(s => s.provider_id))] 
+  useEffect(() => {
+    const colRef = collection(db, 'services');
+    const q = query(colRef, where('is_active', '==', true));
+    
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const data = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Service));
+      setServices(data);
+      setServicesLoading(false);
+    }, (error) => {
+      console.error("Error fetching services:", error);
+      setServicesError(true);
+      setServicesLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const providerIds = services 
+    ? [...new Set(services.map(s => s.provider_id))] 
     : [];
 
   // 3. Fetch Providers
@@ -134,7 +146,7 @@ export const useServicesData = () => {
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
-  const serviceIds = servicesQuery.data ? servicesQuery.data.map(s => s.id) : [];
+  const serviceIds = services ? services.map(s => s.id) : [];
 
   // 6. Fetch Service Ratings
   const serviceRatingsQuery = useQuery({
@@ -179,12 +191,12 @@ export const useServicesData = () => {
 
   return {
     categories: categoriesQuery.data || [],
-    services: servicesQuery.data || [],
+    services: services || [],
     providers: providersQuery.data || {},
     providerRatings: ratingsQuery.data || {},
     offers: offersQuery.data || {},
     serviceRatings: serviceRatingsQuery.data || {},
-    isLoading: categoriesQuery.isLoading || servicesQuery.isLoading || (providerIds.length > 0 && providersQuery.isLoading),
-    isError: categoriesQuery.isError || servicesQuery.isError || providersQuery.isError
+    isLoading: categoriesQuery.isLoading || servicesLoading || (providerIds.length > 0 && providersQuery.isLoading),
+    isError: categoriesQuery.isError || servicesError || providersQuery.isError
   };
 };

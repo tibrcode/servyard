@@ -19,12 +19,12 @@ import { db } from "@/integrations/firebase/client";
 import InteractiveMap from "@/components/map/InteractiveMap";
 import { ServiceCategory, initializeServiceCategories } from "@/lib/firebase/collections";
 
-import { getServicesCached, invalidateServicesCache } from "@/lib/servicesCache";
 import { upsertDefaultServiceCategories } from "@/lib/firebase/defaultCategories";
 import { getCategoryLabel } from "@/lib/categoriesLocale";
 import { filterByRadius, formatDistance, calculateDistance, RADIUS_OPTIONS, DEFAULT_RADIUS_KM, Coordinates } from "@/lib/geolocation";
 import { Slider } from "@/components/ui/slider";
 import { FavoriteButton } from "@/components/common/FavoriteButton";
+import { ShareButton } from "@/components/common/ShareButton";
 import { Service, Offer, ProviderProfile } from "@/types/service";
 import { useServicesData } from "@/hooks/useServicesData";
 
@@ -82,6 +82,22 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
 
   const { t, isRTL } = useTranslation(currentLanguage);
   const { toast } = useToast();
+
+  // Handle deep linking to specific service
+  useEffect(() => {
+    const serviceIdParam = searchParams.get('serviceId');
+    if (serviceIdParam && services.length > 0 && !loading) {
+      const service = services.find(s => s.id === serviceIdParam);
+      if (service) {
+        const provider = providers[service.provider_id];
+        if (provider) {
+          setSelectedService(service);
+          setSelectedProvider(provider);
+          setShowBookingModal(true);
+        }
+      }
+    }
+  }, [searchParams, services, providers, loading]);
 
   // محاولة استرجاع الموقع المحفوظ عند بداية الصفحة + الاستماع للتحديثات
   useEffect(() => {
@@ -703,11 +719,59 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                     ({serviceRatings[service.id].count})
                                   </span>
                                 </div>
+                                
+                                {/* Actions: Share & Favorite */}
+                                <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                                  <ShareButton
+                                    title={service.name}
+                                    text={`${isRTL ? 'احجز' : 'Book'} ${service.name} ${isRTL ? 'من' : 'from'} ${provider?.full_name}`}
+                                    url={`${window.location.origin}/services?serviceId=${service.id}`}
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8 text-muted-foreground hover:text-blue-600"
+                                  />
+                                  <FavoriteButton
+                                    type="service"
+                                    itemId={service.id}
+                                    itemData={{
+                                      title: service.name,
+                                      category: category?.[isRTL ? 'name_ar' : 'name_en'],
+                                      rating: serviceRatings[service.id]?.avg
+                                    }}
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8"
+                                  />
+                                </div>
                               </div>
                             ) : (
                               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px', height: '16px' }}>
                                 <div className="text-muted-foreground" style={{ fontSize: '10px' }}>
                                   ⭐ {isRTL ? 'لا توجد تقييمات' : 'No reviews'}
+                                </div>
+                                
+                                {/* Actions: Share & Favorite */}
+                                <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                                  <ShareButton
+                                    title={service.name}
+                                    text={`${isRTL ? 'احجز' : 'Book'} ${service.name} ${isRTL ? 'من' : 'from'} ${provider?.full_name}`}
+                                    url={`${window.location.origin}/services?serviceId=${service.id}`}
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8 text-muted-foreground hover:text-blue-600"
+                                  />
+                                  <FavoriteButton
+                                    type="service"
+                                    itemId={service.id}
+                                    itemData={{
+                                      title: service.name,
+                                      category: category?.[isRTL ? 'name_ar' : 'name_en'],
+                                      rating: serviceRatings[service.id]?.avg
+                                    }}
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8"
+                                  />
                                 </div>
                               </div>
                             )}
@@ -940,8 +1004,16 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                 </span>
                               </div>
                               
-                              {/* Favorite Button */}
-                              <div onClick={(e) => e.stopPropagation()}>
+                              {/* Actions: Share & Favorite */}
+                              <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                                <ShareButton
+                                  title={service.name}
+                                  text={`${isRTL ? 'احجز' : 'Book'} ${service.name} ${isRTL ? 'من' : 'from'} ${provider?.full_name}`}
+                                  url={`${window.location.origin}/services?serviceId=${service.id}`}
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-8 w-8 text-muted-foreground hover:text-blue-600"
+                                />
                                 <FavoriteButton
                                   type="service"
                                   itemId={service.id}
@@ -961,8 +1033,16 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                 ⭐ {isRTL ? 'لا توجد تقييمات' : 'No reviews'}
                               </div>
                               
-                              {/* Favorite Button */}
-                              <div onClick={(e) => e.stopPropagation()}>
+                              {/* Actions: Share & Favorite */}
+                              <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                                <ShareButton
+                                  title={service.name}
+                                  text={`${isRTL ? 'احجز' : 'Book'} ${service.name} ${isRTL ? 'من' : 'from'} ${provider?.full_name}`}
+                                  url={`${window.location.origin}/services?serviceId=${service.id}`}
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-8 w-8 text-muted-foreground hover:text-blue-600"
+                                />
                                 <FavoriteButton
                                   type="service"
                                   itemId={service.id}
@@ -1233,8 +1313,16 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                   </span>
                                 </div>
                                 
-                                {/* Favorite Button */}
-                                <div onClick={(e) => e.stopPropagation()}>
+                                {/* Actions: Share & Favorite */}
+                                <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                                  <ShareButton
+                                    title={service.name}
+                                    text={`${isRTL ? 'احجز' : 'Book'} ${service.name} ${isRTL ? 'من' : 'from'} ${provider?.full_name}`}
+                                    url={`${window.location.origin}/services?serviceId=${service.id}`}
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8 text-muted-foreground hover:text-blue-600"
+                                  />
                                   <FavoriteButton
                                     type="service"
                                     itemId={service.id}
@@ -1245,6 +1333,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                     }}
                                     variant="ghost"
                                     size="sm"
+                                    className="h-8 w-8"
                                   />
                                 </div>
                               </div>
@@ -1254,8 +1343,16 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                   ⭐ {isRTL ? 'لا توجد تقييمات' : 'No reviews'}
                                 </div>
                                 
-                                {/* Favorite Button */}
-                                <div onClick={(e) => e.stopPropagation()}>
+                                {/* Actions: Share & Favorite */}
+                                <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                                  <ShareButton
+                                    title={service.name}
+                                    text={`${isRTL ? 'احجز' : 'Book'} ${service.name} ${isRTL ? 'من' : 'from'} ${provider?.full_name}`}
+                                    url={`${window.location.origin}/services?serviceId=${service.id}`}
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8 text-muted-foreground hover:text-blue-600"
+                                  />
                                   <FavoriteButton
                                     type="service"
                                     itemId={service.id}
@@ -1266,6 +1363,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                     }}
                                     variant="ghost"
                                     size="sm"
+                                    className="h-8 w-8"
                                   />
                                 </div>
                               </div>
