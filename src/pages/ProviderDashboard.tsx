@@ -205,20 +205,20 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
         </div>
 
         {/* Stats Overview */}
-        <div className="grid !grid-cols-2 lg:!grid-cols-4 gap-2 sm:gap-3 mb-6 sm:mb-8">
+        <div className="grid grid-cols-4 gap-1 sm:gap-3 mb-6 sm:mb-8">
           <Card className="h-auto bg-muted/50 hover:bg-muted/70 transition-colors">
-            <CardHeader className="pb-2">
-              <div className="flex flex-col items-center text-center gap-2">
-                <div className="bg-blue-100 p-2 sm:p-3 rounded-full">
-                  <Settings className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
+            <CardHeader className="p-2 sm:p-6 pb-1 sm:pb-2">
+              <div className="flex flex-col items-center text-center gap-1 sm:gap-2">
+                <div className="bg-blue-100 p-1.5 sm:p-3 rounded-full">
+                  <Settings className="h-3 w-3 sm:h-5 sm:w-5 text-blue-600" />
                 </div>
-                <CardTitle className="text-xs sm:text-sm font-medium">{t.provider.services}</CardTitle>
+                <CardTitle className="text-[10px] sm:text-sm font-medium leading-tight">{t.provider.services}</CardTitle>
               </div>
             </CardHeader>
-            <CardContent className="pt-0">
+            <CardContent className="p-2 sm:p-6 pt-0 sm:pt-0">
               <div className="text-center">
-                <div className="text-lg sm:text-xl lg:text-2xl font-bold mb-1">{activeServices.length}</div>
-                <p className="text-xs text-muted-foreground">
+                <div className="text-sm sm:text-xl lg:text-2xl font-bold mb-0 sm:mb-1">{activeServices.length}</div>
+                <p className="text-[9px] sm:text-xs text-muted-foreground hidden sm:block">
                   {t.provider.activeServices}
                 </p>
               </div>
@@ -226,18 +226,18 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
           </Card>
 
           <Card className="h-auto bg-muted/50 hover:bg-muted/70 transition-colors">
-            <CardHeader className="pb-2">
-              <div className="flex flex-col items-center text-center gap-2">
-                <div className="bg-purple-100 p-2 sm:p-3 rounded-full">
-                  <Star className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
+            <CardHeader className="p-2 sm:p-6 pb-1 sm:pb-2">
+              <div className="flex flex-col items-center text-center gap-1 sm:gap-2">
+                <div className="bg-purple-100 p-1.5 sm:p-3 rounded-full">
+                  <Star className="h-3 w-3 sm:h-5 sm:w-5 text-purple-600" />
                 </div>
-                <CardTitle className="text-xs sm:text-sm font-medium">{t.provider.rating}</CardTitle>
+                <CardTitle className="text-[10px] sm:text-sm font-medium leading-tight">{t.provider.rating}</CardTitle>
               </div>
             </CardHeader>
-            <CardContent className="pt-0">
+            <CardContent className="p-2 sm:p-6 pt-0 sm:pt-0">
               <div className="text-center">
-                <div className="text-lg sm:text-xl lg:text-2xl font-bold mb-1">{averageRating}</div>
-                <p className="text-xs text-muted-foreground">
+                <div className="text-sm sm:text-xl lg:text-2xl font-bold mb-0 sm:mb-1">{averageRating}</div>
+                <p className="text-[9px] sm:text-xs text-muted-foreground hidden sm:block">
                   {reviews.length} {t.provider.reviews}
                 </p>
               </div>
@@ -245,18 +245,18 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
           </Card>
 
           <Card className="h-auto bg-muted/50 hover:bg-muted/70 transition-colors">
-            <CardHeader className="pb-2">
-              <div className="flex flex-col items-center text-center gap-2">
-                <div className="bg-green-100 p-2 sm:p-3 rounded-full">
-                  <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
+            <CardHeader className="p-2 sm:p-6 pb-1 sm:pb-2">
+              <div className="flex flex-col items-center text-center gap-1 sm:gap-2">
+                <div className="bg-green-100 p-1.5 sm:p-3 rounded-full">
+                  <CheckCircle2 className="h-3 w-3 sm:h-5 sm:w-5 text-green-600" />
                 </div>
-                <CardTitle className="text-xs sm:text-sm font-medium">{isRTL ? 'حجوزات مفعلة' : 'Active'}</CardTitle>
+                <CardTitle className="text-[10px] sm:text-sm font-medium leading-tight">{isRTL ? 'مفعلة' : 'Active'}</CardTitle>
               </div>
             </CardHeader>
-            <CardContent className="pt-0">
+            <CardContent className="p-2 sm:p-6 pt-0 sm:pt-0">
               <div className="text-center">
-                <div className="text-lg sm:text-xl lg:text-2xl font-bold mb-1">{confirmedBookingsCount}</div>
-                <p className="text-xs text-muted-foreground">
+                <div className="text-sm sm:text-xl lg:text-2xl font-bold mb-0 sm:mb-1">{confirmedBookingsCount}</div>
+                <p className="text-[9px] sm:text-xs text-muted-foreground hidden sm:block">
                   {isRTL ? 'حجوزات مفعّلة' : 'Active Bookings'}
                 </p>
               </div>
@@ -264,18 +264,18 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
           </Card>
 
           <Card className="h-auto bg-muted/50 hover:bg-muted/70 transition-colors">
-            <CardHeader className="pb-2">
-              <div className="flex flex-col items-center text-center gap-2">
-                <div className="bg-yellow-100 p-2 sm:p-3 rounded-full">
-                  <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-600" />
+            <CardHeader className="p-2 sm:p-6 pb-1 sm:pb-2">
+              <div className="flex flex-col items-center text-center gap-1 sm:gap-2">
+                <div className="bg-yellow-100 p-1.5 sm:p-3 rounded-full">
+                  <AlertCircle className="h-3 w-3 sm:h-5 sm:w-5 text-yellow-600" />
                 </div>
-                <CardTitle className="text-xs sm:text-sm font-medium">{t.provider.pendingBookings}</CardTitle>
+                <CardTitle className="text-[10px] sm:text-sm font-medium leading-tight">{isRTL ? 'انتظار' : 'Pending'}</CardTitle>
               </div>
             </CardHeader>
-            <CardContent className="pt-0">
+            <CardContent className="p-2 sm:p-6 pt-0 sm:pt-0">
               <div className="text-center">
-                <div className="text-lg sm:text-xl lg:text-2xl font-bold mb-1">{pendingBookingsCount}</div>
-                <p className="text-xs text-muted-foreground">
+                <div className="text-sm sm:text-xl lg:text-2xl font-bold mb-0 sm:mb-1">{pendingBookingsCount}</div>
+                <p className="text-[9px] sm:text-xs text-muted-foreground hidden sm:block">
                   {isRTL ? 'بانتظار التأكيد' : 'Awaiting Confirmation'}
                 </p>
               </div>

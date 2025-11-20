@@ -282,21 +282,22 @@ export default function Favorites() {
                               </span>
                             </div>
                             
-                            {/* Favorite Button */}
+                            {/* Favorite Button - Remove Action */}
                             <Button
                               size="icon"
                               variant="ghost"
-                              className="h-8 w-8 hover:bg-green-200 dark:hover:bg-green-900/40 flex-shrink-0 bg-green-100 dark:bg-green-900/30"
+                              className="h-8 w-8 hover:bg-red-200 dark:hover:bg-red-900/40 flex-shrink-0 bg-red-100 dark:bg-red-900/30"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleRemove(favorite.item_id);
                               }}
                               disabled={removingId === favorite.item_id}
+                              title={isRTL ? 'إزالة من المفضلة' : 'Remove from favorites'}
                             >
                               {removingId === favorite.item_id ? (
-                                <div className="h-4 w-4 border-2 border-green-700 border-t-transparent rounded-full animate-spin" />
+                                <div className="h-4 w-4 border-2 border-red-700 border-t-transparent rounded-full animate-spin" />
                               ) : (
-                                <span style={{ fontSize: '22px', color: '#15803d', fontWeight: 'bold', lineHeight: 1 }}>✓</span>
+                                <Trash2 className="h-4 w-4 text-red-600" />
                               )}
                             </Button>
                           </div>
@@ -306,21 +307,22 @@ export default function Favorites() {
                               ⭐ {isRTL ? 'لا توجد تقييمات' : 'No reviews'}
                             </div>
                             
-                            {/* Favorite Button */}
+                            {/* Favorite Button - Remove Action */}
                             <Button
                               size="icon"
                               variant="ghost"
-                              className="h-8 w-8 hover:bg-green-200 dark:hover:bg-green-900/40 flex-shrink-0 bg-green-100 dark:bg-green-900/30"
+                              className="h-8 w-8 hover:bg-red-200 dark:hover:bg-red-900/40 flex-shrink-0 bg-red-100 dark:bg-red-900/30"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleRemove(favorite.item_id);
                               }}
                               disabled={removingId === favorite.item_id}
+                              title={isRTL ? 'إزالة من المفضلة' : 'Remove from favorites'}
                             >
                               {removingId === favorite.item_id ? (
-                                <div className="h-4 w-4 border-2 border-green-700 border-t-transparent rounded-full animate-spin" />
+                                <div className="h-4 w-4 border-2 border-red-700 border-t-transparent rounded-full animate-spin" />
                               ) : (
-                                <span style={{ fontSize: '22px', color: '#15803d', fontWeight: 'bold', lineHeight: 1 }}>✓</span>
+                                <Trash2 className="h-4 w-4 text-red-600" />
                               )}
                             </Button>
                           </div>
