@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Filter, MapPin, Star, Clock, ExternalLink, Calendar, Map as MapIcon, List, ChevronDown, Sparkles, Wrench, Heart, Dumbbell, Scissors, GraduationCap, Stethoscope, Home, Car, Laptop, Scale, DollarSign, Users, Cog, Palette, Shirt, Code, Building, Megaphone, Camera, Languages, Briefcase, Sofa, PenTool, Music, Plane } from "lucide-react";
+import { Search, Filter, MapPin, Star, Clock, ExternalLink, Calendar, Map as MapIcon, List, ChevronDown, Sparkles, Wrench, Heart, Dumbbell, Scissors, GraduationCap, Stethoscope, Home, Car, Laptop, Scale, DollarSign, Users, Cog, Palette, Shirt, Code, Building, Megaphone, Camera, Languages, Briefcase, Sofa, PenTool, Music, Plane, Trash2 } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from "@/hooks/use-toast";
@@ -17,7 +17,7 @@ import { getCategoryIcon, getCategoryColor } from "@/lib/categoryIcons";
 // Currency display uses Latin currency code (e.g., AED) instead of symbol
 import { db } from "@/integrations/firebase/client";
 import InteractiveMap from "@/components/map/InteractiveMap";
-import { collection, getDocs, doc, getDoc, query as fsQuery, where } from "firebase/firestore";
+import { collection, getDocs, doc, getDoc, query as fsQuery, where, deleteDoc } from "firebase/firestore";
 import { ServiceCategory, initializeServiceCategories, Offer } from "@/lib/firebase/collections";
 import { getServiceCategoriesCached } from "@/lib/categoriesCache";
 import { getServicesCached, invalidateServicesCache } from "@/lib/servicesCache";
@@ -698,15 +698,42 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
             ) : (
               offersList.map((offer) => (
                 <Card key={offer.id} className="shadow-sm">
-                  <CardHeader className="flex items-start justify-between">
-                    <CardTitle className="text-sm font-medium">
-                      {offer.title || (isRTL ? 'عرض' : 'Offer')}
-                    </CardTitle>
-                    {(offer.discount_percentage || offer.discount_amount) ? (
-                      <Badge variant="secondary" className="ml-2 whitespace-nowrap">
-                        {offer.discount_percentage ? `${offer.discount_percentage}%` : `${offer.discount_amount}`}
-                      </Badge>
-                    ) : null}
+                  <CardHeader className="flex items-start justify-between gap-2">
+                    <div className="flex-1">
+                      <CardTitle className="text-sm font-medium">
+                        {offer.title || (isRTL ? 'عرض' : 'Offer')}
+                      </CardTitle>
+                      {(offer.discount_percentage || offer.discount_amount) ? (
+                        <Badge variant="secondary" className="mt-1 whitespace-nowrap">
+                          {offer.discount_percentage ? `${offer.discount_percentage}%` : `${offer.discount_amount}`}
+                        </Badge>
+                      ) : null}
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={async () => {
+                        if (window.confirm(isRTL ? 'هل تريد حذف هذا العرض؟' : 'Are you sure you want to delete this offer?')) {
+                          try {
+                            await deleteDoc(doc(db, 'offers', offer.id));
+                            setOffersList(offersList.filter(o => o.id !== offer.id));
+                            toast({
+                              title: isRTL ? 'تم الحذف' : 'Deleted',
+                              description: isRTL ? 'تم حذف العرض بنجاح' : 'Offer deleted successfully'
+                            });
+                          } catch (error) {
+                            toast({
+                              variant: "destructive",
+                              title: isRTL ? 'خطأ' : 'Error',
+                              description: isRTL ? 'فشل حذف العرض' : 'Failed to delete offer'
+                            });
+                          }
+                        }
+                      }}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground mb-2">{offer.description}</p>
