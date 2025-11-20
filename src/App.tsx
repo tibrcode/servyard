@@ -13,31 +13,33 @@ import { doc, updateDoc } from "firebase/firestore";
 import { Header } from "@/components/layout/Header";
 import { requestNotificationPermission, onMessageListener } from "@/lib/firebase/notifications";
 import { useAuth } from "@/contexts/AuthContext";
-import Index from "@/pages/Index";
-import Auth from "@/pages/Auth";
-import ProviderSignup from "@/pages/ProviderSignup";
-import CustomerSignup from "@/pages/CustomerSignup";
-import Services from "@/pages/Services";
-// Lazy load heavy dashboard pages for code-splitting
+
+// Lazy load all pages for code-splitting and performance optimization
+const Index = React.lazy(() => import("@/pages/Index"));
+const Auth = React.lazy(() => import("@/pages/Auth"));
+const ProviderSignup = React.lazy(() => import("@/pages/ProviderSignup"));
+const CustomerSignup = React.lazy(() => import("@/pages/CustomerSignup"));
+const Services = React.lazy(() => import("@/pages/Services"));
 const ProviderDashboard = React.lazy(() => import('@/pages/ProviderDashboard'));
 const CustomerDashboard = React.lazy(() => import('@/pages/CustomerDashboard'));
-import AddService from "@/pages/AddService";
-import EditService from "@/pages/EditService";
-import EditProfile from "@/pages/EditProfile";
-import TimezoneSettings from "@/pages/TimezoneSettings";
-import ProviderProfile from "@/pages/ProviderProfile";
+const AddService = React.lazy(() => import("@/pages/AddService"));
+const EditService = React.lazy(() => import("@/pages/EditService"));
+const EditProfile = React.lazy(() => import("@/pages/EditProfile"));
+const TimezoneSettings = React.lazy(() => import("@/pages/TimezoneSettings"));
+const ProviderProfile = React.lazy(() => import("@/pages/ProviderProfile"));
 const AdminConsole = React.lazy(() => import('@/pages/AdminConsole'));
-import Terms from "@/pages/Terms";
-import CompleteProfile from "@/pages/CompleteProfile";
-import Privacy from "@/pages/Privacy";
-import Disclaimer from "@/pages/Disclaimer";
-import ContentPolicy from "@/pages/ContentPolicy";
-import AboutUs from "@/pages/AboutUs";
-import ContactUs from "@/pages/ContactUs";
-import NotFound from "@/pages/NotFound";
-import DebugNotifications from "@/pages/DebugNotifications";
-import NotificationsHistory from "@/pages/NotificationsHistory";
-import Favorites from "@/pages/Favorites";
+const Terms = React.lazy(() => import("@/pages/Terms"));
+const CompleteProfile = React.lazy(() => import("@/pages/CompleteProfile"));
+const Privacy = React.lazy(() => import("@/pages/Privacy"));
+const Disclaimer = React.lazy(() => import("@/pages/Disclaimer"));
+const ContentPolicy = React.lazy(() => import("@/pages/ContentPolicy"));
+const AboutUs = React.lazy(() => import("@/pages/AboutUs"));
+const ContactUs = React.lazy(() => import("@/pages/ContactUs"));
+const NotFound = React.lazy(() => import("@/pages/NotFound"));
+const DebugNotifications = React.lazy(() => import("@/pages/DebugNotifications"));
+const NotificationsHistory = React.lazy(() => import("@/pages/NotificationsHistory"));
+const Favorites = React.lazy(() => import("@/pages/Favorites"));
+
 import { NotificationLogProvider, useNotificationLog } from "@/contexts/NotificationLogContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
@@ -314,6 +316,11 @@ const AppContent = () => {
                     <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none"></div>
                     
                     <div className="relative z-10">
+                    <React.Suspense fallback={
+                      <div className="flex items-center justify-center min-h-[50vh]">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                      </div>
+                    }>
                     <Routes>
                       <Route path="/" element={
                         <Index
@@ -333,16 +340,12 @@ const AppContent = () => {
                       } />
                       <Route path="/provider-dashboard" element={
                         <ProtectedRoute requireRole="provider">
-                          <React.Suspense fallback={<div className="p-6 text-center text-sm text-muted-foreground">Loading dashboard…</div>}>
-                            <ProviderDashboard currentLanguage={currentLanguage} />
-                          </React.Suspense>
+                          <ProviderDashboard currentLanguage={currentLanguage} />
                         </ProtectedRoute>
                       } />
                       <Route path="/customer-dashboard" element={
                         <ProtectedRoute requireRole="customer">
-                          <React.Suspense fallback={<div className="p-6 text-center text-sm text-muted-foreground">Loading dashboard…</div>}>
-                            <CustomerDashboard currentLanguage={currentLanguage} />
-                          </React.Suspense>
+                          <CustomerDashboard currentLanguage={currentLanguage} />
                         </ProtectedRoute>
                       } />
                       <Route path="/add-service" element={<AddService currentLanguage={currentLanguage} />} />
@@ -350,7 +353,7 @@ const AppContent = () => {
                       <Route path="/edit-profile" element={<EditProfile currentLanguage={currentLanguage} />} />
                       <Route path="/timezone" element={<TimezoneSettings currentLanguage={currentLanguage} />} />
                       <Route path="/provider/:providerId" element={<ProviderProfile currentLanguage={currentLanguage} onLanguageChange={handleLanguageChange} />} />
-                      <Route path="/console" element={<React.Suspense fallback={<div className="p-6 text-center text-sm text-muted-foreground">Loading console…</div>}><AdminConsole currentLanguage={currentLanguage} /></React.Suspense>} />
+                      <Route path="/console" element={<AdminConsole currentLanguage={currentLanguage} />} />
                       <Route path="/terms" element={<Terms currentLanguage={currentLanguage} />} />
                       <Route path="/privacy" element={<Privacy currentLanguage={currentLanguage} />} />
                       <Route path="/disclaimer" element={<Disclaimer currentLanguage={currentLanguage} />} />
@@ -363,6 +366,7 @@ const AppContent = () => {
                       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                       <Route path="*" element={<NotFound currentLanguage={currentLanguage} />} />
                     </Routes>
+                    </React.Suspense>
                     </div>
                   </main>
                 </div>
