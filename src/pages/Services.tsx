@@ -397,7 +397,8 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
             color_scheme: category?.color_scheme,
             has_discount: service.has_discount,
             discount_price: service.discount_price,
-            discount_percentage: service.discount_percentage
+            discount_percentage: service.discount_percentage,
+            type: service.type
           };
         })
       };

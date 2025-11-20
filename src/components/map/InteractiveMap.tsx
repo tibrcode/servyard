@@ -23,6 +23,7 @@ interface Location {
     has_discount?: boolean;
     discount_price?: string;
     discount_percentage?: number;
+    type?: 'service' | 'booking';
   }>;
   provider_rating?: number;
   provider_reviews_count?: number;
@@ -607,7 +608,15 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                   
                   <!-- Price -->
                   <div style="margin-bottom: 8px;">
-                    ${service.has_discount && service.discount_price ? `
+                    ${service.type === 'booking' ? `
+                      <div style="
+                        font-size: 16px;
+                        color: #2563eb;
+                        font-weight: 700;
+                      ">
+                        ${isRTL ? 'حجز موعد' : 'Book Appointment'}
+                      </div>
+                    ` : service.has_discount && service.discount_price ? `
                       <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
                         <div style="
                           font-size: 18px;
