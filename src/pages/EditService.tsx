@@ -20,35 +20,15 @@ import { ServiceBookingSettings } from "@/components/booking/ServiceBookingSetti
 import { ServiceScheduleSetup } from "@/components/booking/ServiceScheduleSetup";
 import { BookingSettings } from "@/types/booking";
 import { invalidateServicesCache } from "@/lib/servicesCache";
+import { Service } from "@/types/service";
+import { useServiceCategories } from "@/hooks/useServiceCategories";
+import { useServiceDetails } from "@/hooks/useServiceDetails";
 
 interface EditServiceProps {
   currentLanguage: string;
 }
 
-interface Service {
-  id: string;
-  name: string;
-  description: string;
-  category_id: string;
-  approximate_price: string;
-  duration_minutes: number;
-  specialty_description: string;
-  price_range: string;
-  provider_id: string;
-  is_active: boolean;
-  // Booking settings
-  booking_enabled?: boolean;
-  max_concurrent_bookings?: number;
-  advance_booking_days?: number;
-  buffer_time_minutes?: number;
-  cancellation_policy_hours?: number;
-  require_confirmation?: boolean;
-  allow_customer_cancellation?: boolean;
-  // Discount fields
-  has_discount?: boolean;
-  discount_price?: string;
-  discount_percentage?: number;
-}
+
 
 const EditService: React.FC<EditServiceProps> = ({ currentLanguage }) => {
   const { serviceId } = useParams<{ serviceId: string }>();
@@ -56,7 +36,9 @@ const EditService: React.FC<EditServiceProps> = ({ currentLanguage }) => {
   const { toast } = useToast();
   const { t, isRTL } = useTranslation(currentLanguage);
 
-  const [categories, setCategories] = useState<ServiceCategory[]>([]);
+  const { data: categories = [] } = useServiceCategories();
+  const { data: serviceData, isLoading: serviceLoading } = useServiceDetails(serviceId);
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [service, setService] = useState<Service | null>(null);
@@ -85,131 +67,87 @@ const EditService: React.FC<EditServiceProps> = ({ currentLanguage }) => {
     allow_customer_cancellation: true,
   });
 
-  // Fetch categories and service data
+  // Initialize form data when service loads
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        if (!auth.currentUser || !serviceId) {
-          console.error('No authenticated user or service ID');
-          navigate('/provider-dashboard');
-          return;
-        }
+    const checkAuthAndLoad = async () => {
+      if (!auth.currentUser || !serviceId) {
+        navigate('/provider-dashboard');
+        return;
+      }
 
-        // Upsert default categories to ensure all 24 are present
-        console.log('Upserting default service categories for EditService...');
-        const inserted = await upsertDefaultServiceCategories();
-        console.log(`Inserted ${inserted} new categories for EditService`);
+      if (serviceData) {
+        // Check ownership
+        try {
+          const userProfileQuery = query(
+            collection(db, 'profiles'),
+            where('user_id', '==', auth.currentUser.uid),
+            where('user_type', '==', 'provider')
+          );
+          const userProfileSnapshot = await getDocs(userProfileQuery);
 
-        // Fetch categories
-        console.log('Fetching categories for EditService...');
-        const categoriesRef = collection(db, 'service_categories');
-        const categoriesQuery = query(
-          categoriesRef,
-          where('is_active', '==', true)
-        );
-        const categoriesSnapshot = await getDocs(categoriesQuery);
-        let categoriesData = categoriesSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        })) as ServiceCategory[];
-
-        // Deduplicate
-        const seen = new Set<string>();
-        const deduped: ServiceCategory[] = [];
-        for (const cat of categoriesData) {
-          const key = ((cat.name_en || cat.name_ar || cat.id) + '').trim().toLowerCase();
-          if (!seen.has(key)) {
-            seen.add(key);
-            deduped.push(cat);
+          if (userProfileSnapshot.empty) {
+            navigate('/provider-dashboard');
+            return;
           }
-        }
-        deduped.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
-        console.log(`Fetched ${categoriesData.length} categories for EditService → after dedup ${deduped.length}`);
-        setCategories(deduped);
 
-        // Fetch service data
-        console.log('Fetching service data for editing...');
-        const serviceDoc = await getDoc(doc(db, 'services', serviceId));
+          const userProfile = userProfileSnapshot.docs[0];
+          if (serviceData.provider_id !== userProfile.id) {
+             console.error('Unauthorized access to service');
+             toast({
+               title: t.toast.error,
+               description: t.ui.accessDenied,
+               variant: "destructive",
+             });
+             navigate('/provider-dashboard');
+             return;
+          }
 
-        if (!serviceDoc.exists()) {
-          console.error('Service not found');
-          toast({
-            title: t.toast.error,
-            description: t.ui.serviceNotFound || 'Service not found',
-            variant: "destructive",
+          setService(serviceData);
+          setFormData({
+            name: serviceData.name || '',
+            description: serviceData.description || '',
+            category_id: serviceData.category_id || '',
+            approximate_price: serviceData.approximate_price || '',
+            duration_minutes: serviceData.duration_minutes || 60,
+            specialty_description: serviceData.specialty_description || '',
+            price_range: serviceData.price_range || 'budget',
+            has_discount: serviceData.has_discount || false,
+            discount_price: serviceData.discount_price || '',
+            discount_percentage: serviceData.discount_percentage || 0
           });
-          navigate('/provider-dashboard');
-          return;
-        }
 
-        const serviceData = { id: serviceDoc.id, ...serviceDoc.data() } as Service;
-
-        // Check if the current user owns this service
-        const userProfileQuery = query(
-          collection(db, 'profiles'),
-          where('user_id', '==', auth.currentUser.uid),
-          where('user_type', '==', 'provider')
-        );
-        const userProfileSnapshot = await getDocs(userProfileQuery);
-
-        if (userProfileSnapshot.empty) {
-          console.error('Provider profile not found');
-          navigate('/provider-dashboard');
-          return;
-        }
-
-        const userProfile = userProfileSnapshot.docs[0];
-        if (serviceData.provider_id !== userProfile.id) {
-          console.error('Unauthorized access to service');
-          toast({
-            title: t.toast.error,
-            description: t.ui.accessDenied,
-            variant: "destructive",
+          setBookingSettings({
+            booking_enabled: serviceData.booking_enabled || false,
+            duration_minutes: serviceData.duration_minutes || 30,
+            max_concurrent_bookings: serviceData.max_concurrent_bookings || 1,
+            advance_booking_days: serviceData.advance_booking_days || 30,
+            buffer_time_minutes: serviceData.buffer_time_minutes || 0,
+            cancellation_policy_hours: serviceData.cancellation_policy_hours || 24,
+            require_confirmation: serviceData.require_confirmation !== false,
+            allow_customer_cancellation: serviceData.allow_customer_cancellation !== false,
           });
+          
+          setLoading(false);
+        } catch (error) {
+          console.error('Error checking auth:', error);
           navigate('/provider-dashboard');
-          return;
         }
-
-        setService(serviceData);
-        setFormData({
-          name: serviceData.name || '',
-          description: serviceData.description || '',
-          category_id: serviceData.category_id || '',
-          approximate_price: serviceData.approximate_price || '',
-          duration_minutes: serviceData.duration_minutes || 60,
-          specialty_description: serviceData.specialty_description || '',
-          price_range: serviceData.price_range || 'budget',
-          has_discount: serviceData.has_discount || false,
-          discount_price: serviceData.discount_price || '',
-          discount_percentage: serviceData.discount_percentage || 0
-        });
-
-        // Load booking settings
-        setBookingSettings({
-          booking_enabled: serviceData.booking_enabled || false,
-          duration_minutes: serviceData.duration_minutes || 30,
-          max_concurrent_bookings: serviceData.max_concurrent_bookings || 1,
-          advance_booking_days: serviceData.advance_booking_days || 30,
-          buffer_time_minutes: serviceData.buffer_time_minutes || 0,
-          cancellation_policy_hours: serviceData.cancellation_policy_hours || 24,
-          require_confirmation: serviceData.require_confirmation !== undefined ? serviceData.require_confirmation : true,
-          allow_customer_cancellation: serviceData.allow_customer_cancellation !== undefined ? serviceData.allow_customer_cancellation : true,
-        });
-
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        toast({
-          title: t.toast.error,
-          description: t.ui.errorLoadingData || 'Error loading data',
-          variant: "destructive",
-        });
-      } finally {
-        setLoading(false);
+      } else if (!serviceLoading && serviceId) {
+         if (serviceData === null) {
+            toast({
+              title: t.toast.error,
+              description: t.ui.serviceNotFound || 'Service not found',
+              variant: "destructive",
+            });
+            navigate('/provider-dashboard');
+         }
       }
     };
 
-    fetchData();
-  }, [serviceId, navigate, toast]);
+    checkAuthAndLoad();
+  }, [serviceData, serviceLoading, serviceId, navigate, t, toast]);
+
+
 
   const handleInputChange = (field: string, value: string | number) => {
     setFormData(prev => ({

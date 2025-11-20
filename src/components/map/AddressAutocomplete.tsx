@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
@@ -47,22 +47,7 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
     : "Start typing to search for an address..."
   );
 
-  useEffect(() => {
-    // التحقق من تحميل Google Places API
-    const checkGoogleMaps = () => {
-      if (window.google && window.google.maps && window.google.maps.places) {
-        initializeAutocomplete();
-        setLoading(false);
-      } else {
-        // إعادة المحاولة بعد 100ms
-        setTimeout(checkGoogleMaps, 100);
-      }
-    };
-
-    checkGoogleMaps();
-  }, []);
-
-  const initializeAutocomplete = () => {
+  const initializeAutocomplete = useCallback(() => {
     if (!inputRef.current) return;
 
     // إنشاء Autocomplete
@@ -113,7 +98,22 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
 
       setValue(fullAddress);
     });
-  };
+  }, [onAddressSelect]);
+
+  useEffect(() => {
+    // التحقق من تحميل Google Places API
+    const checkGoogleMaps = () => {
+      if (window.google && window.google.maps && window.google.maps.places) {
+        initializeAutocomplete();
+        setLoading(false);
+      } else {
+        // إعادة المحاولة بعد 100ms
+        setTimeout(checkGoogleMaps, 100);
+      }
+    };
+
+    checkGoogleMaps();
+  }, [initializeAutocomplete]);
 
   if (loading) {
     return (

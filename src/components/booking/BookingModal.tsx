@@ -17,23 +17,7 @@ import { trackBookingCreated, trackPhoneClick } from "@/lib/firebase/analytics";
 import { ServiceBooking } from "@/components/booking/ServiceBooking";
 import { withTrace } from '@/lib/trace';
 import { BookingSettings } from "@/types/booking";
-
-interface Service {
-  id: string;
-  name: string;
-  description?: string;
-  provider_id: string;
-  approximate_price?: string;
-  duration_minutes?: number;
-  price_range?: string;
-  booking_enabled?: boolean;
-  max_concurrent_bookings?: number;
-  advance_booking_days?: number;
-  buffer_time_minutes?: number;
-  cancellation_policy_hours?: number;
-  require_confirmation?: boolean;
-  allow_customer_cancellation?: boolean;
-}
+import { Service } from "@/types/service";
 
 interface Provider {
   id: string;

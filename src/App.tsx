@@ -44,6 +44,7 @@ import { NotificationLogProvider, useNotificationLog } from "@/contexts/Notifica
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import EnsureProfile from "@/components/auth/EnsureProfile";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 
 const queryClient = new QueryClient();
 
@@ -380,11 +381,13 @@ const AppContent = () => {
 
 const App = () => {
   return (
-    <AuthProvider>
-      <NotificationLogProvider>
-        <AppContent />
-      </NotificationLogProvider>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <NotificationLogProvider>
+          <AppContent />
+        </NotificationLogProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 };
 

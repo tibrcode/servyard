@@ -12,38 +12,14 @@ import { commonTimezones, getBrowserTimezone } from "@/lib/timezones";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "@/lib/i18n";
-import { db } from "@/integrations/firebase/client";
-import { doc, updateDoc, getDoc, collection, query, getDocs } from "firebase/firestore";
 import { getCategoryLabel } from "@/lib/categoriesLocale";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { deleteCurrentUserFully } from "@/lib/firebase/deleteAccount";
 import LocationPicker from "@/components/provider/LocationPicker";
+import { useProfileData, ProfileData } from "@/hooks/useProfileData";
+import { useServiceCategories } from "@/hooks/useServiceCategories";
 
 interface EditProfileProps {
   currentLanguage: string;
-}
-
-interface ProfileData {
-  full_name: string;
-  email: string;
-  phone_numbers: string[];
-  whatsapp_number: string;
-  city: string;
-  country: string;
-  profile_description: string;
-  website_url: string;
-  google_business_url: string;
-  license_number: string;
-  instagram_url: string;
-  facebook_url: string;
-  tiktok_url: string;
-  currency_code?: string;
-  timezone?: string;
-  main_category_id?: string;
-  // حقول الموقع الجغرافي
-  latitude?: number;
-  longitude?: number;
-  location_address?: string;
 }
 
 const EditProfile: React.FC<EditProfileProps> = ({ currentLanguage }) => {
@@ -52,11 +28,10 @@ const EditProfile: React.FC<EditProfileProps> = ({ currentLanguage }) => {
   const { user, role, loading: authLoading } = useAuth();
   const { t, isRTL } = useTranslation(currentLanguage);
 
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [deleting, setDeleting] = useState(false);
+  const { profile, isLoading: profileLoading, updateProfile, isUpdating, deleteAccount, isDeleting } = useProfileData();
+  const { data: categories = [] } = useServiceCategories();
+
   const [newPhoneNumber, setNewPhoneNumber] = useState("");
-  const [categories, setCategories] = useState<any[]>([]);
 
   const [formData, setFormData] = useState<ProfileData>({
     full_name: '',
@@ -80,85 +55,32 @@ const EditProfile: React.FC<EditProfileProps> = ({ currentLanguage }) => {
     location_address: ''
   });
 
-  // Fetch categories
+  // Initialize form data when profile loads
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const categoriesQuery = query(collection(db, 'service_categories'));
-        const categoriesSnapshot = await getDocs(categoriesQuery);
-        const categoriesData = categoriesSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-        setCategories(categoriesData);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
-    fetchCategories();
-  }, []);
-
-  // Fetch user profile data
-  useEffect(() => {
-    const fetchProfile = async () => {
-      if (!user) {
-        navigate('/auth');
-        return;
-      }
-
-      try {
-        const profileDoc = await getDoc(doc(db, 'profiles', user.uid));
-
-        if (!profileDoc.exists()) {
-          console.error('Profile not found');
-          toast({
-            title: t.editProfile.errorTitle,
-            description: "Profile not found",
-            variant: "destructive",
-          });
-          return;
-        }
-
-        const profile = profileDoc.data();
-        setFormData({
-          full_name: profile.full_name || '',
-          email: profile.email || '',
-          phone_numbers: profile.phone_numbers || [],
-          whatsapp_number: profile.whatsapp_number || '',
-          city: profile.city || '',
-          country: profile.country || '',
-          profile_description: profile.profile_description || '',
-          website_url: profile.website_url || '',
-          google_business_url: profile.google_business_url || '',
-          license_number: profile.license_number || '',
-          instagram_url: profile.instagram_url || '',
-          facebook_url: profile.facebook_url || '',
-          tiktok_url: profile.tiktok_url || '',
-          currency_code: profile.currency_code || '',
-          timezone: profile.timezone || 'Asia/Dubai',
-          main_category_id: profile.main_category_id || '',
-          latitude: profile.latitude,
-          longitude: profile.longitude,
-          location_address: profile.location_address || ''
-        });
-
-      } catch (error) {
-        console.error('Error fetching profile:', error);
-        toast({
-          title: t.editProfile.errorTitle,
-          description: t.editProfile.errorMessage,
-          variant: "destructive",
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (!authLoading) {
-      fetchProfile();
+    if (profile) {
+      setFormData({
+        full_name: profile.full_name || '',
+        email: profile.email || '',
+        phone_numbers: profile.phone_numbers || [],
+        whatsapp_number: profile.whatsapp_number || '',
+        city: profile.city || '',
+        country: profile.country || '',
+        profile_description: profile.profile_description || '',
+        website_url: profile.website_url || '',
+        google_business_url: profile.google_business_url || '',
+        license_number: profile.license_number || '',
+        instagram_url: profile.instagram_url || '',
+        facebook_url: profile.facebook_url || '',
+        tiktok_url: profile.tiktok_url || '',
+        currency_code: profile.currency_code || '',
+        timezone: profile.timezone || 'Asia/Dubai',
+        main_category_id: profile.main_category_id || '',
+        latitude: profile.latitude,
+        longitude: profile.longitude,
+        location_address: profile.location_address || ''
+      });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, authLoading, navigate, toast]);
+  }, [profile]);
 
   const handleInputChange = (field: keyof ProfileData, value: string | string[]) => {
     setFormData(prev => ({
@@ -200,10 +122,8 @@ const EditProfile: React.FC<EditProfileProps> = ({ currentLanguage }) => {
       return;
     }
 
-    setSaving(true);
-
     try {
-      await updateDoc(doc(db, 'profiles', user.uid), {
+      await updateProfile({
         full_name: formData.full_name.trim(),
         email: formData.email.trim(),
         phone_numbers: formData.phone_numbers,
@@ -217,14 +137,12 @@ const EditProfile: React.FC<EditProfileProps> = ({ currentLanguage }) => {
         instagram_url: formData.instagram_url.trim(),
         facebook_url: formData.facebook_url.trim(),
         tiktok_url: formData.tiktok_url.trim(),
-        currency_code: (formData.currency_code || '').trim() || null,
+        currency_code: (formData.currency_code || '').trim() || undefined,
         timezone: formData.timezone || 'Asia/Dubai',
-        main_category_id: formData.main_category_id || null,
-        // حفظ الموقع الجغرافي
-        latitude: formData.latitude || null,
-        longitude: formData.longitude || null,
-        location_address: formData.location_address?.trim() || null,
-        updated_at: new Date()
+        main_category_id: formData.main_category_id || undefined,
+        latitude: formData.latitude || undefined,
+        longitude: formData.longitude || undefined,
+        location_address: formData.location_address?.trim() || undefined,
       });
 
       toast({
@@ -245,8 +163,6 @@ const EditProfile: React.FC<EditProfileProps> = ({ currentLanguage }) => {
         description: t.editProfile.errorMessage,
         variant: "destructive",
       });
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -260,20 +176,17 @@ const EditProfile: React.FC<EditProfileProps> = ({ currentLanguage }) => {
 
   const handleDeleteAccount = async () => {
     if (!user) return;
-    setDeleting(true);
     try {
-  await deleteCurrentUserFully();
-  toast({ title: 'Account deleted', description: t.ui.interfaceUpdated });
+      await deleteAccount();
+      toast({ title: 'Account deleted', description: t.ui.interfaceUpdated });
       navigate('/');
     } catch (error: any) {
       console.error('Error deleting account:', error);
       toast({ variant: 'destructive', title: t.toast.error, description: error?.message || 'Failed to delete account' });
-    } finally {
-      setDeleting(false);
     }
   };
 
-  if (authLoading || loading) {
+  if (authLoading || profileLoading) {
     return (
       <div className="container mx-auto p-6" dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="flex justify-center items-center min-h-[400px]">
@@ -591,9 +504,9 @@ const EditProfile: React.FC<EditProfileProps> = ({ currentLanguage }) => {
               >
                 {t.editProfile.cancel}
               </Button>
-              <Button type="submit" disabled={saving}>
+              <Button type="submit" disabled={isUpdating}>
                 <Save className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-                {saving ? t.editProfile.saving : t.editProfile.saveChanges}
+                {isUpdating ? t.editProfile.saving : t.editProfile.saveChanges}
               </Button>
             </div>
           </form>
@@ -614,9 +527,9 @@ const EditProfile: React.FC<EditProfileProps> = ({ currentLanguage }) => {
         <CardContent>
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="destructive" disabled={deleting}>
+              <Button variant="destructive" disabled={isDeleting}>
                 <Trash2 className="w-4 h-4 mr-2" />
-                {deleting ? (t.ui.loading || 'Deleting...') : ('Delete my account')}
+                {isDeleting ? (t.ui.loading || 'Deleting...') : ('Delete my account')}
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>

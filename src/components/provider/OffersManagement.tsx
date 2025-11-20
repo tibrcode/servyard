@@ -40,7 +40,7 @@ export function OffersManagement({ currentLanguage }: OffersManagementProps) {
   const loadOffers = async () => {
     if (!user) return;
     try {
-      let offersQuery = query(
+      const offersQuery = query(
         collection(db, 'offers'),
         where('provider_id', '==', user.uid),
         orderBy('created_at', 'desc')

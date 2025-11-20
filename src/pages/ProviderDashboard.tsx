@@ -23,72 +23,20 @@ import {
   AlertCircle
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
-import { auth, db } from "@/integrations/firebase/client";
+import { auth } from "@/integrations/firebase/client";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { doc, getDoc, collection, getDocs, query, where, updateDoc, onSnapshot } from "firebase/firestore";
 import { useTranslation } from "@/lib/i18n";
 import { toast } from "@/hooks/use-toast";
 import { ShareProfile } from "@/components/provider/ShareProfile";
 import { BookingManagement } from "@/components/booking/BookingManagement";
 import { Settings as SettingsComponent } from "@/components/settings/Settings";
+import { useProviderActions } from "@/hooks/useProviderActions";
+
+import { Service, Offer } from "@/types/service";
+import { useProviderDashboardData } from "@/hooks/useProviderDashboardData";
 
 interface ProviderDashboardProps {
   currentLanguage: string;
-}
-
-interface Offer {
-  id: string;
-  title: string;
-  description: string;
-  discount_percentage?: number;
-  discount_amount?: number;
-  valid_until: string;
-  is_active: boolean;
-  created_at: any;
-}
-
-interface Service {
-  id: string;
-  name: string;
-  description?: string;
-  is_active: boolean;
-  approximate_price?: string;
-  duration_minutes?: number;
-  category_id?: string;
-  price_range?: string;
-  specialty_description?: string;
-  created_at?: any;
-  updated_at?: any;
-  has_discount?: boolean;
-  discount_price?: string;
-  discount_percentage?: number;
-}
-
-interface Profile {
-  id: string;
-  full_name: string;
-  email: string;
-  phone_numbers?: string[];
-  whatsapp_number?: string;
-  city: string;
-  country: string;
-  user_type: string;
-  is_online?: boolean;
-  profile_description?: string;
-  currency_code?: string;
-}
-
-interface Review {
-  id: string;
-  rating: number;
-  comment?: string;
-  customer_id: string;
-  provider_id: string;
-  service_id: string;
-  booking_id: string;
-  created_at: any;
-  // Customer information populated from customer profile
-  customer_name?: string;
 }
 
 const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
@@ -97,13 +45,25 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
   const location = useLocation();
 
   const [currentUser, setCurrentUser] = useState<any>(null);
-  const [providerProfile, setProviderProfile] = useState<Profile | null>(null);
-  const [services, setServices] = useState<Service[]>([]);
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [offers, setOffers] = useState<Offer[]>([]);
-  const [confirmedBookingsCount, setConfirmedBookingsCount] = useState(0);
-  const [pendingBookingsCount, setPendingBookingsCount] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
+  
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const { 
+    profile: providerProfile, 
+    services, 
+    offers, 
+    reviews, 
+    confirmedBookingsCount, 
+    pendingBookingsCount, 
+    isLoading 
+  } = useProviderDashboardData(currentUser?.uid);
+
+  const { updateOnlineStatus } = useProviderActions();
 
   // Highlight booking if bookingId query param present (for provider)
   // IMPORTANT: Hooks must run before any early returns to avoid React error #310.
@@ -131,106 +91,6 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
     }, 600);
     return () => clearTimeout(t);
   }, [location.search]);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setCurrentUser(user);
-        loadProviderData(user);
-        
-        // Setup real-time listener for bookings
-        const bookingsQuery = query(
-          collection(db, 'bookings'),
-          where('provider_id', '==', user.uid)
-        );
-        
-        const unsubscribeBookings = onSnapshot(bookingsQuery, (snapshot) => {
-          const bookingsData = snapshot.docs.map(doc => doc.data());
-          
-          // Count confirmed bookings
-          const confirmedCount = bookingsData.filter(
-            (booking: any) => booking.status === 'confirmed'
-          ).length;
-          setConfirmedBookingsCount(confirmedCount);
-          
-          // Count pending bookings
-          const pendingCount = bookingsData.filter(
-            (booking: any) => booking.status === 'pending'
-          ).length;
-          setPendingBookingsCount(pendingCount);
-        });
-        
-        return () => {
-          unsubscribeBookings();
-        };
-      } else {
-        setCurrentUser(null);
-        setProviderProfile(null);
-        setIsLoading(false);
-      }
-    });
-
-    return () => unsubscribe();
-  }, []);
-
-  const loadProviderData = async (user: any) => {
-    try {
-      // Load provider profile
-      const profileDoc = await getDoc(doc(db, 'profiles', user.uid));
-      if (profileDoc.exists()) {
-        const profileData = { id: profileDoc.id, ...profileDoc.data() } as Profile;
-
-        // Check if user is a provider
-        if (profileData.user_type !== 'provider') {
-          setProviderProfile(null);
-          setIsLoading(false);
-          return;
-        }
-
-        setProviderProfile(profileData);
-
-        // Load services
-        const servicesQuery = query(
-          collection(db, 'services'),
-          where('provider_id', '==', user.uid)
-        );
-        const servicesSnapshot = await getDocs(servicesQuery);
-        const servicesData = servicesSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        })) as Service[];
-        setServices(servicesData);
-
-        // Load offers
-        const offersQuery = query(
-          collection(db, 'offers'),
-          where('provider_id', '==', user.uid)
-        );
-        const offersSnapshot = await getDocs(offersQuery);
-        const offersData = offersSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        })) as Offer[];
-        setOffers(offersData);
-
-        // Load reviews
-        const reviewsQuery = query(
-          collection(db, 'reviews'),
-          where('provider_id', '==', user.uid)
-        );
-        const reviewsSnapshot = await getDocs(reviewsQuery);
-        const reviewsData = reviewsSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        })) as Review[];
-        setReviews(reviewsData);
-      }
-    } catch (error) {
-      console.error('Error loading provider data:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   if (isLoading) {
     return (
@@ -269,14 +129,7 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
     if (!currentUser) return;
 
     try {
-      const profileRef = doc(db, 'profiles', currentUser.uid);
-      await updateDoc(profileRef, {
-        is_online: isOnline,
-        updated_at: new Date()
-      });
-
-      // Update local state
-      setProviderProfile(prev => prev ? { ...prev, is_online: isOnline } : null);
+      await updateOnlineStatus.mutateAsync({ uid: currentUser.uid, isOnline });
 
       toast({
         title: isOnline ? t.toast.onlineStatus : t.toast.offlineStatus,

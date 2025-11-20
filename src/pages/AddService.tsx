@@ -17,6 +17,7 @@ import { getCategoryLabel } from "@/lib/categoriesLocale";
 import { ServiceBookingSettings } from "@/components/booking/ServiceBookingSettings";
 import { BookingSettings } from "@/types/booking";
 import { invalidateServicesCache } from "@/lib/servicesCache";
+import { useServiceCategories } from "@/hooks/useServiceCategories";
 
 interface AddServiceProps {
   currentLanguage: string;
@@ -51,73 +52,9 @@ const AddService = ({ currentLanguage }: AddServiceProps) => {
     allow_customer_cancellation: true,
   });
 
-  const [categories, setCategories] = useState<any[]>([]);
+  const { data: categories = [] } = useServiceCategories();
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        // Upsert default categories to ensure all 24 are present
-        console.log('Upserting default service categories for AddService...');
-        const inserted = await upsertDefaultServiceCategories();
-        console.log(`Inserted ${inserted} new categories for AddService`);
-
-        // Fetch categories from Firestore
-        console.log('Fetching categories for AddService...');
-        const categoriesQuery = query(
-          collection(db, 'service_categories'),
-          where('is_active', '==', true),
-          orderBy('display_order')
-        );
-        const categoriesSnapshot = await getDocs(categoriesQuery);
-        let categoriesData = categoriesSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...(doc.data() as any)
-        }));
-        // Deduplicate by name_en/name_ar
-        const seen = new Set<string>();
-        const deduped: any[] = [];
-        for (const cat of categoriesData) {
-          const key = ((cat as any).name_en || (cat as any).name_ar || cat.id + '').trim().toLowerCase();
-          if (!seen.has(key)) {
-            seen.add(key);
-            deduped.push(cat);
-          }
-        }
-        deduped.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
-        console.log(`Fetched ${categoriesData.length} categories for AddService → after dedup ${deduped.length}`);
-        setCategories(deduped);
-      } catch (error) {
-        console.error('Error fetching categories:', error);
-        // Fallback: try without orderBy
-        try {
-          console.log('Trying fallback fetch for AddService...');
-          const categoriesSnapshot = await getDocs(collection(db, 'service_categories'));
-          let categoriesData = categoriesSnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...(doc.data() as any)
-          }));
-          categoriesData = categoriesData.filter((cat: any) => cat.is_active);
-          const seenF = new Set<string>();
-          const dedupF: any[] = [];
-          for (const cat of categoriesData) {
-            const key = ((cat as any).name_en || (cat as any).name_ar || cat.id + '').trim().toLowerCase();
-            if (!seenF.has(key)) {
-              seenF.add(key);
-              dedupF.push(cat);
-            }
-          }
-            dedupF.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
-          console.log(`Fallback fetch got ${categoriesData.length} categories → after dedup ${dedupF.length}`);
-          setCategories(dedupF);
-        } catch (fallbackError) {
-          console.error('Fallback fetch also failed:', fallbackError);
-        }
-      }
-    };
-
-    fetchCategories();
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

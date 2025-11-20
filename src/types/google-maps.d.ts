@@ -13,7 +13,7 @@ declare namespace google {
   namespace maps {
     export class Map {
       constructor(mapDiv: HTMLElement, opts?: MapOptions);
-      addListener(eventName: string, handler: Function): void;
+      addListener(eventName: string, handler: (...args: any[]) => void): void;
       setCenter(latlng: LatLng | LatLngLiteral): void;
       setZoom(zoom: number): void;
     }
@@ -22,7 +22,7 @@ declare namespace google {
       constructor(opts?: MarkerOptions);
       setMap(map: Map | null): void;
       getPosition(): LatLng | null;
-      addListener(eventName: string, handler: Function): void;
+      addListener(eventName: string, handler: (...args: any[]) => void): void;
     }
 
     export class InfoWindow {
@@ -79,7 +79,7 @@ declare namespace google {
     namespace places {
       export class Autocomplete {
         constructor(input: HTMLInputElement, opts?: AutocompleteOptions);
-        addListener(eventName: string, handler: Function): void;
+        addListener(eventName: string, handler: (...args: any[]) => void): void;
         getPlace(): PlaceResult;
       }
 

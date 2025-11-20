@@ -1,7 +1,7 @@
 // Service Schedule Setup Component
 // مكون إعداد الجدول الأسبوعي للخدمة
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -79,12 +79,7 @@ export function ServiceScheduleSetup({
     closed: isRTL ? 'مغلق' : 'Closed',
   };
 
-  // Initialize schedules for all days
-  useEffect(() => {
-    loadSchedules();
-  }, [serviceId]);
-
-  const loadSchedules = async () => {
+  const loadSchedules = useCallback(async () => {
     setIsLoading(true);
     try {
       console.log('📥 Loading schedules for service:', serviceId);
@@ -130,7 +125,12 @@ export function ServiceScheduleSetup({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [serviceId, isRTL, toast]);
+
+  // Initialize schedules for all days
+  useEffect(() => {
+    loadSchedules();
+  }, [serviceId, loadSchedules]);
 
   const updateDaySchedule = (day: DayOfWeek, updates: Partial<DaySchedule>) => {
     setSchedules(prev =>

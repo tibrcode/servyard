@@ -1,7 +1,7 @@
 // Service Booking Component for Customers
 // مكون حجز الخدمة للعملاء
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -120,14 +120,7 @@ export function ServiceBooking({
     requiresConfirmation: isRTL ? 'يتطلب تأكيد من مقدم الخدمة' : 'Requires provider confirmation',
   };
 
-  // Load availability when date changes
-  useEffect(() => {
-    if (selectedDate) {
-      loadAvailability(selectedDate);
-    }
-  }, [selectedDate, existingBookingId]);
-
-  const loadAvailability = async (date: Date) => {
+  const loadAvailability = useCallback(async (date: Date) => {
     setIsLoadingSlots(true);
     // Clear selected times when loading new date
     setSelectedTimes([]);
@@ -203,7 +196,14 @@ export function ServiceBooking({
     } finally {
       setIsLoadingSlots(false);
     }
-  };
+  }, [serviceId, existingBookingId, bookingSettings, providerTimezone, initialDate, initialTimes, isRTL, toast]);
+
+  // Load availability when date changes
+  useEffect(() => {
+    if (selectedDate) {
+      loadAvailability(selectedDate);
+    }
+  }, [selectedDate, existingBookingId, loadAvailability]);
 
   const handleDateSelect = (date: Date | undefined) => {
     if (!date) return;

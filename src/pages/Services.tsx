@@ -17,54 +17,19 @@ import { getCategoryIcon, getCategoryColor } from "@/lib/categoryIcons";
 // Currency display uses Latin currency code (e.g., AED) instead of symbol
 import { db } from "@/integrations/firebase/client";
 import InteractiveMap from "@/components/map/InteractiveMap";
-import { collection, getDocs, doc, getDoc, query as fsQuery, where, deleteDoc } from "firebase/firestore";
-import { ServiceCategory, initializeServiceCategories, Offer } from "@/lib/firebase/collections";
-import { getServiceCategoriesCached } from "@/lib/categoriesCache";
+import { ServiceCategory, initializeServiceCategories } from "@/lib/firebase/collections";
+
 import { getServicesCached, invalidateServicesCache } from "@/lib/servicesCache";
 import { upsertDefaultServiceCategories } from "@/lib/firebase/defaultCategories";
 import { getCategoryLabel } from "@/lib/categoriesLocale";
 import { filterByRadius, formatDistance, calculateDistance, RADIUS_OPTIONS, DEFAULT_RADIUS_KM, Coordinates } from "@/lib/geolocation";
 import { Slider } from "@/components/ui/slider";
 import { FavoriteButton } from "@/components/common/FavoriteButton";
+import { Service, Offer, ProviderProfile } from "@/types/service";
+import { useServicesData } from "@/hooks/useServicesData";
 
 interface ServicesProps {
   currentLanguage: string;
-}
-
-interface Service {
-  id: string;
-  name: string;
-  description?: string;
-  provider_id: string;
-  category_id: string;
-  approximate_price?: string;
-  duration_minutes?: number;
-  price_range?: string;
-  is_active: boolean;
-  // Booking settings
-  booking_enabled?: boolean;
-  max_concurrent_bookings?: number;
-  advance_booking_days?: number;
-  buffer_time_minutes?: number;
-  cancellation_policy_hours?: number;
-  require_confirmation?: boolean;
-  allow_customer_cancellation?: boolean;
-  // Discount fields
-  has_discount?: boolean;
-  discount_price?: string;
-  discount_percentage?: number;
-}
-
-interface Provider {
-  id: string;
-  full_name: string;
-  city?: string;
-  country?: string;
-  profile_description?: string;
-  currency_code?: string;
-  latitude?: number;
-  longitude?: number;
-  location_address?: string;
 }
 
 const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
@@ -76,16 +41,23 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
   const [searchQuery, setSearchQuery] = useState(qParam || '');
   const [selectedCategory, setSelectedCategory] = useState(categoryParam || 'all');
   const [sortBy, setSortBy] = useState('relevance');
-  const [services, setServices] = useState<Service[]>([]);
-  const [categories, setCategories] = useState<ServiceCategory[]>([]);
-  const [providers, setProviders] = useState<{ [key: string]: Provider }>({});
-  const [offersByProvider, setOffersByProvider] = useState<Record<string, Offer[]>>({});
-  const [offersList, setOffersList] = useState<Offer[]>([]);
-  const [providerRatings, setProviderRatings] = useState<{ [key: string]: { avg: number; count: number } }>({});
-  const [serviceRatings, setServiceRatings] = useState<{ [key: string]: { avg: number; count: number } }>({});
-  const [loading, setLoading] = useState(true);
+
+  const { 
+    services, 
+    categories, 
+    providers, 
+    offers: offersByProvider, 
+    providerRatings, 
+    serviceRatings, 
+    isLoading: loading 
+  } = useServicesData();
+
+  const offersList = useMemo(() => {
+    return Object.values(offersByProvider).flat();
+  }, [offersByProvider]);
+
   const [selectedService, setSelectedService] = useState<Service | null>(null);
-  const [selectedProvider, setSelectedProvider] = useState<Provider | null>(null);
+  const [selectedProvider, setSelectedProvider] = useState<ProviderProfile | null>(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
   
   // Location-based filtering states
@@ -127,158 +99,6 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
       }
     }
   }, []);
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        // Upsert default categories to ensure all 24 are present
-        console.log('Upserting default service categories for Services page...');
-        const inserted = await upsertDefaultServiceCategories();
-        console.log(`Inserted ${inserted} new categories for Services page`);
-
-        // Load categories (cached)
-        const cats = await getServiceCategoriesCached();
-        setCategories(cats);
-
-        // Load services (cached)
-        const servicesData = await getServicesCached();
-        setServices(servicesData);
-
-        // Load providers for services
-        const providerIds = [...new Set(servicesData.map(s => s.provider_id))];
-        const providersData: { [key: string]: Provider } = {};
-
-        for (const providerId of providerIds) {
-          const providerDoc = await getDoc(doc(db, 'profiles', providerId));
-          if (providerDoc.exists()) {
-            providersData[providerId] = {
-              id: providerDoc.id,
-              ...providerDoc.data()
-            } as Provider;
-          }
-        }
-        setProviders(providersData);
-
-        // Load reviews for these providers in chunks (Firestore 'in' supports up to 10 values)
-        if (providerIds.length > 0) {
-          const chunks: string[][] = [];
-          for (let i = 0; i < providerIds.length; i += 10) {
-            chunks.push(providerIds.slice(i, i + 10));
-          }
-
-          const ratingsMap: { [key: string]: { sum: number; count: number } } = {};
-          for (const chunk of chunks) {
-            const reviewsRef = collection(db, 'reviews');
-            const q = fsQuery(reviewsRef, where('provider_id', 'in', chunk));
-            const snap = await getDocs(q);
-            snap.forEach(d => {
-              const data: any = d.data();
-              const pid = data.provider_id as string | undefined;
-              const approved = (data.is_approved === undefined) ? true : !!data.is_approved;
-              if (!pid || typeof data.rating !== 'number' || !approved) return;
-              if (!ratingsMap[pid]) ratingsMap[pid] = { sum: 0, count: 0 };
-              ratingsMap[pid].sum += data.rating;
-              ratingsMap[pid].count += 1;
-            });
-          }
-
-          const finalRatings: { [key: string]: { avg: number; count: number } } = {};
-          Object.entries(ratingsMap).forEach(([pid, { sum, count }]) => {
-            if (count > 0) finalRatings[pid] = { avg: sum / count, count };
-          });
-          setProviderRatings(finalRatings);
-        
-        // Load active offers for these providers
-        try {
-          const offersMap: Record<string, Offer[]> = {};
-          const offersArr: Offer[] = [];
-          const chunksOffers: string[][] = [];
-          for (let i = 0; i < providerIds.length; i += 10) chunksOffers.push(providerIds.slice(i, i + 10));
-
-          for (const chunk of chunksOffers) {
-            try {
-              const offersRef = collection(db, 'offers');
-              const q = fsQuery(offersRef, where('provider_id', 'in', chunk), where('is_active', '==', true));
-              const snap = await getDocs(q);
-              snap.forEach(d => {
-                const data: any = d.data();
-                const offer: Offer = {
-                  id: d.id,
-                  provider_id: data.provider_id,
-                  title: data.title,
-                  description: data.description,
-                  discount_percentage: data.discount_percentage,
-                  discount_amount: data.discount_amount,
-                  valid_from: data.valid_from,
-                  valid_until: data.valid_until,
-                  is_active: data.is_active,
-                  created_at: data.created_at,
-                  updated_at: data.updated_at
-                } as Offer;
-                offersArr.push(offer);
-                if (!offersMap[offer.provider_id]) offersMap[offer.provider_id] = [];
-                offersMap[offer.provider_id].push(offer);
-              });
-            } catch (err) {
-              console.warn('Error loading offers chunk', err);
-            }
-          }
-
-          setOffersByProvider(offersMap);
-          setOffersList(offersArr);
-        } catch (err) {
-          console.warn('Failed to load offers for providers', err);
-        }
-        }
-
-        // Load per-service ratings in chunks as well
-        const serviceIds = servicesData.map(s => s.id);
-        if (serviceIds.length > 0) {
-          const chunksS: string[][] = [];
-          for (let i = 0; i < serviceIds.length; i += 10) {
-            chunksS.push(serviceIds.slice(i, i + 10));
-          }
-
-          const srMap: { [key: string]: { sum: number; count: number } } = {};
-          for (const chunk of chunksS) {
-            const reviewsRef = collection(db, 'reviews');
-            const q = fsQuery(reviewsRef, where('service_id', 'in', chunk));
-            const snap = await getDocs(q);
-            snap.forEach(d => {
-              const data: any = d.data();
-              const sid = data.service_id as string | undefined;
-              const approved = (data.is_approved === undefined) ? true : !!data.is_approved;
-              if (!sid || typeof data.rating !== 'number' || !approved) return;
-              if (!srMap[sid]) srMap[sid] = { sum: 0, count: 0 };
-              srMap[sid].sum += data.rating;
-              srMap[sid].count += 1;
-            });
-          }
-
-          const finalServiceRatings: { [key: string]: { avg: number; count: number } } = {};
-          Object.entries(srMap).forEach(([sid, { sum, count }]) => {
-            if (count > 0) finalServiceRatings[sid] = { avg: sum / count, count };
-          });
-          setServiceRatings(finalServiceRatings);
-        }
-
-      } catch (error) {
-        console.error('Error loading services:', error);
-        const errorTitle = isRTL ? 'خطأ' : 'Error';
-        const errorDesc = isRTL ? 'فشل تحميل الخدمات' : 'Failed to load services';
-        toast({
-          variant: "destructive",
-          title: errorTitle,
-          description: errorDesc
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadData();
-  }, [selectedCategory, toast, isRTL]);
 
   const handleSearch = () => {
     toast({
@@ -522,7 +342,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
       m.services.filter(s => s.average_rating > 0).length));
     
     return markers;
-  }, [baseFilteredServices, providers, isRTL, serviceRatings]);
+  }, [baseFilteredServices, providers, isRTL, serviceRatings, categories]);
 
   if (loading) {
     return (

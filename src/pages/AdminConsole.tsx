@@ -21,6 +21,8 @@ import { useToast } from "@/hooks/use-toast";
 import { auth, db } from "@/integrations/firebase/client";
 import { collection, doc, getDoc, getCountFromServer, query, where, limit, getDocs, orderBy, startAfter, startAt, endAt, QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
+import { useAdminStats } from "@/hooks/useAdminStats";
+import { useAdminUsers } from "@/hooks/useAdminUsers";
 import { useTranslation } from "@/lib/i18n";
 import { upsertCategoryTranslations } from "@/lib/firebase/migrations/upsertCategoryTranslations";
 import { Input } from "@/components/ui/input";
@@ -37,18 +39,19 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
   const { toast } = useToast();
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
-  const [stats, setStats] = useState({
+  
+  const { data: statsData, isLoading: loadingStats } = useAdminStats(isAuthorized === true);
+  
+  const stats = statsData || {
     totalUsers: 0,
     totalProviders: 0,
     totalServices: 0,
-    pendingReports: 0,
-    activeBookings: 0
-  });
-  const [derivedStats, setDerivedStats] = useState({
     customers: 0,
     incomplete: 0,
-  });
-  const [loadingStats, setLoadingStats] = useState<boolean>(false);
+    pendingReports: 0,
+    activeBookings: 0
+  };
+
   const [deleteField, setDeleteField] = useState<string>("");
   const [deleteMode, setDeleteMode] = useState<"email" | "uid">("email");
   const [deleting, setDeleting] = useState<boolean>(false);
@@ -56,15 +59,28 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
   const [findMode, setFindMode] = useState<"email" | "uid">("email");
   const [finding, setFinding] = useState<boolean>(false);
   const [foundProfile, setFoundProfile] = useState<any | null>(null);
+  
   // Users list (paginated)
-  const [users, setUsers] = useState<any[]>([]);
   const [usersRoleFilter, setUsersRoleFilter] = useState<"all" | "provider" | "customer">("all");
-  const [usersLoading, setUsersLoading] = useState<boolean>(false);
-  const [usersEnd, setUsersEnd] = useState<boolean>(false);
-  const lastDocRef = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
   // Search
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [searchField, setSearchField] = useState<"email" | "full_name">("email");
+
+  const {
+    data: usersData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading: usersLoading
+  } = useAdminUsers({
+    roleFilter: usersRoleFilter,
+    searchTerm,
+    searchField,
+    enabled: isAuthorized === true
+  });
+
+  const users = usersData?.pages.flatMap(page => page.users) || [];
+
   // Ensure auto-run only executes once
   const autoRanRef = useRef(false);
   // Query flags (dev-only migration bypass)
@@ -87,112 +103,9 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
     return () => unsubscribe();
   }, []);
 
-  // Load basic stats from Firestore (profiles/services). New users appear after profile creation.
-  useEffect(() => {
-    if (isAuthorized !== true) return;
-    let cancelled = false;
-    (async () => {
-      try {
-        setLoadingStats(true);
-        const profilesRef = collection(db, "profiles");
-        const servicesRef = collection(db, "services");
 
-        const [usersSnap, providersSnap, servicesSnap, customersSnap] = await Promise.all([
-          getCountFromServer(profilesRef),
-          getCountFromServer(query(profilesRef, where("user_type", "==", "provider"))),
-          getCountFromServer(servicesRef),
-          getCountFromServer(query(profilesRef, where("user_type", "==", "customer"))),
-        ]);
 
-        if (cancelled) return;
-        setStats((s) => ({
-          ...s,
-          totalUsers: usersSnap.data().count || 0,
-          totalProviders: providersSnap.data().count || 0,
-          totalServices: servicesSnap.data().count || 0,
-        }));
-        const total = usersSnap.data().count || 0;
-        const providers = providersSnap.data().count || 0;
-        const customers = customersSnap.data().count || 0;
-        setDerivedStats({
-          customers,
-          incomplete: Math.max(0, total - providers - customers),
-        });
-      } catch (e) {
-        console.warn("Failed to load admin stats", e);
-      } finally {
-        if (!cancelled) setLoadingStats(false);
-      }
-    })();
-    return () => { cancelled = true; };
-  }, [isAuthorized]);
 
-  // Load users list (paged by 50, ordered by email). Optional role filter.
-  const PAGE_SIZE = 50;
-  const loadUsers = async (reset = false) => {
-    if (usersLoading) return;
-    try {
-      setUsersLoading(true);
-      if (reset) {
-        setUsers([]);
-        setUsersEnd(false);
-        lastDocRef.current = null;
-      }
-      let base = collection(db, 'profiles');
-      let qBase;
-      const term = searchTerm.trim();
-      if (usersRoleFilter === 'all') {
-        if (term) {
-          const end = term + '\\uf8ff';
-          qBase = query(base, orderBy(searchField as any), startAt(term), endAt(end), limit(PAGE_SIZE));
-          if (!reset && lastDocRef.current) {
-            qBase = query(base, orderBy(searchField as any), startAt(term), endAt(end), startAfter(lastDocRef.current), limit(PAGE_SIZE));
-          }
-        } else {
-          qBase = query(base, orderBy('createdAt', 'desc' as any), limit(PAGE_SIZE));
-          if (!reset && lastDocRef.current) {
-            qBase = query(base, orderBy('createdAt', 'desc' as any), startAfter(lastDocRef.current), limit(PAGE_SIZE));
-          }
-        }
-      } else {
-        // Avoid composite index requirement with role filter: no orderBy
-        qBase = query(base, where('user_type', '==', usersRoleFilter), limit(PAGE_SIZE));
-        if (!reset && lastDocRef.current) {
-          qBase = query(base, where('user_type', '==', usersRoleFilter), startAfter(lastDocRef.current), limit(PAGE_SIZE));
-        }
-      }
-      const snap = await getDocs(qBase);
-  const newDocs = snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) }));
-      // Fallback: if All+no search returned empty on first load, retry without order to ensure something shows
-      if (reset && usersRoleFilter === 'all' && !term && newDocs.length === 0) {
-        const snap2 = await getDocs(query(base, limit(PAGE_SIZE)));
-        const newDocs2 = snap2.docs.map((d) => ({ id: d.id, ...(d.data() as any) }));
-        if (snap2.docs.length > 0) {
-          lastDocRef.current = snap2.docs[snap2.docs.length - 1] as QueryDocumentSnapshot<DocumentData>;
-        }
-        setUsers(newDocs2);
-        if (snap2.docs.length < PAGE_SIZE) setUsersEnd(true);
-        return;
-      }
-      if (snap.docs.length > 0) {
-        lastDocRef.current = snap.docs[snap.docs.length - 1] as QueryDocumentSnapshot<DocumentData>;
-      }
-      setUsers((prev) => (reset ? newDocs : [...prev, ...newDocs]));
-      if (snap.docs.length < PAGE_SIZE) setUsersEnd(true);
-    } catch (e) {
-      console.warn('Failed to load users list', e);
-      toast({ variant: 'destructive', title: 'Failed to load users', description: (e as any)?.message || String(e) });
-    } finally {
-      setUsersLoading(false);
-    }
-  };
-
-  // Initial users load when authorized; reload when filter changes
-  useEffect(() => {
-    if (isAuthorized !== true) return;
-    loadUsers(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthorized, usersRoleFilter]);
 
   // Optional auto-run of category translations migration via URL query param
   useEffect(() => {
@@ -290,7 +203,7 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{derivedStats.customers}</div>
+              <div className="text-2xl font-bold">{stats.customers}</div>
             </CardContent>
           </Card>
 
@@ -300,7 +213,7 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
               <AlertTriangle className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-yellow-600">{derivedStats.incomplete}</div>
+              <div className="text-2xl font-bold text-yellow-600">{stats.incomplete}</div>
             </CardContent>
           </Card>
 
@@ -390,8 +303,8 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
                       <Button size="sm" variant={searchField === 'full_name' ? 'default' : 'outline'} onClick={() => setSearchField('full_name')}>By Name</Button>
                     </div>
                     <div className="flex gap-2">
-                      <Button size="sm" onClick={() => loadUsers(true)} disabled={usersLoading}>Search</Button>
-                      <Button size="sm" variant="outline" onClick={() => { setSearchTerm(''); loadUsers(true); }} disabled={usersLoading}>Reset</Button>
+                      {/* Search is automatic via hook */}
+                      <Button size="sm" variant="outline" onClick={() => { setSearchTerm(''); }} disabled={usersLoading}>Reset</Button>
                     </div>
                     <Button size="sm" variant="outline" onClick={() => {
                       try {
@@ -516,8 +429,8 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
                     Showing {users.length} {usersRoleFilter === 'all' ? 'users' : usersRoleFilter}
                   </div>
                   <div className="flex gap-2">
-                    {!usersEnd && (
-                      <Button size="sm" onClick={() => loadUsers(false)} disabled={usersLoading}>{usersLoading ? 'Loading…' : 'Load more'}</Button>
+                    {hasNextPage && (
+                      <Button size="sm" onClick={() => fetchNextPage()} disabled={isFetchingNextPage}>{isFetchingNextPage ? 'Loading…' : 'Load more'}</Button>
                     )}
                   </div>
                 </div>

@@ -61,6 +61,7 @@ export interface Booking {
   currency: string;
   notes?: string;
   cancellation_reason?: string;
+  cancellation_policy_hours?: number;
   created_at: Timestamp;
   updated_at: Timestamp;
 }

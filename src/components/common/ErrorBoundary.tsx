@@ -17,7 +17,6 @@ export class ErrorBoundary extends React.Component<Props, State> {
   }
 
   async componentDidCatch(error: any, info: any) {
-    // eslint-disable-next-line no-console
     console.error('[ErrorBoundary] Caught runtime error:', error, info);
     try {
       // Sample: only log ~20% to control write costs at scale

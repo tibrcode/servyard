@@ -1,7 +1,7 @@
 // My Bookings Component - Customer's bookings list
 // مكون حجوزاتي - قائمة حجوزات العميل
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -130,6 +130,84 @@ export function MyBookings({
     },
   };
 
+  
+
+  const loadCustomerLocation = useCallback(async () => {
+    try {
+      const customerDoc = await getDoc(doc(db, 'profiles', customerId));
+      if (customerDoc.exists()) {
+        const data = customerDoc.data();
+        console.log('📍 Customer location data:', {
+          customerId,
+          hasLatitude: !!data.latitude,
+          hasLongitude: !!data.longitude,
+          latitude: data.latitude,
+          longitude: data.longitude
+        });
+        if (data.latitude && data.longitude) {
+          setCustomerLocation({
+            latitude: data.latitude,
+            longitude: data.longitude
+          });
+          console.log('✅ Customer location set:', { latitude: data.latitude, longitude: data.longitude });
+        } else {
+          console.warn('⚠️ Customer location not available in profile');
+        }
+      }
+    } catch (error) {
+      console.error('Error loading customer location:', error);
+    }
+  }, [customerId]);
+
+  const loadProviderContacts = useCallback(async (bookingsData: Booking[]) => {
+    const providerIds = [...new Set(bookingsData.map(b => b.provider_id))];
+    const contacts: Record<string, {phone?: string[], whatsapp?: string, latitude?: number, longitude?: number}> = {};
+    
+    console.log('📍 Loading provider locations for', providerIds.length, 'providers');
+    
+    for (const providerId of providerIds) {
+      try {
+        const providerDoc = await getDoc(doc(db, 'profiles', providerId));
+        if (providerDoc.exists()) {
+          const data = providerDoc.data();
+          console.log(`📍 Provider ${providerId}:`, {
+            hasLatitude: !!data.latitude,
+            hasLongitude: !!data.longitude,
+            latitude: data.latitude,
+            longitude: data.longitude
+          });
+          contacts[providerId] = {
+            phone: data.phone_numbers,
+            whatsapp: data.whatsapp_number,
+            latitude: data.latitude,
+            longitude: data.longitude
+          };
+        }
+      } catch (error) {
+        console.error(`Error loading provider ${providerId}:`, error);
+      }
+    }
+    
+    console.log('✅ Provider contacts loaded:', contacts);
+    setProviderContacts(contacts);
+  }, []);
+
+  const loadExistingReviews = useCallback(async () => {
+    try {
+      const reviewsQuery = query(
+        collection(db, 'reviews'),
+        where('customer_id', '==', customerId)
+      );
+      const reviewsSnapshot = await getDocs(reviewsQuery);
+      const reviewedBookingIds = new Set(
+        reviewsSnapshot.docs.map(doc => doc.data().booking_id).filter(Boolean)
+      );
+      setExistingReviews(reviewedBookingIds);
+    } catch (error) {
+      console.error('Error loading reviews:', error);
+    }
+  }, [customerId]);
+
   useEffect(() => {
     setIsLoading(true);
     
@@ -169,7 +247,7 @@ export function MyBookings({
     
     // Cleanup subscription on unmount
     return () => unsubscribe();
-  }, [customerId]);
+  }, [customerId, loadCustomerLocation, loadExistingReviews, loadProviderContacts]);
 
   // Refresh cancellation hours every 10 seconds
   useEffect(() => {
@@ -197,82 +275,6 @@ export function MyBookings({
     
     return () => clearInterval(interval);
   }, [bookings]);
-
-  const loadCustomerLocation = async () => {
-    try {
-      const customerDoc = await getDoc(doc(db, 'profiles', customerId));
-      if (customerDoc.exists()) {
-        const data = customerDoc.data();
-        console.log('📍 Customer location data:', {
-          customerId,
-          hasLatitude: !!data.latitude,
-          hasLongitude: !!data.longitude,
-          latitude: data.latitude,
-          longitude: data.longitude
-        });
-        if (data.latitude && data.longitude) {
-          setCustomerLocation({
-            latitude: data.latitude,
-            longitude: data.longitude
-          });
-          console.log('✅ Customer location set:', { latitude: data.latitude, longitude: data.longitude });
-        } else {
-          console.warn('⚠️ Customer location not available in profile');
-        }
-      }
-    } catch (error) {
-      console.error('Error loading customer location:', error);
-    }
-  };
-
-  const loadProviderContacts = async (bookingsData: Booking[]) => {
-    const providerIds = [...new Set(bookingsData.map(b => b.provider_id))];
-    const contacts: Record<string, {phone?: string[], whatsapp?: string, latitude?: number, longitude?: number}> = {};
-    
-    console.log('📍 Loading provider locations for', providerIds.length, 'providers');
-    
-    for (const providerId of providerIds) {
-      try {
-        const providerDoc = await getDoc(doc(db, 'profiles', providerId));
-        if (providerDoc.exists()) {
-          const data = providerDoc.data();
-          console.log(`📍 Provider ${providerId}:`, {
-            hasLatitude: !!data.latitude,
-            hasLongitude: !!data.longitude,
-            latitude: data.latitude,
-            longitude: data.longitude
-          });
-          contacts[providerId] = {
-            phone: data.phone_numbers,
-            whatsapp: data.whatsapp_number,
-            latitude: data.latitude,
-            longitude: data.longitude
-          };
-        }
-      } catch (error) {
-        console.error(`Error loading provider ${providerId}:`, error);
-      }
-    }
-    
-    console.log('✅ Provider contacts loaded:', contacts);
-    setProviderContacts(contacts);
-  };
-
-  const loadExistingReviews = async () => {
-    try {
-      const reviewsQuery = query(
-        collection(db, 'reviews'),
-        where('customer_id', '==', customerId)
-      );
-      const reviewsSnapshot = await getDocs(reviewsQuery);
-      const reviewedBookingIds = new Set(
-        reviewsSnapshot.docs.map(doc => doc.data().booking_id).filter(Boolean)
-      );
-      setExistingReviews(reviewedBookingIds);
-    } catch (error) {
-      console.error('Error loading reviews:', error);
-    }
-  };
 
   const loadBookings = async () => {
     // Kept for manual refresh if needed

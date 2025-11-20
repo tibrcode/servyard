@@ -12,7 +12,6 @@ export async function collectWebVitals(cb: VitalsCallback) {
     mod.onFID((m) => cb({ name: m.name, value: m.value, id: m.id }));
     mod.onINP?.((m: any) => cb({ name: m.name, value: m.value, id: m.id })); // future-proof
   } catch (e) {
-    // eslint-disable-next-line no-console
     console.warn('[Vitals] Failed to load web-vitals module', e);
   }
 }
@@ -32,7 +31,6 @@ export async function logVital(metric: { name: string; value: number; id: string
       ua: navigator.userAgent.slice(0, 120),
     });
   } catch (e) {
-    // eslint-disable-next-line no-console
     console.warn('[Vitals] logVital failed (non-critical)', e);
   }
 }

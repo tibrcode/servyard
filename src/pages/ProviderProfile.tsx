@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -27,67 +27,16 @@ import {
 import { Footer } from "@/components/layout/Footer";
 import { useToast } from "@/hooks/use-toast";
 import { BookingModal } from "@/components/booking/BookingModal";
-import { auth, db } from "@/integrations/firebase/client";
-import { doc, getDoc, collection, getDocs, query, where } from "firebase/firestore";
+import { auth } from "@/integrations/firebase/client";
 import { useTranslation } from "@/lib/i18n";
 import { FavoriteButton } from "@/components/common/FavoriteButton";
 import { iconMap, colorMap } from "@/lib/categoryIcons";
-// Currency shown as Latin code (e.g., AED) per requirement; symbol helper not used here
+import { useProviderData } from "@/hooks/useProviderData";
+import { Service, ProviderProfile as ProviderProfileType } from "@/types/service";
 
 interface ProviderProfileProps {
   currentLanguage: string;
   onLanguageChange: (language: string) => void;
-}
-
-interface ProviderProfile {
-  id: string;
-  user_id: string; // Add user_id field
-  full_name: string;
-  email: string;
-  phone_numbers: string[];
-  whatsapp_number?: string;
-  city: string;
-  country: string;
-  profile_description: string;
-  avatar_url?: string;
-  is_verified: boolean;
-  is_online?: boolean;
-  rating?: number;
-  total_reviews?: number;
-  user_type: string;
-  // Optional links
-  website_url?: string;
-  google_business_url?: string;
-  instagram_url?: string;
-  facebook_url?: string;
-  tiktok_url?: string;
-  currency_code?: string;
-  main_category_id?: string;
-}
-
-interface Service {
-  id: string;
-  name: string;
-  description: string;
-  provider_id: string;
-  approximate_price: string;
-  duration_minutes: number;
-  is_active: boolean;
-  category_id?: string;
-  updated_at?: string;
-  provider?: any;
-  category?: any;
-}
-
-interface Offer {
-  id: string;
-  title: string;
-  description: string;
-  discount_percentage?: number;
-  discount_amount?: number;
-  valid_until: any; // Can be string or Firebase Timestamp
-  valid_from?: any; // Add valid_from field
-  is_active: boolean;
 }
 
 const ProviderProfile = ({ currentLanguage, onLanguageChange }: ProviderProfileProps) => {
@@ -95,14 +44,24 @@ const ProviderProfile = ({ currentLanguage, onLanguageChange }: ProviderProfileP
   const { t, isRTL } = useTranslation(currentLanguage);
   const { toast } = useToast();
 
-  const [profile, setProfile] = useState<ProviderProfile | null>(null);
-  const [services, setServices] = useState<Service[]>([]);
-  const [offers, setOffers] = useState<Offer[]>([]);
-  const [availability, setAvailability] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [mainCategory, setMainCategory] = useState<any>(null);
+  const { profile, services, offers, reviews, mainCategory, isLoading } = useProviderData(providerId);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
+
+  // Calculate rating
+  const displayProfile = useMemo(() => {
+    if (!profile) return null;
+    
+    if (!reviews.length) return profile;
+    
+    const ratings = reviews
+      .filter(r => r.is_approved !== false && typeof r.rating === 'number')
+      .map(r => r.rating);
+    const total = ratings.length;
+    const avg = total > 0 ? ratings.reduce((a, b) => a + b, 0) / total : undefined;
+    
+    return { ...profile, rating: avg, total_reviews: total };
+  }, [profile, reviews]);
 
   // Normalize URLs to ensure they have protocol
   const normalizeUrl = (url: string) => {
@@ -113,7 +72,7 @@ const ProviderProfile = ({ currentLanguage, onLanguageChange }: ProviderProfileP
   // Share current provider profile link using Web Share API with clipboard fallback
   const handleShare = async () => {
     const shareUrl = window.location.href;
-    const title = profile?.full_name || 'ServYard';
+    const title = displayProfile?.full_name || 'ServYard';
     try {
       if ('share' in navigator) {
         await (navigator as any).share({ title, text: title, url: shareUrl });
@@ -139,102 +98,6 @@ const ProviderProfile = ({ currentLanguage, onLanguageChange }: ProviderProfileP
     }
   };
 
-  useEffect(() => {
-    if (providerId) {
-      loadProviderData();
-    }
-  }, [providerId]);
-
-  const loadProviderData = async () => {
-    if (!providerId) return;
-
-    try {
-      // Load provider profile
-      const profileDoc = await getDoc(doc(db, 'profiles', providerId));
-      if (profileDoc.exists() && profileDoc.data()?.user_type === 'provider') {
-        const profileData = { id: profileDoc.id, ...profileDoc.data() } as ProviderProfile;
-        setProfile(profileData);
-
-        if (profileData.main_category_id) {
-          try {
-            const categoryDoc = await getDoc(doc(db, 'service_categories', profileData.main_category_id));
-            if (categoryDoc.exists()) {
-              setMainCategory(categoryDoc.data());
-            }
-          } catch (err) {
-            console.error("Error fetching main category", err);
-          }
-        }
-
-        // Load services
-        const servicesQuery = query(
-          collection(db, 'services'),
-          where('provider_id', '==', providerId),
-          where('is_active', '==', true)
-        );
-        const servicesSnapshot = await getDocs(servicesQuery);
-        const servicesData = servicesSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        })) as Service[];
-        setServices(servicesData);
-
-        // Load active offers
-        const offersQuery = query(
-          collection(db, 'offers'),
-          where('provider_id', '==', providerId), // Use providerId since profile ID = user ID
-          where('is_active', '==', true)
-        );
-        const offersSnapshot = await getDocs(offersQuery);
-        const offersData = offersSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        })) as Offer[];
-
-        console.log('Loaded offers for provider:', providerId, 'Offers:', offersData);
-
-        // Filter valid offers - check both current date and future dates
-        const validOffers = offersData.filter(offer => {
-          const validUntilDate = new Date(offer.valid_until.seconds ? offer.valid_until.toDate() : offer.valid_until);
-          const today = new Date();
-          today.setHours(0, 0, 0, 0); // Reset time to start of day for comparison
-
-          console.log('Offer:', offer.title, 'Valid until:', validUntilDate, 'Today:', today, 'Is valid:', validUntilDate >= today);
-
-          return validUntilDate >= today;
-        });
-
-        console.log('Valid offers:', validOffers);
-        setOffers(validOffers);
-
-        // Load reviews and compute average rating and total reviews for this provider
-        try {
-          const reviewsRef = collection(db, 'reviews');
-          const reviewsQ = query(reviewsRef, where('provider_id', '==', providerId));
-          const reviewsSnap = await getDocs(reviewsQ);
-          const ratings: number[] = [];
-          reviewsSnap.forEach((doc) => {
-            const data: any = doc.data();
-            // Consider only approved reviews when available
-            const approved = (data.is_approved === undefined) ? true : !!data.is_approved;
-            if (approved && typeof data.rating === 'number') {
-              ratings.push(data.rating);
-            }
-          });
-          const total = ratings.length;
-          const avg = total > 0 ? (ratings.reduce((a, b) => a + b, 0) / total) : undefined;
-          setProfile((prev) => prev ? { ...prev, rating: avg, total_reviews: total } : prev);
-        } catch (ratingErr) {
-          console.warn('Failed calculating provider rating', ratingErr);
-        }
-      }
-    } catch (error) {
-      console.error('Error loading provider data:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleBookService = (service: Service) => {
     setSelectedService(service);
     setShowBookingModal(true);
@@ -244,6 +107,17 @@ const ProviderProfile = ({ currentLanguage, onLanguageChange }: ProviderProfileP
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!displayProfile) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-2">{isRTL ? 'لم يتم العثور على مقدم الخدمة' : 'Provider not found'}</h2>
+          <Button onClick={() => window.history.back()}>{isRTL ? 'عودة' : 'Go Back'}</Button>
+        </div>
       </div>
     );
   }

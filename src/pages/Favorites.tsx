@@ -1,52 +1,20 @@
 // Favorites Page - Customer's favorite services and providers
 // صفحة المفضلة - الخدمات ومزودي الخدمة المفضلين للعميل
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Heart, MapPin, Star, Trash2, ArrowRight, Package, Users, Clock, AlertCircle, ExternalLink, ChevronDown, Calendar } from 'lucide-react';
-import { getUserFavoritesByType, removeFavorite } from '@/lib/firebase/favoriteFunctions';
-import { Favorite } from '@/types/favorites';
+import { Heart, MapPin, Star, Trash2, ArrowRight, Package, Users, AlertCircle, ExternalLink, ChevronDown, Calendar } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { doc, getDoc, collection, getDocs, query, where } from 'firebase/firestore';
-import { db } from '@/integrations/firebase/client';
 import { BookingModal } from '@/components/booking/BookingModal';
 import { useTranslation } from '@/lib/i18n';
 import { getCategoryIcon, getCategoryColor } from '@/lib/categoryIcons';
-
-interface ServiceData {
-  id: string;
-  name: string;
-  description?: string;
-  approximate_price?: string;
-  duration_minutes?: number;
-  price_range?: string;
-  is_active: boolean;
-  provider_id: string;
-  category_id?: string;
-  booking_enabled?: boolean;
-}
-
-interface ProviderData {
-  id: string;
-  full_name: string;
-  city?: string;
-  country?: string;
-  profile_description?: string;
-  avatar_url?: string;
-  rating?: number;
-  total_reviews?: number;
-  currency_code?: string;
-}
-
-interface ServiceRating {
-  avg: number;
-  count: number;
-}
+import { Service, ProviderProfile } from '@/types/service';
+import { useFavoritesData } from '@/hooks/useFavoritesData';
 
 export default function Favorites() {
   const { user } = useAuth();
@@ -54,125 +22,31 @@ export default function Favorites() {
   const { toast } = useToast();
   const { t, isRTL } = useTranslation();
   
+  const { 
+    serviceFavorites, 
+    providerFavorites, 
+    isLoading: loading, 
+    removeFavorite 
+  } = useFavoritesData();
+
   const [activeTab, setActiveTab] = useState<'services' | 'providers'>('services');
-  const [serviceFavorites, setServiceFavorites] = useState<Favorite[]>([]);
-  const [providerFavorites, setProviderFavorites] = useState<Favorite[]>([]);
-  const [serviceDetails, setServiceDetails] = useState<{ [key: string]: ServiceData | null }>({});
-  const [providerDetails, setProviderDetails] = useState<{ [key: string]: ProviderData | null }>({});
-  const [serviceRatings, setServiceRatings] = useState<{ [key: string]: ServiceRating }>({});
-  const [categories, setCategories] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [expandedServiceId, setExpandedServiceId] = useState<string | null>(null);
   const [bookingModalOpen, setBookingModalOpen] = useState(false);
-  const [selectedService, setSelectedService] = useState<(ServiceData & { provider_id: string }) | null>(null);
-  const [selectedProvider, setSelectedProvider] = useState<ProviderData | null>(null);
-
-  useEffect(() => {
-    if (user?.uid) {
-      loadFavorites();
-    }
-  }, [user?.uid]);
-
-  const loadFavorites = async () => {
-    if (!user?.uid) return;
-
-    setLoading(true);
-    try {
-      // Load categories first
-      const categoriesQuery = query(
-        collection(db, 'service_categories'),
-        where('is_active', '==', true)
-      );
-      const categoriesSnapshot = await getDocs(categoriesQuery);
-      const categoriesData = categoriesSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      setCategories(categoriesData);
-
-      const [services, providers] = await Promise.all([
-        getUserFavoritesByType(user.uid, 'service'),
-        getUserFavoritesByType(user.uid, 'provider'),
-      ]);
-
-      setServiceFavorites(services);
-      setProviderFavorites(providers);
-
-      // Load service details
-      const serviceDetailsMap: { [key: string]: ServiceData | null } = {};
-      const serviceRatingsMap: { [key: string]: ServiceRating } = {};
-      
-      for (const fav of services) {
-        try {
-          const serviceDoc = await getDoc(doc(db, 'services', fav.item_id));
-          if (serviceDoc.exists()) {
-            serviceDetailsMap[fav.item_id] = { id: serviceDoc.id, ...serviceDoc.data() } as ServiceData;
-            
-            // Load ratings
-            const reviewsQuery = query(
-              collection(db, 'reviews'),
-              where('service_id', '==', fav.item_id)
-            );
-            const reviewsSnapshot = await getDocs(reviewsQuery);
-            const reviews = reviewsSnapshot.docs.map(d => d.data());
-            const avgRating = reviews.length > 0
-              ? reviews.reduce((sum, r: any) => sum + (r.rating || 0), 0) / reviews.length
-              : 0;
-            serviceRatingsMap[fav.item_id] = {
-              avg: avgRating,
-              count: reviews.length
-            };
-          } else {
-            serviceDetailsMap[fav.item_id] = null;
-          }
-        } catch (error) {
-          console.error(`Error loading service ${fav.item_id}:`, error);
-          serviceDetailsMap[fav.item_id] = null;
-        }
-      }
-      setServiceDetails(serviceDetailsMap);
-      setServiceRatings(serviceRatingsMap);
-
-      // Load provider details
-      const providerDetailsMap: { [key: string]: ProviderData | null } = {};
-      for (const fav of providers) {
-        try {
-          const providerDoc = await getDoc(doc(db, 'profiles', fav.item_id));
-          providerDetailsMap[fav.item_id] = providerDoc.exists() 
-            ? { id: providerDoc.id, ...providerDoc.data() } as ProviderData
-            : null;
-        } catch (error) {
-          console.error(`Error loading provider ${fav.item_id}:`, error);
-          providerDetailsMap[fav.item_id] = null;
-        }
-      }
-      setProviderDetails(providerDetailsMap);
-    } catch (error) {
-      console.error('Error loading favorites:', error);
-      toast({
-        variant: 'destructive',
-        title: isRTL ? 'خطأ' : 'Error',
-        description: isRTL ? 'حدث خطأ أثناء تحميل المفضلة' : 'Error loading favorites',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [selectedService, setSelectedService] = useState<(Service & { provider_id: string }) | null>(null);
+  const [selectedProvider, setSelectedProvider] = useState<ProviderProfile | null>(null);
 
   const handleRemove = async (itemId: string) => {
     if (!user?.uid) return;
 
     setRemovingId(itemId);
     try {
-      await removeFavorite(user.uid, itemId);
+      await removeFavorite(itemId);
 
       toast({
         title: isRTL ? 'تمت الإزالة' : 'Removed',
         description: isRTL ? 'تم إزالة العنصر من المفضلة' : 'Item removed from favorites',
       });
-
-      await loadFavorites();
     } catch (error) {
       console.error('Error removing favorite:', error);
       toast({
@@ -185,9 +59,8 @@ export default function Favorites() {
     }
   };
 
-  const handleBookingClick = (service: ServiceData) => {
+  const handleBookingClick = (service: Service, provider?: ProviderProfile) => {
     setSelectedService({ ...service, provider_id: service.provider_id });
-    const provider = providerDetails[service.provider_id];
     if (provider) {
       setSelectedProvider(provider);
       setBookingModalOpen(true);
@@ -271,12 +144,12 @@ export default function Favorites() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {serviceFavorites.map((favorite) => {
-                const service = serviceDetails[favorite.item_id];
-                const isDeleted = service === null;
+                const service = favorite.details;
+                const isDeleted = !service;
                 const isExpanded = expandedServiceId === favorite.item_id;
                 const CategoryIcon = getCategoryIcon(favorite.item_category);
                 const categoryColor = getCategoryColor(favorite.item_category);
-                const rating = serviceRatings[favorite.item_id] || { avg: 0, count: 0 };
+                const rating = favorite.rating || { avg: 0, count: 0 };
                 const isTopService = rating.avg >= 4.5;
 
                 if (isDeleted) {
@@ -309,9 +182,24 @@ export default function Favorites() {
                   );
                 }
 
+                // We know service is defined here because of the check above
+                // But TypeScript might need help if we don't assert or check again
                 if (!service) return null;
 
-                const provider = service.provider_id ? providerDetails[service.provider_id] : null;
+                // We don't have provider details directly attached to service in the hook yet
+                // Wait, the hook fetches service details, but does it fetch the provider of that service?
+                // The hook logic:
+                // const serviceDoc = await getDoc(doc(db, 'services', fav.item_id));
+                // It does NOT fetch the provider of the service.
+                // But wait, the original code did:
+                // const provider = service.provider_id ? providerDetails[service.provider_id] : null;
+                // And providerDetails were fetched separately.
+                
+                // My hook implementation for serviceFavorites only fetches the service doc and ratings.
+                // It does NOT fetch the provider profile for that service.
+                if (!service) return null;
+
+                const provider = favorite.provider;
 
                 return (
                   <Card 
@@ -505,7 +393,7 @@ export default function Favorites() {
                                   }}
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    handleBookingClick(service);
+                                    handleBookingClick(service, provider);
                                   }}
                                 >
                                   <Calendar className="h-4 w-4 mr-2" />
@@ -529,11 +417,12 @@ export default function Favorites() {
                       )}
                     </CardContent>
                   </Card>
-                );
+                ); 
               })}
             </div>
           )}
         </TabsContent>
+
 
         {/* Providers Tab */}
         <TabsContent value="providers" className="space-y-4">
@@ -568,8 +457,8 @@ export default function Favorites() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {providerFavorites.map((favorite) => {
-                const provider = providerDetails[favorite.item_id];
-                const isDeleted = provider === null;
+                const provider = favorite.details;
+                const isDeleted = !provider;
 
                 if (isDeleted) {
                   return (

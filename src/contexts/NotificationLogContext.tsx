@@ -92,7 +92,7 @@ export const NotificationLogProvider: React.FC<{ children: React.ReactNode }> = 
         updateDoc(doc(db, 'profiles', user.uid), { notifications_last_viewed_at: now, notifications_unread_count: 0 }).catch(() => {});
       }
     } catch {}
-  }, []);
+  }, [user?.uid]);
 
   const unreadCount = React.useMemo(() => {
     if (!lastViewedAt) return notifications.length;
@@ -141,7 +141,7 @@ export const NotificationLogProvider: React.FC<{ children: React.ReactNode }> = 
       } catch {}
     })();
     return () => { cancelled = true; };
-  }, [user?.uid]);
+  }, [user?.uid, lastViewedAt]);
 
   // Realtime unread listener: reflect remote changes live
   const lastViewedRef = useRef<string | null>(lastViewedAt);

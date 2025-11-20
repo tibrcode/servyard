@@ -1,30 +1,6 @@
 import { db } from '@/integrations/firebase/client';
 import { collection, getDocs, query, where } from 'firebase/firestore';
-
-export interface Service {
-  id: string;
-  name: string;
-  description?: string;
-  provider_id: string;
-  category_id: string;
-  approximate_price?: string;
-  duration_minutes?: number;
-  price_range?: string;
-  is_active: boolean;
-  booking_enabled?: boolean;
-  max_concurrent_bookings?: number;
-  advance_booking_days?: number;
-  buffer_time_minutes?: number;
-  cancellation_policy_hours?: number;
-  require_confirmation?: boolean;
-  allow_customer_cancellation?: boolean;
-  // Discount fields
-  has_discount?: boolean;
-  discount_price?: string;
-  discount_percentage?: number;
-  created_at?: any;
-  updated_at?: any;
-}
+import { Service } from '@/types/service';
 
 type CacheShape = { data: Service[]; ts: number };
 const MEM_KEY = 'svc-list:v1';

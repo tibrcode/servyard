@@ -102,7 +102,7 @@ export async function getProviderBookings(
   endDate?: string
 ): Promise<Booking[]> {
   // Remove orderBy to avoid index requirement, sort in JavaScript instead
-  let q = query(
+  const q = query(
     bookingsCollection,
     where('provider_id', '==', providerId)
   );

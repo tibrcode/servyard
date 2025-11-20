@@ -2,7 +2,7 @@
 // مكون إدارة الحجوزات لمزود الخدمة
 // Updated: 2025-11-10 - Fixed translation loading
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -111,30 +111,7 @@ export function BookingManagement({
     },
   };
 
-  useEffect(() => {
-    setIsLoading(true);
-    
-    // Subscribe to real-time updates
-    const unsubscribe = subscribeToProviderBookings(providerId, (data) => {
-      setBookings(data);
-      setIsLoading(false);
-      
-      // Load customer locations for all bookings
-      loadCustomerLocations(data);
-    });
-    
-    // Load provider location
-    loadProviderLocation();
-    
-    // Cleanup subscription on unmount
-    return () => unsubscribe();
-  }, [providerId]);
-
-  useEffect(() => {
-    filterBookings();
-  }, [bookings, viewMode, statusFilter, showOnlyPending]);
-
-  const loadProviderLocation = async () => {
+  const loadProviderLocation = useCallback(async () => {
     try {
       const providerDoc = await getDoc(doc(db, 'profiles', providerId));
       if (providerDoc.exists()) {
@@ -149,9 +126,9 @@ export function BookingManagement({
     } catch (error) {
       console.error('Error loading provider location:', error);
     }
-  };
+  }, [providerId]);
 
-  const loadCustomerLocations = async (bookingsData: Booking[]) => {
+  const loadCustomerLocations = useCallback(async (bookingsData: Booking[]) => {
     const customerIds = [...new Set(bookingsData.map(b => b.customer_id))];
     const locations: Record<string, {latitude: number, longitude: number}> = {};
     
@@ -173,9 +150,9 @@ export function BookingManagement({
     }
     
     setCustomerLocations(locations);
-  };
+  }, []);
 
-  const loadBookings = async () => {
+  const loadBookings = useCallback(async () => {
     // Kept for manual refresh if needed
     setIsLoading(true);
     try {
@@ -191,9 +168,9 @@ export function BookingManagement({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [providerId, isRTL, toast]);
 
-  const filterBookings = () => {
+  const filterBookings = useCallback(() => {
     let filtered = [...bookings];
 
     // If showing only pending, override all other filters
@@ -246,7 +223,32 @@ export function BookingManagement({
     });
 
     setFilteredBookings(filtered);
-  };
+  }, [bookings, showOnlyPending, viewMode, statusFilter]);
+
+  useEffect(() => {
+    setIsLoading(true);
+    
+    // Subscribe to real-time updates
+    const unsubscribe = subscribeToProviderBookings(providerId, (data) => {
+      setBookings(data);
+      setIsLoading(false);
+      
+      // Load customer locations for all bookings
+      loadCustomerLocations(data);
+    });
+    
+    // Load provider location
+    loadProviderLocation();
+    
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
+  }, [providerId, loadCustomerLocations, loadProviderLocation]);
+
+  useEffect(() => {
+    filterBookings();
+  }, [filterBookings]);
+
+
 
   const handleStatusUpdate = async (bookingId: string, newStatus: BookingStatus) => {
     setUpdatingId(bookingId);

@@ -21,32 +21,17 @@ import {
 import { useTranslation } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { auth, db } from "@/integrations/firebase/client";
-import { collection, query, where, getDocs, doc, getDoc, updateDoc, addDoc, onSnapshot } from "firebase/firestore";
+import { auth } from "@/integrations/firebase/client";
 import { Review } from "@/lib/firebase/collections";
 import { MyBookings } from "@/components/booking/MyBookings";
 import { Settings as SettingsComponent } from "@/components/settings/Settings";
 import Favorites from "@/pages/Favorites";
+import { Service } from "@/types/service";
+import { useCustomerDashboardData } from "@/hooks/useCustomerDashboardData";
+import { useReviewActions } from "@/hooks/useReviewActions";
 
 interface CustomerDashboardProps {
   currentLanguage: string;
-}
-
-interface Service {
-  id: string;
-  name: string;
-  provider_id: string;
-  approximate_price?: string;
-  duration_minutes?: number;
-}
-
-interface Profile {
-  id: string;
-  full_name: string;
-  city?: string;
-  country?: string;
-  phone_numbers?: string[];
-  whatsapp_number?: string;
 }
 
 const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
@@ -56,14 +41,19 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [services, setServices] = useState<{ [key: string]: Service }>({});
-  const [providers, setProviders] = useState<{ [key: string]: Profile }>({});
-  const [upcomingBookingsCount, setUpcomingBookingsCount] = useState(0);
-  const [completedBookingsCount, setCompletedBookingsCount] = useState(0);
-  const [favoritesCount, setFavoritesCount] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const { 
+    profile, 
+    reviews, 
+    services, 
+    providers, 
+    favoritesCount, 
+    upcomingBookingsCount, 
+    completedBookingsCount, 
+    isLoading: loading 
+  } = useCustomerDashboardData(user?.uid);
+
+  const { updateReview } = useReviewActions();
+
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [reviewRating, setReviewRating] = useState(5);
   const [isEditingReview, setIsEditingReview] = useState(false);
@@ -71,118 +61,10 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!authLoading && user && role === 'customer') {
-      loadCustomerData();
-    } else if (!authLoading && (!user || role !== 'customer')) {
+    if (!authLoading && (!user || role !== 'customer')) {
       navigate('/auth');
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, role, authLoading, navigate]);
-
-  const loadCustomerData = async () => {
-    try {
-      const user_uid = user?.uid;
-      if (!user_uid) return;
-
-      // Load customer profile
-      const profileDoc = await getDoc(doc(db, 'profiles', user_uid));
-      if (profileDoc.exists()) {
-        setProfile({ id: profileDoc.id, ...profileDoc.data() } as Profile);
-      }
-
-      // Real-time listener for customer reviews
-      const reviewsQuery = query(
-        collection(db, 'reviews'),
-        where('customer_id', '==', user_uid)
-      );
-      
-      onSnapshot(reviewsQuery, async (snapshot) => {
-        const reviewsData = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        })) as Review[];
-
-        // Sort reviews by created_at in JavaScript
-        reviewsData.sort((a, b) => {
-          const aDate = a.created_at?.toDate?.() || new Date(a.created_at);
-          const bDate = b.created_at?.toDate?.() || new Date(b.created_at);
-          return bDate.getTime() - aDate.getTime();
-        });
-        setReviews(reviewsData);
-
-        // Load related services and providers from reviews
-        const serviceIds = [...new Set(reviewsData.map((r: any) => r.service_id).filter(Boolean))];
-        const providerIds = [...new Set(reviewsData.map((r: any) => r.provider_id).filter(Boolean))];
-
-      // Real-time listener for customer bookings
-      const bookingsQuery = query(
-        collection(db, 'bookings'),
-        where('customer_id', '==', user_uid)
-      );
-      
-      onSnapshot(bookingsQuery, (snapshot) => {
-        const bookingsData = snapshot.docs.map(doc => doc.data());
-        const now = new Date();
-        
-        // Count upcoming bookings (confirmed or pending, and in the future)
-        const upcomingCount = bookingsData.filter((booking: any) => {
-          if (booking.status !== 'confirmed' && booking.status !== 'pending') return false;
-          
-          const [year, month, day] = booking.booking_date.split('-').map(Number);
-          const [hour, minute] = booking.start_time.split(':').map(Number);
-          const bookingDate = new Date(year, month - 1, day, hour, minute);
-          
-          return bookingDate > now;
-        }).length;
-        setUpcomingBookingsCount(upcomingCount);
-        
-        // Count completed bookings
-        const completedCount = bookingsData.filter(
-          (booking: any) => booking.status === 'completed'
-        ).length;
-        setCompletedBookingsCount(completedCount);
-      });
-
-        // Load services
-        const servicesData: { [key: string]: Service } = {};
-        for (const serviceId of serviceIds) {
-          const serviceDoc = await getDoc(doc(db, 'services', serviceId as string));
-          if (serviceDoc.exists()) {
-            servicesData[serviceId as string] = { id: serviceDoc.id, ...serviceDoc.data() } as Service;
-          }
-        }
-        setServices(servicesData);
-
-        // Load providers
-        const providersData: { [key: string]: Profile } = {};
-        for (const providerId of providerIds) {
-          const providerDoc = await getDoc(doc(db, 'profiles', providerId as string));
-          if (providerDoc.exists()) {
-            providersData[providerId as string] = { id: providerDoc.id, ...providerDoc.data() } as Profile;
-          }
-        }
-        setProviders(providersData);
-
-        // Count favorites
-        const favoritesQuery = query(
-          collection(db, 'favorites'),
-          where('user_id', '==', user_uid)
-        );
-        const favoritesSnapshot = await getDocs(favoritesQuery);
-        setFavoritesCount(favoritesSnapshot.size);
-      });
-
-    } catch (error) {
-      console.error('Error loading customer data:', error);
-      toast({
-        variant: "destructive",
-        title: t.toast.error,
-        description: t.ui.errorLoadingServices
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // Highlight booking if bookingId query param present (persistent until interaction)
   useEffect(() => {
@@ -203,6 +85,7 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
           el.removeEventListener('keydown', clear);
           el.removeEventListener('touchstart', clear);
         };
+
         el.addEventListener('click', clear, { once: true });
         el.addEventListener('keydown', clear, { once: true });
         el.addEventListener('touchstart', clear, { once: true });
@@ -235,18 +118,7 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
     try {
       if (isEditingReview && editingReviewId) {
         // Update existing review
-        const reviewRef = doc(db, 'reviews', editingReviewId);
-        await updateDoc(reviewRef, {
-          rating: reviewRating,
-          created_at: new Date()
-        });
-
-        // Update local reviews state
-        setReviews(reviews.map(review =>
-          review.id === editingReviewId
-            ? { ...review, rating: reviewRating }
-            : review
-        ));
+        await updateReview.mutateAsync({ id: editingReviewId, rating: reviewRating });
 
         toast({
           title: t.toast.reviewUpdated || t.toast.bookingCompleted,

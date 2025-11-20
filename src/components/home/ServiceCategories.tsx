@@ -31,12 +31,9 @@ import {
   Plane
 } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
-import { db } from "@/integrations/firebase/client";
-import { collection, getDocs, query, where, orderBy } from "firebase/firestore";
-import { upsertDefaultServiceCategories } from "@/lib/firebase/defaultCategories";
-import { ServiceCategory } from "@/lib/firebase/collections";
 import { getCategoryLabel } from "@/lib/categoriesLocale";
 import CategoryCard from "@/components/CategoryCard";
+import { useServiceCategories } from "@/hooks/useServiceCategories";
 
 interface ServiceCategoriesProps {
   currentLanguage?: string;
@@ -48,14 +45,13 @@ export const ServiceCategories = ({
   onCategoryClick
 }: ServiceCategoriesProps) => {
   const { t, isRTL } = useTranslation(currentLanguage);
-  const [categories, setCategories] = useState<ServiceCategory[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: categories = [], isLoading: loading } = useServiceCategories();
   const [unifiedTitleSize, setUnifiedTitleSize] = useState<number | null>(null);
 
   // Reset unified size when language or categories change
   useEffect(() => {
     setUnifiedTitleSize(null);
-  }, [currentLanguage]);
+  }, [currentLanguage, categories]);
 
   // Icon mapping
   const iconMap: { [key: string]: any } = {
@@ -111,96 +107,7 @@ export const ServiceCategories = ({
     'yellow': { text: 'text-yellow-500', bg: 'bg-yellow-50 dark:bg-yellow-950/20' },
   };
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        // Upsert default categories to ensure all 24 are present
-        console.log('Upserting default service categories...');
-        const inserted = await upsertDefaultServiceCategories();
-        console.log(`Inserted ${inserted} new categories`);
 
-        // Fetch categories from Firestore
-        console.log('Fetching categories from Firestore...');
-        const categoriesQuery = query(
-          collection(db, 'service_categories'),
-          where('is_active', '==', true),
-          orderBy('display_order')
-        );
-        const categoriesSnapshot = await getDocs(categoriesQuery);
-        let categoriesData = categoriesSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        })) as ServiceCategory[];
-
-        // Deduplicate categories by English name (or Arabic fallback) to avoid double rendering
-        const seen = new Set<string>();
-        const deduped: ServiceCategory[] = [];
-        // Allow opt-in duplicate logging only when localStorage flag set to avoid noisy consoles
-        let duplicateLogCount = 0;
-        const debugDuplicates = (() => {
-          try { return localStorage.getItem('debug-duplicates') === '1'; } catch { return false; }
-        })();
-        for (const cat of categoriesData) {
-          const key = (cat.name_en || cat.name_ar || cat.id).trim();
-          if (!seen.has(key)) {
-            seen.add(key);
-            deduped.push(cat);
-          } else if (debugDuplicates) {
-            // Only log a limited number to prevent potential performance issues
-            if (duplicateLogCount < 20) {
-              console.warn('[ServiceCategories] Duplicate category suppressed:', key, cat.id);
-              duplicateLogCount++;
-            }
-          }
-        }
-
-        // Sort again by display_order after dedup just in case duplicates affected order
-        deduped.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
-
-        console.log('Fetched categories:', categoriesData.length, '→ after dedup:', deduped.length);
-        setCategories(deduped);
-      } catch (error) {
-        console.error('Error fetching categories:', error);
-        // Try to fetch without the orderBy if there's an error
-        try {
-          console.log('Trying fallback fetch...');
-          const categoriesSnapshot = await getDocs(collection(db, 'service_categories'));
-          let categoriesData = categoriesSnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          })) as ServiceCategory[];
-          categoriesData = categoriesData.filter(cat => cat.is_active);
-          const seenFallback = new Set<string>();
-          const dedupFallback: ServiceCategory[] = [];
-          const debugDuplicatesFallback = (() => {
-            try { return localStorage.getItem('debug-duplicates') === '1'; } catch { return false; }
-          })();
-          let duplicateLogCountFallback = 0;
-          for (const cat of categoriesData) {
-            const key = (cat.name_en || cat.name_ar || cat.id).trim();
-            if (!seenFallback.has(key)) {
-              seenFallback.add(key);
-              dedupFallback.push(cat);
-            } else if (debugDuplicatesFallback) {
-              if (duplicateLogCountFallback < 20) {
-                console.warn('[ServiceCategories] [fallback] Duplicate category suppressed:', key, cat.id);
-                duplicateLogCountFallback++;
-              }
-            }
-          }
-          dedupFallback.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
-          console.log('Fallback fetch got:', categoriesData.length, '→ after dedup:', dedupFallback.length);
-          setCategories(dedupFallback);
-        } catch (fallbackError) {
-          console.error('Fallback fetch also failed:', fallbackError);
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCategories();
-  }, []);
 
   if (loading) {
     return (

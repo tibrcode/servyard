@@ -164,96 +164,12 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
       mounted = false;
       clearInterval(checkInterval);
     };
-  }, []);
+  }, [t.error]);
 
-  // إنشاء الخريطة (مرة واحدة فقط)
-  useEffect(() => {
-    if (!apiLoaded || !mapRef.current || mapInstanceRef.current) return;
 
-    const defaultCenter = center || { latitude: 31.9454, longitude: 35.9284 }; // عمّان، الأردن
-
-    const map = new google.maps.Map(mapRef.current, {
-      center: { lat: defaultCenter.latitude, lng: defaultCenter.longitude },
-      zoom: zoom,
-      mapTypeControl: true,
-      streetViewControl: false,
-      fullscreenControl: true,
-      zoomControl: true,
-    });
-
-    mapInstanceRef.current = map;
-
-    // إضافة event listener للنقر
-    if (onLocationSelect) {
-      map.addListener('click', (event: google.maps.MapMouseEvent) => {
-        if (event.latLng) {
-          const location: Location = {
-            latitude: event.latLng.lat(),
-            longitude: event.latLng.lng()
-          };
-          onLocationSelect(location);
-          
-          // إضافة/تحديث العلامة
-          clearMarkers();
-          addMarker(location, t.clickToSelect, true);
-        }
-      });
-    }
-  }, [apiLoaded]);
-
-  // تحديث موقع ومستوى التكبير للخريطة
-  useEffect(() => {
-    if (!mapInstanceRef.current || !center) return;
-
-    mapInstanceRef.current.setCenter({ 
-      lat: center.latitude, 
-      lng: center.longitude 
-    });
-    mapInstanceRef.current.setZoom(zoom);
-  }, [center, zoom]);
-
-  // تحديث العلامات على الخريطة
-  useEffect(() => {
-    // انتظار تحميل API وإنشاء الخريطة
-    if (!apiLoaded || !mapInstanceRef.current) {
-      return;
-    }
-
-    // حذف العلامات القديمة
-    clearMarkers();
-    
-    // إضافة العلامات الجديدة
-    markers.forEach((marker) => {
-      addMarker(marker, marker.label);
-    });
-  }, [apiLoaded, markers, currentLanguage]);
-
-  // مراقبة التغيير بين النمط الليلي والنهاري
-  useEffect(() => {
-    if (!apiLoaded || !mapInstanceRef.current) return;
-
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.attributeName === 'class') {
-          // إعادة رسم العلامات عند تغيير النمط
-          clearMarkers();
-          markers.forEach((marker) => {
-            addMarker(marker, marker.label);
-          });
-        }
-      });
-    });
-
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class']
-    });
-
-    return () => observer.disconnect();
-  }, [apiLoaded, markers]);
 
   // إضافة علامة محسّنة مع معلومات الخدمات
-  const addMarker = (location: Location, label?: string, draggable = false, isCurrentLocation = false) => {
+  const addMarker = useCallback((location: Location, label?: string, draggable = false, isCurrentLocation = false) => {
     if (!mapInstanceRef.current) return;
 
     const isRTL = currentLanguage === 'ar';
@@ -584,8 +500,8 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                 const isTopRated = rating >= 4.5;
                 
                 // الحصول على تفاصيل الفئة للأيقونة
-                let categoryBgColor = '#f3f4f6';
-                let categoryTextColor = '#4b5563';
+                const categoryBgColor = '#f3f4f6';
+                const categoryTextColor = '#4b5563';
                 
                 return `
                 <div class="service-card" style="
@@ -843,15 +759,101 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
     }
 
     markersRef.current.push(marker);
-  };
+  }, [currentLanguage, onLocationSelect, onServiceClick]);
 
   // حذف جميع العلامات
-  const clearMarkers = () => {
+  const clearMarkers = useCallback(() => {
     markersRef.current.forEach(marker => {
       marker.setMap(null);
     });
     markersRef.current = [];
-  };
+  }, []);
+
+  // إنشاء الخريطة (مرة واحدة فقط)
+  useEffect(() => {
+    if (!apiLoaded || !mapRef.current || mapInstanceRef.current) return;
+
+    const defaultCenter = center || { latitude: 31.9454, longitude: 35.9284 }; // عمّان، الأردن
+
+    const map = new google.maps.Map(mapRef.current, {
+      center: { lat: defaultCenter.latitude, lng: defaultCenter.longitude },
+      zoom: zoom,
+      mapTypeControl: true,
+      streetViewControl: false,
+      fullscreenControl: true,
+      zoomControl: true,
+    });
+
+    mapInstanceRef.current = map;
+
+    // إضافة event listener للنقر
+    if (onLocationSelect) {
+      map.addListener('click', (event: google.maps.MapMouseEvent) => {
+        if (event.latLng) {
+          const location: Location = {
+            latitude: event.latLng.lat(),
+            longitude: event.latLng.lng()
+          };
+          onLocationSelect(location);
+          
+          // إضافة/تحديث العلامة
+          clearMarkers();
+          addMarker(location, t.clickToSelect, true);
+        }
+      });
+    }
+  }, [apiLoaded, center, zoom, onLocationSelect, t.clickToSelect, addMarker, clearMarkers]);
+
+  // تحديث موقع ومستوى التكبير للخريطة
+  useEffect(() => {
+    if (!mapInstanceRef.current || !center) return;
+
+    mapInstanceRef.current.setCenter({ 
+      lat: center.latitude, 
+      lng: center.longitude 
+    });
+    mapInstanceRef.current.setZoom(zoom);
+  }, [center, zoom]);
+
+  // تحديث العلامات على الخريطة
+  useEffect(() => {
+    // انتظار تحميل API وإنشاء الخريطة
+    if (!apiLoaded || !mapInstanceRef.current) {
+      return;
+    }
+
+    // حذف العلامات القديمة
+    clearMarkers();
+    
+    // إضافة العلامات الجديدة
+    markers.forEach((marker) => {
+      addMarker(marker, marker.label);
+    });
+  }, [apiLoaded, markers, currentLanguage, addMarker, clearMarkers]);
+
+  // مراقبة التغيير بين النمط الليلي والنهاري
+  useEffect(() => {
+    if (!apiLoaded || !mapInstanceRef.current) return;
+
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class') {
+          // إعادة رسم العلامات عند تغيير النمط
+          clearMarkers();
+          markers.forEach((marker) => {
+            addMarker(marker, marker.label);
+          });
+        }
+      });
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+    return () => observer.disconnect();
+  }, [apiLoaded, markers, addMarker, clearMarkers]);
 
   // الحصول على الموقع الحالي
   const handleGetCurrentLocation = () => {

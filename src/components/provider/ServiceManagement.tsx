@@ -11,26 +11,7 @@ import { collection, query, where, getDocs, doc, updateDoc, deleteDoc, getDoc } 
 import { invalidateServicesCache } from "@/lib/servicesCache";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "@/lib/i18n";
-
-interface Service {
-  id: string;
-  name: string;
-  description?: string;
-  category_id: string;
-  provider_id: string;
-  approximate_price?: string;
-  duration_minutes?: number;
-  price_range?: string;
-  specialty_description?: string;
-  is_active: boolean;
-  created_at: any;
-  updated_at: any;
-  averageRating?: number;
-  reviewCount?: number;
-  has_discount?: boolean;
-  discount_price?: string;
-  discount_percentage?: number;
-}
+import { Service } from "@/types/service";
 
 interface ServiceManagementProps {
   currentLanguage: string;
@@ -126,7 +107,7 @@ export const ServiceManagement = ({ currentLanguage, currencyCode }: ServiceMana
     };
 
     fetchServices();
-  }, [toast]);
+  }, [toast, t]);
 
   const toggleServiceStatus = async (serviceId: string, currentStatus: boolean) => {
     try {
