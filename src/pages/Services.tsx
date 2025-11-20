@@ -498,26 +498,6 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
               {t.actions.search}: "{qParam}" • {filteredServices.length}
             </p>
           )}
-          
-          {/* View Toggle */}
-          <div className="flex gap-2 mt-4">
-            <Button
-              variant={viewMode === 'list' ? 'default' : 'outline'}
-              onClick={() => setViewMode('list')}
-              className="flex-1"
-            >
-              <List className="w-4 h-4 mr-2" />
-              {isRTL ? 'عرض القائمة' : 'List View'}
-            </Button>
-            <Button
-              variant={viewMode === 'map' ? 'default' : 'outline'}
-              onClick={() => setViewMode('map')}
-              className="flex-1"
-            >
-              <MapIcon className="w-4 h-4 mr-2" />
-              {isRTL ? 'عرض الخريطة' : 'Map View'}
-            </Button>
-          </div>
         </div>
 
         {/* Services / Offers Tabs */}
@@ -826,6 +806,32 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
             )}
           </div>
         ) : null}
+
+        {/* View Toggle (Services Only) */}
+        {activeTab === 'services' && (
+          <div className="flex justify-end mb-4">
+            <div className="flex items-center bg-muted/50 p-1 rounded-lg border">
+              <Button
+                variant={viewMode === 'list' ? 'secondary' : 'ghost'}
+                size="sm"
+                className="px-4"
+                onClick={() => setViewMode('list')}
+              >
+                <List className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                {isRTL ? 'قائمة' : 'List'}
+              </Button>
+              <Button
+                variant={viewMode === 'map' ? 'secondary' : 'ghost'}
+                size="sm"
+                className="px-4"
+                onClick={() => setViewMode('map')}
+              >
+                <MapIcon className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                {isRTL ? 'خريطة' : 'Map'}
+              </Button>
+            </div>
+          </div>
+        )}
 
         {/* Services Grid or Map */}
         {activeTab === 'services' && (filteredServices.length === 0 ? (
