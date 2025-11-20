@@ -65,11 +65,10 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
   const [radiusKm, setRadiusKm] = useState(DEFAULT_RADIUS_KM);
   const [locationLoading, setLocationLoading] = useState(false);
   
-  // View toggle: 'list' or 'map' - initialize from URL parameter
-  const [viewMode, setViewMode] = useState<'list' | 'map'>(
-    viewParam === 'map' ? 'map' : 'list'
+  // View toggle: 'services', 'map', or 'offers'
+  const [activeView, setActiveView] = useState<'services' | 'map' | 'offers'>(
+    viewParam === 'map' ? 'map' : 'services'
   );
-  const [activeTab, setActiveTab] = useState<'services' | 'offers'>('services');
   
   // Selected service from map
   const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
@@ -258,8 +257,8 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
         return { ...service, distance };
       });
 
-      // فلترة حسب النطاق الجغرافي (فقط في وضع القائمة)
-      if (radiusKm > 0 && viewMode === 'list') {
+      // فلترة حسب النطاق الجغرافي (فقط في وضع القائمة أو العروض)
+      if (radiusKm > 0 && (activeView === 'services' || activeView === 'offers')) {
         filtered = filtered.filter(s => (s as any).distance !== undefined && (s as any).distance <= radiusKm);
       }
     }
@@ -315,7 +314,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
     });
 
     return filtered;
-  }, [baseFilteredServices, userLocation, radiusKm, providers, viewMode, sortBy, serviceRatings]);
+  }, [baseFilteredServices, userLocation, radiusKm, providers, activeView, sortBy, serviceRatings]);
 
   // حساب mapMarkers من الفلترة الأساسية (بدون فلترة الموقع)
   const mapMarkers = useMemo(() => {
@@ -417,7 +416,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
     <div className="min-h-screen flex flex-col overflow-x-hidden max-w-[100vw]" dir={isRTL ? 'rtl' : 'ltr'}>
       <main className="flex-1 container mx-auto px-3 sm:px-4 py-6 sm:py-8 overflow-x-hidden touch-pan-y max-w-[100vw]">
         {/* 1. Location-based Filter (Top) */}
-        <div className="mb-6">
+        <div className="mb-4">
           {userLocation ? (
             <div className="bg-muted/30 rounded-lg p-3 border border-border/50">
               <div className="flex justify-between items-center mb-3">
@@ -449,10 +448,52 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
           )}
         </div>
 
-        {/* 2. Categories & Sort (Below Radius) */}
-        <div className="flex flex-col sm:flex-row gap-2 min-w-0 mb-6">
+        {/* 2. Main Navigation Buttons (Services, Map, Offers) */}
+        <div className="grid grid-cols-3 gap-2 mb-4">
+          <Button
+            variant={activeView === 'services' ? 'default' : 'outline'}
+            className={`h-16 flex flex-col items-center justify-center gap-1 rounded-xl border-2 ${
+              activeView === 'services' 
+                ? 'border-primary bg-primary text-primary-foreground shadow-md' 
+                : 'border-muted bg-card hover:bg-muted/50 hover:border-primary/50'
+            }`}
+            onClick={() => setActiveView('services')}
+          >
+            <List className="w-5 h-5" />
+            <span className="text-xs font-bold">{isRTL ? 'الخدمات' : 'Services'}</span>
+          </Button>
+
+          <Button
+            variant={activeView === 'map' ? 'default' : 'outline'}
+            className={`h-16 flex flex-col items-center justify-center gap-1 rounded-xl border-2 ${
+              activeView === 'map' 
+                ? 'border-primary bg-primary text-primary-foreground shadow-md' 
+                : 'border-muted bg-card hover:bg-muted/50 hover:border-primary/50'
+            }`}
+            onClick={() => setActiveView('map')}
+          >
+            <MapIcon className="w-5 h-5" />
+            <span className="text-xs font-bold">{isRTL ? 'الخريطة' : 'Map'}</span>
+          </Button>
+
+          <Button
+            variant={activeView === 'offers' ? 'default' : 'outline'}
+            className={`h-16 flex flex-col items-center justify-center gap-1 rounded-xl border-2 ${
+              activeView === 'offers' 
+                ? 'border-primary bg-primary text-primary-foreground shadow-md' 
+                : 'border-muted bg-card hover:bg-muted/50 hover:border-primary/50'
+            }`}
+            onClick={() => setActiveView('offers')}
+          >
+            <Sparkles className="w-5 h-5" />
+            <span className="text-xs font-bold">{isRTL ? 'العروض' : 'Offers'}</span>
+          </Button>
+        </div>
+
+        {/* 3. Filters & Sort (Below Buttons) */}
+        <div className="flex flex-col sm:flex-row gap-2 min-w-0 mb-4">
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className="w-full sm:w-48">
+            <SelectTrigger className="w-full sm:w-48 h-10">
               <SelectValue placeholder={t.ui.allCategories} />
             </SelectTrigger>
             <SelectContent>
@@ -466,7 +507,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
           </Select>
 
           <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger className="w-full sm:w-48">
+            <SelectTrigger className="w-full sm:w-48 h-10">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -479,68 +520,22 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
           </Select>
         </div>
 
-        {/* 3. Services / Offers Tabs */}
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
-          <TabsList className="grid w-full grid-cols-2 mb-6 h-14">
-            <TabsTrigger value="services" className="w-full h-full text-base font-medium">
-              {isRTL ? 'الخدمات' : 'Services'}
-            </TabsTrigger>
-            <TabsTrigger value="offers" className="w-full h-full text-base font-medium">
-              {isRTL ? 'العروض والتخفيضات' : 'Offers & Discounts'}
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
-
-        {/* Services Tab Content */}
-        {activeTab === 'services' && (
-          <>
-            {/* 4. View Toggle (List/Map) */}
-            <div className="mb-6">
-              <div className="grid grid-cols-2 gap-1 bg-muted p-1 rounded-lg border shadow-sm w-full">
-                <Button
-                  variant={viewMode === 'list' ? 'default' : 'ghost'}
-                  size="sm"
-                  className={`w-full h-9 rounded-md transition-all duration-200 ${
-                    viewMode === 'list' 
-                      ? 'bg-primary text-primary-foreground shadow-sm' 
-                      : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
-                  }`}
-                  onClick={() => setViewMode('list')}
-                >
-                  <List className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-                  <span className="text-sm font-medium">{isRTL ? 'قائمة' : 'List'}</span>
-                </Button>
-                <Button
-                  variant={viewMode === 'map' ? 'default' : 'ghost'}
-                  size="sm"
-                  className={`w-full h-9 rounded-md transition-all duration-200 ${
-                    viewMode === 'map' 
-                      ? 'bg-primary text-primary-foreground shadow-sm' 
-                      : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
-                  }`}
-                  onClick={() => setViewMode('map')}
-                >
-                  <MapIcon className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-                  <span className="text-sm font-medium">{isRTL ? 'خريطة' : 'Map'}</span>
-                </Button>
-              </div>
-            </div>
-
-            {/* 5. Search Bar (Alone) */}
-            <div className="flex gap-2 min-w-0 mb-6">
-              <Input
-                placeholder={t.home.searchPlaceholder}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1"
-              />
-              <Button onClick={handleSearch} className="px-6">
-                <Search className="h-4 w-4" />
-              </Button>
-            </div>
+        {/* 4. Search Bar */}
+        <div className="flex gap-2 min-w-0 mb-6">
+          <Input
+            placeholder={t.home.searchPlaceholder}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="flex-1 h-10"
+          />
+          <Button onClick={handleSearch} className="px-6 h-10">
+            <Search className="h-4 w-4" />
+          </Button>
+        </div>
 
             {/* 6. Results (Grid or Map) */}
-            {filteredServices.length === 0 ? (
+            {activeView !== 'offers' && (
+              filteredServices.length === 0 ? (
               <Card>
                 <CardContent className="p-12 text-center">
                   <Search className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
@@ -548,7 +543,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                   <p className="text-muted-foreground">{t.home.searchPlaceholder}</p>
                 </CardContent>
               </Card>
-            ) : viewMode === 'map' ? (
+            ) : activeView === 'map' ? (
               /* Map View */
               <div className="space-y-3">
                 {/* Map */}
@@ -1077,11 +1072,11 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                   })}
                 </div>
               </div>
-            )}
-          </>
-        )}
+            ))}
 
-        {activeTab === 'offers' ? (
+
+        {/* Offers List View */}
+        {activeView === 'offers' && (
           <div>
             {/* Services with Discounts Only */}
             {filteredServices.filter(s => 
@@ -1374,23 +1369,10 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
               </Card>
             )}
           </div>
-        ) : null}
-            
-
-            
-
-
-
-
-
-                    
-
-
-
-
+        )}
 
         {/* Load More */}
-        {activeTab === 'services' && filteredServices.length > 0 && (
+        {(activeView === 'services' || activeView === 'offers') && filteredServices.length > 0 && (
           <div className="text-center mt-12">
             <Button variant="outline" onClick={() => toast({ title: t.ui.loading, description: t.ui.loadingMoreServices })}>
               {t.ui.loadMore}
