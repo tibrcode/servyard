@@ -1083,559 +1083,317 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                   })}
                 </div>
               </div>
-            ))}
+            )}
           </>
         )}
 
-        {activeTab === 'offers' ? (                  {isRTL 
-                    ? `${mapMarkers.length} من ${filteredServices.length} خدمة على الخريطة`
-                    : `${mapMarkers.length} of ${filteredServices.length} services on map`
-                  }
-                </span>
-              </div>
-              {(filteredServices.length - mapMarkers.length) > 0 && (
-                <Badge variant="secondary">
-                  {isRTL 
-                    ? `${filteredServices.length - mapMarkers.length} بدون موقع`
-                    : `${filteredServices.length - mapMarkers.length} without location`
-                  }
-                </Badge>
-              )}
-            </div>
-            
-            {/* Selected Service Display */}
-            {selectedServiceId && (() => {
-                    const service = filteredServices.find(s => s.id === selectedServiceId);
-                    const provider = service ? providers[service.provider_id] : null;
-                    
-                    if (!service || !provider) return null;
-                    
-                    return (
-                      <div 
-                        ref={selectedServiceRef}
-                        className="mt-6 animate-in fade-in slide-in-from-bottom-4 duration-500"
-                      >
-                        <Card className="border-2 border-primary/50 shadow-lg">
-                          <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5">
-                            <div className="flex items-start justify-between gap-4">
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-2">
-                                  <Badge variant="secondary" className="text-xs">
-                                    {isRTL ? '✨ مختار من الخريطة' : '✨ Selected from map'}
-                                  </Badge>
-                                </div>
-                                <CardTitle className="text-2xl flex items-center gap-3">
-                                  {(() => {
-                                    const category = categories.find(c => c.id === service.category_id);
-                                    if (category?.icon_name && category?.color_scheme) {
-                                      const IconComponent = getCategoryIcon(category.icon_name);
-                                      const colors = getCategoryColor(category.color_scheme);
-                                      return (
-                                        <div className={`${colors.bg} p-3 rounded-lg`}>
-                                          <IconComponent className={`w-8 h-8 ${colors.text}`} />
-                                        </div>
-                                      );
-                                    }
-                                    return null;
-                                  })()}
-                                  {service.name}
-                                </CardTitle>
-                                <p className="text-sm text-muted-foreground mt-2">
-                                  {service.description || (isRTL ? 'لا يوجد وصف' : 'No description')}
-                                </p>
-                              </div>
-                              <div className="flex gap-2 shrink-0">
-                                <FavoriteButton
-                                  type="service"
-                                  itemId={service.id}
-                                  itemData={{
-                                    title: service.name,
-                                    category: categories.find(c => c.id === service.category_id)?.[isRTL ? 'name_ar' : 'name_en'],
-                                  }}
-                                  size="sm"
-                                />
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => setSelectedServiceId(null)}
-                                >
-                                  ✕
-                                </Button>
-                              </div>
+        {activeTab === 'offers' ? (
+          <div>
+            {/* Services with Discounts Only */}
+            {filteredServices.filter(s => 
+              s.has_discount === true && 
+              s.discount_price && 
+              s.discount_price.toString().trim() !== '' &&
+              s.discount_percentage && 
+              s.discount_percentage > 0
+            ).length > 0 ? (
+              <div>
+                <div className="w-full max-w-full overflow-x-clip">
+                  <div className="grid w-full grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+                    {filteredServices.filter(s => 
+                      s.has_discount === true && 
+                      s.discount_price && 
+                      s.discount_price.toString().trim() !== '' &&
+                      s.discount_percentage && 
+                      s.discount_percentage > 0
+                    ).map((service) => {
+                      const provider = providers[service.provider_id];
+                      const category = categories.find(c => c.id === service.category_id);
+                      const isExpanded = expandedServiceId === service.id;
+                      const iconMap: { [key: string]: any } = {
+                        'Sparkles': Sparkles, 'Wrench': Wrench, 'Heart': Heart, 'Dumbbell': Dumbbell,
+                        'Scissors': Scissors, 'GraduationCap': GraduationCap, 'Stethoscope': Stethoscope,
+                        'Home': Home, 'Car': Car, 'Laptop': Laptop, 'Scale': Scale, 'DollarSign': DollarSign,
+                        'Users': Users, 'Cog': Cog, 'Palette': Palette, 'Shirt': Shirt, 'Code': Code,
+                        'Building': Building, 'Megaphone': Megaphone, 'Camera': Camera, 'Languages': Languages,
+                        'Briefcase': Briefcase, 'Calendar': Calendar, 'Sofa': Sofa, 'PenTool': PenTool,
+                        'Music': Music, 'Plane': Plane
+                      };
+                      const CategoryIcon = category?.icon_name ? iconMap[category.icon_name] || Users : Users;
+
+                      return (
+                        <div
+                          key={service.id}
+                          className="relative transition-all duration-300 bg-card border hover:border-primary/40"
+                          style={{
+                            borderRadius: '16px',
+                            boxShadow: '0 6px 20px rgba(0,0,0,0.15)',
+                            overflow: 'hidden'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = 'translateY(-2px)';
+                            e.currentTarget.style.boxShadow = '0 8px 25px rgba(0,0,0,0.2)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'translateY(0)';
+                            e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.15)';
+                          }}
+                        >
+                          {/* Compact Header - Always Visible */}
+                          <div
+                            className="flex flex-col p-3 cursor-pointer hover:bg-muted/50 transition-colors"
+                            onClick={() => setExpandedServiceId(isExpanded ? null : service.id)}
+                          >
+                            {/* Service Name with Category Icon */}
+                            <div 
+                              className="text-foreground flex items-center gap-2"
+                              style={{
+                                fontSize: '13px',
+                                fontWeight: '700',
+                                marginBottom: '10px',
+                                lineHeight: '1.4'
+                              }}
+                            >
+                              {(() => {
+                                const category = categories.find(c => c.id === service.category_id);
+                                if (category?.icon_name && category?.color_scheme) {
+                                  const IconComponent = getCategoryIcon(category.icon_name);
+                                  const colors = getCategoryColor(category.color_scheme);
+                                  return (
+                                    <div className={`${colors.bg} p-2 rounded-md flex-shrink-0`}>
+                                      <IconComponent className={`w-5 h-5 ${colors.text}`} />
+                                    </div>
+                                  );
+                                }
+                                return null;
+                              })()}
+                              <span
+                                style={{
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  display: '-webkit-box',
+                                  WebkitLineClamp: 2,
+                                  WebkitBoxOrient: 'vertical',
+                                  flex: 1
+                                }}
+                              >
+                                {service.name}
+                              </span>
                             </div>
-                          </CardHeader>
-                          <CardContent className="pt-4 sm:pt-6">
-                            <div className="grid md:grid-cols-2 gap-4 sm:gap-6">
-                              {/* معلومات الخدمة */}
-                              <div className="space-y-2 sm:space-y-4">
-                                <h3 className="font-semibold text-lg border-b pb-2">
-                                  {isRTL ? '📋 تفاصيل الخدمة' : '📋 Service Details'}
-                                </h3>
+                            
+                            {/* Rating & Reviews with Favorite Button */}
+                            {serviceRatings[service.id]?.avg > 0 ? (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '10px', justifyContent: 'space-between' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                  <div style={{
+                                    color: '#fbbf24',
+                                    fontSize: '12px',
+                                    letterSpacing: '0.5px',
+                                    lineHeight: 1
+                                  }}>
+                                    {[1, 2, 3, 4, 5].map((star) => {
+                                      const rating = serviceRatings[service.id]?.avg || 0;
+                                      const fullStars = Math.floor(rating);
+                                      const hasHalfStar = rating % 1 >= 0.5;
+                                      if (star <= fullStars) return '★';
+                                      if (star === fullStars + 1 && hasHalfStar) return '⯨';
+                                      return '☆';
+                                    }).join('')}
+                                  </div>
+                                  <span className="text-foreground" style={{ fontSize: '12px', fontWeight: '600' }}>
+                                    {serviceRatings[service.id].avg.toFixed(1)}
+                                  </span>
+                                  <span className="text-muted-foreground" style={{ fontSize: '10px' }}>
+                                    ({serviceRatings[service.id].count})
+                                  </span>
+                                </div>
                                 
-                                {/* السعر */}
-                                <div className="flex flex-col gap-1">
-                                  <span className="text-muted-foreground text-sm">{isRTL ? 'السعر:' : 'Price:'}</span>
-                                  {service.has_discount && service.discount_price ? (
-                                    <div className="flex items-center gap-3">
-                                      <div className="flex flex-col">
-                                        <span className="text-2xl font-bold text-red-600">
-                                          {service.discount_price} {provider?.currency_code || 'AED'}
-                                        </span>
-                                        <span className="text-base text-muted-foreground line-through decoration-red-500 decoration-2">
-                                          {service.approximate_price} {provider?.currency_code || 'AED'}
-                                        </span>
-                                      </div>
+                                {/* Favorite Button */}
+                                <div onClick={(e) => e.stopPropagation()}>
+                                  <FavoriteButton
+                                    type="service"
+                                    itemId={service.id}
+                                    itemData={{
+                                      title: service.name,
+                                      category: category?.[isRTL ? 'name_ar' : 'name_en'],
+                                      rating: serviceRatings[service.id]?.avg
+                                    }}
+                                    variant="ghost"
+                                    size="sm"
+                                  />
+                                </div>
+                              </div>
+                            ) : (
+                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px', height: '16px' }}>
+                                <div className="text-muted-foreground" style={{ fontSize: '10px' }}>
+                                  ⭐ {isRTL ? 'لا توجد تقييمات' : 'No reviews'}
+                                </div>
+                                
+                                {/* Favorite Button */}
+                                <div onClick={(e) => e.stopPropagation()}>
+                                  <FavoriteButton
+                                    type="service"
+                                    itemId={service.id}
+                                    itemData={{
+                                      title: service.name,
+                                      category: category?.[isRTL ? 'name_ar' : 'name_en'],
+                                      rating: serviceRatings[service.id]?.avg
+                                    }}
+                                    variant="ghost"
+                                    size="sm"
+                                  />
+                                </div>
+                              </div>
+                            )}
+                            
+                            {/* Price + Expand Arrow */}
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                {service.has_discount && service.discount_price ? (
+                                  <>
+                                    {/* Discounted Price */}
+                                    <div style={{ 
+                                      fontSize: '18px', 
+                                      color: '#dc2626', 
+                                      fontWeight: '700',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: '8px'
+                                    }}>
+                                      {service.discount_price} {provider?.currency_code || 'AED'}
                                       {service.discount_percentage && (
-                                        <Badge variant="destructive" className="bg-red-500 text-white">
-                                          {isRTL ? `خصم ${service.discount_percentage}%` : `${service.discount_percentage}% OFF`}
+                                        <Badge 
+                                          variant="destructive" 
+                                          className="bg-red-500 text-white text-[10px] px-1.5 py-0.5"
+                                        >
+                                          -{service.discount_percentage}%
                                         </Badge>
                                       )}
                                     </div>
-                                  ) : (
-                                    <span className="text-xl font-bold text-primary">
-                                      {service.approximate_price 
-                                        ? `${service.approximate_price} ${provider?.currency_code || 'AED'}`
-                                        : service.price_range || (isRTL ? 'السعر عند الطلب' : 'Price on request')
-                                      }
-                                    </span>
-                                  )}
-                                </div>
-                                
-                                {/* المدة */}
+                                    {/* Original Price - Strikethrough */}
+                                    <div style={{ 
+                                      fontSize: '14px', 
+                                      color: '#6b7280', 
+                                      fontWeight: '500',
+                                      textDecoration: 'line-through',
+                                      textDecorationColor: '#dc2626',
+                                      textDecorationThickness: '2px'
+                                    }}>
+                                      {service.approximate_price} {provider?.currency_code || 'AED'}
+                                    </div>
+                                  </>
+                                ) : null}
+                              </div>
+                              <ChevronDown
+                                className={`h-5 w-5 text-muted-foreground transition-transform duration-200 ${
+                                  isExpanded ? 'rotate-180' : ''
+                                }`}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Expanded Content */}
+                          {isExpanded && (
+                            <div 
+                              className="border-t px-3 pb-3 pt-2 animate-in slide-in-from-top-2 duration-200"
+                            >
+                              <div className="space-y-2">
+                                {/* Description */}
+                                {service.description && (
+                                  <p className="text-foreground" style={{ fontSize: '14px', lineHeight: '1.6', margin: 0 }}>
+                                    {service.description}
+                                  </p>
+                                )}
+
+                                {/* Provider */}
+                                <p className="text-muted-foreground" style={{ fontSize: '12px' }}>
+                                  <span className="text-primary" style={{ fontWeight: '600' }}>
+                                    {isRTL ? 'المزود:' : 'Provider:'}
+                                  </span> {provider?.full_name || t.ui.noData}
+                                </p>
+
+                                {/* Duration */}
                                 {service.duration_minutes && (
-                                  <div className="flex items-center gap-2 text-sm">
-                                    <Clock className="w-4 h-4 text-muted-foreground" />
-                                    <span>{service.duration_minutes} {isRTL ? 'دقيقة' : 'minutes'}</span>
-                                  </div>
+                                  <p className="text-muted-foreground" style={{ fontSize: '12px' }}>
+                                    <span className="text-primary" style={{ fontWeight: '600' }}>
+                                      {isRTL ? 'المدة:' : 'Duration:'}
+                                    </span> {service.duration_minutes} {isRTL ? 'دقيقة' : 'minutes'}
+                                  </p>
                                 )}
-                                
-                                {/* الفئة */}
-                                <div className="flex items-center gap-2">
-                                  <Badge variant="outline">
-                                    {categories.find(c => c.id === service.category_id)?.[isRTL ? 'name_ar' : 'name_en']}
-                                  </Badge>
+
+                                {/* City */}
+                                {provider?.city && (
+                                  <p className="text-muted-foreground" style={{ fontSize: '12px' }}>
+                                    <span className="text-primary" style={{ fontWeight: '600' }}>
+                                      {isRTL ? 'المدينة:' : 'City:'}
+                                    </span> {provider.city}
+                                  </p>
+                                )}
+
+                                {/* Buttons */}
+                                <div className="space-y-2 pt-2">
+                                  {service.booking_enabled && (
+                                    <Button
+                                      className="w-full"
+                                      style={{
+                                        background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                                        border: 'none'
+                                      }}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleServiceClick(service);
+                                      }}
+                                    >
+                                      <Calendar className="h-4 w-4 mr-2" />
+                                      {isRTL ? 'حجز موعد' : 'Book Appointment'}
+                                    </Button>
+                                  )}
+                                  <Button
+                                    variant="outline"
+                                    className="w-full"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      window.location.href = `/provider/${service.provider_id}`;
+                                    }}
+                                  >
+                                    <ExternalLink className="h-4 w-4 mr-2" />
+                                    {isRTL ? 'عرض كل الخدمات' : 'View All Services'}
+                                  </Button>
                                 </div>
                               </div>
-                              
-                              {/* معلومات المزود */}
-                              <div className="space-y-2 sm:space-y-4">
-                                <h3 className="font-semibold text-lg border-b pb-2">
-                                  {isRTL ? '👤 معلومات المزود' : '👤 Provider Info'}
-                                </h3>
-                                
-                                <div className="flex items-center gap-3 p-3 card-nested rounded-lg">
-                                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-lg">
-                                    {provider.full_name.charAt(0).toUpperCase()}
-                                  </div>
-                                  <div>
-                                    <div className="font-semibold">{provider.full_name}</div>
-                                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                                      <MapPin className="w-3 h-3" />
-                                      <span>{provider.city || (isRTL ? 'مزود خدمة' : 'Service Provider')}</span>
-                                    </div>
-                                  </div>
-                                </div>
-                                
-                                {/* المسافة */}
-                                {userLocation && provider.latitude && provider.longitude && (
-                                  <div className="flex items-center gap-2 p-3 bg-primary/10 rounded-lg">
-                                    <MapPin className="w-5 h-5 text-primary" />
-                                    <div>
-                                      <div className="text-sm text-muted-foreground">
-                                        {isRTL ? 'المسافة التقديرية' : 'Estimated Distance'}
-                                      </div>
-                                      <div className="text-lg font-semibold text-primary">
-                                        {formatDistance(
-                                          calculateDistance(
-                                            userLocation,
-                                            { latitude: provider.latitude, longitude: provider.longitude }
-                                          ),
-                                          currentLanguage === 'ar' ? 'ar' : 'en'
-                                        )}
-                                      </div>
-                                    </div>
-                                  </div>
-                                )}
-                                
-                                {/* الموقع */}
-                                {provider.location_address && (
-                                  <div className="flex items-start gap-2 text-sm">
-                                    <MapPin className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
-                                    <span className="text-muted-foreground">{provider.location_address}</span>
-                                  </div>
-                                )}
-                              </div>
                             </div>
-                            
-                            {/* الأزرار */}
-                            <div className="flex flex-wrap gap-3 mt-6 pt-6 border-t">
-                              {service.booking_enabled && (
-                                <Button
-                                  size="lg"
-                                  onClick={() => {
-                                    setBookingService(service);
-                                    setSelectedServiceId(null);
-                                  }}
-                                  className="flex-1 min-w-[200px]"
-                                >
-                                  <Calendar className="w-4 h-4 mr-2" />
-                                  {isRTL ? 'حجز موعد' : 'Book Appointment'}
-                                </Button>
-                              )}
-                              
-                              <Button
-                                variant="outline"
-                                size="lg"
-                                onClick={() => {
-                                  window.location.href = `/provider/${service.provider_id}`;
-                                }}
-                                className="flex-1 min-w-[200px]"
-                              >
-                                <ExternalLink className="w-4 h-4 mr-2" />
-                                {isRTL ? 'عرض كل خدمات المزود' : 'View All Provider Services'}
-                              </Button>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </div>
-                    );
-                  })()}
-            
-            {/* Help Message */}
-            {(filteredServices.length - mapMarkers.length) > 0 && (
-              <div className="p-4 bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-                <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                  {isRTL 
-                    ? '💡 بعض مقدمي الخدمات لم يضيفوا موقعهم بعد. يمكنهم إضافة الموقع من صفحة تحرير الملف الشخصي.'
-                    : '💡 Some service providers have not added their location yet. They can add it from their Edit Profile page.'
-                  }
-                </p>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
+            ) : (
+              /* Empty State */
+              <Card>
+                <CardContent className="p-12 text-center">
+                  <Sparkles className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">{isRTL ? 'لا توجد عروض' : 'No Offers Available'}</h3>
+                  <p className="text-muted-foreground">{isRTL ? 'لا توجد خدمات بتخفيضات حالياً' : 'No services with discounts available right now.'}</p>
+                </CardContent>
+              </Card>
             )}
           </div>
-        ) : (
-          /* List View */
-          <div className="w-full max-w-full overflow-x-clip">
-            <div className="grid w-full grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-              {filteredServices.map((service) => {
-                const provider = providers[service.provider_id];
-                const isExpanded = expandedServiceId === service.id;
-                const category = categories.find(c => c.id === service.category_id);
-                
-                // Icon mapping for categories
-                const iconMap: { [key: string]: any } = {
-                  'Sparkles': Sparkles, 'Wrench': Wrench, 'Heart': Heart, 'Dumbbell': Dumbbell,
-                  'Scissors': Scissors, 'GraduationCap': GraduationCap, 'Stethoscope': Stethoscope,
-                  'Home': Home, 'Car': Car, 'Laptop': Laptop, 'Scale': Scale, 'DollarSign': DollarSign,
-                  'Users': Users, 'Cog': Cog, 'Palette': Palette, 'Shirt': Shirt, 'Code': Code,
-                  'Building': Building, 'Megaphone': Megaphone, 'Camera': Camera, 'Languages': Languages,
-                  'Briefcase': Briefcase, 'Calendar': Calendar, 'Sofa': Sofa, 'PenTool': PenTool,
-                  'Music': Music, 'Plane': Plane
-                };
-                const CategoryIcon = category?.icon_name ? iconMap[category.icon_name] || Users : Users;
+        ) : null}
+            
 
-                return (
-                  <div
-                    key={service.id}
-                    className="relative transition-all duration-300 bg-card border hover:border-primary/40"
-                    style={{
-                      borderRadius: '16px',
-                      boxShadow: '0 6px 20px rgba(0,0,0,0.15)',
-                      overflow: 'hidden'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = 'translateY(-2px)';
-                      e.currentTarget.style.boxShadow = '0 8px 25px rgba(0,0,0,0.2)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.15)';
-                    }}
-                  >
-                    {/* TOP Badge */}
-                    {serviceRatings[service.id]?.avg >= 4.5 && (
-                      <div 
-                        style={{
-                          position: 'absolute',
-                          top: '8px',
-                          [isRTL ? 'left' : 'right']: '8px',
-                          background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                          color: 'white',
-                          fontSize: '9px',
-                          fontWeight: '700',
-                          padding: '3px 7px',
-                          borderRadius: '10px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '2px',
-                          boxShadow: '0 2px 8px rgba(16, 185, 129, 0.3)',
-                          zIndex: 10
-                        }}
-                      >
-                        <span>⭐</span>
-                        <span>{isRTL ? 'ممتاز' : 'TOP'}</span>
-                      </div>
-                    )}
+            
+
+
+
+
+
                     
-                    {/* Compact Header - Always Visible */}
-                    <div
-                      className="flex flex-col p-3 cursor-pointer hover:bg-muted/50 transition-colors"
-                      onClick={() => setExpandedServiceId(isExpanded ? null : service.id)}
-                    >
-                      {/* Service Name with Category Icon */}
-                      <div 
-                        className="text-foreground flex items-center gap-2"
-                        style={{
-                          fontSize: '13px',
-                          fontWeight: '700',
-                          marginBottom: '10px',
-                          lineHeight: '1.4',
-                          paddingRight: serviceRatings[service.id]?.avg >= 4.5 ? '50px' : '0'
-                        }}
-                      >
-                        {(() => {
-                          const category = categories.find(c => c.id === service.category_id);
-                          if (category?.icon_name && category?.color_scheme) {
-                            const IconComponent = getCategoryIcon(category.icon_name);
-                            const colors = getCategoryColor(category.color_scheme);
-                            return (
-                              <div className={`${colors.bg} p-2 rounded-md flex-shrink-0`}>
-                                <IconComponent className={`w-5 h-5 ${colors.text}`} />
-                              </div>
-                            );
-                          }
-                          return null;
-                        })()}
-                        <span
-                          style={{
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            display: '-webkit-box',
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: 'vertical',
-                            flex: 1
-                          }}
-                        >
-                          {service.name}
-                        </span>
-                      </div>
-                      
-                      {/* Rating & Reviews with Favorite Button */}
-                      {serviceRatings[service.id]?.avg > 0 ? (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '10px', justifyContent: 'space-between' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            <div style={{
-                              color: '#fbbf24',
-                              fontSize: '12px',
-                              letterSpacing: '0.5px',
-                              lineHeight: 1
-                            }}>
-                              {[1, 2, 3, 4, 5].map((star) => {
-                                const rating = serviceRatings[service.id]?.avg || 0;
-                                const fullStars = Math.floor(rating);
-                                const hasHalfStar = rating % 1 >= 0.5;
-                                if (star <= fullStars) return '★';
-                                if (star === fullStars + 1 && hasHalfStar) return '⯨';
-                                return '☆';
-                              }).join('')}
-                            </div>
-                            <span className="text-foreground" style={{ fontSize: '12px', fontWeight: '600' }}>
-                              {serviceRatings[service.id].avg.toFixed(1)}
-                            </span>
-                            <span className="text-muted-foreground" style={{ fontSize: '10px' }}>
-                              ({serviceRatings[service.id].count})
-                            </span>
-                          </div>
-                          
-                          {/* Favorite Button */}
-                          <div onClick={(e) => e.stopPropagation()}>
-                            <FavoriteButton
-                              type="service"
-                              itemId={service.id}
-                              itemData={{
-                                title: service.name,
-                                category: category?.[isRTL ? 'name_ar' : 'name_en'],
-                                rating: serviceRatings[service.id]?.avg
-                              }}
-                              variant="ghost"
-                              size="sm"
-                            />
-                          </div>
-                        </div>
-                      ) : (
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px', height: '16px' }}>
-                          <div className="text-muted-foreground" style={{ fontSize: '10px' }}>
-                            ⭐ {isRTL ? 'لا توجد تقييمات' : 'No reviews'}
-                          </div>
-                          
-                          {/* Favorite Button */}
-                          <div onClick={(e) => e.stopPropagation()}>
-                            <FavoriteButton
-                              type="service"
-                              itemId={service.id}
-                              itemData={{
-                                title: service.name,
-                                category: category?.[isRTL ? 'name_ar' : 'name_en'],
-                                rating: serviceRatings[service.id]?.avg
-                              }}
-                              variant="ghost"
-                              size="sm"
-                            />
-                          </div>
-                        </div>
-                      )}
-                      
-                      {/* Price + Expand Arrow */}
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                          {service.has_discount && service.discount_price ? (
-                            <>
-                              {/* Discounted Price */}
-                              <div style={{ 
-                                fontSize: '18px', 
-                                color: '#dc2626', 
-                                fontWeight: '700',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px'
-                              }}>
-                                {service.discount_price} {provider?.currency_code || 'AED'}
-                                {service.discount_percentage && (
-                                  <Badge 
-                                    variant="destructive" 
-                                    className="bg-red-500 text-white text-[10px] px-1.5 py-0.5"
-                                  >
-                                    -{service.discount_percentage}%
-                                  </Badge>
-                                )}
-                              </div>
-                              {/* Original Price - Strikethrough */}
-                              <div style={{ 
-                                fontSize: '14px', 
-                                color: '#6b7280', 
-                                fontWeight: '500',
-                                textDecoration: 'line-through',
-                                textDecorationColor: '#dc2626',
-                                textDecorationThickness: '2px'
-                              }}>
-                                {service.approximate_price} {provider?.currency_code || 'AED'}
-                              </div>
-                            </>
-                          ) : (
-                            /* Regular Price */
-                            <div style={{ fontSize: '18px', color: '#f59e0b', fontWeight: '700' }}>
-                              {service.approximate_price 
-                                ? `${service.approximate_price} ${provider?.currency_code || 'AED'}`
-                                : service.price_range || (isRTL ? 'السعر عند الطلب' : 'Price on request')
-                              }
-                            </div>
-                          )}
-                        </div>
-                        <ChevronDown
-                          className={`h-5 w-5 text-muted-foreground transition-transform duration-200 ${
-                            isExpanded ? 'rotate-180' : ''
-                          }`}
-                        />
-                      </div>
-                    </div>
 
-                    {/* Expanded Content */}
-                    {isExpanded && (
-                      <div 
-                        className="border-t px-3 pb-3 pt-2 animate-in slide-in-from-top-2 duration-200"
-                      >
-                        <div className="space-y-2">
-                          {/* Description */}
-                          {service.description && (
-                            <p className="text-foreground" style={{ fontSize: '14px', lineHeight: '1.6', margin: 0 }}>
-                              {service.description}
-                            </p>
-                          )}
 
-                          {/* Provider */}
-                          <p className="text-muted-foreground" style={{ fontSize: '12px' }}>
-                            <span className="text-primary" style={{ fontWeight: '600' }}>
-                              {isRTL ? 'المزود:' : 'Provider:'}
-                            </span> {provider?.full_name || t.ui.noData}
-                          </p>
 
-                          {/* Duration */}
-                          {service.duration_minutes && (
-                            <p className="text-muted-foreground" style={{ fontSize: '12px' }}>
-                              <span className="text-primary" style={{ fontWeight: '600' }}>
-                                {isRTL ? 'المدة:' : 'Duration:'}
-                              </span> {service.duration_minutes} {isRTL ? 'دقيقة' : 'minutes'}
-                            </p>
-                          )}
 
-                          {/* City */}
-                          {provider?.city && (
-                            <p className="text-muted-foreground" style={{ fontSize: '12px' }}>
-                              <span className="text-primary" style={{ fontWeight: '600' }}>
-                                {isRTL ? 'المدينة:' : 'City:'}
-                              </span> {provider.city}
-                            </p>
-                          )}
-
-                          {/* Distance */}
-                          {(service as any).distance !== undefined && (
-                            <div className="text-muted-foreground" style={{ 
-                              display: 'flex', 
-                              alignItems: 'center', 
-                              gap: '6px',
-                              fontSize: '12px'
-                            }}>
-                              <MapPin className="h-4 w-4 text-primary" />
-                              <span className="text-primary" style={{ fontWeight: '600' }}>
-                                {formatDistance((service as any).distance, currentLanguage === 'ar' ? 'ar' : 'en')}
-                              </span>
-                              <span>
-                                {isRTL ? 'من موقعك' : 'from your location'}
-                              </span>
-                            </div>
-                          )}
-
-                          {/* Buttons */}
-                          <div className="space-y-2 pt-2">
-                            {service.booking_enabled && (
-                              <Button
-                                className="w-full"
-                                style={{
-                                  background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-                                  border: 'none'
-                                }}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleServiceClick(service);
-                                }}
-                              >
-                                <Calendar className="h-4 w-4 mr-2" />
-                                {isRTL ? 'حجز موعد' : 'Book Appointment'}
-                              </Button>
-                            )}
-                            <Button
-                              variant="outline"
-                              className="w-full"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (provider?.id) {
-                                  window.location.href = `/provider/${provider.id}`;
-                                }
-                              }}
-                            >
-                              <ExternalLink className="h-4 w-4 mr-2" />
-                              {isRTL ? 'عرض المزود' : 'View Provider'}
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        ))}
 
         {/* Load More */}
         {activeTab === 'services' && filteredServices.length > 0 && (
