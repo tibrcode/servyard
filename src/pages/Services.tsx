@@ -215,46 +215,84 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
     return filtered;
   }, [services, selectedCategory, searchQuery]);
 
-  // فلترة للقائمة (تشمل فلترة الموقع + إضافة المسافة)
+  // فلترة للقائمة (تشمل فلترة الموقع + الترتيب)
   const filteredServices = useMemo(() => {
-    let filtered = baseFilteredServices;
+    let filtered = [...baseFilteredServices];
 
     // إضافة معلومات المسافة لكل خدمة (إذا كان موقع المستخدم متوفر)
     if (userLocation) {
-      const servicesWithLocation = filtered
-        .map(service => {
-          const provider = providers[service.provider_id];
-          if (!provider?.latitude || !provider?.longitude) {
-            return { ...service, distance: undefined };
-          }
-          
-          const distance = calculateDistance(
-            userLocation,
-            { latitude: provider.latitude, longitude: provider.longitude }
-          );
-          
-          return { ...service, distance };
-        });
+      filtered = filtered.map(service => {
+        const provider = providers[service.provider_id];
+        if (!provider?.latitude || !provider?.longitude) {
+          return { ...service, distance: undefined };
+        }
+        
+        const distance = calculateDistance(
+          userLocation,
+          { latitude: provider.latitude, longitude: provider.longitude }
+        );
+        
+        return { ...service, distance };
+      });
 
       // فلترة حسب النطاق الجغرافي (فقط في وضع القائمة)
       if (radiusKm > 0 && viewMode === 'list') {
-        filtered = servicesWithLocation
-          .filter(s => s.distance !== undefined && s.distance <= radiusKm)
-          .sort((a, b) => (a.distance || 0) - (b.distance || 0));
-      } else {
-        // ترتيب حسب المسافة بدون فلترة
-        filtered = servicesWithLocation.sort((a, b) => {
-          if (a.distance === undefined) return 1;
-          if (b.distance === undefined) return -1;
-          return a.distance - b.distance;
-        });
+        filtered = filtered.filter(s => (s as any).distance !== undefined && (s as any).distance <= radiusKm);
       }
-      
-      return filtered;
     }
 
+    // تطبيق الترتيب
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'nearest':
+          const distA = (a as any).distance;
+          const distB = (b as any).distance;
+          // If distance is undefined (no location), put at the end
+          if (distA === undefined && distB === undefined) return 0;
+          if (distA === undefined) return 1;
+          if (distB === undefined) return -1;
+          return distA - distB;
+
+        case 'rating':
+          const ratingA = serviceRatings[a.id]?.avg || 0;
+          const ratingB = serviceRatings[b.id]?.avg || 0;
+          return ratingB - ratingA; // Highest rated first
+          
+        case 'price-low':
+          const priceA_low = a.has_discount && a.discount_price 
+            ? parseFloat(a.discount_price.toString().replace(/[^0-9.]/g, '')) || 0
+            : parseFloat((a.approximate_price || '0').toString().replace(/[^0-9.]/g, '')) || 0;
+          const priceB_low = b.has_discount && b.discount_price 
+            ? parseFloat(b.discount_price.toString().replace(/[^0-9.]/g, '')) || 0
+            : parseFloat((b.approximate_price || '0').toString().replace(/[^0-9.]/g, '')) || 0;
+          return priceA_low - priceB_low;
+          
+        case 'price-high':
+          const priceA_high = a.has_discount && a.discount_price 
+            ? parseFloat(a.discount_price.toString().replace(/[^0-9.]/g, '')) || 0
+            : parseFloat((a.approximate_price || '0').toString().replace(/[^0-9.]/g, '')) || 0;
+          const priceB_high = b.has_discount && b.discount_price 
+            ? parseFloat(b.discount_price.toString().replace(/[^0-9.]/g, '')) || 0
+            : parseFloat((b.approximate_price || '0').toString().replace(/[^0-9.]/g, '')) || 0;
+          return priceB_high - priceA_high;
+          
+        case 'relevance':
+        default:
+          // If user location is available, sort by distance
+          if (userLocation) {
+            const distA = (a as any).distance;
+            const distB = (b as any).distance;
+            if (distA === undefined && distB === undefined) return 0;
+            if (distA === undefined) return 1;
+            if (distB === undefined) return -1;
+            return distA - distB;
+          }
+          return 0;
+      }
+    });
+
     return filtered;
-  }, [baseFilteredServices, userLocation, radiusKm, providers, viewMode]);
+  }, [baseFilteredServices, userLocation, radiusKm, providers, viewMode, sortBy, serviceRatings]);
 
   // حساب mapMarkers من الفلترة الأساسية (بدون فلترة الموقع)
   const mapMarkers = useMemo(() => {
@@ -391,6 +429,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="relevance">{t.ui.relevance}</SelectItem>
+                  <SelectItem value="nearest">{isRTL ? 'الأقرب مسافة' : 'Nearest'}</SelectItem>
                   <SelectItem value="rating">{t.ui.highestRated}</SelectItem>
                   <SelectItem value="price-low">{t.ui.priceLowHigh}</SelectItem>
                   <SelectItem value="price-high">{t.ui.priceHighLow}</SelectItem>
