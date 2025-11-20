@@ -684,70 +684,141 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
               {isRTL ? 'الخدمات' : 'Services'}
             </TabsTrigger>
             <TabsTrigger value="offers" className="flex items-center justify-center">
-              {isRTL ? 'العروض' : 'Offers'}
+              {isRTL ? 'العروض والتخفيضات' : 'Offers & Discounts'}
             </TabsTrigger>
           </TabsList>
         </Tabs>
 
         {activeTab === 'offers' ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-            {offersList.length === 0 ? (
-              <div className="col-span-full text-center text-sm text-muted-foreground">
-                {isRTL ? 'لا توجد عروض حالياً' : 'No offers available right now.'}
+          <div>
+            {/* Services with Discounts */}
+            {filteredServices.filter(s => s.has_discount && s.discount_price).length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-lg font-semibold mb-4">{isRTL ? '🎉 خدمات بتخفيضات' : '🎉 Services with Discounts'}</h3>
+                <div className="w-full max-w-full overflow-x-clip">
+                  <div className="grid w-full grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+                    {filteredServices.filter(s => s.has_discount && s.discount_price).map((service) => {
+                      const provider = providers[service.provider_id];
+                      const category = categories.find(c => c.id === service.category_id);
+                      const iconMap: { [key: string]: any } = {
+                        'Sparkles': Sparkles, 'Wrench': Wrench, 'Heart': Heart, 'Dumbbell': Dumbbell,
+                        'Scissors': Scissors, 'GraduationCap': GraduationCap, 'Stethoscope': Stethoscope,
+                        'Home': Home, 'Car': Car, 'Laptop': Laptop, 'Scale': Scale, 'DollarSign': DollarSign,
+                        'Users': Users, 'Cog': Cog, 'Palette': Palette, 'Shirt': Shirt, 'Code': Code,
+                        'Building': Building, 'Megaphone': Megaphone, 'Camera': Camera, 'Languages': Languages,
+                        'Briefcase': Briefcase, 'Calendar': Calendar, 'Sofa': Sofa, 'PenTool': PenTool,
+                        'Music': Music, 'Plane': Plane
+                      };
+                      const CategoryIcon = category?.icon_name ? iconMap[category.icon_name] || Users : Users;
+
+                      return (
+                        <Card key={service.id} className="bg-gradient-to-br from-red-50/50 to-orange-50/50 dark:from-red-950/20 dark:to-orange-950/20 border-red-200 dark:border-red-800">
+                          <CardHeader className="pb-3">
+                            <div className="flex items-start gap-2">
+                              <div className={`${category?.color_scheme ? getCategoryColor(category.color_scheme).bg : 'bg-primary/10'} p-2 rounded-md flex-shrink-0`}>
+                                <CategoryIcon className={`w-5 h-5 ${category?.color_scheme ? getCategoryColor(category.color_scheme).text : 'text-primary'}`} />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <h3 className="font-semibold text-sm leading-snug break-words">{service.name}</h3>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <span className="text-2xl font-bold text-red-600">{service.discount_price} {provider?.currency_code || 'AED'}</span>
+                                  {service.discount_percentage && (
+                                    <Badge className="bg-red-500 text-white">-{service.discount_percentage}%</Badge>
+                                  )}
+                                </div>
+                                <div className="text-sm text-muted-foreground line-through">
+                                  {service.approximate_price} {provider?.currency_code || 'AED'}
+                                </div>
+                              </div>
+                            </div>
+                          </CardHeader>
+                          <CardContent className="space-y-2 pt-2">
+                            {service.description && <p className="text-xs text-muted-foreground line-clamp-2">{service.description}</p>}
+                            <div className="flex items-center justify-between pt-2 border-t">
+                              <span className="text-xs font-medium">{provider?.full_name}</span>
+                              <Button size="sm" variant="default" onClick={() => handleServiceClick(service)}>
+                                {isRTL ? 'عرض' : 'View'}
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
-            ) : (
-              offersList.map((offer) => (
-                <Card key={offer.id} className="shadow-sm">
-                  <CardHeader className="flex items-start justify-between gap-2">
-                    <div className="flex-1">
-                      <CardTitle className="text-sm font-medium">
-                        {offer.title || (isRTL ? 'عرض' : 'Offer')}
-                      </CardTitle>
-                      {(offer.discount_percentage || offer.discount_amount) ? (
-                        <Badge variant="secondary" className="mt-1 whitespace-nowrap">
-                          {offer.discount_percentage ? `${offer.discount_percentage}%` : `${offer.discount_amount}`}
-                        </Badge>
-                      ) : null}
-                    </div>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={async () => {
-                        if (window.confirm(isRTL ? 'هل تريد حذف هذا العرض؟' : 'Are you sure you want to delete this offer?')) {
-                          try {
-                            await deleteDoc(doc(db, 'offers', offer.id));
-                            setOffersList(offersList.filter(o => o.id !== offer.id));
-                            toast({
-                              title: isRTL ? 'تم الحذف' : 'Deleted',
-                              description: isRTL ? 'تم حذف العرض بنجاح' : 'Offer deleted successfully'
-                            });
-                          } catch (error) {
-                            toast({
-                              variant: "destructive",
-                              title: isRTL ? 'خطأ' : 'Error',
-                              description: isRTL ? 'فشل حذف العرض' : 'Failed to delete offer'
-                            });
-                          }
-                        }
-                      }}
-                      className="text-destructive hover:text-destructive"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground mb-2">{offer.description}</p>
-                    <div className="flex items-center justify-between">
-                      <div className="text-xs text-muted-foreground">
-                        {providers[offer.provider_id]?.full_name || (isRTL ? 'مزود' : 'Provider')}
-                      </div>
-                      <a href={`/provider/${offer.provider_id}`} className="text-xs text-primary hover:underline">
-                        {isRTL ? 'عرض الملف' : 'View Provider'}
-                      </a>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
+            )}
+
+            {/* Provider Offers */}
+            {offersList.length > 0 && (
+              <div>
+                <h3 className="text-lg font-semibold mb-4">{isRTL ? '🎁 عروض المزودين' : '🎁 Provider Offers'}</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {offersList.map((offer) => (
+                    <Card key={offer.id} className="shadow-sm">
+                      <CardHeader className="flex items-start justify-between gap-2">
+                        <div className="flex-1">
+                          <CardTitle className="text-sm font-medium">
+                            {offer.title || (isRTL ? 'عرض' : 'Offer')}
+                          </CardTitle>
+                          {(offer.discount_percentage || offer.discount_amount) ? (
+                            <Badge variant="secondary" className="mt-1 whitespace-nowrap">
+                              {offer.discount_percentage ? `${offer.discount_percentage}%` : `${offer.discount_amount}`}
+                            </Badge>
+                          ) : null}
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={async () => {
+                            if (window.confirm(isRTL ? 'هل تريد حذف هذا العرض؟' : 'Are you sure you want to delete this offer?')) {
+                              try {
+                                await deleteDoc(doc(db, 'offers', offer.id));
+                                setOffersList(offersList.filter(o => o.id !== offer.id));
+                                toast({
+                                  title: isRTL ? 'تم الحذف' : 'Deleted',
+                                  description: isRTL ? 'تم حذف العرض بنجاح' : 'Offer deleted successfully'
+                                });
+                              } catch (error) {
+                                toast({
+                                  variant: "destructive",
+                                  title: isRTL ? 'خطأ' : 'Error',
+                                  description: isRTL ? 'فشل حذف العرض' : 'Failed to delete offer'
+                                });
+                              }
+                            }
+                          }}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-muted-foreground mb-2">{offer.description}</p>
+                        <div className="flex items-center justify-between">
+                          <div className="text-xs text-muted-foreground">
+                            {providers[offer.provider_id]?.full_name || (isRTL ? 'مزود' : 'Provider')}
+                          </div>
+                          <a href={`/provider/${offer.provider_id}`} className="text-xs text-primary hover:underline">
+                            {isRTL ? 'عرض الملف' : 'View Provider'}
+                          </a>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Empty State */}
+            {offersList.length === 0 && filteredServices.filter(s => s.has_discount && s.discount_price).length === 0 && (
+              <Card>
+                <CardContent className="p-12 text-center">
+                  <Sparkles className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">{isRTL ? 'لا توجد عروض' : 'No Offers Available'}</h3>
+                  <p className="text-muted-foreground">{isRTL ? 'لا توجد خدمات بتخفيضات أو عروض حالياً' : 'No services with discounts or offers available right now.'}</p>
+                </CardContent>
+              </Card>
             )}
           </div>
         ) : null}
