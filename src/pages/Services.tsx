@@ -692,11 +692,23 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
         {activeTab === 'offers' ? (
           <div>
             {/* Services with Discounts Only */}
-            {filteredServices.filter(s => s.has_discount && s.discount_price).length > 0 ? (
+            {filteredServices.filter(s => 
+              s.has_discount === true && 
+              s.discount_price && 
+              s.discount_price.toString().trim() !== '' &&
+              s.discount_percentage && 
+              s.discount_percentage > 0
+            ).length > 0 ? (
               <div>
                 <div className="w-full max-w-full overflow-x-clip">
                   <div className="grid w-full grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-                    {filteredServices.filter(s => s.has_discount && s.discount_price).map((service) => {
+                    {filteredServices.filter(s => 
+                      s.has_discount === true && 
+                      s.discount_price && 
+                      s.discount_price.toString().trim() !== '' &&
+                      s.discount_percentage && 
+                      s.discount_percentage > 0
+                    ).map((service) => {
                       const provider = providers[service.provider_id];
                       const category = categories.find(c => c.id === service.category_id);
                       const isExpanded = expandedServiceId === service.id;
