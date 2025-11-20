@@ -417,39 +417,37 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
     <div className="min-h-screen flex flex-col overflow-x-hidden max-w-[100vw]" dir={isRTL ? 'rtl' : 'ltr'}>
       <main className="flex-1 container mx-auto px-3 sm:px-4 py-6 sm:py-8 overflow-x-hidden touch-pan-y max-w-[100vw]">
         {/* 1. Location-based Filter (Top) */}
-        <Card className="mb-6">
-          <CardContent className="pt-6">
-            {userLocation ? (
-              <div className="space-y-2">
-                <div className="flex justify-between items-center mb-2">
-                  <Label>
-                    {isRTL ? "نطاق البحث:" : "Search Radius:"}
-                  </Label>
-                  <Badge variant="secondary">
-                    {radiusKm} {isRTL ? "كم" : "km"}
-                  </Badge>
-                </div>
-                <Slider
-                  value={[radiusKm]}
-                  onValueChange={(values) => setRadiusKm(values[0])}
-                  min={5}
-                  max={500}
-                  step={5}
-                  className="w-full py-2"
-                />
+        <div className="mb-6">
+          {userLocation ? (
+            <div className="bg-muted/30 rounded-lg p-3 border border-border/50">
+              <div className="flex justify-between items-center mb-3">
+                <Label className="text-muted-foreground font-normal">
+                  {isRTL ? "نطاق البحث:" : "Search Radius:"}
+                </Label>
+                <span className="text-sm font-semibold">
+                  {radiusKm} {isRTL ? "كم" : "km"}
+                </span>
               </div>
-            ) : (
-              <div className="text-center py-2">
-                <p className="text-sm text-muted-foreground mb-2">
-                  {isRTL 
-                    ? "يرجى تحديد موقعك من الشريط العلوي لعرض الخدمات القريبة" 
-                    : "Please set your location from the header to see nearby services"
-                  }
-                </p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+              <Slider
+                value={[radiusKm]}
+                onValueChange={(values) => setRadiusKm(values[0])}
+                min={5}
+                max={500}
+                step={5}
+                className="w-full"
+              />
+            </div>
+          ) : (
+            <div className="text-center py-2 bg-muted/30 rounded-lg border border-border/50">
+              <p className="text-sm text-muted-foreground">
+                {isRTL 
+                  ? "يرجى تحديد موقعك من الشريط العلوي لعرض الخدمات القريبة" 
+                  : "Please set your location from the header to see nearby services"
+                }
+              </p>
+            </div>
+          )}
+        </div>
 
         {/* 2. Categories & Sort (Below Radius) */}
         <div className="flex flex-col sm:flex-row gap-2 min-w-0 mb-6">
@@ -484,10 +482,10 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
         {/* 3. Services / Offers Tabs */}
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
           <TabsList className="grid w-full grid-cols-2 mb-6 h-14">
-            <TabsTrigger value="services" className="flex items-center justify-center h-full text-base font-medium">
+            <TabsTrigger value="services" className="w-full h-full text-base font-medium">
               {isRTL ? 'الخدمات' : 'Services'}
             </TabsTrigger>
-            <TabsTrigger value="offers" className="flex items-center justify-center h-full text-base font-medium">
+            <TabsTrigger value="offers" className="w-full h-full text-base font-medium">
               {isRTL ? 'العروض والتخفيضات' : 'Offers & Discounts'}
             </TabsTrigger>
           </TabsList>
@@ -497,12 +495,12 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
         {activeTab === 'services' && (
           <>
             {/* 4. View Toggle (List/Map) */}
-            <div className="flex justify-center mb-6">
-              <div className="flex items-center bg-muted p-1 rounded-lg border shadow-sm">
+            <div className="mb-6">
+              <div className="grid grid-cols-2 gap-1 bg-muted p-1 rounded-lg border shadow-sm w-full">
                 <Button
                   variant={viewMode === 'list' ? 'default' : 'ghost'}
                   size="sm"
-                  className={`px-6 h-9 rounded-md transition-all duration-200 ${
+                  className={`w-full h-9 rounded-md transition-all duration-200 ${
                     viewMode === 'list' 
                       ? 'bg-primary text-primary-foreground shadow-sm' 
                       : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
@@ -515,7 +513,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                 <Button
                   variant={viewMode === 'map' ? 'default' : 'ghost'}
                   size="sm"
-                  className={`px-6 h-9 rounded-md transition-all duration-200 ${
+                  className={`w-full h-9 rounded-md transition-all duration-200 ${
                     viewMode === 'map' 
                       ? 'bg-primary text-primary-foreground shadow-sm' 
                       : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
