@@ -76,7 +76,7 @@ const ProviderProfile = ({ currentLanguage, onLanguageChange }: ProviderProfileP
     const title = displayProfile?.full_name || 'ServYard';
     try {
       if ('share' in navigator) {
-        await (navigator as any).share({ title, text: title, url: shareUrl });
+        await (navigator as any).share({ title, text: `${title} | ServYard 📱`, url: shareUrl });
         return;
       }
     } catch (err) {
@@ -244,7 +244,7 @@ const ProviderProfile = ({ currentLanguage, onLanguageChange }: ProviderProfileP
                       </Button>
                     )}
                     <Button variant="outline" size="sm" onClick={handleShare}>
-                      <Share2 className="w-4 h-4 mr-2" />
+                      <Share2 className="w-6 h-6 mr-2" />
                       {t.actions.share}
                     </Button>
                     {profile.website_url && (
@@ -405,7 +405,7 @@ const ProviderProfile = ({ currentLanguage, onLanguageChange }: ProviderProfileP
                             <div className="flex items-center gap-1 ml-2 rtl:mr-2 rtl:ml-0">
                               <ShareButton
                                 title={service.name}
-                                text={`${isRTL ? 'احجز' : 'Book'} ${service.name} ${isRTL ? 'من' : 'from'} ${profile.full_name}`}
+                                text={`${isRTL ? 'احجز' : 'Book'} ${service.name} ${isRTL ? 'من' : 'from'} ${profile.full_name} | ServYard 📱`}
                                 url={`${window.location.origin}/services?serviceId=${service.id}`}
                                 variant="ghost"
                                 size="sm"

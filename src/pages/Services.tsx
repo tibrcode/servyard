@@ -724,7 +724,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                 <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
                                   <ShareButton
                                     title={service.name}
-                                    text={`${isRTL ? 'احجز' : 'Book'} ${service.name} ${isRTL ? 'من' : 'from'} ${provider?.full_name}`}
+                                    text={`${isRTL ? 'احجز' : 'Book'} ${service.name} ${isRTL ? 'من' : 'from'} ${provider?.full_name} | ServYard 📱`}
                                     url={`${window.location.origin}/services?serviceId=${service.id}`}
                                     variant="ghost"
                                     size="sm"
@@ -754,7 +754,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                 <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
                                   <ShareButton
                                     title={service.name}
-                                    text={`${isRTL ? 'احجز' : 'Book'} ${service.name} ${isRTL ? 'من' : 'from'} ${provider?.full_name}`}
+                                    text={`${isRTL ? 'احجز' : 'Book'} ${service.name} ${isRTL ? 'من' : 'from'} ${provider?.full_name} | ServYard 📱`}
                                     url={`${window.location.origin}/services?serviceId=${service.id}`}
                                     variant="ghost"
                                     size="sm"
@@ -1008,7 +1008,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                               <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
                                 <ShareButton
                                   title={service.name}
-                                  text={`${isRTL ? 'احجز' : 'Book'} ${service.name} ${isRTL ? 'من' : 'from'} ${provider?.full_name}`}
+                                  text={`${isRTL ? 'احجز' : 'Book'} ${service.name} ${isRTL ? 'من' : 'from'} ${provider?.full_name} | ServYard 📱`}
                                   url={`${window.location.origin}/services?serviceId=${service.id}`}
                                   variant="ghost"
                                   size="sm"
@@ -1037,7 +1037,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                               <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
                                 <ShareButton
                                   title={service.name}
-                                  text={`${isRTL ? 'احجز' : 'Book'} ${service.name} ${isRTL ? 'من' : 'from'} ${provider?.full_name}`}
+                                  text={`${isRTL ? 'احجز' : 'Book'} ${service.name} ${isRTL ? 'من' : 'from'} ${provider?.full_name} | ServYard 📱`}
                                   url={`${window.location.origin}/services?serviceId=${service.id}`}
                                   variant="ghost"
                                   size="sm"
@@ -1317,7 +1317,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                 <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
                                   <ShareButton
                                     title={service.name}
-                                    text={`${isRTL ? 'احجز' : 'Book'} ${service.name} ${isRTL ? 'من' : 'from'} ${provider?.full_name}`}
+                                    text={`${isRTL ? 'احجز' : 'Book'} ${service.name} ${isRTL ? 'من' : 'from'} ${provider?.full_name} | ServYard 📱`}
                                     url={`${window.location.origin}/services?serviceId=${service.id}`}
                                     variant="ghost"
                                     size="sm"
@@ -1347,7 +1347,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                 <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
                                   <ShareButton
                                     title={service.name}
-                                    text={`${isRTL ? 'احجز' : 'Book'} ${service.name} ${isRTL ? 'من' : 'from'} ${provider?.full_name}`}
+                                    text={`${isRTL ? 'احجز' : 'Book'} ${service.name} ${isRTL ? 'من' : 'from'} ${provider?.full_name} | ServYard 📱`}
                                     url={`${window.location.origin}/services?serviceId=${service.id}`}
                                     variant="ghost"
                                     size="sm"

@@ -90,7 +90,7 @@ export function ShareButton({
       disabled={isSharing}
       title={t.share}
     >
-      <Share2 className={cn("h-5 w-5", showLabel && (isRTL ? "ml-2" : "mr-2"))} />
+      <Share2 className={cn("h-6 w-6", showLabel && (isRTL ? "ml-2" : "mr-2"))} />
       {showLabel && <span>{t.share}</span>}
     </Button>
   );
