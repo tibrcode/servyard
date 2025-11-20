@@ -416,97 +416,6 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
   return (
     <div className="min-h-screen flex flex-col overflow-x-hidden max-w-[100vw]" dir={isRTL ? 'rtl' : 'ltr'}>
       <main className="flex-1 container mx-auto px-3 sm:px-4 py-6 sm:py-8 overflow-x-hidden touch-pan-y max-w-[100vw]">
-        {/* Search & Filters */}
-        <div className="mb-6 sm:mb-8">
-          <div className="flex flex-col lg:flex-row gap-4 mb-6">
-            <div className="flex-1 flex gap-2 min-w-0">
-              <Input
-                placeholder={t.home.searchPlaceholder}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1"
-              />
-              <Button onClick={handleSearch} className="px-6">
-                <Search className="h-4 w-4" />
-              </Button>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-2 min-w-0">
-              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger className="w-full sm:w-48">
-                  <SelectValue placeholder={t.ui.allCategories} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">{t.ui.allCategories}</SelectItem>
-                  {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {getCategoryLabel(category as any, currentLanguage)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-full sm:w-48">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="relevance">{t.ui.relevance}</SelectItem>
-                  <SelectItem value="nearest">{isRTL ? 'الأقرب مسافة' : 'Nearest'}</SelectItem>
-                  <SelectItem value="rating">{t.ui.highestRated}</SelectItem>
-                  <SelectItem value="price-low">{t.ui.priceLowHigh}</SelectItem>
-                  <SelectItem value="price-high">{t.ui.priceHighLow}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {/* Location-based Filter */}
-          <Card className="mt-4">
-            <CardContent className="pt-6">
-              {userLocation ? (
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <Label>
-                      {isRTL ? "نطاق البحث:" : "Search Radius:"}
-                    </Label>
-                    <Badge variant="secondary">
-                      {radiusKm} {isRTL ? "كم" : "km"}
-                    </Badge>
-                  </div>
-                  <Slider
-                    value={[radiusKm]}
-                    onValueChange={(values) => setRadiusKm(values[0])}
-                    min={5}
-                    max={500}
-                    step={5}
-                    className="w-full"
-                  />
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>{isRTL ? "قريب جداً" : "Very Close"}</span>
-                    <span>{isRTL ? "بعيد" : "Far"}</span>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center py-2">
-                  <p className="text-sm text-muted-foreground mb-2">
-                    {isRTL 
-                      ? "يرجى تحديد موقعك من الشريط العلوي لعرض الخدمات القريبة" 
-                      : "Please set your location from the header to see nearby services"
-                    }
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {qParam && (
-            <p className="text-muted-foreground mt-4">
-              {t.actions.search}: "{qParam}" • {filteredServices.length}
-            </p>
-          )}
-        </div>
-
         {/* Services / Offers Tabs */}
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
           <TabsList className="grid w-full grid-cols-2 mb-4">
@@ -518,6 +427,99 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
             </TabsTrigger>
           </TabsList>
         </Tabs>
+
+        {/* Search & Filters (Moved inside Services Tab logic) */}
+        {activeTab === 'services' && (
+          <div className="mb-6 sm:mb-8">
+            <div className="flex flex-col lg:flex-row gap-4 mb-6">
+              <div className="flex-1 flex gap-2 min-w-0">
+                <Input
+                  placeholder={t.home.searchPlaceholder}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="flex-1"
+                />
+                <Button onClick={handleSearch} className="px-6">
+                  <Search className="h-4 w-4" />
+                </Button>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-2 min-w-0">
+                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                  <SelectTrigger className="w-full sm:w-48">
+                    <SelectValue placeholder={t.ui.allCategories} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{t.ui.allCategories}</SelectItem>
+                    {categories.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {getCategoryLabel(category as any, currentLanguage)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger className="w-full sm:w-48">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="relevance">{t.ui.relevance}</SelectItem>
+                    <SelectItem value="nearest">{isRTL ? 'الأقرب مسافة' : 'Nearest'}</SelectItem>
+                    <SelectItem value="rating">{t.ui.highestRated}</SelectItem>
+                    <SelectItem value="price-low">{t.ui.priceLowHigh}</SelectItem>
+                    <SelectItem value="price-high">{t.ui.priceHighLow}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Location-based Filter */}
+            <Card className="mt-4">
+              <CardContent className="pt-6">
+                {userLocation ? (
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <Label>
+                        {isRTL ? "نطاق البحث:" : "Search Radius:"}
+                      </Label>
+                      <Badge variant="secondary">
+                        {radiusKm} {isRTL ? "كم" : "km"}
+                      </Badge>
+                    </div>
+                    <Slider
+                      value={[radiusKm]}
+                      onValueChange={(values) => setRadiusKm(values[0])}
+                      min={5}
+                      max={500}
+                      step={5}
+                      className="w-full"
+                    />
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>{isRTL ? "قريب جداً" : "Very Close"}</span>
+                      <span>{isRTL ? "بعيد" : "Far"}</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-2">
+                    <p className="text-sm text-muted-foreground mb-2">
+                      {isRTL 
+                        ? "يرجى تحديد موقعك من الشريط العلوي لعرض الخدمات القريبة" 
+                        : "Please set your location from the header to see nearby services"
+                      }
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {qParam && (
+              <p className="text-muted-foreground mt-4">
+                {t.actions.search}: "{qParam}" • {filteredServices.length}
+              </p>
+            )}
+          </div>
+        )}
 
         {activeTab === 'offers' ? (
           <div>
