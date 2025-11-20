@@ -84,20 +84,36 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
   const { t, isRTL } = useTranslation(currentLanguage);
   const { toast } = useToast();
 
-  // محاولة استرجاع الموقع المحفوظ عند بداية الصفحة
+  // محاولة استرجاع الموقع المحفوظ عند بداية الصفحة + الاستماع للتحديثات
   useEffect(() => {
-    const savedLocation = localStorage.getItem('userLocation');
-    if (savedLocation) {
-      try {
-        const { latitude, longitude, timestamp } = JSON.parse(savedLocation);
-        // استخدام الموقع إذا كان أقل من ساعة
-        if (Date.now() - timestamp < 3600000) {
-          setUserLocation({ latitude, longitude });
+    const loadSavedLocation = () => {
+      const savedLocation = localStorage.getItem('userLocation');
+      if (savedLocation) {
+        try {
+          const { latitude, longitude, timestamp } = JSON.parse(savedLocation);
+          // استخدام الموقع إذا كان أقل من ساعة
+          if (Date.now() - timestamp < 3600000) {
+            setUserLocation({ latitude, longitude });
+          }
+        } catch (e) {
+          console.error('Error parsing saved location:', e);
         }
-      } catch (e) {
-        console.error('Error parsing saved location:', e);
       }
-    }
+    };
+
+    loadSavedLocation();
+
+    // الاستماع لتحديثات الموقع من الهيدر
+    const handleLocationUpdate = (event: CustomEvent) => {
+      if (event.detail) {
+        setUserLocation(event.detail);
+      }
+    };
+
+    window.addEventListener('location-updated', handleLocationUpdate as EventListener);
+    return () => {
+      window.removeEventListener('location-updated', handleLocationUpdate as EventListener);
+    };
   }, []);
 
   const handleSearch = () => {
@@ -440,62 +456,21 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
 
           {/* Location-based Filter */}
           <Card className="mt-4">
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <MapPin className="w-4 h-4" />
-                {isRTL ? "البحث حسب الموقع" : "Search by Location"}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Button
-                  onClick={handleGetLocation}
-                  disabled={locationLoading}
-                  variant={userLocation ? "secondary" : "default"}
-                  className="flex-1"
-                >
-                  <MapPin className="w-4 h-4 mr-2" />
-                  {locationLoading 
-                    ? (isRTL ? "جاري تحديد الموقع..." : "Getting location...")
-                    : userLocation
-                      ? (isRTL ? "تم تحديد الموقع" : "Location Set")
-                      : (isRTL ? "استخدم موقعي" : "Use My Location")
-                  }
-                </Button>
-                {userLocation && (
-                  <Button
-                    onClick={() => {
-                      setUserLocation(null);
-                      localStorage.removeItem('userLocation');
-                      toast({
-                        title: isRTL ? "تم إلغاء الفلتر" : "Filter Cleared",
-                        description: isRTL ? "سيتم عرض جميع الخدمات" : "Showing all services"
-                      });
-                    }}
-                    variant="outline"
-                  >
-                    {isRTL ? "إلغاء" : "Clear"}
-                  </Button>
-                )}
-              </div>
-
-              {userLocation && (
+            <CardContent className="pt-6">
+              {userLocation ? (
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
                     <Label>
                       {isRTL ? "نطاق البحث:" : "Search Radius:"}
                     </Label>
                     <Badge variant="secondary">
-                      {radiusKm === 0 
-                        ? (isRTL ? "أي مسافة" : "Any distance")
-                        : `${radiusKm} ${isRTL ? "كم" : "km"}`
-                      }
+                      {radiusKm} {isRTL ? "كم" : "km"}
                     </Badge>
                   </div>
                   <Slider
                     value={[radiusKm]}
                     onValueChange={(values) => setRadiusKm(values[0])}
-                    min={0}
+                    min={5}
                     max={500}
                     step={5}
                     className="w-full"
@@ -504,6 +479,15 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                     <span>{isRTL ? "قريب جداً" : "Very Close"}</span>
                     <span>{isRTL ? "بعيد" : "Far"}</span>
                   </div>
+                </div>
+              ) : (
+                <div className="text-center py-2">
+                  <p className="text-sm text-muted-foreground mb-2">
+                    {isRTL 
+                      ? "يرجى تحديد موقعك من الشريط العلوي لعرض الخدمات القريبة" 
+                      : "Please set your location from the header to see nearby services"
+                    }
+                  </p>
                 </div>
               )}
             </CardContent>

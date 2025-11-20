@@ -191,6 +191,11 @@ const AppContent = () => {
           longitude,
           timestamp: Date.now()
         }));
+
+        // Dispatch custom event for other components to react
+        window.dispatchEvent(new CustomEvent('location-updated', { 
+          detail: { latitude, longitude } 
+        }));
         
         // حفظ في profile إذا كان المستخدم مسجل دخول
         if (user?.uid) {
