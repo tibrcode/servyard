@@ -220,16 +220,23 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
 
     // فلترة حسب البحث
     if (searchQuery) {
-      filtered = filtered.filter(service => 
-        service.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        service.description?.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(service => {
+        const provider = providers[service.provider_id];
+        const providerName = provider?.full_name || '';
+        
+        return (
+          service.name.toLowerCase().includes(query) ||
+          service.description?.toLowerCase().includes(query) ||
+          providerName.toLowerCase().includes(query)
+        );
+      });
       console.log('  After search filter:', filtered.length);
     }
 
     console.log('  Final baseFilteredServices:', filtered.length);
     return filtered;
-  }, [services, selectedCategory, searchQuery]);
+  }, [services, selectedCategory, searchQuery, providers]);
 
   // فلترة للقائمة (تشمل فلترة الموقع + الترتيب)
   const filteredServices = useMemo(() => {
