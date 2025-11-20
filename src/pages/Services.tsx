@@ -421,7 +421,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
           <CardContent className="pt-6">
             {userLocation ? (
               <div className="space-y-2">
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center mb-2">
                   <Label>
                     {isRTL ? "نطاق البحث:" : "Search Radius:"}
                   </Label>
@@ -435,12 +435,8 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                   min={5}
                   max={500}
                   step={5}
-                  className="w-full"
+                  className="w-full py-2"
                 />
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>{isRTL ? "قريب جداً" : "Very Close"}</span>
-                  <span>{isRTL ? "بعيد" : "Far"}</span>
-                </div>
               </div>
             ) : (
               <div className="text-center py-2">
@@ -487,11 +483,11 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
 
         {/* 3. Services / Offers Tabs */}
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
-          <TabsList className="grid w-full grid-cols-2 mb-6">
-            <TabsTrigger value="services" className="flex items-center justify-center">
+          <TabsList className="grid w-full grid-cols-2 mb-6 h-14">
+            <TabsTrigger value="services" className="flex items-center justify-center h-full text-base font-medium">
               {isRTL ? 'الخدمات' : 'Services'}
             </TabsTrigger>
-            <TabsTrigger value="offers" className="flex items-center justify-center">
+            <TabsTrigger value="offers" className="flex items-center justify-center h-full text-base font-medium">
               {isRTL ? 'العروض والتخفيضات' : 'Offers & Discounts'}
             </TabsTrigger>
           </TabsList>
@@ -502,32 +498,32 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
           <>
             {/* 4. View Toggle (List/Map) */}
             <div className="flex justify-center mb-6">
-              <div className="flex items-center bg-muted p-1.5 rounded-xl border shadow-sm">
+              <div className="flex items-center bg-muted p-1 rounded-lg border shadow-sm">
                 <Button
                   variant={viewMode === 'list' ? 'default' : 'ghost'}
-                  size="lg"
-                  className={`px-8 h-11 rounded-lg transition-all duration-200 ${
+                  size="sm"
+                  className={`px-6 h-9 rounded-md transition-all duration-200 ${
                     viewMode === 'list' 
-                      ? 'bg-primary text-primary-foreground shadow-md' 
+                      ? 'bg-primary text-primary-foreground shadow-sm' 
                       : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
                   }`}
                   onClick={() => setViewMode('list')}
                 >
-                  <List className={`w-5 h-5 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-                  <span className="text-base font-medium">{isRTL ? 'قائمة' : 'List'}</span>
+                  <List className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                  <span className="text-sm font-medium">{isRTL ? 'قائمة' : 'List'}</span>
                 </Button>
                 <Button
                   variant={viewMode === 'map' ? 'default' : 'ghost'}
-                  size="lg"
-                  className={`px-8 h-11 rounded-lg transition-all duration-200 ${
+                  size="sm"
+                  className={`px-6 h-9 rounded-md transition-all duration-200 ${
                     viewMode === 'map' 
-                      ? 'bg-primary text-primary-foreground shadow-md' 
+                      ? 'bg-primary text-primary-foreground shadow-sm' 
                       : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
                   }`}
                   onClick={() => setViewMode('map')}
                 >
-                  <MapIcon className={`w-5 h-5 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-                  <span className="text-base font-medium">{isRTL ? 'خريطة' : 'Map'}</span>
+                  <MapIcon className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                  <span className="text-sm font-medium">{isRTL ? 'خريطة' : 'Map'}</span>
                 </Button>
               </div>
             </div>

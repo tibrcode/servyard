@@ -922,16 +922,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   return (
     <div className="w-full h-full flex flex-col">
       {/* Header */}
-      <div className="bg-card border-b p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div className="flex items-center gap-3 flex-wrap">
-          <div className="flex items-center gap-2">
-            <MapPin className="w-5 h-5 text-primary shrink-0" />
-            <h3 className="text-xl sm:text-2xl font-semibold leading-none">{t.title}</h3>
-          </div>
-          <span className="hidden sm:inline text-muted-foreground">•</span>
-          <p className="text-sm text-muted-foreground">{t.description}</p>
-        </div>
-        
+      <div className="bg-card border-b p-2 flex justify-end">
         {showCurrentLocation && (
           <Button
             onClick={handleGetCurrentLocation}
@@ -948,8 +939,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
       {/* Map */}
       <div 
         ref={mapRef} 
-        style={{ width: '100%', height: 'calc(100% - 73px)' }}
-        className="overflow-hidden"
+        className="overflow-hidden flex-1 w-full"
       />
     </div>
   );
