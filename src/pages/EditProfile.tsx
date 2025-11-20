@@ -13,7 +13,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "@/lib/i18n";
 import { db } from "@/integrations/firebase/client";
-import { doc, updateDoc, getDoc } from "firebase/firestore";
+import { doc, updateDoc, getDoc, collection, query, getDocs } from "firebase/firestore";
+import { getCategoryLabel } from "@/lib/categoriesLocale";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { deleteCurrentUserFully } from "@/lib/firebase/deleteAccount";
 import LocationPicker from "@/components/provider/LocationPicker";
@@ -38,6 +39,7 @@ interface ProfileData {
   tiktok_url: string;
   currency_code?: string;
   timezone?: string;
+  main_category_id?: string;
   // حقول الموقع الجغرافي
   latitude?: number;
   longitude?: number;
@@ -54,6 +56,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ currentLanguage }) => {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [newPhoneNumber, setNewPhoneNumber] = useState("");
+  const [categories, setCategories] = useState<any[]>([]);
 
   const [formData, setFormData] = useState<ProfileData>({
     full_name: '',
@@ -71,10 +74,29 @@ const EditProfile: React.FC<EditProfileProps> = ({ currentLanguage }) => {
     tiktok_url: '',
     currency_code: '',
     timezone: getBrowserTimezone(),
+    main_category_id: '',
     latitude: undefined,
     longitude: undefined,
     location_address: ''
   });
+
+  // Fetch categories
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const categoriesQuery = query(collection(db, 'service_categories'));
+        const categoriesSnapshot = await getDocs(categoriesQuery);
+        const categoriesData = categoriesSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setCategories(categoriesData);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   // Fetch user profile data
   useEffect(() => {
@@ -114,6 +136,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ currentLanguage }) => {
           tiktok_url: profile.tiktok_url || '',
           currency_code: profile.currency_code || '',
           timezone: profile.timezone || 'Asia/Dubai',
+          main_category_id: profile.main_category_id || '',
           latitude: profile.latitude,
           longitude: profile.longitude,
           location_address: profile.location_address || ''
@@ -196,6 +219,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ currentLanguage }) => {
         tiktok_url: formData.tiktok_url.trim(),
         currency_code: (formData.currency_code || '').trim() || null,
         timezone: formData.timezone || 'Asia/Dubai',
+        main_category_id: formData.main_category_id || null,
         // حفظ الموقع الجغرافي
         latitude: formData.latitude || null,
         longitude: formData.longitude || null,
@@ -328,6 +352,25 @@ const EditProfile: React.FC<EditProfileProps> = ({ currentLanguage }) => {
                     onChange={(e) => handleInputChange('country', e.target.value)}
                     placeholder={t.editProfile.countryPlaceholder}
                   />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="main_category">{isRTL ? "المجال الرئيسي" : "Main Category"}</Label>
+                  <Select
+                    value={formData.main_category_id || ""}
+                    onValueChange={(value) => handleInputChange('main_category_id', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={isRTL ? "اختر المجال الرئيسي" : "Select Main Category"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map((category) => (
+                        <SelectItem key={category.id} value={category.id}>
+                          {getCategoryLabel(category, currentLanguage)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             </div>

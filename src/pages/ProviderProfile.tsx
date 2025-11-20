@@ -31,6 +31,7 @@ import { auth, db } from "@/integrations/firebase/client";
 import { doc, getDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { useTranslation } from "@/lib/i18n";
 import { FavoriteButton } from "@/components/common/FavoriteButton";
+import { iconMap, colorMap } from "@/lib/categoryIcons";
 // Currency shown as Latin code (e.g., AED) per requirement; symbol helper not used here
 
 interface ProviderProfileProps {
@@ -61,6 +62,7 @@ interface ProviderProfile {
   facebook_url?: string;
   tiktok_url?: string;
   currency_code?: string;
+  main_category_id?: string;
 }
 
 interface Service {
@@ -98,6 +100,7 @@ const ProviderProfile = ({ currentLanguage, onLanguageChange }: ProviderProfileP
   const [offers, setOffers] = useState<Offer[]>([]);
   const [availability, setAvailability] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [mainCategory, setMainCategory] = useState<any>(null);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
 
@@ -151,6 +154,17 @@ const ProviderProfile = ({ currentLanguage, onLanguageChange }: ProviderProfileP
       if (profileDoc.exists() && profileDoc.data()?.user_type === 'provider') {
         const profileData = { id: profileDoc.id, ...profileDoc.data() } as ProviderProfile;
         setProfile(profileData);
+
+        if (profileData.main_category_id) {
+          try {
+            const categoryDoc = await getDoc(doc(db, 'service_categories', profileData.main_category_id));
+            if (categoryDoc.exists()) {
+              setMainCategory(categoryDoc.data());
+            }
+          } catch (err) {
+            console.error("Error fetching main category", err);
+          }
+        }
 
         // Load services
         const servicesQuery = query(
@@ -254,12 +268,21 @@ const ProviderProfile = ({ currentLanguage, onLanguageChange }: ProviderProfileP
                 {/* Provider Info */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start gap-4 mb-6">
-                    <Avatar className="w-20 h-20">
-                      <AvatarImage src={profile.avatar_url} alt={profile.full_name} />
-                      <AvatarFallback className="text-2xl">
-                        {profile.full_name.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
+                    {mainCategory && iconMap[mainCategory.icon] ? (
+                      <div className={`w-20 h-20 rounded-full flex items-center justify-center shrink-0 ${colorMap[mainCategory.color]?.bg || 'bg-primary/10'}`}>
+                        {(() => {
+                          const IconComponent = iconMap[mainCategory.icon];
+                          return <IconComponent className={`w-10 h-10 ${colorMap[mainCategory.color]?.text || 'text-primary'}`} />;
+                        })()}
+                      </div>
+                    ) : (
+                      <Avatar className="w-20 h-20">
+                        <AvatarImage src={profile.avatar_url} alt={profile.full_name} />
+                        <AvatarFallback className="text-2xl">
+                          {profile.full_name.charAt(0)}
+                        </AvatarFallback>
+                      </Avatar>
+                    )}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-2 min-w-0">
                         <h1 className="text-2xl md:text-3xl font-bold leading-tight break-words whitespace-normal max-w-full flex-1 min-w-0">{profile.full_name}</h1>
