@@ -728,7 +728,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                     url={`${window.location.origin}/services?serviceId=${service.id}`}
                                     variant="ghost"
                                     size="sm"
-                                    className="h-8 w-8 text-muted-foreground hover:text-blue-600"
+                                    className="h-10 w-10 rounded-full text-muted-foreground hover:text-blue-600"
                                   />
                                   <FavoriteButton
                                     type="service"
@@ -740,7 +740,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                     }}
                                     variant="ghost"
                                     size="sm"
-                                    className="h-8 w-8"
+                                    className="h-10 w-10 rounded-full"
                                   />
                                 </div>
                               </div>
@@ -758,7 +758,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                     url={`${window.location.origin}/services?serviceId=${service.id}`}
                                     variant="ghost"
                                     size="sm"
-                                    className="h-8 w-8 text-muted-foreground hover:text-blue-600"
+                                    className="h-10 w-10 rounded-full text-muted-foreground hover:text-blue-600"
                                   />
                                   <FavoriteButton
                                     type="service"
@@ -770,7 +770,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                     }}
                                     variant="ghost"
                                     size="sm"
-                                    className="h-8 w-8"
+                                    className="h-10 w-10 rounded-full"
                                   />
                                 </div>
                               </div>
@@ -1012,7 +1012,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                   url={`${window.location.origin}/services?serviceId=${service.id}`}
                                   variant="ghost"
                                   size="sm"
-                                  className="h-8 w-8 text-muted-foreground hover:text-blue-600"
+                                  className="h-10 w-10 rounded-full text-muted-foreground hover:text-blue-600"
                                 />
                                 <FavoriteButton
                                   type="service"
@@ -1041,7 +1041,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                   url={`${window.location.origin}/services?serviceId=${service.id}`}
                                   variant="ghost"
                                   size="sm"
-                                  className="h-8 w-8 text-muted-foreground hover:text-blue-600"
+                                  className="h-10 w-10 rounded-full text-muted-foreground hover:text-blue-600"
                                 />
                                 <FavoriteButton
                                   type="service"
@@ -1321,7 +1321,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                     url={`${window.location.origin}/services?serviceId=${service.id}`}
                                     variant="ghost"
                                     size="sm"
-                                    className="h-8 w-8 text-muted-foreground hover:text-blue-600"
+                                    className="h-10 w-10 rounded-full text-muted-foreground hover:text-blue-600"
                                   />
                                   <FavoriteButton
                                     type="service"
@@ -1333,7 +1333,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                     }}
                                     variant="ghost"
                                     size="sm"
-                                    className="h-8 w-8"
+                                    className="h-10 w-10 rounded-full"
                                   />
                                 </div>
                               </div>
@@ -1351,7 +1351,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                     url={`${window.location.origin}/services?serviceId=${service.id}`}
                                     variant="ghost"
                                     size="sm"
-                                    className="h-8 w-8 text-muted-foreground hover:text-blue-600"
+                                    className="h-10 w-10 rounded-full text-muted-foreground hover:text-blue-600"
                                   />
                                   <FavoriteButton
                                     type="service"
@@ -1363,7 +1363,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                     }}
                                     variant="ghost"
                                     size="sm"
-                                    className="h-8 w-8"
+                                    className="h-10 w-10 rounded-full"
                                   />
                                 </div>
                               </div>

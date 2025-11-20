@@ -244,7 +244,7 @@ const ProviderProfile = ({ currentLanguage, onLanguageChange }: ProviderProfileP
                       </Button>
                     )}
                     <Button variant="outline" size="sm" onClick={handleShare}>
-                      <Share2 className="w-6 h-6 mr-2" />
+                      <Share2 className="w-8 h-8 mr-2" />
                       {t.actions.share}
                     </Button>
                     {profile.website_url && (
@@ -409,7 +409,7 @@ const ProviderProfile = ({ currentLanguage, onLanguageChange }: ProviderProfileP
                                 url={`${window.location.origin}/services?serviceId=${service.id}`}
                                 variant="ghost"
                                 size="sm"
-                                className="h-8 w-8 text-muted-foreground hover:text-blue-600"
+                                className="h-10 w-10 rounded-full text-muted-foreground hover:text-blue-600"
                               />
                               <FavoriteButton
                                 type="service"
@@ -421,7 +421,7 @@ const ProviderProfile = ({ currentLanguage, onLanguageChange }: ProviderProfileP
                                 }}
                                 variant="ghost"
                                 size="sm"
-                                className="h-8 w-8"
+                                className="h-10 w-10 rounded-full"
                               />
                             </div>
                           </div>

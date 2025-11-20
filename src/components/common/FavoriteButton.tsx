@@ -116,17 +116,17 @@ export function FavoriteButton({
     <Button
       variant={variant}
       size={size}
-      className={cn('relative transition-all', className)}
+      className={cn('relative transition-all [&_svg]:size-6', className)}
       onClick={handleClick}
       disabled={isLoading}
       title={isFav ? t.removeFromFavorites : t.addToFavorites}
     >
       {isLoading ? (
-        <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+        <div className="h-6 w-6 border-2 border-current border-t-transparent rounded-full animate-spin" />
       ) : (
         <Heart
           className={cn(
-            'h-4 w-4 transition-all',
+            'h-6 w-6 transition-all',
             isFav && 'fill-red-500 text-red-500 scale-110'
           )}
         />

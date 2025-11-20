@@ -83,7 +83,7 @@ export function ShareButton({
       variant={variant}
       size={size}
       className={cn(
-        "transition-colors hover:text-blue-500 hover:bg-blue-50",
+        "transition-colors hover:text-blue-500 hover:bg-blue-50 [&_svg]:size-6",
         className
       )}
       onClick={handleShare}
