@@ -818,25 +818,33 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
 
         {/* View Toggle (Services Only) */}
         {activeTab === 'services' && (
-          <div className="flex justify-end mb-4">
-            <div className="flex items-center bg-muted/50 p-1 rounded-lg border">
+          <div className="flex justify-center mb-6">
+            <div className="flex items-center bg-muted p-1.5 rounded-xl border shadow-sm">
               <Button
-                variant={viewMode === 'list' ? 'secondary' : 'ghost'}
-                size="sm"
-                className="px-4"
+                variant={viewMode === 'list' ? 'default' : 'ghost'}
+                size="lg"
+                className={`px-8 h-11 rounded-lg transition-all duration-200 ${
+                  viewMode === 'list' 
+                    ? 'bg-primary text-primary-foreground shadow-md' 
+                    : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
+                }`}
                 onClick={() => setViewMode('list')}
               >
-                <List className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-                {isRTL ? 'قائمة' : 'List'}
+                <List className={`w-5 h-5 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                <span className="text-base font-medium">{isRTL ? 'قائمة' : 'List'}</span>
               </Button>
               <Button
-                variant={viewMode === 'map' ? 'secondary' : 'ghost'}
-                size="sm"
-                className="px-4"
+                variant={viewMode === 'map' ? 'default' : 'ghost'}
+                size="lg"
+                className={`px-8 h-11 rounded-lg transition-all duration-200 ${
+                  viewMode === 'map' 
+                    ? 'bg-primary text-primary-foreground shadow-md' 
+                    : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
+                }`}
                 onClick={() => setViewMode('map')}
               >
-                <MapIcon className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-                {isRTL ? 'خريطة' : 'Map'}
+                <MapIcon className={`w-5 h-5 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                <span className="text-base font-medium">{isRTL ? 'خريطة' : 'Map'}</span>
               </Button>
             </div>
           </div>
