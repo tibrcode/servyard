@@ -758,7 +758,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                     url={`${window.location.origin}/services?serviceId=${service.id}`}
                                     variant="ghost"
                                     size="sm"
-                                    className="h-10 w-10 rounded-full text-muted-foreground hover:text-blue-600"
+                                    className="h-10 w-10 rounded-full"
                                   />
                                   <FavoriteButton
                                     type="service"
@@ -817,7 +817,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                     </div>
                                   </>
                                 ) : (
-                                  <div style={{ fontSize: '16px', fontWeight: '700', color: '#111827' }}>
+                                  <div className="text-foreground" style={{ fontSize: '16px', fontWeight: '700' }}>
                                     {service.approximate_price} {provider?.currency_code || 'AED'}
                                   </div>
                                 )}
@@ -1099,7 +1099,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                   </div>
                                 </>
                               ) : (
-                                <div style={{ fontSize: '16px', fontWeight: '700', color: '#111827' }}>
+                                <div className="text-foreground" style={{ fontSize: '16px', fontWeight: '700' }}>
                                   {service.approximate_price} {provider?.currency_code || 'AED'}
                                 </div>
                               )}
@@ -1363,7 +1363,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                     url={`${window.location.origin}/services?serviceId=${service.id}`}
                                     variant="ghost"
                                     size="sm"
-                                    className="h-10 w-10 rounded-full text-muted-foreground hover:text-blue-600"
+                                    className="h-10 w-10 rounded-full"
                                   />
                                   <FavoriteButton
                                     type="service"
@@ -1422,7 +1422,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                     </div>
                                   </>
                                 ) : (
-                                  <div style={{ fontSize: '16px', fontWeight: '700', color: '#111827' }}>
+                                  <div className="text-foreground" style={{ fontSize: '16px', fontWeight: '700' }}>
                                     {service.approximate_price} {provider?.currency_code || 'AED'}
                                   </div>
                                 )}
