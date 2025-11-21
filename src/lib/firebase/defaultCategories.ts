@@ -1,11 +1,11 @@
 import { db } from "@/integrations/firebase/client";
-import { collection, getDocs, addDoc } from "firebase/firestore";
+import { collection, getDocs, addDoc, updateDoc, doc } from "firebase/firestore";
 
 // Centralized default categories list (24 categories)
 const defaultCategories = [
   { name_en: "Cleaning Services", name_ar: "خدمات التنظيف", name_fil: "Serbisyong Paglilinis", icon_name: "Sparkles", color_scheme: "blue", display_order: 1 },
   { name_en: "Repair & Maintenance", name_ar: "الإصلاح والصيانة", name_fil: "Pag-aayos at Pagpapanatili", icon_name: "Wrench", color_scheme: "orange", display_order: 2 },
-  { name_en: "Healthcare Services", name_ar: "الخدمات الصحية", name_fil: "Mga Serbisyong Pangkalusugan", icon_name: "Heart", color_scheme: "red", display_order: 3 },
+  { name_en: "Healthcare Services", name_ar: "الخدمات الصحية", name_fil: "Mga Serbisyong Pangkalusugan", icon_name: "Stethoscope", color_scheme: "red", display_order: 3 },
   { name_en: "Fitness & Wellness", name_ar: "اللياقة والعافية", name_fil: "Fitness at Wellness", icon_name: "Dumbbell", color_scheme: "green", display_order: 4 },
   { name_en: "Beauty Services", name_ar: "خدمات التجميل", name_fil: "Mga Serbisyong Kagandahan", icon_name: "Scissors", color_scheme: "pink", display_order: 5 },
   { name_en: "Education & Tutoring", name_ar: "التعليم والدروس الخصوصية", name_fil: "Edukasyon at Tutoring", icon_name: "GraduationCap", color_scheme: "purple", display_order: 6 },
@@ -29,30 +29,49 @@ const defaultCategories = [
   { name_en: "Travel & Tourism", name_ar: "السفر والسياحة", name_fil: "Travel at Tourism", icon_name: "Plane", color_scheme: "green", display_order: 24 },
 ];
 
-// Upsert default categories into Firestore if missing
+// Upsert default categories into Firestore if missing or needs update
 export const upsertDefaultServiceCategories = async () => {
   const categoriesRef = collection(db, 'service_categories');
   const snapshot = await getDocs(categoriesRef);
 
-  const existingNames = new Set(
-    snapshot.docs.map((d) => (d.data() as any).name_en as string)
-  );
+  const existingDocs = new Map();
+  snapshot.docs.forEach((d) => {
+    const data = d.data();
+    if (data.name_en) {
+      existingDocs.set(data.name_en, d);
+    }
+  });
 
-  const toInsert = defaultCategories.filter((c) => !existingNames.has(c.name_en));
+  let updatesCount = 0;
+  let insertsCount = 0;
 
-  if (toInsert.length === 0) return 0;
+  for (const cat of defaultCategories) {
+    const existingDoc = existingDocs.get(cat.name_en);
 
-  for (const [index, c] of toInsert.entries()) {
-    await addDoc(categoriesRef, {
-      ...c,
-      is_active: true,
-      parent_id: null,
-      created_at: new Date(),
-      // keep display_order as provided; if you want to append, you could offset using snapshot.size
-      display_order: c.display_order,
-    });
+    if (existingDoc) {
+      // Check if update is needed (e.g. icon changed)
+      const data = existingDoc.data();
+      if (data.icon_name !== cat.icon_name || data.color_scheme !== cat.color_scheme) {
+         await updateDoc(doc(db, 'service_categories', existingDoc.id), {
+           icon_name: cat.icon_name,
+           color_scheme: cat.color_scheme,
+         });
+         updatesCount++;
+      }
+    } else {
+      // Insert new
+      await addDoc(categoriesRef, {
+        ...cat,
+        is_active: true,
+        parent_id: null,
+        created_at: new Date(),
+        display_order: cat.display_order,
+      });
+      insertsCount++;
+    }
   }
-  return toInsert.length;
+
+  return { inserts: insertsCount, updates: updatesCount };
 };
 
 export default defaultCategories;
