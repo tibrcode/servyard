@@ -37,6 +37,7 @@ import { useProviderActions } from "@/hooks/useProviderActions";
 
 import { Service, Offer } from "@/types/service";
 import { useProviderDashboardData } from "@/hooks/useProviderDashboardData";
+import { useServiceCategories } from "@/hooks/useServiceCategories";
 
 interface ProviderDashboardProps {
   currentLanguage: string;
@@ -65,6 +66,9 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
     pendingBookingsCount, 
     isLoading 
   } = useProviderDashboardData(currentUser?.uid);
+
+  const { data: categories = [] } = useServiceCategories();
+  const category = providerProfile ? categories.find(c => c.id === providerProfile.main_category_id) : null;
 
   const { updateOnlineStatus } = useProviderActions();
 
@@ -158,6 +162,8 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
             <ProviderLogo
               providerName={providerProfile.full_name}
               size="lg"
+              categoryIconName={category?.icon_name}
+              categoryColorScheme={category?.color_scheme}
             />
             <div className="min-w-0 flex-1 w-full max-w-full">
               <h1 className="dashboard-title text-xl sm:text-2xl lg:text-3xl font-bold leading-snug max-w-full">{t.provider.dashboard}</h1>

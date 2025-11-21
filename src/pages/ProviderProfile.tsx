@@ -143,11 +143,11 @@ const ProviderProfile = ({ currentLanguage, onLanguageChange }: ProviderProfileP
                 {/* Provider Info */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start gap-4 mb-6">
-                    {mainCategory && iconMap[mainCategory.icon] ? (
-                      <div className={`w-20 h-20 rounded-full flex items-center justify-center shrink-0 ${colorMap[mainCategory.color]?.bg || 'bg-primary/10'}`}>
+                    {mainCategory && iconMap[mainCategory.icon_name] ? (
+                      <div className={`w-20 h-20 rounded-full flex items-center justify-center shrink-0 ${colorMap[mainCategory.color_scheme]?.bg || 'bg-primary/10'}`}>
                         {(() => {
-                          const IconComponent = iconMap[mainCategory.icon];
-                          return <IconComponent className={`w-10 h-10 ${colorMap[mainCategory.color]?.text || 'text-primary'}`} />;
+                          const IconComponent = iconMap[mainCategory.icon_name];
+                          return <IconComponent className={`w-10 h-10 ${colorMap[mainCategory.color_scheme]?.text || 'text-primary'}`} />;
                         })()}
                       </div>
                     ) : (

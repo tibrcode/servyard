@@ -4,6 +4,7 @@ import { CheckCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
+import { getCategoryIcon, colorMap } from "@/lib/categoryIcons";
 
 interface ProviderLogoProps {
   providerName: string;
@@ -12,6 +13,8 @@ interface ProviderLogoProps {
   size?: "sm" | "md" | "lg";
   showName?: boolean;
   className?: string;
+  categoryIconName?: string;
+  categoryColorScheme?: string;
 }
 
 export const ProviderLogo = ({
@@ -20,12 +23,20 @@ export const ProviderLogo = ({
   verified = false,
   size = "md",
   showName = true,
-  className
+  className,
+  categoryIconName,
+  categoryColorScheme
 }: ProviderLogoProps) => {
   const sizeClasses = {
     sm: "w-8 h-8",
     md: "w-12 h-12",
     lg: "w-16 h-16"
+  };
+
+  const iconSizes = {
+    sm: "w-4 h-4",
+    md: "w-6 h-6",
+    lg: "w-8 h-8"
   };
 
   const getInitials = (name: string) => {
@@ -37,11 +48,18 @@ export const ProviderLogo = ({
       .slice(0, 2);
   };
 
+  const CategoryIcon = categoryIconName ? getCategoryIcon(categoryIconName) : null;
+  const colorStyles = categoryColorScheme && colorMap[categoryColorScheme] 
+    ? colorMap[categoryColorScheme] 
+    : { bg: "bg-primary/10", text: "text-primary" };
+
   return (
     <div className={cn("flex items-center gap-3 min-w-0", className)}>
       <div className="relative flex-shrink-0">
-        <Avatar className={sizeClasses[size]}>
-          {avatarUrl ? (
+        <Avatar className={cn(sizeClasses[size], "flex items-center justify-center", CategoryIcon ? colorStyles.bg : "bg-primary/10")}>
+          {CategoryIcon ? (
+            <CategoryIcon className={cn(iconSizes[size], colorStyles.text)} />
+          ) : avatarUrl ? (
             <LazyLoadImage
               src={avatarUrl}
               alt={providerName}
