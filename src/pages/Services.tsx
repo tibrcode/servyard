@@ -472,7 +472,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
           )}
         </div>
 
-        {/* 2. Main Navigation Buttons (Services, Map, Offers, Appointments) */}
+        {/* 2. Main Navigation Buttons (Services, Appointments, Map, Offers) */}
         <div className="grid grid-cols-4 gap-2 mb-4">
           <Button
             variant={activeView === 'services' ? 'default' : 'outline'}
@@ -485,6 +485,19 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
           >
             <List className="w-5 h-5" />
             <span className="text-xs font-bold">{isRTL ? 'الخدمات' : 'Services'}</span>
+          </Button>
+
+          <Button
+            variant={activeView === 'appointments' ? 'default' : 'outline'}
+            className={`h-16 flex flex-col items-center justify-center gap-1 rounded-xl border-2 ${
+              activeView === 'appointments' 
+                ? 'border-primary bg-primary text-primary-foreground shadow-md' 
+                : 'border-muted bg-card hover:bg-muted/50 hover:border-primary/50'
+            }`}
+            onClick={() => setActiveView('appointments')}
+          >
+            <Calendar className="w-5 h-5" />
+            <span className="text-xs font-bold">{isRTL ? 'حجز' : 'Appointments'}</span>
           </Button>
 
           <Button
@@ -511,19 +524,6 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
           >
             <Sparkles className="w-5 h-5" />
             <span className="text-xs font-bold">{isRTL ? 'العروض' : 'Offers'}</span>
-          </Button>
-
-          <Button
-            variant={activeView === 'appointments' ? 'default' : 'outline'}
-            className={`h-16 flex flex-col items-center justify-center gap-1 rounded-xl border-2 ${
-              activeView === 'appointments' 
-                ? 'border-primary bg-primary text-primary-foreground shadow-md' 
-                : 'border-muted bg-card hover:bg-muted/50 hover:border-primary/50'
-            }`}
-            onClick={() => setActiveView('appointments')}
-          >
-            <Calendar className="w-5 h-5" />
-            <span className="text-xs font-bold">{isRTL ? 'مواعيد' : 'Bookings'}</span>
           </Button>
         </div>
 
