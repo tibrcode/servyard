@@ -16,7 +16,8 @@ import {
   Settings,
   Bell,
   CheckCircle2,
-  Heart
+  Heart,
+  List
 } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
@@ -228,21 +229,100 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
         {/* Main Content */}
         <div className="space-y-4">
           <Tabs defaultValue="services" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6 mb-6 h-auto">
-              <TabsTrigger value="services">{isRTL ? 'خدماتي' : 'My Services'}</TabsTrigger>
-              <TabsTrigger value="appointments">{isRTL ? 'مواعيدي' : 'My Appointments'}</TabsTrigger>
-              <TabsTrigger value="favorites">
-                <Heart className="w-4 h-4 mr-2" />
-                <span className="hidden xs:inline">{isRTL ? 'المفضلة' : 'Favorites'}</span>
-                {favoritesCount > 0 && (
-                  <span className="ml-1 text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full">
-                    {favoritesCount}
+            <TabsList className="grid w-full grid-cols-3 gap-4 h-auto bg-transparent p-0 mb-6 md:grid-cols-6 md:bg-muted md:p-1 md:rounded-lg md:gap-2">
+              <TabsTrigger 
+                value="services" 
+                className="relative rounded-2xl border border-border bg-card aspect-square overflow-hidden glow-card transition-transform hover:scale-[1.01] min-w-0 p-0 data-[state=active]:ring-2 data-[state=active]:ring-primary data-[state=active]:border-primary md:aspect-auto md:h-auto md:rounded-md md:border-0 md:bg-transparent md:shadow-none md:hover:scale-100 md:data-[state=active]:ring-0 md:data-[state=active]:bg-background md:data-[state=active]:shadow-sm md:py-2"
+              >
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-3 gap-2 min-w-0 md:static md:flex-row md:gap-2 md:p-0">
+                  <div className="opacity-90 flex-shrink-0 md:opacity-100">
+                    <List className="h-6 w-6 sm:h-8 sm:w-8 md:h-4 md:w-4" />
+                  </div>
+                  <span className="block mx-auto text-center font-medium text-foreground w-full px-1 leading-tight tracking-normal text-[10px] sm:text-xs whitespace-normal md:w-auto md:text-sm md:mx-0">
+                    {isRTL ? 'خدماتي' : 'My Services'}
                   </span>
-                )}
+                </div>
               </TabsTrigger>
-              <TabsTrigger value="reviews">{t.customer.myReviews}</TabsTrigger>
-              <TabsTrigger value="profile">{t.customer.profile}</TabsTrigger>
-              <TabsTrigger value="settings">{isRTL ? 'إعدادات' : 'Settings'}</TabsTrigger>
+
+              <TabsTrigger 
+                value="appointments" 
+                className="relative rounded-2xl border border-border bg-card aspect-square overflow-hidden glow-card transition-transform hover:scale-[1.01] min-w-0 p-0 data-[state=active]:ring-2 data-[state=active]:ring-primary data-[state=active]:border-primary md:aspect-auto md:h-auto md:rounded-md md:border-0 md:bg-transparent md:shadow-none md:hover:scale-100 md:data-[state=active]:ring-0 md:data-[state=active]:bg-background md:data-[state=active]:shadow-sm md:py-2"
+              >
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-3 gap-2 min-w-0 md:static md:flex-row md:gap-2 md:p-0">
+                  <div className="opacity-90 flex-shrink-0 md:opacity-100">
+                    <Calendar className="h-6 w-6 sm:h-8 sm:w-8 md:h-4 md:w-4" />
+                  </div>
+                  <span className="block mx-auto text-center font-medium text-foreground w-full px-1 leading-tight tracking-normal text-[10px] sm:text-xs whitespace-normal md:w-auto md:text-sm md:mx-0">
+                    {isRTL ? 'مواعيدي' : 'My Appointments'}
+                  </span>
+                </div>
+              </TabsTrigger>
+
+              <TabsTrigger 
+                value="favorites" 
+                className="relative rounded-2xl border border-border bg-card aspect-square overflow-hidden glow-card transition-transform hover:scale-[1.01] min-w-0 p-0 data-[state=active]:ring-2 data-[state=active]:ring-primary data-[state=active]:border-primary md:aspect-auto md:h-auto md:rounded-md md:border-0 md:bg-transparent md:shadow-none md:hover:scale-100 md:data-[state=active]:ring-0 md:data-[state=active]:bg-background md:data-[state=active]:shadow-sm md:py-2"
+              >
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-3 gap-2 min-w-0 md:static md:flex-row md:gap-2 md:p-0">
+                  <div className="opacity-90 flex-shrink-0 md:opacity-100 relative">
+                    <Heart className="h-6 w-6 sm:h-8 sm:w-8 md:h-4 md:w-4" />
+                    {favoritesCount > 0 && (
+                      <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground md:hidden">
+                        {favoritesCount}
+                      </span>
+                    )}
+                  </div>
+                  <span className="block mx-auto text-center font-medium text-foreground w-full px-1 leading-tight tracking-normal text-[10px] sm:text-xs whitespace-normal md:w-auto md:text-sm md:mx-0">
+                    {isRTL ? 'المفضلة' : 'Favorites'}
+                    {favoritesCount > 0 && (
+                      <span className="hidden md:inline-flex ml-1 items-center justify-center rounded-full bg-primary px-1.5 py-0.5 text-[10px] text-primary-foreground">
+                        {favoritesCount}
+                      </span>
+                    )}
+                  </span>
+                </div>
+              </TabsTrigger>
+
+              <TabsTrigger 
+                value="reviews" 
+                className="relative rounded-2xl border border-border bg-card aspect-square overflow-hidden glow-card transition-transform hover:scale-[1.01] min-w-0 p-0 data-[state=active]:ring-2 data-[state=active]:ring-primary data-[state=active]:border-primary md:aspect-auto md:h-auto md:rounded-md md:border-0 md:bg-transparent md:shadow-none md:hover:scale-100 md:data-[state=active]:ring-0 md:data-[state=active]:bg-background md:data-[state=active]:shadow-sm md:py-2"
+              >
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-3 gap-2 min-w-0 md:static md:flex-row md:gap-2 md:p-0">
+                  <div className="opacity-90 flex-shrink-0 md:opacity-100">
+                    <Star className="h-6 w-6 sm:h-8 sm:w-8 md:h-4 md:w-4" />
+                  </div>
+                  <span className="block mx-auto text-center font-medium text-foreground w-full px-1 leading-tight tracking-normal text-[10px] sm:text-xs whitespace-normal md:w-auto md:text-sm md:mx-0">
+                    {t.customer.myReviews}
+                  </span>
+                </div>
+              </TabsTrigger>
+
+              <TabsTrigger 
+                value="profile" 
+                className="relative rounded-2xl border border-border bg-card aspect-square overflow-hidden glow-card transition-transform hover:scale-[1.01] min-w-0 p-0 data-[state=active]:ring-2 data-[state=active]:ring-primary data-[state=active]:border-primary md:aspect-auto md:h-auto md:rounded-md md:border-0 md:bg-transparent md:shadow-none md:hover:scale-100 md:data-[state=active]:ring-0 md:data-[state=active]:bg-background md:data-[state=active]:shadow-sm md:py-2"
+              >
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-3 gap-2 min-w-0 md:static md:flex-row md:gap-2 md:p-0">
+                  <div className="opacity-90 flex-shrink-0 md:opacity-100">
+                    <User className="h-6 w-6 sm:h-8 sm:w-8 md:h-4 md:w-4" />
+                  </div>
+                  <span className="block mx-auto text-center font-medium text-foreground w-full px-1 leading-tight tracking-normal text-[10px] sm:text-xs whitespace-normal md:w-auto md:text-sm md:mx-0">
+                    {t.customer.profile}
+                  </span>
+                </div>
+              </TabsTrigger>
+
+              <TabsTrigger 
+                value="settings" 
+                className="relative rounded-2xl border border-border bg-card aspect-square overflow-hidden glow-card transition-transform hover:scale-[1.01] min-w-0 p-0 data-[state=active]:ring-2 data-[state=active]:ring-primary data-[state=active]:border-primary md:aspect-auto md:h-auto md:rounded-md md:border-0 md:bg-transparent md:shadow-none md:hover:scale-100 md:data-[state=active]:ring-0 md:data-[state=active]:bg-background md:data-[state=active]:shadow-sm md:py-2"
+              >
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-3 gap-2 min-w-0 md:static md:flex-row md:gap-2 md:p-0">
+                  <div className="opacity-90 flex-shrink-0 md:opacity-100">
+                    <Settings className="h-6 w-6 sm:h-8 sm:w-8 md:h-4 md:w-4" />
+                  </div>
+                  <span className="block mx-auto text-center font-medium text-foreground w-full px-1 leading-tight tracking-normal text-[10px] sm:text-xs whitespace-normal md:w-auto md:text-sm md:mx-0">
+                    {isRTL ? 'إعدادات' : 'Settings'}
+                  </span>
+                </div>
+              </TabsTrigger>
             </TabsList>
 
             {/* Services Tab */}
