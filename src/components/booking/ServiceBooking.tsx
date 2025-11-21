@@ -143,13 +143,13 @@ export function ServiceBooking({
       if (!schedule) {
         console.warn('⚠️ No schedule found for this day');
         // Only show toast if we are not in the initial load loop to avoid spamming
-        // toast({
-        //   title: isRTL ? 'تنبيه' : 'Notice',
-        //   description: isRTL 
-        //     ? 'لم يتم تحديد جدول عمل لهذا اليوم. يرجى مراجعة مزود الخدمة.' 
-        //     : 'No schedule set for this day. Please contact the service provider.',
-        //   variant: 'destructive',
-        // });
+        toast({
+          title: isRTL ? 'تنبيه' : 'Notice',
+          description: isRTL 
+            ? 'لم يتم تحديد جدول عمل لهذا اليوم. يرجى مراجعة مزود الخدمة.' 
+            : 'No schedule set for this day. Please contact the service provider.',
+          variant: 'destructive',
+        });
         setAvailability({
           date: dateString,
           day_of_week: dayOfWeek,
