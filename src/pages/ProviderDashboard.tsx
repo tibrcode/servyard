@@ -288,81 +288,81 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
         {/* Dashboard Tabs - With proper spacing from content */}
         <div className="space-y-4">
           <Tabs defaultValue="services" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 gap-4 h-auto bg-transparent p-0 mb-6">
+            <TabsList className="grid w-full grid-cols-3 gap-4 h-auto bg-transparent p-0 mb-6 md:grid-cols-6 md:bg-muted md:p-1 md:rounded-lg md:gap-2">
               <TabsTrigger 
                 value="services" 
-                className="relative rounded-2xl border border-border bg-card aspect-square overflow-hidden glow-card transition-transform hover:scale-[1.01] min-w-0 p-0 data-[state=active]:ring-2 data-[state=active]:ring-primary data-[state=active]:border-primary"
+                className="relative rounded-2xl border border-border bg-card aspect-square overflow-hidden glow-card transition-transform hover:scale-[1.01] min-w-0 p-0 data-[state=active]:ring-2 data-[state=active]:ring-primary data-[state=active]:border-primary md:aspect-auto md:h-auto md:rounded-md md:border-0 md:bg-transparent md:shadow-none md:hover:scale-100 md:data-[state=active]:ring-0 md:data-[state=active]:bg-background md:data-[state=active]:shadow-sm md:py-2"
               >
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-3 gap-2 min-w-0">
-                  <div className="opacity-90 flex-shrink-0">
-                    <Settings className="h-6 w-6 sm:h-8 sm:w-8" />
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-3 gap-2 min-w-0 md:static md:flex-row md:gap-2 md:p-0">
+                  <div className="opacity-90 flex-shrink-0 md:opacity-100">
+                    <Settings className="h-6 w-6 sm:h-8 sm:w-8 md:h-4 md:w-4" />
                   </div>
-                  <span className="block mx-auto text-center font-medium text-foreground w-full px-1 leading-tight tracking-normal text-[10px] sm:text-xs whitespace-normal">
-                    {t.provider.services} & {isRTL ? 'مواعيد' : 'Appointments'}
+                  <span className="block mx-auto text-center font-medium text-foreground w-full px-1 leading-tight tracking-normal text-[10px] sm:text-xs whitespace-normal md:w-auto md:text-sm md:mx-0">
+                    {t.provider.services}
                   </span>
                 </div>
               </TabsTrigger>
               <TabsTrigger 
                 value="offers" 
-                className="relative rounded-2xl border border-border bg-card aspect-square overflow-hidden glow-card transition-transform hover:scale-[1.01] min-w-0 p-0 data-[state=active]:ring-2 data-[state=active]:ring-primary data-[state=active]:border-primary"
+                className="relative rounded-2xl border border-border bg-card aspect-square overflow-hidden glow-card transition-transform hover:scale-[1.01] min-w-0 p-0 data-[state=active]:ring-2 data-[state=active]:ring-primary data-[state=active]:border-primary md:aspect-auto md:h-auto md:rounded-md md:border-0 md:bg-transparent md:shadow-none md:hover:scale-100 md:data-[state=active]:ring-0 md:data-[state=active]:bg-background md:data-[state=active]:shadow-sm md:py-2"
               >
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-3 gap-2 min-w-0">
-                  <div className="opacity-90 flex-shrink-0">
-                    <Megaphone className="h-6 w-6 sm:h-8 sm:w-8" />
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-3 gap-2 min-w-0 md:static md:flex-row md:gap-2 md:p-0">
+                  <div className="opacity-90 flex-shrink-0 md:opacity-100">
+                    <Megaphone className="h-6 w-6 sm:h-8 sm:w-8 md:h-4 md:w-4" />
                   </div>
-                  <span className="block mx-auto text-center font-medium text-foreground w-full px-1 leading-tight tracking-normal text-[10px] sm:text-xs whitespace-normal">
+                  <span className="block mx-auto text-center font-medium text-foreground w-full px-1 leading-tight tracking-normal text-[10px] sm:text-xs whitespace-normal md:w-auto md:text-sm md:mx-0">
                     {t.provider.offers}
                   </span>
                 </div>
               </TabsTrigger>
               <TabsTrigger 
                 value="bookings" 
-                className="relative rounded-2xl border border-border bg-card aspect-square overflow-hidden glow-card transition-transform hover:scale-[1.01] min-w-0 p-0 data-[state=active]:ring-2 data-[state=active]:ring-primary data-[state=active]:border-primary"
+                className="relative rounded-2xl border border-border bg-card aspect-square overflow-hidden glow-card transition-transform hover:scale-[1.01] min-w-0 p-0 data-[state=active]:ring-2 data-[state=active]:ring-primary data-[state=active]:border-primary md:aspect-auto md:h-auto md:rounded-md md:border-0 md:bg-transparent md:shadow-none md:hover:scale-100 md:data-[state=active]:ring-0 md:data-[state=active]:bg-background md:data-[state=active]:shadow-sm md:py-2"
               >
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-3 gap-2 min-w-0">
-                  <div className="opacity-90 flex-shrink-0">
-                    <Calendar className="h-6 w-6 sm:h-8 sm:w-8" />
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-3 gap-2 min-w-0 md:static md:flex-row md:gap-2 md:p-0">
+                  <div className="opacity-90 flex-shrink-0 md:opacity-100">
+                    <Calendar className="h-6 w-6 sm:h-8 sm:w-8 md:h-4 md:w-4" />
                   </div>
-                  <span className="block mx-auto text-center font-medium text-foreground w-full px-1 leading-tight tracking-normal text-[10px] sm:text-xs whitespace-normal">
+                  <span className="block mx-auto text-center font-medium text-foreground w-full px-1 leading-tight tracking-normal text-[10px] sm:text-xs whitespace-normal md:w-auto md:text-sm md:mx-0">
                     {t.provider.bookings}
                   </span>
                 </div>
               </TabsTrigger>
               <TabsTrigger 
                 value="appointments" 
-                className="relative rounded-2xl border border-border bg-card aspect-square overflow-hidden glow-card transition-transform hover:scale-[1.01] min-w-0 p-0 data-[state=active]:ring-2 data-[state=active]:ring-primary data-[state=active]:border-primary"
+                className="relative rounded-2xl border border-border bg-card aspect-square overflow-hidden glow-card transition-transform hover:scale-[1.01] min-w-0 p-0 data-[state=active]:ring-2 data-[state=active]:ring-primary data-[state=active]:border-primary md:aspect-auto md:h-auto md:rounded-md md:border-0 md:bg-transparent md:shadow-none md:hover:scale-100 md:data-[state=active]:ring-0 md:data-[state=active]:bg-background md:data-[state=active]:shadow-sm md:py-2"
               >
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-3 gap-2 min-w-0">
-                  <div className="opacity-90 flex-shrink-0">
-                    <Clock className="h-6 w-6 sm:h-8 sm:w-8" />
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-3 gap-2 min-w-0 md:static md:flex-row md:gap-2 md:p-0">
+                  <div className="opacity-90 flex-shrink-0 md:opacity-100">
+                    <Clock className="h-6 w-6 sm:h-8 sm:w-8 md:h-4 md:w-4" />
                   </div>
-                  <span className="block mx-auto text-center font-medium text-foreground w-full px-1 leading-tight tracking-normal text-[10px] sm:text-xs whitespace-normal">
+                  <span className="block mx-auto text-center font-medium text-foreground w-full px-1 leading-tight tracking-normal text-[10px] sm:text-xs whitespace-normal md:w-auto md:text-sm md:mx-0">
                     {t.provider.pendingBookings}
                   </span>
                 </div>
               </TabsTrigger>
               <TabsTrigger 
                 value="share" 
-                className="relative rounded-2xl border border-border bg-card aspect-square overflow-hidden glow-card transition-transform hover:scale-[1.01] min-w-0 p-0 data-[state=active]:ring-2 data-[state=active]:ring-primary data-[state=active]:border-primary"
+                className="relative rounded-2xl border border-border bg-card aspect-square overflow-hidden glow-card transition-transform hover:scale-[1.01] min-w-0 p-0 data-[state=active]:ring-2 data-[state=active]:ring-primary data-[state=active]:border-primary md:aspect-auto md:h-auto md:rounded-md md:border-0 md:bg-transparent md:shadow-none md:hover:scale-100 md:data-[state=active]:ring-0 md:data-[state=active]:bg-background md:data-[state=active]:shadow-sm md:py-2"
               >
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-3 gap-2 min-w-0">
-                  <div className="opacity-90 flex-shrink-0">
-                    <Share2 className="h-6 w-6 sm:h-8 sm:w-8" />
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-3 gap-2 min-w-0 md:static md:flex-row md:gap-2 md:p-0">
+                  <div className="opacity-90 flex-shrink-0 md:opacity-100">
+                    <Share2 className="h-6 w-6 sm:h-8 sm:w-8 md:h-4 md:w-4" />
                   </div>
-                  <span className="block mx-auto text-center font-medium text-foreground w-full px-1 leading-tight tracking-normal text-[10px] sm:text-xs whitespace-normal">
+                  <span className="block mx-auto text-center font-medium text-foreground w-full px-1 leading-tight tracking-normal text-[10px] sm:text-xs whitespace-normal md:w-auto md:text-sm md:mx-0">
                     {t.provider.shareProfile}
                   </span>
                 </div>
               </TabsTrigger>
               <TabsTrigger 
                 value="settings" 
-                className="relative rounded-2xl border border-border bg-card aspect-square overflow-hidden glow-card transition-transform hover:scale-[1.01] min-w-0 p-0 data-[state=active]:ring-2 data-[state=active]:ring-primary data-[state=active]:border-primary"
+                className="relative rounded-2xl border border-border bg-card aspect-square overflow-hidden glow-card transition-transform hover:scale-[1.01] min-w-0 p-0 data-[state=active]:ring-2 data-[state=active]:ring-primary data-[state=active]:border-primary md:aspect-auto md:h-auto md:rounded-md md:border-0 md:bg-transparent md:shadow-none md:hover:scale-100 md:data-[state=active]:ring-0 md:data-[state=active]:bg-background md:data-[state=active]:shadow-sm md:py-2"
               >
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-3 gap-2 min-w-0">
-                  <div className="opacity-90 flex-shrink-0">
-                    <Settings className="h-6 w-6 sm:h-8 sm:w-8" />
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-3 gap-2 min-w-0 md:static md:flex-row md:gap-2 md:p-0">
+                  <div className="opacity-90 flex-shrink-0 md:opacity-100">
+                    <Settings className="h-6 w-6 sm:h-8 sm:w-8 md:h-4 md:w-4" />
                   </div>
-                  <span className="block mx-auto text-center font-medium text-foreground w-full px-1 leading-tight tracking-normal text-[10px] sm:text-xs whitespace-normal">
+                  <span className="block mx-auto text-center font-medium text-foreground w-full px-1 leading-tight tracking-normal text-[10px] sm:text-xs whitespace-normal md:w-auto md:text-sm md:mx-0">
                     {isRTL ? 'إعدادات' : 'Settings'}
                   </span>
                 </div>
