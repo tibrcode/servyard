@@ -46,12 +46,14 @@ interface MyBookingsProps {
   customerId: string;
   language?: 'ar' | 'en';
   cancellationPolicyHours?: number;
+  filterType?: 'service' | 'booking';
 }
 
 export function MyBookings({
   customerId,
   language = 'ar',
   cancellationPolicyHours = 24,
+  filterType,
 }: MyBookingsProps) {
   const { toast } = useToast();
   const { t, isRTL: isRTLFromHook } = useTranslation(language);
@@ -59,6 +61,9 @@ export function MyBookings({
   const [isLoading, setIsLoading] = useState(true);
   const [cancellingId, setCancellingId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
+  
+  // Service types cache
+  const [serviceTypes, setServiceTypes] = useState<Record<string, 'service' | 'booking' | undefined>>({});
   
   // Review state
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
@@ -215,16 +220,19 @@ export function MyBookings({
     const unsubscribe = subscribeToCustomerBookings(customerId, async (data) => {
       setBookings(data);
       
-      // Load cancellation hours for each unique service
+      // Load cancellation hours and types for each unique service
       const uniqueServiceIds = [...new Set(data.map(b => b.service_id))];
       const hoursCache: Record<string, number> = {};
+      const typesCache: Record<string, 'service' | 'booking' | undefined> = {};
       
       await Promise.all(
         uniqueServiceIds.map(async (serviceId) => {
           try {
             const serviceDoc = await getDoc(doc(db, 'services', serviceId));
             if (serviceDoc.exists()) {
-              hoursCache[serviceId] = serviceDoc.data().cancellation_policy_hours || 24;
+              const data = serviceDoc.data();
+              hoursCache[serviceId] = data.cancellation_policy_hours || 24;
+              typesCache[serviceId] = data.type as 'service' | 'booking' | undefined;
             }
           } catch (error) {
             console.error(`Error loading service ${serviceId}:`, error);
@@ -233,6 +241,7 @@ export function MyBookings({
       );
       
       setServiceCancellationHours(hoursCache);
+      setServiceTypes(typesCache);
       setIsLoading(false);
       
       // Load provider contacts for all bookings
@@ -283,16 +292,19 @@ export function MyBookings({
       const data = await getCustomerBookings(customerId);
       setBookings(data);
       
-      // Load cancellation hours for each unique service
+      // Load cancellation hours and types for each unique service
       const uniqueServiceIds = [...new Set(data.map(b => b.service_id))];
       const hoursCache: Record<string, number> = {};
+      const typesCache: Record<string, 'service' | 'booking' | undefined> = {};
       
       await Promise.all(
         uniqueServiceIds.map(async (serviceId) => {
           try {
             const serviceDoc = await getDoc(doc(db, 'services', serviceId));
             if (serviceDoc.exists()) {
-              hoursCache[serviceId] = serviceDoc.data().cancellation_policy_hours || 24;
+              const data = serviceDoc.data();
+              hoursCache[serviceId] = data.cancellation_policy_hours || 24;
+              typesCache[serviceId] = data.type as 'service' | 'booking' | undefined;
             }
           } catch (error) {
             console.error(`Error loading service ${serviceId}:`, error);
@@ -301,6 +313,7 @@ export function MyBookings({
       );
       
       setServiceCancellationHours(hoursCache);
+      setServiceTypes(typesCache);
     } catch (error) {
       console.error('Error loading bookings:', error);
       toast({
@@ -539,8 +552,18 @@ export function MyBookings({
     return isFutureDate && isActiveStatus;
   };
 
-  const upcomingBookings = bookings.filter(isUpcoming);
-  const pastBookings = bookings.filter(b => !isUpcoming(b));
+  const filteredBookings = bookings.filter(booking => {
+    if (!filterType) return true;
+    const type = serviceTypes[booking.service_id];
+    // Default to 'service' if type is missing (backward compatibility)
+    const resolvedType = type || 'service';
+    
+    if (filterType === 'booking') return resolvedType === 'booking';
+    return resolvedType !== 'booking';
+  });
+
+  const upcomingBookings = filteredBookings.filter(isUpcoming);
+  const pastBookings = filteredBookings.filter(b => !isUpcoming(b));
 
   const renderBookingCard = (booking: Booking) => {
     // استخدام cancellation_policy_hours من الحجز، أو من الخدمة، أو القيمة الافتراضية

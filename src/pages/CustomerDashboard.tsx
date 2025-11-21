@@ -227,9 +227,10 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
 
         {/* Main Content */}
         <div className="space-y-4">
-          <Tabs defaultValue="appointments" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 mb-6">
-              <TabsTrigger value="appointments">{t.customer.myBookings}</TabsTrigger>
+          <Tabs defaultValue="services" className="w-full">
+            <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6 mb-6 h-auto">
+              <TabsTrigger value="services">{isRTL ? 'خدماتي' : 'My Services'}</TabsTrigger>
+              <TabsTrigger value="appointments">{isRTL ? 'مواعيدي' : 'My Appointments'}</TabsTrigger>
               <TabsTrigger value="favorites">
                 <Heart className="w-4 h-4 mr-2" />
                 <span className="hidden xs:inline">{isRTL ? 'المفضلة' : 'Favorites'}</span>
@@ -244,11 +245,11 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
               <TabsTrigger value="settings">{isRTL ? 'إعدادات' : 'Settings'}</TabsTrigger>
             </TabsList>
 
-            {/* Bookings Tab - Unified Modern Booking System */}
-            <TabsContent value="appointments" className="space-y-6">
+            {/* Services Tab */}
+            <TabsContent value="services" className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>{t.customer.myBookings}</CardTitle>
+                  <CardTitle>{isRTL ? 'خدماتي' : 'My Services'}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   {user && (
@@ -256,6 +257,26 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
                       customerId={user.uid}
                       language={currentLanguage as 'en' | 'ar'}
                       cancellationPolicyHours={24}
+                      filterType="service"
+                    />
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Appointments Tab */}
+            <TabsContent value="appointments" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>{isRTL ? 'مواعيدي' : 'My Appointments'}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {user && (
+                    <MyBookings
+                      customerId={user.uid}
+                      language={currentLanguage as 'en' | 'ar'}
+                      cancellationPolicyHours={24}
+                      filterType="booking"
                     />
                   )}
                 </CardContent>
