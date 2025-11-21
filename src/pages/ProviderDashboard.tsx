@@ -18,9 +18,11 @@ import {
   Settings,
   Plus,
   LogOut,
-  Bell,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Megaphone,
+  Share2,
+  Bell
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { auth } from "@/integrations/firebase/client";
@@ -286,42 +288,84 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
         {/* Dashboard Tabs - With proper spacing from content */}
         <div className="space-y-4">
           <Tabs defaultValue="services" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 gap-2 auto-rows-[6rem] bg-transparent p-0 mb-6">
+            <TabsList className="grid w-full grid-cols-3 gap-4 h-auto bg-transparent p-0 mb-6">
               <TabsTrigger 
                 value="services" 
-                className="h-full w-full py-1 whitespace-normal leading-tight px-1 text-[10px] sm:text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground border bg-muted/30 hover:bg-muted/50 transition-colors flex items-center justify-center"
+                className="relative rounded-2xl border border-border bg-card aspect-square overflow-hidden glow-card transition-transform hover:scale-[1.01] min-w-0 p-0 data-[state=active]:ring-2 data-[state=active]:ring-primary data-[state=active]:border-primary"
               >
-                {t.provider.services} & {isRTL ? 'مواعيد' : 'Appointments'}
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-3 gap-2 min-w-0">
+                  <div className="opacity-90 flex-shrink-0">
+                    <Settings className="h-6 w-6 sm:h-8 sm:w-8" />
+                  </div>
+                  <span className="block mx-auto text-center font-medium text-foreground w-full px-1 leading-tight tracking-normal text-[10px] sm:text-xs whitespace-normal">
+                    {t.provider.services} & {isRTL ? 'مواعيد' : 'Appointments'}
+                  </span>
+                </div>
               </TabsTrigger>
               <TabsTrigger 
                 value="offers" 
-                className="h-full w-full py-1 whitespace-normal leading-tight px-1 text-[10px] sm:text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground border bg-muted/30 hover:bg-muted/50 transition-colors flex items-center justify-center"
+                className="relative rounded-2xl border border-border bg-card aspect-square overflow-hidden glow-card transition-transform hover:scale-[1.01] min-w-0 p-0 data-[state=active]:ring-2 data-[state=active]:ring-primary data-[state=active]:border-primary"
               >
-                {t.provider.offers}
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-3 gap-2 min-w-0">
+                  <div className="opacity-90 flex-shrink-0">
+                    <Megaphone className="h-6 w-6 sm:h-8 sm:w-8" />
+                  </div>
+                  <span className="block mx-auto text-center font-medium text-foreground w-full px-1 leading-tight tracking-normal text-[10px] sm:text-xs whitespace-normal">
+                    {t.provider.offers}
+                  </span>
+                </div>
               </TabsTrigger>
               <TabsTrigger 
                 value="bookings" 
-                className="h-full w-full py-1 whitespace-normal leading-tight px-1 text-[10px] sm:text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground border bg-muted/30 hover:bg-muted/50 transition-colors flex items-center justify-center"
+                className="relative rounded-2xl border border-border bg-card aspect-square overflow-hidden glow-card transition-transform hover:scale-[1.01] min-w-0 p-0 data-[state=active]:ring-2 data-[state=active]:ring-primary data-[state=active]:border-primary"
               >
-                {t.provider.bookings}
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-3 gap-2 min-w-0">
+                  <div className="opacity-90 flex-shrink-0">
+                    <Calendar className="h-6 w-6 sm:h-8 sm:w-8" />
+                  </div>
+                  <span className="block mx-auto text-center font-medium text-foreground w-full px-1 leading-tight tracking-normal text-[10px] sm:text-xs whitespace-normal">
+                    {t.provider.bookings}
+                  </span>
+                </div>
               </TabsTrigger>
               <TabsTrigger 
                 value="appointments" 
-                className="h-full w-full py-1 whitespace-normal leading-tight px-1 text-[10px] sm:text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground border bg-muted/30 hover:bg-muted/50 transition-colors flex items-center justify-center"
+                className="relative rounded-2xl border border-border bg-card aspect-square overflow-hidden glow-card transition-transform hover:scale-[1.01] min-w-0 p-0 data-[state=active]:ring-2 data-[state=active]:ring-primary data-[state=active]:border-primary"
               >
-                {t.provider.pendingBookings}
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-3 gap-2 min-w-0">
+                  <div className="opacity-90 flex-shrink-0">
+                    <Clock className="h-6 w-6 sm:h-8 sm:w-8" />
+                  </div>
+                  <span className="block mx-auto text-center font-medium text-foreground w-full px-1 leading-tight tracking-normal text-[10px] sm:text-xs whitespace-normal">
+                    {t.provider.pendingBookings}
+                  </span>
+                </div>
               </TabsTrigger>
               <TabsTrigger 
                 value="share" 
-                className="h-full w-full py-1 whitespace-normal leading-tight px-1 text-[10px] sm:text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground border bg-muted/30 hover:bg-muted/50 transition-colors flex items-center justify-center"
+                className="relative rounded-2xl border border-border bg-card aspect-square overflow-hidden glow-card transition-transform hover:scale-[1.01] min-w-0 p-0 data-[state=active]:ring-2 data-[state=active]:ring-primary data-[state=active]:border-primary"
               >
-                {t.provider.shareProfile}
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-3 gap-2 min-w-0">
+                  <div className="opacity-90 flex-shrink-0">
+                    <Share2 className="h-6 w-6 sm:h-8 sm:w-8" />
+                  </div>
+                  <span className="block mx-auto text-center font-medium text-foreground w-full px-1 leading-tight tracking-normal text-[10px] sm:text-xs whitespace-normal">
+                    {t.provider.shareProfile}
+                  </span>
+                </div>
               </TabsTrigger>
               <TabsTrigger 
                 value="settings" 
-                className="h-full w-full py-1 whitespace-normal leading-tight px-1 text-[10px] sm:text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground border bg-muted/30 hover:bg-muted/50 transition-colors flex items-center justify-center"
+                className="relative rounded-2xl border border-border bg-card aspect-square overflow-hidden glow-card transition-transform hover:scale-[1.01] min-w-0 p-0 data-[state=active]:ring-2 data-[state=active]:ring-primary data-[state=active]:border-primary"
               >
-                {isRTL ? 'إعدادات' : 'Settings'}
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-3 gap-2 min-w-0">
+                  <div className="opacity-90 flex-shrink-0">
+                    <Settings className="h-6 w-6 sm:h-8 sm:w-8" />
+                  </div>
+                  <span className="block mx-auto text-center font-medium text-foreground w-full px-1 leading-tight tracking-normal text-[10px] sm:text-xs whitespace-normal">
+                    {isRTL ? 'إعدادات' : 'Settings'}
+                  </span>
+                </div>
               </TabsTrigger>
             </TabsList>
 
