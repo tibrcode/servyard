@@ -1,39 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Stethoscope,
-  Home,
-  Car,
-  GraduationCap,
-  Scissors,
-  Dumbbell,
-  Laptop,
-  Scale,
-  DollarSign,
-  Sparkles,
-  Wrench,
-  Users,
-  Heart,
-  Cog,
-  Palette,
-  Shirt,
-  Code,
-  Building,
-  Megaphone,
-  Camera,
-  Languages,
-  Briefcase,
-  Calendar,
-  Sofa,
-  PenTool,
-  Music,
-  Plane
-} from "lucide-react";
+import { Users } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
 import { getCategoryLabel } from "@/lib/categoriesLocale";
 import CategoryCard from "@/components/CategoryCard";
 import { useServiceCategories } from "@/hooks/useServiceCategories";
+import { iconMap, colorMap } from "@/lib/categoryIcons";
 
 interface ServiceCategoriesProps {
   currentLanguage?: string;
@@ -52,60 +25,6 @@ export const ServiceCategories = ({
   useEffect(() => {
     setUnifiedTitleSize(null);
   }, [currentLanguage, categories]);
-
-  // Icon mapping
-  const iconMap: { [key: string]: any } = {
-    'Sparkles': Sparkles,
-    'Wrench': Wrench,
-    'Heart': Heart,
-    'Dumbbell': Dumbbell,
-    'Scissors': Scissors,
-    'GraduationCap': GraduationCap,
-    'Stethoscope': Stethoscope,
-    'Home': Home,
-    'Car': Car,
-    'Laptop': Laptop,
-    'Scale': Scale,
-    'DollarSign': DollarSign,
-    'Users': Users,
-    'Cog': Cog,
-    'Palette': Palette,
-    'Shirt': Shirt,
-    'Code': Code,
-    'Building': Building,
-    'Megaphone': Megaphone,
-    'Camera': Camera,
-    'Languages': Languages,
-    'Briefcase': Briefcase,
-    'Calendar': Calendar,
-    'Sofa': Sofa,
-    'PenTool': PenTool,
-    'Music': Music,
-    'Plane': Plane
-  };
-
-  // Color mapping
-  const colorMap: { [key: string]: { text: string; bg: string } } = {
-    'blue': { text: 'text-blue-500', bg: 'bg-blue-50 dark:bg-blue-950/20' },
-    'orange': { text: 'text-orange-500', bg: 'bg-orange-50 dark:bg-orange-950/20' },
-    'red': { text: 'text-red-500', bg: 'bg-red-50 dark:bg-red-950/20' },
-    'green': { text: 'text-green-500', bg: 'bg-green-50 dark:bg-green-950/20' },
-    'pink': { text: 'text-pink-500', bg: 'bg-pink-50 dark:bg-pink-950/20' },
-    'purple': { text: 'text-purple-500', bg: 'bg-purple-50 dark:bg-purple-950/20' },
-    'slate': { text: 'text-slate-500', bg: 'bg-slate-50 dark:bg-slate-950/20' },
-    'gray': { text: 'text-gray-500', bg: 'bg-gray-50 dark:bg-gray-950/20' },
-    'violet': { text: 'text-violet-500', bg: 'bg-violet-50 dark:bg-violet-950/20' },
-    'rose': { text: 'text-rose-500', bg: 'bg-rose-50 dark:bg-rose-950/20' },
-    'emerald': { text: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-950/20' },
-    'amber': { text: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-950/20' },
-    'cyan': { text: 'text-cyan-500', bg: 'bg-cyan-50 dark:bg-cyan-950/20' },
-    'indigo': { text: 'text-indigo-500', bg: 'bg-indigo-50 dark:bg-indigo-950/20' },
-    'teal': { text: 'text-teal-500', bg: 'bg-teal-50 dark:bg-teal-950/20' },
-    'stone': { text: 'text-stone-500', bg: 'bg-stone-50 dark:bg-stone-950/20' },
-    'lime': { text: 'text-lime-500', bg: 'bg-lime-50 dark:bg-lime-950/20' },
-    'sky': { text: 'text-sky-500', bg: 'bg-sky-50 dark:bg-sky-950/20' },
-    'yellow': { text: 'text-yellow-500', bg: 'bg-yellow-50 dark:bg-yellow-950/20' },
-  };
 
 
 

@@ -32,7 +32,7 @@ import {
 export const iconMap: { [key: string]: LucideIcon } = {
   'Sparkles': Sparkles,
   'Wrench': Wrench,
-  'Heart': Heart,
+  'Heart': Stethoscope, // Remapped to Stethoscope for Healthcare Services
   'Dumbbell': Dumbbell,
   'Scissors': Scissors,
   'GraduationCap': GraduationCap,
