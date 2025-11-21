@@ -289,37 +289,37 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
             <TabsList className="grid w-full grid-cols-3 gap-2 h-auto bg-transparent p-0 mb-6">
               <TabsTrigger 
                 value="services" 
-                className="h-full min-h-[3.5rem] py-2 whitespace-normal leading-tight px-1 text-[10px] sm:text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground border bg-muted/30 hover:bg-muted/50 transition-colors"
+                className="h-14 sm:h-16 py-1 whitespace-normal leading-tight px-1 text-[10px] sm:text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground border bg-muted/30 hover:bg-muted/50 transition-colors"
               >
                 {t.provider.services} & {isRTL ? 'مواعيد' : 'Appointments'}
               </TabsTrigger>
               <TabsTrigger 
                 value="offers" 
-                className="h-full min-h-[3.5rem] py-2 whitespace-normal leading-tight px-1 text-[10px] sm:text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground border bg-muted/30 hover:bg-muted/50 transition-colors"
+                className="h-14 sm:h-16 py-1 whitespace-normal leading-tight px-1 text-[10px] sm:text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground border bg-muted/30 hover:bg-muted/50 transition-colors"
               >
                 {t.provider.offers}
               </TabsTrigger>
               <TabsTrigger 
                 value="bookings" 
-                className="h-full min-h-[3.5rem] py-2 whitespace-normal leading-tight px-1 text-[10px] sm:text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground border bg-muted/30 hover:bg-muted/50 transition-colors"
+                className="h-14 sm:h-16 py-1 whitespace-normal leading-tight px-1 text-[10px] sm:text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground border bg-muted/30 hover:bg-muted/50 transition-colors"
               >
                 {t.provider.bookings}
               </TabsTrigger>
               <TabsTrigger 
                 value="appointments" 
-                className="h-full min-h-[3.5rem] py-2 whitespace-normal leading-tight px-1 text-[10px] sm:text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground border bg-muted/30 hover:bg-muted/50 transition-colors"
+                className="h-14 sm:h-16 py-1 whitespace-normal leading-tight px-1 text-[10px] sm:text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground border bg-muted/30 hover:bg-muted/50 transition-colors"
               >
                 {t.provider.pendingBookings}
               </TabsTrigger>
               <TabsTrigger 
                 value="share" 
-                className="h-full min-h-[3.5rem] py-2 whitespace-normal leading-tight px-1 text-[10px] sm:text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground border bg-muted/30 hover:bg-muted/50 transition-colors"
+                className="h-14 sm:h-16 py-1 whitespace-normal leading-tight px-1 text-[10px] sm:text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground border bg-muted/30 hover:bg-muted/50 transition-colors"
               >
                 {t.provider.shareProfile}
               </TabsTrigger>
               <TabsTrigger 
                 value="settings" 
-                className="h-full min-h-[3.5rem] py-2 whitespace-normal leading-tight px-1 text-[10px] sm:text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground border bg-muted/30 hover:bg-muted/50 transition-colors"
+                className="h-14 sm:h-16 py-1 whitespace-normal leading-tight px-1 text-[10px] sm:text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground border bg-muted/30 hover:bg-muted/50 transition-colors"
               >
                 {isRTL ? 'إعدادات' : 'Settings'}
               </TabsTrigger>
