@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -55,9 +55,11 @@ const EditProfile: React.FC<EditProfileProps> = ({ currentLanguage }) => {
     location_address: ''
   });
 
+  const isInitialized = useRef(false);
+
   // Initialize form data when profile loads
   useEffect(() => {
-    if (profile) {
+    if (profile && !isInitialized.current) {
       setFormData({
         full_name: profile.full_name || '',
         email: profile.email || '',
@@ -79,6 +81,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ currentLanguage }) => {
         longitude: profile.longitude,
         location_address: profile.location_address || ''
       });
+      isInitialized.current = true;
     }
   }, [profile]);
 
@@ -140,8 +143,8 @@ const EditProfile: React.FC<EditProfileProps> = ({ currentLanguage }) => {
         currency_code: (formData.currency_code || '').trim() || undefined,
         timezone: formData.timezone || 'Asia/Dubai',
         main_category_id: formData.main_category_id || undefined,
-        latitude: formData.latitude || undefined,
-        longitude: formData.longitude || undefined,
+        latitude: formData.latitude,
+        longitude: formData.longitude,
         location_address: formData.location_address?.trim() || undefined,
       });
 
