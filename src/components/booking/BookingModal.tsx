@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -152,18 +152,18 @@ export const BookingModal = ({ service, provider, isOpen, onClose, currentLangua
   };
 
   // If booking is enabled for this service, use the new booking system
-  if (service.booking_enabled && user && role === 'customer') {
-    const bookingSettings: BookingSettings = {
-      booking_enabled: service.booking_enabled,
-      duration_minutes: service.duration_minutes || 30,
-      max_concurrent_bookings: service.max_concurrent_bookings || 1,
-      advance_booking_days: service.advance_booking_days || 30,
-      buffer_time_minutes: service.buffer_time_minutes || 0,
-      cancellation_policy_hours: service.cancellation_policy_hours || 24,
-      require_confirmation: service.require_confirmation !== undefined ? service.require_confirmation : true,
-      allow_customer_cancellation: service.allow_customer_cancellation !== undefined ? service.allow_customer_cancellation : true,
-    };
+  const bookingSettings = useMemo<BookingSettings>(() => ({
+    booking_enabled: service.booking_enabled || false,
+    duration_minutes: service.duration_minutes || 30,
+    max_concurrent_bookings: service.max_concurrent_bookings || 1,
+    advance_booking_days: service.advance_booking_days || 30,
+    buffer_time_minutes: service.buffer_time_minutes || 0,
+    cancellation_policy_hours: service.cancellation_policy_hours || 24,
+    require_confirmation: service.require_confirmation !== undefined ? service.require_confirmation : true,
+    allow_customer_cancellation: service.allow_customer_cancellation !== undefined ? service.allow_customer_cancellation : true,
+  }), [service]);
 
+  if (service.booking_enabled && user && role === 'customer') {
     if (!isOpen) return null;
 
     return (

@@ -39,7 +39,7 @@ export function minutesToTime(minutes: number): string {
  */
 export function getDayOfWeek(dateString: string): DayOfWeek {
   const date = new Date(dateString);
-  return date.getDay() as DayOfWeek;
+  return date.getUTCDay() as DayOfWeek;
 }
 
 /**
