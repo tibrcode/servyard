@@ -85,3 +85,8 @@ export const getCategoryIcon = (iconName: string | undefined): LucideIcon | null
   if (!iconName) return null;
   return iconMap[iconName] || null;
 };
+
+export const getCategoryColor = (colorName: string | undefined): { text: string; bg: string } => {
+  if (!colorName) return { text: 'text-primary', bg: 'bg-primary/10' };
+  return colorMap[colorName] || { text: 'text-primary', bg: 'bg-primary/10' };
+};
