@@ -82,6 +82,15 @@ service cloud.firestore {
                                resource.data.provider_id == request.auth.uid;
     }
     
+    // Service Schedules Collection
+    match /service_schedules/{scheduleId} {
+      allow read: if true; // Public schedules for booking
+      allow create: if isSignedIn() && 
+                       request.resource.data.provider_id == request.auth.uid;
+      allow update, delete: if isSignedIn() && 
+                               resource.data.provider_id == request.auth.uid;
+    }
+
     // Service Availability Collection
     match /service_availability/{availabilityId} {
       allow read: if true; // Public availability for booking
