@@ -305,35 +305,6 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
               </TabsTrigger>
 
               <TabsTrigger 
-                value="bookings" 
-                className="relative rounded-2xl border border-border bg-card aspect-square overflow-hidden glow-card transition-transform hover:scale-[1.01] min-w-0 p-0 data-[state=active]:ring-2 data-[state=active]:ring-primary data-[state=active]:border-primary md:aspect-auto md:h-auto md:rounded-md md:border-0 md:bg-transparent md:shadow-none md:hover:scale-100 md:data-[state=active]:ring-0 md:data-[state=active]:bg-background md:data-[state=active]:shadow-sm md:py-2"
-              >
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-3 gap-2 min-w-0 md:static md:flex-row md:gap-2 md:p-0">
-                  <div className="opacity-90 flex-shrink-0 md:opacity-100">
-                    <Calendar className="h-6 w-6 sm:h-8 sm:w-8 md:h-4 md:w-4" />
-                  </div>
-                  <span className="block mx-auto text-center font-medium text-foreground w-full px-1 leading-tight tracking-normal text-[10px] sm:text-xs whitespace-normal md:w-auto md:text-sm md:mx-0">
-                    {isRTL ? 'حجز' : 'Appointments'}
-                  </span>
-                </div>
-              </TabsTrigger>
-
-              <TabsTrigger 
-                value="map" 
-                onClick={() => navigate('/services?view=map')}
-                className="relative rounded-2xl border border-border bg-card aspect-square overflow-hidden glow-card transition-transform hover:scale-[1.01] min-w-0 p-0 data-[state=active]:ring-2 data-[state=active]:ring-primary data-[state=active]:border-primary md:aspect-auto md:h-auto md:rounded-md md:border-0 md:bg-transparent md:shadow-none md:hover:scale-100 md:data-[state=active]:ring-0 md:data-[state=active]:bg-background md:data-[state=active]:shadow-sm md:py-2"
-              >
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-3 gap-2 min-w-0 md:static md:flex-row md:gap-2 md:p-0">
-                  <div className="opacity-90 flex-shrink-0 md:opacity-100">
-                    <MapIcon className="h-6 w-6 sm:h-8 sm:w-8 md:h-4 md:w-4" />
-                  </div>
-                  <span className="block mx-auto text-center font-medium text-foreground w-full px-1 leading-tight tracking-normal text-[10px] sm:text-xs whitespace-normal md:w-auto md:text-sm md:mx-0">
-                    {isRTL ? 'الخريطة' : 'Map'}
-                  </span>
-                </div>
-              </TabsTrigger>
-
-              <TabsTrigger 
                 value="offers" 
                 className="relative rounded-2xl border border-border bg-card aspect-square overflow-hidden glow-card transition-transform hover:scale-[1.01] min-w-0 p-0 data-[state=active]:ring-2 data-[state=active]:ring-primary data-[state=active]:border-primary md:aspect-auto md:h-auto md:rounded-md md:border-0 md:bg-transparent md:shadow-none md:hover:scale-100 md:data-[state=active]:ring-0 md:data-[state=active]:bg-background md:data-[state=active]:shadow-sm md:py-2"
               >
@@ -343,6 +314,20 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
                   </div>
                   <span className="block mx-auto text-center font-medium text-foreground w-full px-1 leading-tight tracking-normal text-[10px] sm:text-xs whitespace-normal md:w-auto md:text-sm md:mx-0">
                     {t.provider.offers}
+                  </span>
+                </div>
+              </TabsTrigger>
+
+              <TabsTrigger 
+                value="bookings" 
+                className="relative rounded-2xl border border-border bg-card aspect-square overflow-hidden glow-card transition-transform hover:scale-[1.01] min-w-0 p-0 data-[state=active]:ring-2 data-[state=active]:ring-primary data-[state=active]:border-primary md:aspect-auto md:h-auto md:rounded-md md:border-0 md:bg-transparent md:shadow-none md:hover:scale-100 md:data-[state=active]:ring-0 md:data-[state=active]:bg-background md:data-[state=active]:shadow-sm md:py-2"
+              >
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-3 gap-2 min-w-0 md:static md:flex-row md:gap-2 md:p-0">
+                  <div className="opacity-90 flex-shrink-0 md:opacity-100">
+                    <Calendar className="h-6 w-6 sm:h-8 sm:w-8 md:h-4 md:w-4" />
+                  </div>
+                  <span className="block mx-auto text-center font-medium text-foreground w-full px-1 leading-tight tracking-normal text-[10px] sm:text-xs whitespace-normal md:w-auto md:text-sm md:mx-0">
+                    {t.provider.bookings}
                   </span>
                 </div>
               </TabsTrigger>
