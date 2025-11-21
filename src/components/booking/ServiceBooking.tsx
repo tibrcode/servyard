@@ -142,13 +142,14 @@ export function ServiceBooking({
       
       if (!schedule) {
         console.warn('⚠️ No schedule found for this day');
-        toast({
-          title: isRTL ? 'تنبيه' : 'Notice',
-          description: isRTL 
-            ? 'لم يتم تحديد جدول عمل لهذا اليوم. يرجى مراجعة مزود الخدمة.' 
-            : 'No schedule set for this day. Please contact the service provider.',
-          variant: 'destructive',
-        });
+        // Only show toast if we are not in the initial load loop to avoid spamming
+        // toast({
+        //   title: isRTL ? 'تنبيه' : 'Notice',
+        //   description: isRTL 
+        //     ? 'لم يتم تحديد جدول عمل لهذا اليوم. يرجى مراجعة مزود الخدمة.' 
+        //     : 'No schedule set for this day. Please contact the service provider.',
+        //   variant: 'destructive',
+        // });
         setAvailability({
           date: dateString,
           day_of_week: dayOfWeek,
@@ -196,7 +197,8 @@ export function ServiceBooking({
     } finally {
       setIsLoadingSlots(false);
     }
-  }, [serviceId, existingBookingId, bookingSettings, providerTimezone, initialDate, initialTimes, isRTL, toast]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [serviceId, existingBookingId, JSON.stringify(bookingSettings), providerTimezone, initialDate, JSON.stringify(initialTimes), isRTL, toast]);
 
   // Load availability when date changes
   useEffect(() => {
