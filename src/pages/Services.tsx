@@ -476,7 +476,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
         <div className="grid grid-cols-4 gap-2 mb-4">
           <Button
             variant={activeView === 'services' ? 'default' : 'outline'}
-            className={`h-16 flex flex-col items-center justify-center gap-1 rounded-xl border-2 ${
+            className={`h-16 flex flex-col items-center justify-center gap-1 rounded-xl border-2 px-0 ${
               activeView === 'services' 
                 ? 'border-primary bg-primary text-primary-foreground shadow-md' 
                 : 'border-muted bg-card hover:bg-muted/50 hover:border-primary/50'
@@ -484,12 +484,12 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
             onClick={() => setActiveView('services')}
           >
             <List className="w-5 h-5" />
-            <span className="text-xs font-bold">{isRTL ? 'الخدمات' : 'Services'}</span>
+            <span className="text-[10px] sm:text-xs font-bold leading-tight">{isRTL ? 'الخدمات' : 'Services'}</span>
           </Button>
 
           <Button
             variant={activeView === 'appointments' ? 'default' : 'outline'}
-            className={`h-16 flex flex-col items-center justify-center gap-1 rounded-xl border-2 ${
+            className={`h-16 flex flex-col items-center justify-center gap-1 rounded-xl border-2 px-0 ${
               activeView === 'appointments' 
                 ? 'border-primary bg-primary text-primary-foreground shadow-md' 
                 : 'border-muted bg-card hover:bg-muted/50 hover:border-primary/50'
@@ -497,12 +497,12 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
             onClick={() => setActiveView('appointments')}
           >
             <Calendar className="w-5 h-5" />
-            <span className="text-xs font-bold">{isRTL ? 'حجز' : 'Appointments'}</span>
+            <span className="text-[10px] sm:text-xs font-bold leading-tight">{isRTL ? 'حجز' : 'Appointments'}</span>
           </Button>
 
           <Button
             variant={activeView === 'map' ? 'default' : 'outline'}
-            className={`h-16 flex flex-col items-center justify-center gap-1 rounded-xl border-2 ${
+            className={`h-16 flex flex-col items-center justify-center gap-1 rounded-xl border-2 px-0 ${
               activeView === 'map' 
                 ? 'border-primary bg-primary text-primary-foreground shadow-md' 
                 : 'border-muted bg-card hover:bg-muted/50 hover:border-primary/50'
@@ -510,12 +510,12 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
             onClick={() => setActiveView('map')}
           >
             <MapIcon className="w-5 h-5" />
-            <span className="text-xs font-bold">{isRTL ? 'الخريطة' : 'Map'}</span>
+            <span className="text-[10px] sm:text-xs font-bold leading-tight">{isRTL ? 'الخريطة' : 'Map'}</span>
           </Button>
 
           <Button
             variant={activeView === 'offers' ? 'default' : 'outline'}
-            className={`h-16 flex flex-col items-center justify-center gap-1 rounded-xl border-2 ${
+            className={`h-16 flex flex-col items-center justify-center gap-1 rounded-xl border-2 px-0 ${
               activeView === 'offers' 
                 ? 'border-primary bg-primary text-primary-foreground shadow-md' 
                 : 'border-muted bg-card hover:bg-muted/50 hover:border-primary/50'
@@ -523,7 +523,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
             onClick={() => setActiveView('offers')}
           >
             <Sparkles className="w-5 h-5" />
-            <span className="text-xs font-bold">{isRTL ? 'العروض' : 'Offers'}</span>
+            <span className="text-[10px] sm:text-xs font-bold leading-tight">{isRTL ? 'العروض' : 'Offers'}</span>
           </Button>
         </div>
 
