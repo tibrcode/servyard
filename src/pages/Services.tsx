@@ -1125,6 +1125,18 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                 </p>
                               )}
 
+                              {/* Specialty Description */}
+                              {service.specialty_description && (
+                                <div className="mt-2 pt-2 border-t border-dashed">
+                                  <p className="text-xs font-semibold text-primary mb-1">
+                                    {t.addService.specialtyDescription}
+                                  </p>
+                                  <p className="text-foreground text-sm">
+                                    {service.specialty_description}
+                                  </p>
+                                </div>
+                              )}
+
                               {/* Provider */}
                               <p className="text-muted-foreground" style={{ fontSize: '12px' }}>
                                 <span className="text-primary" style={{ fontWeight: '600' }}>

@@ -386,6 +386,16 @@ const ProviderProfile = ({ currentLanguage, onLanguageChange }: ProviderProfileP
                             <div className="flex-1">
                               <h3 className="text-xl font-semibold mb-1 sm:mb-2">{service.name}</h3>
                               <p className="text-muted-foreground mb-2 sm:mb-3">{service.description}</p>
+                              {service.specialty_description && (
+                                <div className="mb-3 p-2 bg-background rounded border border-dashed">
+                                  <p className="text-xs font-semibold text-primary mb-1">
+                                    {t.addService.specialtyDescription}
+                                  </p>
+                                  <p className="text-sm text-foreground">
+                                    {service.specialty_description}
+                                  </p>
+                                </div>
+                              )}
                               <div className="flex items-center gap-3 sm:gap-4 text-sm text-muted-foreground">
                                 <div className="flex items-center gap-1">
                                   <Clock className="w-4 h-4" />
