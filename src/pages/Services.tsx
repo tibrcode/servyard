@@ -473,7 +473,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
         </div>
 
         {/* 2. Main Navigation Buttons (Services, Appointments, Map, Offers) */}
-        <div className="grid grid-cols-4 gap-2 mb-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
           <Button
             variant={activeView === 'services' ? 'default' : 'outline'}
             className={`h-16 flex flex-col items-center justify-center gap-1 rounded-xl border-2 px-0 ${
