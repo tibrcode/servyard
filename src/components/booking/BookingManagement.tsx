@@ -19,6 +19,8 @@ import { format } from 'date-fns';
 import { ar, enUS } from 'date-fns/locale';
 import { Separator } from '@/components/ui/separator';
 import { useTranslation } from '@/lib/i18n';
+import { downloadBookingICS } from '@/lib/calendar';
+import { CALENDAR_PREFS_KEY } from '@/components/settings/CalendarSettings';
 import {
   Select,
   SelectContent,
@@ -259,6 +261,28 @@ export function BookingManagement({
       setBookings(prev =>
         prev.map(b => (b.booking_id === bookingId ? { ...b, status: newStatus } : b))
       );
+
+      // Check for calendar auto-add
+      if (newStatus === 'confirmed') {
+        const booking = bookings.find(b => b.booking_id === bookingId);
+        if (booking) {
+          const savedPrefs = localStorage.getItem(CALENDAR_PREFS_KEY);
+          if (savedPrefs) {
+            try {
+              const prefs = JSON.parse(savedPrefs);
+              if (prefs.autoAdd) {
+                downloadBookingICS(booking, isRTL);
+                toast({
+                  title: isRTL ? 'تمت الإضافة للتقويم' : 'Added to Calendar',
+                  description: isRTL ? 'تم تنزيل ملف التقويم' : 'Calendar file downloaded',
+                });
+              }
+            } catch (e) {
+              console.error('Error parsing calendar prefs', e);
+            }
+          }
+        }
+      }
 
       toast({
         title: translations.updateSuccess,
