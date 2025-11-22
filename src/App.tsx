@@ -56,7 +56,7 @@ const AppContent = () => {
   });
   const { t } = useTranslation(currentLanguage);
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user, role } = useAuth();
   
   // State للموقع الجغرافي
   const [userLocation, setUserLocation] = React.useState<{
@@ -199,20 +199,26 @@ const AppContent = () => {
         
         // حفظ في profile إذا كان المستخدم مسجل دخول
         if (user?.uid) {
-          try {
-            console.log('🔄 Saving location to profile for user:', user.uid);
-            await updateDoc(doc(db, 'profiles', user.uid), {
-              latitude,
-              longitude,
-              location_updated_at: new Date().toISOString()
-            });
-            console.log('✅ Location saved to profile successfully!', { 
-              userId: user.uid,
-              latitude, 
-              longitude 
-            });
-          } catch (error) {
-            console.error('❌ Error saving location to profile:', error);
+          // If user is a provider, DO NOT update their profile location from here.
+          // They should only update it via Edit Profile settings.
+          if (role === 'provider') {
+             console.log('ℹ️ User is provider - skipping profile location update (local state only)');
+          } else {
+            try {
+              console.log('🔄 Saving location to profile for user:', user.uid);
+              await updateDoc(doc(db, 'profiles', user.uid), {
+                latitude,
+                longitude,
+                location_updated_at: new Date().toISOString()
+              });
+              console.log('✅ Location saved to profile successfully!', { 
+                userId: user.uid,
+                latitude, 
+                longitude 
+              });
+            } catch (error) {
+              console.error('❌ Error saving location to profile:', error);
+            }
           }
         } else {
           console.warn('⚠️ User not logged in - location not saved to profile');
