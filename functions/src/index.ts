@@ -74,7 +74,21 @@ async function deleteByServiceIds(col: string, serviceIds: string[]) {
 //  - Hard cap of 25 duplicate groups per invocation
 //  - Dry run returns a plan without modifying data
 //  - Execute returns detailed summary of operations performed
-export const dedupeServiceCategories = onRequest({ cors: true, maxInstances: 1, secrets: [ADMIN_DELETE_TOKEN] }, async (req: any, res: any) => {
+export const dedupeServiceCategories = onRequest({ maxInstances: 1, secrets: [ADMIN_DELETE_TOKEN] }, async (req: any, res: any) => {
+  // Manual CORS
+  res.set('Access-Control-Allow-Origin', '*');
+  if (req.headers.origin) {
+    res.set('Access-Control-Allow-Origin', req.headers.origin);
+  }
+  res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-admin-key, x-trace-id');
+  res.set('Access-Control-Max-Age', '3600');
+
+  if (req.method === 'OPTIONS') {
+    res.status(204).send('');
+    return;
+  }
+
   if (req.method !== 'POST') return errorResponse(res, 405, 'method_not_allowed', 'POST required', req.get('x-trace-id'));
   const mode = (req.query.mode || req.body?.mode || 'dryRun') as 'dryRun' | 'execute';
   const trace = req.get('x-trace-id');
@@ -260,7 +274,21 @@ export const onAuthDeleteUser = auth.user().onDelete(async (userRecord) => {
 });
 
 // 2) Admin HTTP endpoint: POST /adminDeleteUser with header x-admin-key and body { uid }
-export const adminDeleteUser = onRequest({ cors: true, maxInstances: 1, secrets: [ADMIN_DELETE_TOKEN] }, async (req: any, res: any) => {
+export const adminDeleteUser = onRequest({ maxInstances: 1, secrets: [ADMIN_DELETE_TOKEN] }, async (req: any, res: any) => {
+  // Manual CORS
+  res.set('Access-Control-Allow-Origin', '*');
+  if (req.headers.origin) {
+    res.set('Access-Control-Allow-Origin', req.headers.origin);
+  }
+  res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-admin-key, x-trace-id');
+  res.set('Access-Control-Max-Age', '3600');
+
+  if (req.method === 'OPTIONS') {
+    res.status(204).send('');
+    return;
+  }
+
   if (req.method !== 'POST') return errorResponse(res, 405, 'method_not_allowed', 'POST required', req.get('x-trace-id'));
   const trace = req.get('x-trace-id');
   const started = Date.now();
