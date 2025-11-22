@@ -55,6 +55,8 @@ export function useProfileData() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['profile', user?.uid] });
+      queryClient.invalidateQueries({ queryKey: ['providerProfile', user?.uid] });
+      queryClient.invalidateQueries({ queryKey: ['provider', user?.uid] });
     }
   });
 
