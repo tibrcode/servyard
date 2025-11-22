@@ -11,14 +11,11 @@ import {
   Building2,
   ShoppingBag,
   LogOut,
-  Moon,
-  Sun,
   Clock,
   Heart
 } from "lucide-react";
 import { Bell } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
-import { Globe, MapPin } from "lucide-react";
 import { useNotificationLog } from "@/contexts/NotificationLogContext";
 import {
   Sidebar,
@@ -32,9 +29,8 @@ import {
   SidebarHeader,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useTranslation, supportedLanguages } from "@/lib/i18n";
+import { useTranslation } from "@/lib/i18n";
 import { useAuth } from "@/contexts/AuthContext";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import BrandLogo from "@/components/BrandLogo";
 
 interface AppSidebarProps {
@@ -50,8 +46,6 @@ export function AppSidebar({ currentLanguage = 'en', onLanguageChange, onLocatio
   const { user, role, signOut, displayName } = useAuth();
   const { unreadCount } = useNotificationLog();
   const currentPath = location.pathname;
-  const languages = supportedLanguages;
-  const [langOpen, setLangOpen] = React.useState(false);
 
   const handleNavigation = () => {
     // Close sidebar on mobile after navigation
@@ -89,17 +83,6 @@ export function AppSidebar({ currentLanguage = 'en', onLanguageChange, onLocatio
   const handleLogout = async () => {
     await signOut();
     if (isMobile) setOpenMobile(false);
-  };
-
-  const handleThemeToggle = () => {
-    try {
-      const root = document.documentElement;
-      const isDark = root.classList.contains('dark');
-      const newTheme = isDark ? 'light' : 'dark';
-      root.classList.remove('light', 'dark');
-      root.classList.add(newTheme);
-      localStorage.setItem('servyard-theme', newTheme);
-    } catch { }
   };
 
   return (
@@ -171,56 +154,6 @@ export function AppSidebar({ currentLanguage = 'en', onLanguageChange, onLocatio
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
-
-                {/* Preferences: Language, Location, Theme */}
-                <SidebarMenuItem>
-                  <DropdownMenu open={langOpen} onOpenChange={setLangOpen}>
-                    <DropdownMenuTrigger asChild>
-                      <SidebarMenuButton className="justify-start">
-                        <Globe className="h-4 w-4 mr-2" />
-                        <span>{t.nav.language}</span>
-                      </SidebarMenuButton>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent portalled={false} align={isRTL ? 'start' : 'end'} className="w-48">
-                      {languages.map((language) => (
-                        <DropdownMenuItem
-                          key={language.code}
-                          onClick={() => {
-                            setLangOpen(false);
-                            if (language.code !== currentLanguage) {
-                              setTimeout(() => {
-                                onLanguageChange?.(language.code);
-                                if (isMobile) setOpenMobile(false);
-                              }, 0);
-                            }
-                          }}
-                          className={currentLanguage === language.code ? 'bg-accent' : ''}
-                        >
-                          <span className="truncate">{language.name}</span>
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </SidebarMenuItem>
-
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
-                    <button onClick={onLocationChange} className="flex items-center w-full">
-                      <MapPin className="h-4 w-4 mr-2" />
-                      <span>{t.nav.location}</span>
-                    </button>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
-                    <button onClick={handleThemeToggle} className="relative inline-flex items-center w-full">
-                      <Sun className="h-4 w-4 mr-2 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                      <Moon className="h-4 w-4 mr-2 -ml-6 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-                      <span className="ml-0">{t.nav.theme || 'Theme'}</span>
-                    </button>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
