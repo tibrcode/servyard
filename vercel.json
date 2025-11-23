@@ -1,6 +1,10 @@
 {
   "cleanUrls": true,
   "rewrites": [
+    {
+      "source": "/adminDeleteUser",
+      "destination": "https://admindeleteuser-btfczcxdyq-uc.a.run.app"
+    },
     { "source": "/(.*)", "destination": "/" }
   ]
 }
