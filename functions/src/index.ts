@@ -39,11 +39,22 @@ function syntheticTrace(event: string) {
 const ADMIN_DELETE_TOKEN = defineSecret('ADMIN_DELETE_TOKEN');
 
 async function deleteByQuery(col: string, field: string, value: string) {
-  const snap = await db.collection(col).where(field, '==', value).get();
-  if (snap.empty) return;
-  const bw = db.bulkWriter();
-  snap.docs.forEach((d: admin.firestore.QueryDocumentSnapshot) => bw.delete(d.ref));
-  await bw.close();
+  console.log(`deleteByQuery: ${col} where ${field} == ${value}`);
+  try {
+    const snap = await db.collection(col).where(field, '==', value).get();
+    if (snap.empty) {
+      console.log(`deleteByQuery: ${col} empty`);
+      return;
+    }
+    console.log(`deleteByQuery: deleting ${snap.size} docs from ${col}`);
+    const bw = db.bulkWriter();
+    snap.docs.forEach((d: admin.firestore.QueryDocumentSnapshot) => bw.delete(d.ref));
+    await bw.close();
+    console.log(`deleteByQuery: ${col} deleted`);
+  } catch (e) {
+    console.error(`deleteByQuery error for ${col}:`, e);
+    throw e;
+  }
 }
 
 // Standardized error response helper
@@ -230,6 +241,7 @@ export const dedupeServiceCategories = onRequest({ maxInstances: 1, secrets: [AD
 });
 
 async function deleteUserData(uid: string) {
+  console.log(`deleteUserData: fetching profile for ${uid}`);
   // Try to read role
   let role: 'provider' | 'customer' | null = null;
   try {
@@ -237,11 +249,15 @@ async function deleteUserData(uid: string) {
     if (profileSnap.exists) {
       role = (profileSnap.data()?.user_type as any) || null;
     }
-  } catch {}
+    console.log(`deleteUserData: role is ${role}`);
+  } catch (e) {
+    console.error(`deleteUserData: error fetching profile`, e);
+  }
 
   if (role === 'provider') {
-  const servicesSnap = await db.collection('services').where('provider_id', '==', uid).get();
-  const serviceIds = servicesSnap.docs.map((d: admin.firestore.QueryDocumentSnapshot) => d.id);
+    console.log(`deleteUserData: cleaning up provider data`);
+    const servicesSnap = await db.collection('services').where('provider_id', '==', uid).get();
+    const serviceIds = servicesSnap.docs.map((d: admin.firestore.QueryDocumentSnapshot) => d.id);
 
     await deleteByServiceIds('service_availability', serviceIds);
     await deleteByServiceIds('service_special_dates', serviceIds);
@@ -252,16 +268,18 @@ async function deleteUserData(uid: string) {
 
     if (!servicesSnap.empty) {
       const bw = db.bulkWriter();
-  servicesSnap.docs.forEach((d: admin.firestore.QueryDocumentSnapshot) => bw.delete(d.ref));
+      servicesSnap.docs.forEach((d: admin.firestore.QueryDocumentSnapshot) => bw.delete(d.ref));
       await bw.close();
     }
   }
 
   // Customer side
+  console.log(`deleteUserData: cleaning up customer data`);
   await deleteByQuery('bookings', 'customer_id', uid);
   await deleteByQuery('reviews', 'customer_id', uid);
 
   // Profile last
+  console.log(`deleteUserData: deleting profile doc`);
   await db.collection('profiles').doc(uid).delete().catch(() => {});
 }
 
@@ -318,7 +336,8 @@ export const adminDeleteUser = onRequest({ maxInstances: 1, secrets: [ADMIN_DELE
   const emailParam = (req.body?.email || req.query.email) as string | undefined;
   try {
     if (!uid && emailParam) {
-      const userRecord = await admin.auth().getUserByEmail(emailParam);
+      const trimmedEmail = emailParam.trim();
+      const userRecord = await admin.auth().getUserByEmail(trimmedEmail);
       uid = userRecord.uid;
     }
   } catch (e: any) {
@@ -326,18 +345,30 @@ export const adminDeleteUser = onRequest({ maxInstances: 1, secrets: [ADMIN_DELE
   }
   if (!uid) return errorResponse(res, 400, 'missing_parameters', 'Missing uid or email', trace);
 
+  // Revoke tokens to force logout on all devices
+  try {
+    console.log(`Revoking tokens for ${uid}`);
+    await admin.auth().revokeRefreshTokens(uid);
+  } catch (e) {
+    console.error('Failed to revoke tokens:', e);
+  }
+
   // Try to delete Auth user first (ignore if not found)
   try {
+    console.log(`Deleting auth user ${uid}`);
     await admin.auth().deleteUser(uid);
   } catch (e: any) {
+    console.error(`Auth delete error for ${uid}:`, e);
     if (e?.code !== 'auth/user-not-found') throw e;
   }
 
   try {
+    console.log(`Starting deleteUserData for ${uid}`);
     await deleteUserData(uid);
     logTrace(trace, 'adminDeleteUser:done', { duration_ms: Date.now() - started });
     return res.json({ ok: true });
   } catch (e: any) {
+    console.error(`deleteUserData error for ${uid}:`, e);
     logTrace(trace, 'adminDeleteUser:error', { duration_ms: Date.now() - started, message: e?.message });
     return errorResponse(res, 500, 'delete_failed', 'Failed to delete user data', trace);
   }
