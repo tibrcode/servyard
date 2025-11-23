@@ -112,7 +112,7 @@ exports.dedupeServiceCategories = (0, https_1.onRequest)({ maxInstances: 1, secr
         res.set('Access-Control-Allow-Origin', req.headers.origin);
     }
     res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-admin-key, x-trace-id');
+    res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-admin-key, x-trace-id, x-client-version');
     res.set('Access-Control-Max-Age', '3600');
     if (req.method === 'OPTIONS') {
         res.status(204).send('');
@@ -300,7 +300,7 @@ exports.adminDeleteUser = (0, https_1.onRequest)({ maxInstances: 1, secrets: [AD
         res.set('Access-Control-Allow-Origin', req.headers.origin);
     }
     res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-admin-key, x-trace-id');
+    res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-admin-key, x-trace-id, x-client-version');
     res.set('Access-Control-Max-Age', '3600');
     if (req.method === 'OPTIONS') {
         res.status(204).send('');
