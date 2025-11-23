@@ -1,9 +1,12 @@
 import * as admin from 'firebase-admin';
+import cors from 'cors';
 import { onRequest } from 'firebase-functions/v2/https';
 import { onDocumentCreated, onDocumentUpdated } from 'firebase-functions/v2/firestore';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { auth } from 'firebase-functions/v1';
 import { defineSecret } from 'firebase-functions/params';
+
+const corsHandler = cors({ origin: true });
 
 // Initialize Firebase Admin - uses default credentials automatically
 admin.initializeApp();
@@ -74,41 +77,28 @@ async function deleteByServiceIds(col: string, serviceIds: string[]) {
 //  - Hard cap of 25 duplicate groups per invocation
 //  - Dry run returns a plan without modifying data
 //  - Execute returns detailed summary of operations performed
-export const dedupeServiceCategories = onRequest({ maxInstances: 1, secrets: [ADMIN_DELETE_TOKEN] }, async (req: any, res: any) => {
-  // Manual CORS
-  res.set('Access-Control-Allow-Origin', '*');
-  if (req.headers.origin) {
-    res.set('Access-Control-Allow-Origin', req.headers.origin);
-  }
-  res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-admin-key, x-trace-id, x-client-version');
-  res.set('Access-Control-Max-Age', '3600');
+export const dedupeServiceCategories = onRequest({ maxInstances: 1, secrets: [ADMIN_DELETE_TOKEN] }, (req: any, res: any) => {
+  corsHandler(req, res, async () => {
+    if (req.method !== 'POST') return errorResponse(res, 405, 'method_not_allowed', 'POST required', req.get('x-trace-id'));
+    const mode = (req.query.mode || req.body?.mode || 'dryRun') as 'dryRun' | 'execute';
+    const trace = req.get('x-trace-id');
+    logTrace(trace, 'dedupeServiceCategories:start', { mode });
 
-  if (req.method === 'OPTIONS') {
-    res.status(204).send('');
-    return;
-  }
-
-  if (req.method !== 'POST') return errorResponse(res, 405, 'method_not_allowed', 'POST required', req.get('x-trace-id'));
-  const mode = (req.query.mode || req.body?.mode || 'dryRun') as 'dryRun' | 'execute';
-  const trace = req.get('x-trace-id');
-  logTrace(trace, 'dedupeServiceCategories:start', { mode });
-
-  // Auth check (only required for execute)
-  const ensureAuthorized = async () => {
-    if (mode === 'dryRun') return true; // allow anonymous dry runs for inspection
-    let isAuthorized = false;
-    const bearer = (req.get('Authorization') || '').replace(/^Bearer\s+/i, '').trim();
-    if (bearer) {
-      try {
-        const decoded = await admin.auth().verifyIdToken(bearer);
-        const email: string | undefined = (decoded as any)?.email;
-        const hasAdminClaim = (decoded as any)?.admin === true;
-        const emailDomainOk = typeof email === 'string' && /@(tibrcode\.com|servyard\.com|serv-yard\.com)$/i.test(email || '');
-        const specificAdmin = typeof email === 'string' && email.toLowerCase() === 'admin@servyard.com';
-        if (hasAdminClaim || emailDomainOk || specificAdmin) isAuthorized = true;
-      } catch {}
-    }
+    // Auth check (only required for execute)
+    const ensureAuthorized = async () => {
+      if (mode === 'dryRun') return true; // allow anonymous dry runs for inspection
+      let isAuthorized = false;
+      const bearer = (req.get('Authorization') || '').replace(/^Bearer\s+/i, '').trim();
+      if (bearer) {
+        try {
+          const decoded = await admin.auth().verifyIdToken(bearer);
+          const email: string | undefined = (decoded as any)?.email;
+          const hasAdminClaim = (decoded as any)?.admin === true;
+          const emailDomainOk = typeof email === 'string' && /@(tibrcode\.com|servyard\.com|serv-yard\.com)$/i.test(email || '');
+          const specificAdmin = typeof email === 'string' && email.toLowerCase() === 'admin@servyard.com';
+          if (hasAdminClaim || emailDomainOk || specificAdmin) isAuthorized = true;
+        } catch {}
+      }
     if (!isAuthorized) {
       const headerKey = (req.get('x-admin-key') || req.query.key) as string | undefined;
       const secretValue = ADMIN_DELETE_TOKEN.value();
@@ -229,6 +219,7 @@ export const dedupeServiceCategories = onRequest({ maxInstances: 1, secrets: [AD
     console.error('Error in dedupeServiceCategories:', e);
     return errorResponse(res, 500, 'internal_error', e?.message || 'Internal server error', trace);
   }
+  });
 });
 
 async function deleteUserData(uid: string) {
@@ -274,30 +265,17 @@ export const onAuthDeleteUser = auth.user().onDelete(async (userRecord) => {
 });
 
 // 2) Admin HTTP endpoint: POST /adminDeleteUser with header x-admin-key and body { uid }
-export const adminDeleteUser = onRequest({ maxInstances: 1, secrets: [ADMIN_DELETE_TOKEN] }, async (req: any, res: any) => {
-  // Manual CORS
-  res.set('Access-Control-Allow-Origin', '*');
-  if (req.headers.origin) {
-    res.set('Access-Control-Allow-Origin', req.headers.origin);
-  }
-  res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-admin-key, x-trace-id, x-client-version');
-  res.set('Access-Control-Max-Age', '3600');
+export const adminDeleteUser = onRequest({ maxInstances: 1, secrets: [ADMIN_DELETE_TOKEN] }, (req: any, res: any) => {
+  corsHandler(req, res, async () => {
+    if (req.method !== 'POST') return errorResponse(res, 405, 'method_not_allowed', 'POST required', req.get('x-trace-id'));
+    const trace = req.get('x-trace-id');
+    const started = Date.now();
+    logTrace(trace, 'adminDeleteUser:start');
 
-  if (req.method === 'OPTIONS') {
-    res.status(204).send('');
-    return;
-  }
-
-  if (req.method !== 'POST') return errorResponse(res, 405, 'method_not_allowed', 'POST required', req.get('x-trace-id'));
-  const trace = req.get('x-trace-id');
-  const started = Date.now();
-  logTrace(trace, 'adminDeleteUser:start');
-
-  // AuthN: either Bearer ID token with admin rights OR x-admin-key secret
-  const bearer = (req.get('Authorization') || '').replace(/^Bearer\s+/i, '').trim();
-  const headerKey = (req.get('x-admin-key') || req.query.key) as string | undefined;
-  const secretValue = ADMIN_DELETE_TOKEN.value();
+    // AuthN: either Bearer ID token with admin rights OR x-admin-key secret
+    const bearer = (req.get('Authorization') || '').replace(/^Bearer\s+/i, '').trim();
+    const headerKey = (req.get('x-admin-key') || req.query.key) as string | undefined;
+    const secretValue = ADMIN_DELETE_TOKEN.value();
 
   let isAuthorized = false;
   if (bearer) {
@@ -346,6 +324,7 @@ export const adminDeleteUser = onRequest({ maxInstances: 1, secrets: [ADMIN_DELE
     logTrace(trace, 'adminDeleteUser:error', { duration_ms: Date.now() - started, message: e?.message });
     return errorResponse(res, 500, 'delete_failed', 'Failed to delete user data', trace);
   }
+  });
 });
 
 // OLD FUNCTIONS - TEMPORARILY DISABLED DUE TO REGION MISMATCH

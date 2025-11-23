@@ -32,13 +32,18 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.pruneOldRequestTraces = exports.monitorDuplicateCategories = exports.snapshotSystemStats = exports.sendScheduledReminders = exports.notifyBookingStatusChange = exports.notifyBookingUpdate = exports.notifyNewBooking = exports.getLocationStats = exports.findNearbyProviders = exports.sendTestNotification = exports.adminDeleteUser = exports.onAuthDeleteUser = exports.dedupeServiceCategories = void 0;
 const admin = __importStar(require("firebase-admin"));
+const cors_1 = __importDefault(require("cors"));
 const https_1 = require("firebase-functions/v2/https");
 const scheduler_1 = require("firebase-functions/v2/scheduler");
 const v1_1 = require("firebase-functions/v1");
 const params_1 = require("firebase-functions/params");
+const corsHandler = (0, cors_1.default)({ origin: true });
 // Initialize Firebase Admin - uses default credentials automatically
 admin.initializeApp();
 const db = admin.firestore();
@@ -105,157 +110,147 @@ async function deleteByServiceIds(col, serviceIds) {
 //  - Hard cap of 25 duplicate groups per invocation
 //  - Dry run returns a plan without modifying data
 //  - Execute returns detailed summary of operations performed
-exports.dedupeServiceCategories = (0, https_1.onRequest)({ maxInstances: 1, secrets: [ADMIN_DELETE_TOKEN] }, async (req, res) => {
-    // Manual CORS
-    res.set('Access-Control-Allow-Origin', '*');
-    if (req.headers.origin) {
-        res.set('Access-Control-Allow-Origin', req.headers.origin);
-    }
-    res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-admin-key, x-trace-id, x-client-version');
-    res.set('Access-Control-Max-Age', '3600');
-    if (req.method === 'OPTIONS') {
-        res.status(204).send('');
-        return;
-    }
-    if (req.method !== 'POST')
-        return errorResponse(res, 405, 'method_not_allowed', 'POST required', req.get('x-trace-id'));
-    const mode = (req.query.mode || req.body?.mode || 'dryRun');
-    const trace = req.get('x-trace-id');
-    logTrace(trace, 'dedupeServiceCategories:start', { mode });
-    // Auth check (only required for execute)
-    const ensureAuthorized = async () => {
-        if (mode === 'dryRun')
-            return true; // allow anonymous dry runs for inspection
-        let isAuthorized = false;
-        const bearer = (req.get('Authorization') || '').replace(/^Bearer\s+/i, '').trim();
-        if (bearer) {
-            try {
-                const decoded = await admin.auth().verifyIdToken(bearer);
-                const email = decoded?.email;
-                const hasAdminClaim = decoded?.admin === true;
-                const emailDomainOk = typeof email === 'string' && /@(tibrcode\.com|servyard\.com|serv-yard\.com)$/i.test(email || '');
-                const specificAdmin = typeof email === 'string' && email.toLowerCase() === 'admin@servyard.com';
-                if (hasAdminClaim || emailDomainOk || specificAdmin)
+exports.dedupeServiceCategories = (0, https_1.onRequest)({ maxInstances: 1, secrets: [ADMIN_DELETE_TOKEN] }, (req, res) => {
+    corsHandler(req, res, async () => {
+        if (req.method !== 'POST')
+            return errorResponse(res, 405, 'method_not_allowed', 'POST required', req.get('x-trace-id'));
+        const mode = (req.query.mode || req.body?.mode || 'dryRun');
+        const trace = req.get('x-trace-id');
+        logTrace(trace, 'dedupeServiceCategories:start', { mode });
+        // Auth check (only required for execute)
+        const ensureAuthorized = async () => {
+            if (mode === 'dryRun')
+                return true; // allow anonymous dry runs for inspection
+            let isAuthorized = false;
+            const bearer = (req.get('Authorization') || '').replace(/^Bearer\s+/i, '').trim();
+            if (bearer) {
+                try {
+                    const decoded = await admin.auth().verifyIdToken(bearer);
+                    const email = decoded?.email;
+                    const hasAdminClaim = decoded?.admin === true;
+                    const emailDomainOk = typeof email === 'string' && /@(tibrcode\.com|servyard\.com|serv-yard\.com)$/i.test(email || '');
+                    const specificAdmin = typeof email === 'string' && email.toLowerCase() === 'admin@servyard.com';
+                    if (hasAdminClaim || emailDomainOk || specificAdmin)
+                        isAuthorized = true;
+                }
+                catch { }
+            }
+            if (!isAuthorized) {
+                const headerKey = (req.get('x-admin-key') || req.query.key);
+                const secretValue = ADMIN_DELETE_TOKEN.value();
+                if (!secretValue)
+                    return false;
+                if (headerKey && headerKey === secretValue)
                     isAuthorized = true;
             }
-            catch { }
-        }
-        if (!isAuthorized) {
-            const headerKey = (req.get('x-admin-key') || req.query.key);
-            const secretValue = ADMIN_DELETE_TOKEN.value();
-            if (!secretValue)
-                return false;
-            if (headerKey && headerKey === secretValue)
-                isAuthorized = true;
-        }
-        return isAuthorized;
-    };
-    if (!(await ensureAuthorized())) {
-        return errorResponse(res, 401, 'unauthorized', 'Not authorized for this operation', trace);
-    }
-    try {
-        const snap = await db.collection('service_categories').get();
-        const all = snap.docs.map((d) => ({ id: d.id, data: d.data() }));
-        const groups = {};
-        function normalize(cat) {
-            const ar = (cat.title_ar || cat.name_ar || '').trim().toLowerCase();
-            const en = (cat.title_en || cat.name_en || cat.title || cat.name || '').trim().toLowerCase();
-            const base = ar || en;
-            // remove duplicate whitespace + unify certain punctuation
-            return base.replace(/[\s]+/g, ' ').replace(/[ـ]/g, '').trim();
-        }
-        for (const c of all) {
-            const key = normalize(c.data);
-            if (!key)
-                continue;
-            if (!groups[key])
-                groups[key] = [];
-            groups[key].push(c);
-        }
-        const duplicateGroups = Object.entries(groups).filter(([, arr]) => arr.length > 1);
-        duplicateGroups.sort((a, b) => b[1].length - a[1].length); // largest first
-        const limitedGroups = duplicateGroups.slice(0, 25); // safety cap
-        if (mode === 'dryRun') {
-            const started = Date.now();
-            const payload = {
-                mode,
-                totalCategories: all.length,
-                duplicateGroupCount: duplicateGroups.length,
-                processedGroups: limitedGroups.length,
-                groups: limitedGroups.map(([key, arr]) => ({
-                    key,
-                    count: arr.length,
-                    ids: arr.map((x) => x.id),
-                    sample: arr[0].data,
-                })),
-                note: 'Execute will re-point services.category_id to primary and delete other category docs.'
-            };
-            logTrace(trace, 'dedupeServiceCategories:done', { mode, duration_ms: Date.now() - started, groups: limitedGroups.length, dryRun: true });
-            return res.json(payload);
-        }
-        // EXECUTE MODE
-        const results = [];
-        let totalServiceUpdates = 0;
-        let totalCategoryDeletes = 0;
-        for (const [key, arr] of limitedGroups) {
-            // Choose primary: earliest created_at, else lexicographic id
-            const withMeta = arr.map((x) => ({
-                id: x.id,
-                created: x.data.created_at ? new Date(x.data.created_at) : null,
-                data: x.data,
-            }));
-            withMeta.sort((a, b) => {
-                if (a.created && b.created)
-                    return a.created.getTime() - b.created.getTime();
-                if (a.created && !b.created)
-                    return -1;
-                if (!a.created && b.created)
-                    return 1;
-                return a.id.localeCompare(b.id);
-            });
-            const primary = withMeta[0];
-            const duplicates = withMeta.slice(1);
-            const duplicateIds = duplicates.map((d) => d.id);
-            // Update referencing services
-            const bw = db.bulkWriter();
-            for (const dupId of duplicateIds) {
-                const svcSnap = await db.collection('services').where('category_id', '==', dupId).get();
-                for (const doc of svcSnap.docs) {
-                    bw.update(doc.ref, { category_id: primary.id });
-                    totalServiceUpdates++;
-                }
-            }
-            await bw.close();
-            // Delete duplicate category docs
-            const bw2 = db.bulkWriter();
-            for (const dupId of duplicateIds) {
-                bw2.delete(db.collection('service_categories').doc(dupId));
-                totalCategoryDeletes++;
-            }
-            await bw2.close();
-            results.push({
-                key,
-                primary: primary.id,
-                removed: duplicateIds,
-                serviceUpdates: totalServiceUpdates,
-            });
-        }
-        const _started = Date.now();
-        const response = {
-            mode,
-            processedGroups: limitedGroups.length,
-            totalServiceUpdates,
-            totalCategoryDeletes,
-            details: results,
+            return isAuthorized;
         };
-        logTrace(trace, 'dedupeServiceCategories:done', { mode, duration_ms: Date.now() - _started, groups: limitedGroups.length });
-        return res.json(response);
-    }
-    catch (e) {
-        console.error('Error in dedupeServiceCategories:', e);
-        return errorResponse(res, 500, 'internal_error', e?.message || 'Internal server error', trace);
-    }
+        if (!(await ensureAuthorized())) {
+            return errorResponse(res, 401, 'unauthorized', 'Not authorized for this operation', trace);
+        }
+        try {
+            const snap = await db.collection('service_categories').get();
+            const all = snap.docs.map((d) => ({ id: d.id, data: d.data() }));
+            const groups = {};
+            function normalize(cat) {
+                const ar = (cat.title_ar || cat.name_ar || '').trim().toLowerCase();
+                const en = (cat.title_en || cat.name_en || cat.title || cat.name || '').trim().toLowerCase();
+                const base = ar || en;
+                // remove duplicate whitespace + unify certain punctuation
+                return base.replace(/[\s]+/g, ' ').replace(/[ـ]/g, '').trim();
+            }
+            for (const c of all) {
+                const key = normalize(c.data);
+                if (!key)
+                    continue;
+                if (!groups[key])
+                    groups[key] = [];
+                groups[key].push(c);
+            }
+            const duplicateGroups = Object.entries(groups).filter(([, arr]) => arr.length > 1);
+            duplicateGroups.sort((a, b) => b[1].length - a[1].length); // largest first
+            const limitedGroups = duplicateGroups.slice(0, 25); // safety cap
+            if (mode === 'dryRun') {
+                const started = Date.now();
+                const payload = {
+                    mode,
+                    totalCategories: all.length,
+                    duplicateGroupCount: duplicateGroups.length,
+                    processedGroups: limitedGroups.length,
+                    groups: limitedGroups.map(([key, arr]) => ({
+                        key,
+                        count: arr.length,
+                        ids: arr.map((x) => x.id),
+                        sample: arr[0].data,
+                    })),
+                    note: 'Execute will re-point services.category_id to primary and delete other category docs.'
+                };
+                logTrace(trace, 'dedupeServiceCategories:done', { mode, duration_ms: Date.now() - started, groups: limitedGroups.length, dryRun: true });
+                return res.json(payload);
+            }
+            // EXECUTE MODE
+            const results = [];
+            let totalServiceUpdates = 0;
+            let totalCategoryDeletes = 0;
+            for (const [key, arr] of limitedGroups) {
+                // Choose primary: earliest created_at, else lexicographic id
+                const withMeta = arr.map((x) => ({
+                    id: x.id,
+                    created: x.data.created_at ? new Date(x.data.created_at) : null,
+                    data: x.data,
+                }));
+                withMeta.sort((a, b) => {
+                    if (a.created && b.created)
+                        return a.created.getTime() - b.created.getTime();
+                    if (a.created && !b.created)
+                        return -1;
+                    if (!a.created && b.created)
+                        return 1;
+                    return a.id.localeCompare(b.id);
+                });
+                const primary = withMeta[0];
+                const duplicates = withMeta.slice(1);
+                const duplicateIds = duplicates.map((d) => d.id);
+                // Update referencing services
+                const bw = db.bulkWriter();
+                for (const dupId of duplicateIds) {
+                    const svcSnap = await db.collection('services').where('category_id', '==', dupId).get();
+                    for (const doc of svcSnap.docs) {
+                        bw.update(doc.ref, { category_id: primary.id });
+                        totalServiceUpdates++;
+                    }
+                }
+                await bw.close();
+                // Delete duplicate category docs
+                const bw2 = db.bulkWriter();
+                for (const dupId of duplicateIds) {
+                    bw2.delete(db.collection('service_categories').doc(dupId));
+                    totalCategoryDeletes++;
+                }
+                await bw2.close();
+                results.push({
+                    key,
+                    primary: primary.id,
+                    removed: duplicateIds,
+                    serviceUpdates: totalServiceUpdates,
+                });
+            }
+            const _started = Date.now();
+            const response = {
+                mode,
+                processedGroups: limitedGroups.length,
+                totalServiceUpdates,
+                totalCategoryDeletes,
+                details: results,
+            };
+            logTrace(trace, 'dedupeServiceCategories:done', { mode, duration_ms: Date.now() - _started, groups: limitedGroups.length });
+            return res.json(response);
+        }
+        catch (e) {
+            console.error('Error in dedupeServiceCategories:', e);
+            return errorResponse(res, 500, 'internal_error', e?.message || 'Internal server error', trace);
+        }
+    });
 });
 async function deleteUserData(uid) {
     // Try to read role
@@ -293,80 +288,70 @@ exports.onAuthDeleteUser = v1_1.auth.user().onDelete(async (userRecord) => {
     await deleteUserData(uid);
 });
 // 2) Admin HTTP endpoint: POST /adminDeleteUser with header x-admin-key and body { uid }
-exports.adminDeleteUser = (0, https_1.onRequest)({ maxInstances: 1, secrets: [ADMIN_DELETE_TOKEN] }, async (req, res) => {
-    // Manual CORS
-    res.set('Access-Control-Allow-Origin', '*');
-    if (req.headers.origin) {
-        res.set('Access-Control-Allow-Origin', req.headers.origin);
-    }
-    res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-admin-key, x-trace-id, x-client-version');
-    res.set('Access-Control-Max-Age', '3600');
-    if (req.method === 'OPTIONS') {
-        res.status(204).send('');
-        return;
-    }
-    if (req.method !== 'POST')
-        return errorResponse(res, 405, 'method_not_allowed', 'POST required', req.get('x-trace-id'));
-    const trace = req.get('x-trace-id');
-    const started = Date.now();
-    logTrace(trace, 'adminDeleteUser:start');
-    // AuthN: either Bearer ID token with admin rights OR x-admin-key secret
-    const bearer = (req.get('Authorization') || '').replace(/^Bearer\s+/i, '').trim();
-    const headerKey = (req.get('x-admin-key') || req.query.key);
-    const secretValue = ADMIN_DELETE_TOKEN.value();
-    let isAuthorized = false;
-    if (bearer) {
+exports.adminDeleteUser = (0, https_1.onRequest)({ maxInstances: 1, secrets: [ADMIN_DELETE_TOKEN] }, (req, res) => {
+    corsHandler(req, res, async () => {
+        if (req.method !== 'POST')
+            return errorResponse(res, 405, 'method_not_allowed', 'POST required', req.get('x-trace-id'));
+        const trace = req.get('x-trace-id');
+        const started = Date.now();
+        logTrace(trace, 'adminDeleteUser:start');
+        // AuthN: either Bearer ID token with admin rights OR x-admin-key secret
+        const bearer = (req.get('Authorization') || '').replace(/^Bearer\s+/i, '').trim();
+        const headerKey = (req.get('x-admin-key') || req.query.key);
+        const secretValue = ADMIN_DELETE_TOKEN.value();
+        let isAuthorized = false;
+        if (bearer) {
+            try {
+                const decoded = await admin.auth().verifyIdToken(bearer);
+                const email = decoded?.email;
+                const hasAdminClaim = decoded?.admin === true;
+                const emailDomainOk = typeof email === 'string' && /@(tibrcode\.com|servyard\.com|serv-yard\.com)$/i.test(email || '');
+                const specificAdmin = typeof email === 'string' && email.toLowerCase() === 'admin@servyard.com';
+                if (hasAdminClaim || emailDomainOk || specificAdmin) {
+                    isAuthorized = true;
+                }
+            }
+            catch { }
+        }
+        if (!isAuthorized) {
+            if (!secretValue)
+                return errorResponse(res, 500, 'server_not_configured', 'Server not configured', trace);
+            if (!headerKey || headerKey !== secretValue)
+                return errorResponse(res, 401, 'unauthorized', 'Unauthorized', trace);
+            isAuthorized = true;
+        }
+        // Accept uid or email
+        let uid = (req.body?.uid || req.query.uid);
+        const emailParam = (req.body?.email || req.query.email);
         try {
-            const decoded = await admin.auth().verifyIdToken(bearer);
-            const email = decoded?.email;
-            const hasAdminClaim = decoded?.admin === true;
-            const emailDomainOk = typeof email === 'string' && /@(tibrcode\.com|servyard\.com|serv-yard\.com)$/i.test(email || '');
-            const specificAdmin = typeof email === 'string' && email.toLowerCase() === 'admin@servyard.com';
-            if (hasAdminClaim || emailDomainOk || specificAdmin) {
-                isAuthorized = true;
+            if (!uid && emailParam) {
+                const userRecord = await admin.auth().getUserByEmail(emailParam);
+                uid = userRecord.uid;
             }
         }
-        catch { }
-    }
-    if (!isAuthorized) {
-        if (!secretValue)
-            return errorResponse(res, 500, 'server_not_configured', 'Server not configured', trace);
-        if (!headerKey || headerKey !== secretValue)
-            return errorResponse(res, 401, 'unauthorized', 'Unauthorized', trace);
-        isAuthorized = true;
-    }
-    // Accept uid or email
-    let uid = (req.body?.uid || req.query.uid);
-    const emailParam = (req.body?.email || req.query.email);
-    try {
-        if (!uid && emailParam) {
-            const userRecord = await admin.auth().getUserByEmail(emailParam);
-            uid = userRecord.uid;
+        catch (e) {
+            return errorResponse(res, 404, 'user_not_found', 'User not found for email', trace);
         }
-    }
-    catch (e) {
-        return errorResponse(res, 404, 'user_not_found', 'User not found for email', trace);
-    }
-    if (!uid)
-        return errorResponse(res, 400, 'missing_parameters', 'Missing uid or email', trace);
-    // Try to delete Auth user first (ignore if not found)
-    try {
-        await admin.auth().deleteUser(uid);
-    }
-    catch (e) {
-        if (e?.code !== 'auth/user-not-found')
-            throw e;
-    }
-    try {
-        await deleteUserData(uid);
-        logTrace(trace, 'adminDeleteUser:done', { duration_ms: Date.now() - started });
-        return res.json({ ok: true });
-    }
-    catch (e) {
-        logTrace(trace, 'adminDeleteUser:error', { duration_ms: Date.now() - started, message: e?.message });
-        return errorResponse(res, 500, 'delete_failed', 'Failed to delete user data', trace);
-    }
+        if (!uid)
+            return errorResponse(res, 400, 'missing_parameters', 'Missing uid or email', trace);
+        // Try to delete Auth user first (ignore if not found)
+        try {
+            await admin.auth().deleteUser(uid);
+        }
+        catch (e) {
+            if (e?.code !== 'auth/user-not-found')
+                throw e;
+        }
+        try {
+            await deleteUserData(uid);
+            logTrace(trace, 'adminDeleteUser:done', { duration_ms: Date.now() - started });
+            return res.json({ ok: true });
+        }
+        catch (e) {
+            logTrace(trace, 'adminDeleteUser:error', { duration_ms: Date.now() - started, message: e?.message });
+            return errorResponse(res, 500, 'delete_failed', 'Failed to delete user data', trace);
+        }
+    });
 });
 // OLD FUNCTIONS - TEMPORARILY DISABLED DUE TO REGION MISMATCH
 // These are replaced by the new notification system below
