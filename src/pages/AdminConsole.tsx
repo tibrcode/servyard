@@ -536,24 +536,24 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
                               const primaryUrl = 'https://us-central1-servyard-de527.cloudfunctions.net/adminDeleteUser';
                               const fallbackUrl = 'https://admindeleteuser-btfczcxdyq-uc.a.run.app';
                               try {
-                                resp = await fetch(primaryUrl, withTrace({
+                                resp = await fetch(primaryUrl, {
                                   method: 'POST',
                                   headers: {
                                     'Content-Type': 'application/json',
                                     'Authorization': `Bearer ${idToken}`,
                                   },
                                   body: JSON.stringify(body),
-                                }));
+                                });
                               } catch (e) {
                                 // Network/CORS error: try Cloud Run direct URL
-                                resp = await fetch(fallbackUrl, withTrace({
+                                resp = await fetch(fallbackUrl, {
                                   method: 'POST',
                                   headers: {
                                     'Content-Type': 'application/json',
                                     'Authorization': `Bearer ${idToken}`,
                                   },
                                   body: JSON.stringify(body),
-                                }));
+                                });
                               }
                               if (!resp.ok) {
                                 const text = await resp.text();

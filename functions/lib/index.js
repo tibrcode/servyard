@@ -39,17 +39,6 @@ const https_1 = require("firebase-functions/v2/https");
 const scheduler_1 = require("firebase-functions/v2/scheduler");
 const v1_1 = require("firebase-functions/v1");
 const params_1 = require("firebase-functions/params");
-// Manual CORS helper to ensure headers are always set
-const applyCors = (req, res) => {
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
-    res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-trace-id, x-client-version, x-admin-key');
-    if (req.method === 'OPTIONS') {
-        res.status(204).send('');
-        return true;
-    }
-    return false;
-};
 // Initialize Firebase Admin - uses default credentials automatically
 admin.initializeApp();
 const db = admin.firestore();
@@ -116,9 +105,7 @@ async function deleteByServiceIds(col, serviceIds) {
 //  - Hard cap of 25 duplicate groups per invocation
 //  - Dry run returns a plan without modifying data
 //  - Execute returns detailed summary of operations performed
-exports.dedupeServiceCategories = (0, https_1.onRequest)({ maxInstances: 1, secrets: [ADMIN_DELETE_TOKEN] }, async (req, res) => {
-    if (applyCors(req, res))
-        return;
+exports.dedupeServiceCategories = (0, https_1.onRequest)({ cors: true, maxInstances: 1, secrets: [ADMIN_DELETE_TOKEN] }, async (req, res) => {
     if (req.method !== 'POST')
         return errorResponse(res, 405, 'method_not_allowed', 'POST required', req.get('x-trace-id'));
     const mode = (req.query.mode || req.body?.mode || 'dryRun');
@@ -294,9 +281,7 @@ exports.onAuthDeleteUser = v1_1.auth.user().onDelete(async (userRecord) => {
     await deleteUserData(uid);
 });
 // 2) Admin HTTP endpoint: POST /adminDeleteUser with header x-admin-key and body { uid }
-exports.adminDeleteUser = (0, https_1.onRequest)({ maxInstances: 1, secrets: [ADMIN_DELETE_TOKEN] }, async (req, res) => {
-    if (applyCors(req, res))
-        return;
+exports.adminDeleteUser = (0, https_1.onRequest)({ cors: true, maxInstances: 1, secrets: [ADMIN_DELETE_TOKEN] }, async (req, res) => {
     if (req.method !== 'POST')
         return errorResponse(res, 405, 'method_not_allowed', 'POST required', req.get('x-trace-id'));
     const trace = req.get('x-trace-id');
