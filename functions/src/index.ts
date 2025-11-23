@@ -6,7 +6,11 @@ import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { auth } from 'firebase-functions/v1';
 import { defineSecret } from 'firebase-functions/params';
 
-const corsHandler = cors({ origin: true });
+const corsHandler = cors({
+  origin: true,
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-trace-id', 'x-client-version', 'x-admin-key'],
+  methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE']
+});
 
 // Initialize Firebase Admin - uses default credentials automatically
 admin.initializeApp();
@@ -77,7 +81,8 @@ async function deleteByServiceIds(col: string, serviceIds: string[]) {
 //  - Hard cap of 25 duplicate groups per invocation
 //  - Dry run returns a plan without modifying data
 //  - Execute returns detailed summary of operations performed
-export const dedupeServiceCategories = onRequest({ cors: true, maxInstances: 1, secrets: [ADMIN_DELETE_TOKEN] }, async (req: any, res: any) => {
+export const dedupeServiceCategories = onRequest({ maxInstances: 1, secrets: [ADMIN_DELETE_TOKEN] }, (req: any, res: any) => {
+  corsHandler(req, res, async () => {
     if (req.method !== 'POST') return errorResponse(res, 405, 'method_not_allowed', 'POST required', req.get('x-trace-id'));
     const mode = (req.query.mode || req.body?.mode || 'dryRun') as 'dryRun' | 'execute';
     const trace = req.get('x-trace-id');
@@ -218,6 +223,7 @@ export const dedupeServiceCategories = onRequest({ cors: true, maxInstances: 1, 
     console.error('Error in dedupeServiceCategories:', e);
     return errorResponse(res, 500, 'internal_error', e?.message || 'Internal server error', trace);
   }
+  });
 });
 
 async function deleteUserData(uid: string) {
@@ -263,7 +269,8 @@ export const onAuthDeleteUser = auth.user().onDelete(async (userRecord) => {
 });
 
 // 2) Admin HTTP endpoint: POST /adminDeleteUser with header x-admin-key and body { uid }
-export const adminDeleteUser = onRequest({ cors: true, maxInstances: 1, secrets: [ADMIN_DELETE_TOKEN] }, async (req: any, res: any) => {
+export const adminDeleteUser = onRequest({ maxInstances: 1, secrets: [ADMIN_DELETE_TOKEN] }, (req: any, res: any) => {
+  corsHandler(req, res, async () => {
     if (req.method !== 'POST') return errorResponse(res, 405, 'method_not_allowed', 'POST required', req.get('x-trace-id'));
     const trace = req.get('x-trace-id');
     const started = Date.now();
@@ -321,6 +328,7 @@ export const adminDeleteUser = onRequest({ cors: true, maxInstances: 1, secrets:
     logTrace(trace, 'adminDeleteUser:error', { duration_ms: Date.now() - started, message: e?.message });
     return errorResponse(res, 500, 'delete_failed', 'Failed to delete user data', trace);
   }
+  });
 });
 
 // OLD FUNCTIONS - TEMPORARILY DISABLED DUE TO REGION MISMATCH
