@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, ClipboardCheck } from "lucide-react";
+import { Loader2, ClipboardCheck, User, UserPlus } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
 import { commonTimezones, getBrowserTimezone } from "@/lib/timezones";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
@@ -29,7 +29,8 @@ export default function CompleteProfile({ currentLanguage }: CompleteProfileProp
   const query = useQuery();
   const navigate = useNavigate();
 
-  const role = (query.get('role') as 'provider' | 'customer' | null) || (profile?.user_type as any) || null;
+  const queryRole = (query.get('role') as 'provider' | 'customer' | null) || (profile?.user_type as any) || null;
+  const [selectedRole, setSelectedRole] = useState<'provider' | 'customer' | null>(queryRole);
 
   const [fullName, setFullName] = useState('');
   const [city, setCity] = useState('');
@@ -39,6 +40,10 @@ export default function CompleteProfile({ currentLanguage }: CompleteProfileProp
   const [accepted, setAccepted] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (queryRole) setSelectedRole(queryRole);
+  }, [queryRole]);
 
   useEffect(() => {
     if (!loading) {
@@ -74,6 +79,52 @@ export default function CompleteProfile({ currentLanguage }: CompleteProfileProp
     );
   }
 
+  // If no role is selected yet, show the selection screen
+  if (!selectedRole) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-4" dir={isRTL ? 'rtl' : 'ltr'}>
+        <div className="max-w-2xl w-full space-y-8">
+          <div className="text-center">
+            <h1 className="text-3xl font-bold text-primary mb-2">{t.auth.welcome}</h1>
+            <p className="text-muted-foreground text-lg">{t.auth.subtitle}</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card 
+              className="cursor-pointer hover:shadow-lg transition-all hover:border-primary group"
+              onClick={() => setSelectedRole('customer')}
+            >
+              <CardHeader className="text-center pb-4">
+                <div className="flex justify-center mb-4">
+                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                    <User className="w-8 h-8 text-primary" />
+                  </div>
+                </div>
+                <CardTitle className="text-xl mb-2">{t.auth.joinAsCustomer}</CardTitle>
+                <CardDescription>{t.auth.customerDescription}</CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card 
+              className="cursor-pointer hover:shadow-lg transition-all hover:border-primary group"
+              onClick={() => setSelectedRole('provider')}
+            >
+              <CardHeader className="text-center pb-4">
+                <div className="flex justify-center mb-4">
+                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                    <UserPlus className="w-8 h-8 text-primary" />
+                  </div>
+                </div>
+                <CardTitle className="text-xl mb-2">{t.auth.joinAsProvider}</CardTitle>
+                <CardDescription>{t.auth.providerDescription}</CardDescription>
+              </CardHeader>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -99,7 +150,7 @@ export default function CompleteProfile({ currentLanguage }: CompleteProfileProp
       // Only set created_at when creating for the first time; never send undefined to Firestore
       if (!profile?.id) payload.created_at = new Date();
       if (phone) payload.phone_numbers = [phone];
-      if (role === 'provider' || role === 'customer') payload.user_type = role;
+      if (selectedRole) payload.user_type = selectedRole;
 
       await setDoc(doc(db, 'profiles', user.uid), payload, { merge: true });
 
@@ -124,7 +175,7 @@ export default function CompleteProfile({ currentLanguage }: CompleteProfileProp
         <CardHeader>
           <CardTitle className="text-center flex items-center justify-center gap-2">
             <ClipboardCheck className="w-5 h-5" />
-            {role === 'provider' ? t.provider?.profile || 'Complete Provider Profile' : t.customer?.profile || 'Complete Profile'}
+            {selectedRole === 'provider' ? t.provider?.profile || 'Complete Provider Profile' : t.customer?.profile || 'Complete Profile'}
           </CardTitle>
         </CardHeader>
         <CardContent>

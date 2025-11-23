@@ -16,8 +16,9 @@ export const EnsureProfile: React.FC = () => {
 
     const missingRequired = !profile?.full_name || !profile?.city || !profile?.country || !profile?.user_type;
     if (missingRequired) {
-      const role = profile?.user_type || 'customer';
-      navigate(`/complete-profile?role=${role}`, { replace: true });
+      // If user_type is missing, don't default to customer. Let CompleteProfile handle the choice.
+      const roleParam = profile?.user_type ? `?role=${profile.user_type}` : '';
+      navigate(`/complete-profile${roleParam}`, { replace: true });
     }
   }, [loading, user, profile, location.pathname, navigate]);
 
