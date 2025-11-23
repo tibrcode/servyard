@@ -533,8 +533,8 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
                               const idToken = await currentUser.getIdToken();
                               const body: any = deleteMode === 'email' ? { email: deleteField } : { uid: deleteField };
                               let resp: Response | null = null;
-                              const primaryUrl = 'https://us-central1-servyard-de527.cloudfunctions.net/adminDeleteUser';
-                              const fallbackUrl = 'https://admindeleteuser-btfczcxdyq-uc.a.run.app';
+                              const primaryUrl = '/adminDeleteUser'; // Use relative path via Firebase Hosting rewrite
+                              // const fallbackUrl = 'https://admindeleteuser-btfczcxdyq-uc.a.run.app';
                               try {
                                 resp = await fetch(primaryUrl, {
                                   method: 'POST',
@@ -545,15 +545,7 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
                                   body: JSON.stringify(body),
                                 });
                               } catch (e) {
-                                // Network/CORS error: try Cloud Run direct URL
-                                resp = await fetch(fallbackUrl, {
-                                  method: 'POST',
-                                  headers: {
-                                    'Content-Type': 'application/json',
-                                    'Authorization': `Bearer ${idToken}`,
-                                  },
-                                  body: JSON.stringify(body),
-                                });
+                                throw e;
                               }
                               if (!resp.ok) {
                                 const text = await resp.text();

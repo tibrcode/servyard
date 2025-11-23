@@ -1,4 +1,26 @@
 {
+  "hosting": {
+    "public": "dist",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/adminDeleteUser",
+        "function": "adminDeleteUser"
+      },
+      {
+        "source": "/dedupeServiceCategories",
+        "function": "dedupeServiceCategories"
+      },
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  },
   "functions": {
     "source": "functions",
     "runtime": "nodejs20",

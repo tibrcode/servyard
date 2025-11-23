@@ -15,6 +15,7 @@ FUNCTIONS=(
   "notifyNewBooking"
   "notifyBookingStatusChange"
   "dedupeServiceCategories"
+  "adminDeleteUser"
 )
 
 for FUNCTION in "${FUNCTIONS[@]}"; do
