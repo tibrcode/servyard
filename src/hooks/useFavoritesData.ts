@@ -91,11 +91,18 @@ export function useFavoritesData() {
       
       const enriched = await Promise.all(favs.map(async (fav) => {
         try {
-          const providerDoc = await getDoc(doc(db, 'provider_profiles', fav.item_id));
           let details: ProviderProfile | undefined;
-
+          
+          // Try provider_profiles first
+          const providerDoc = await getDoc(doc(db, 'provider_profiles', fav.item_id));
           if (providerDoc.exists()) {
             details = { id: providerDoc.id, ...providerDoc.data() } as ProviderProfile;
+          } else {
+            // Fallback to profiles collection (legacy support)
+            const profileDoc = await getDoc(doc(db, 'profiles', fav.item_id));
+            if (profileDoc.exists()) {
+              details = { id: profileDoc.id, ...profileDoc.data() } as ProviderProfile;
+            }
           }
           
           return { ...fav, details } as EnrichedProviderFavorite;
