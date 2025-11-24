@@ -289,7 +289,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
     // تطبيق الترتيب
     filtered.sort((a, b) => {
       switch (sortBy) {
-        case 'nearest':
+        case 'nearest': {
           const distA = (a as any).distance;
           const distB = (b as any).distance;
           // If distance is undefined (no location), put at the end
@@ -297,13 +297,15 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
           if (distA === undefined) return 1;
           if (distB === undefined) return -1;
           return distA - distB;
+        }
 
-        case 'rating':
+        case 'rating': {
           const ratingA = serviceRatings[a.id]?.avg || 0;
           const ratingB = serviceRatings[b.id]?.avg || 0;
           return ratingB - ratingA; // Highest rated first
+        }
           
-        case 'price-low':
+        case 'price-low': {
           const priceA_low = a.has_discount && a.discount_price 
             ? parseFloat(a.discount_price.toString().replace(/[^0-9.]/g, '')) || 0
             : parseFloat((a.approximate_price || '0').toString().replace(/[^0-9.]/g, '')) || 0;
@@ -311,8 +313,9 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
             ? parseFloat(b.discount_price.toString().replace(/[^0-9.]/g, '')) || 0
             : parseFloat((b.approximate_price || '0').toString().replace(/[^0-9.]/g, '')) || 0;
           return priceA_low - priceB_low;
+        }
           
-        case 'price-high':
+        case 'price-high': {
           const priceA_high = a.has_discount && a.discount_price 
             ? parseFloat(a.discount_price.toString().replace(/[^0-9.]/g, '')) || 0
             : parseFloat((a.approximate_price || '0').toString().replace(/[^0-9.]/g, '')) || 0;
@@ -320,9 +323,10 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
             ? parseFloat(b.discount_price.toString().replace(/[^0-9.]/g, '')) || 0
             : parseFloat((b.approximate_price || '0').toString().replace(/[^0-9.]/g, '')) || 0;
           return priceB_high - priceA_high;
+        }
           
         case 'relevance':
-        default:
+        default: {
           // If user location is available, sort by distance
           if (userLocation) {
             const distA = (a as any).distance;
@@ -333,6 +337,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
             return distA - distB;
           }
           return 0;
+        }
       }
     });
 

@@ -570,21 +570,15 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
                             try {
                               const idToken = await currentUser.getIdToken();
                               const body: any = deleteMode === 'email' ? { email: deleteField } : { uid: deleteField };
-                              let resp: Response | null = null;
                               const primaryUrl = '/adminDeleteUser'; // Use relative path via Firebase Hosting rewrite
-                              // const fallbackUrl = 'https://admindeleteuser-btfczcxdyq-uc.a.run.app';
-                              try {
-                                resp = await fetch(primaryUrl, {
-                                  method: 'POST',
-                                  headers: {
-                                    'Content-Type': 'application/json',
-                                    'Authorization': `Bearer ${idToken}`,
-                                  },
-                                  body: JSON.stringify(body),
-                                });
-                              } catch (e) {
-                                throw e;
-                              }
+                              const resp = await fetch(primaryUrl, {
+                                method: 'POST',
+                                headers: {
+                                  'Content-Type': 'application/json',
+                                  'Authorization': `Bearer ${idToken}`,
+                                },
+                                body: JSON.stringify(body),
+                              });
                               if (!resp.ok) {
                                 const text = await resp.text();
                                 throw new Error(text || `Request failed (${resp.status})`);
