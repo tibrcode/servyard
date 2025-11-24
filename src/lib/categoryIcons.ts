@@ -81,9 +81,9 @@ export const colorMap: { [key: string]: { text: string; bg: string } } = {
   'yellow': { text: 'text-yellow-500', bg: 'bg-yellow-50 dark:bg-yellow-950/20' },
 };
 
-export const getCategoryIcon = (iconName: string | undefined): LucideIcon | null => {
-  if (!iconName) return null;
-  return iconMap[iconName] || null;
+export const getCategoryIcon = (iconName: string | undefined): LucideIcon => {
+  if (!iconName) return Sparkles;
+  return iconMap[iconName] || Sparkles;
 };
 
 export const getCategoryColor = (colorName: string | undefined): { text: string; bg: string } => {
