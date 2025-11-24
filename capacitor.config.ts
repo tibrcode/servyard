@@ -7,12 +7,12 @@ const config: CapacitorConfig = {
     appName: "ServYard",
     webDir: "dist",
     server: {
-        // Keep default built-in file scheme for production builds.
+        // Use HTTPS scheme for production builds (required for secure APIs like Google OAuth)
         // For live reload in development, run with `cap run -l --external`.
-        androidScheme: "http",
-        iosScheme: "http",
+        androidScheme: "https",
+        iosScheme: "https",
         // url: "http://YOUR-LAN-IP:8080", // Optional: uncomment and set for manual live reload.
-        // cleartext: true,
+        // cleartext: false,
     },
     plugins: {
         SplashScreen: {
