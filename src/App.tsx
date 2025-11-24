@@ -45,6 +45,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import EnsureProfile from "@/components/auth/EnsureProfile";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
+import { AdBanner } from "@/components/ads/AdBanner";
 
 const queryClient = new QueryClient();
 
@@ -384,6 +385,10 @@ const AppContent = () => {
                 </div>
               </div>
             </SidebarProvider>
+            
+            {/* Mobile Sticky Ad */}
+            <AdBanner type="mobile" slotId="1234567890" />
+            
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>

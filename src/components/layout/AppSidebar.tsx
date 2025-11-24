@@ -32,6 +32,7 @@ import {
 import { useTranslation } from "@/lib/i18n";
 import { useAuth } from "@/contexts/AuthContext";
 import BrandLogo from "@/components/BrandLogo";
+import { AdBanner } from "@/components/ads/AdBanner";
 
 interface AppSidebarProps {
   currentLanguage?: string;
@@ -205,6 +206,11 @@ export function AppSidebar({ currentLanguage = 'en', onLanguageChange, onLocatio
             </SidebarGroupContent>
           </SidebarGroup>
         )}
+
+        {/* Sidebar Ad */}
+        <div className="px-2 py-4 mt-auto">
+          <AdBanner type="sidebar" slotId="1234567890" />
+        </div>
 
       </SidebarContent>
     </Sidebar>
