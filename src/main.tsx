@@ -3,8 +3,11 @@ import App from "./App.tsx";
 import "./index.css";
 import { rtlLanguages as rtlBase } from "@/lib/languages";
 import { registerFirebaseMessagingSW } from "@/lib/firebase/sw";
-import { collectWebVitals, logVital } from "@/lib/monitoring/vitals";
+import { collectWebVitals, logVital, initErrorTracking } from "@/lib/monitoring/vitals";
 import ErrorBoundary from './components/common/ErrorBoundary';
+
+// Initialize error tracking early
+initErrorTracking();
 
 // Lightweight boot diagnostics for Android WebView
 try {
