@@ -60,6 +60,44 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
   const [finding, setFinding] = useState<boolean>(false);
   const [foundProfile, setFoundProfile] = useState<any | null>(null);
   
+  const [blockField, setBlockField] = useState<string>("");
+  const [blockMode, setBlockMode] = useState<"email" | "uid">("email");
+  const [blocking, setBlocking] = useState<boolean>(false);
+
+  const handleBlock = async (shouldBlock: boolean) => {
+    if (!currentUser) return;
+    setBlocking(true);
+    try {
+      const idToken = await currentUser.getIdToken();
+      const body: any = blockMode === 'email' ? { email: blockField, block: shouldBlock } : { uid: blockField, block: shouldBlock };
+      
+      const resp = await fetch('/adminBlockUser', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`,
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (!resp.ok) {
+        const text = await resp.text();
+        throw new Error(text || `Request failed (${resp.status})`);
+      }
+      
+      const data = await resp.json();
+      toast({ 
+        title: shouldBlock ? 'User Blocked' : 'User Unblocked', 
+        description: `User ${data.uid} is now ${shouldBlock ? 'disabled' : 'enabled'}.` 
+      });
+      setBlockField('');
+    } catch (e: any) {
+      toast({ variant: 'destructive', title: 'Operation failed', description: e?.message || String(e) });
+    } finally {
+      setBlocking(false);
+    }
+  };
+
   // Users list (paginated)
   const [usersRoleFilter, setUsersRoleFilter] = useState<"all" | "provider" | "customer">("all");
   // Search
@@ -561,6 +599,45 @@ const AdminConsole = ({ currentLanguage = 'en' }: AdminConsoleProps) => {
                           }}
                         >
                           {deleting ? 'Deleting…' : 'Delete'}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-base font-semibold mb-2 flex items-center gap-2">
+                      <Eye className="h-4 w-4 text-muted-foreground" /> Block / Unblock a user
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Choose by email or UID. Blocking a user disables their account without deleting data.
+                    </p>
+                    <div className="flex flex-col md:flex-row gap-3 md:items-end">
+                      <div className="flex-1">
+                        <Label htmlFor="blockField">{blockMode === 'email' ? 'Email' : 'UID'}</Label>
+                        <Input id="blockField" placeholder={blockMode === 'email' ? 'user@example.com' : 'UID'} value={blockField} onChange={(e) => setBlockField(e.target.value)} />
+                      </div>
+                      <div className="flex gap-2">
+                        <Button type="button" variant={blockMode === 'email' ? 'default' : 'outline'} onClick={() => setBlockMode('email')}>By Email</Button>
+                        <Button type="button" variant={blockMode === 'uid' ? 'default' : 'outline'} onClick={() => setBlockMode('uid')}>By UID</Button>
+                      </div>
+                      <div>
+                        <Button
+                          variant={blocking ? "outline" : "destructive"}
+                          disabled={blocking || !blockField}
+                          onClick={async () => {
+                            handleBlock(true);
+                          }}
+                        >
+                          {blocking ? 'Blocking…' : 'Block'}
+                        </Button>
+                        <Button
+                          variant={blocking ? "outline" : "default"}
+                          disabled={blocking || !blockField}
+                          onClick={async () => {
+                            handleBlock(false);
+                          }}
+                        >
+                          {blocking ? 'Unblocking…' : 'Unblock'}
                         </Button>
                       </div>
                     </div>

@@ -5,6 +5,10 @@
       "source": "/adminDeleteUser",
       "destination": "https://admindeleteuser-btfczcxdyq-uc.a.run.app"
     },
+    {
+      "source": "/adminBlockUser",
+      "destination": "https://us-central1-servyard-de527.cloudfunctions.net/adminBlockUser"
+    },
     { "source": "/(.*)", "destination": "/" }
   ]
 }

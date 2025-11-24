@@ -374,6 +374,77 @@ export const adminDeleteUser = onRequest({ maxInstances: 1, secrets: [ADMIN_DELE
   }
 });
 
+export const adminBlockUser = onRequest({ maxInstances: 1, secrets: [ADMIN_DELETE_TOKEN] }, async (req: any, res: any) => {
+  console.log(`adminBlockUser called with method: ${req.method}, url: ${req.url}`);
+  
+  // Handle Preflight
+  if (req.method === 'OPTIONS') {
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Methods', 'POST');
+    res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.status(204).send('');
+    return;
+  }
+
+  if (req.method !== 'POST') return errorResponse(res, 405, 'method_not_allowed', 'POST required');
+  const trace = req.get('x-trace-id');
+
+  // AuthN
+  const bearer = (req.get('Authorization') || '').replace(/^Bearer\s+/i, '').trim();
+  const headerKey = (req.get('x-admin-key') || req.query.key) as string | undefined;
+  const secretValue = ADMIN_DELETE_TOKEN.value();
+
+  let isAuthorized = false;
+  if (bearer) {
+    try {
+      const decoded = await admin.auth().verifyIdToken(bearer);
+      const email: string | undefined = (decoded as any)?.email;
+      const hasAdminClaim = (decoded as any)?.admin === true;
+      const emailDomainOk = typeof email === 'string' && /@(tibrcode\.com|servyard\.com|serv-yard\.com)$/i.test(email || '');
+      const specificAdmin = typeof email === 'string' && email.toLowerCase() === 'admin@servyard.com';
+      if (hasAdminClaim || emailDomainOk || specificAdmin) {
+        isAuthorized = true;
+      }
+    } catch {}
+  }
+  if (!isAuthorized) {
+    if (!secretValue) return errorResponse(res, 500, 'server_not_configured', 'Server not configured', trace);
+    if (!headerKey || headerKey !== secretValue) return errorResponse(res, 401, 'unauthorized', 'Unauthorized', trace);
+    isAuthorized = true;
+  }
+
+  // Parameters
+  let uid = (req.body?.uid || req.query.uid) as string | undefined;
+  const emailParam = (req.body?.email || req.query.email) as string | undefined;
+  const shouldBlock = req.body?.block === true || req.query.block === 'true';
+
+  try {
+    if (!uid && emailParam) {
+      const trimmedEmail = emailParam.trim();
+      const userRecord = await admin.auth().getUserByEmail(trimmedEmail);
+      uid = userRecord.uid;
+    }
+  } catch (e: any) {
+    return errorResponse(res, 404, 'user_not_found', 'User not found for email', trace);
+  }
+  if (!uid) return errorResponse(res, 400, 'missing_parameters', 'Missing uid or email', trace);
+
+  try {
+    console.log(`Updating disabled status for ${uid} to ${shouldBlock}`);
+    await admin.auth().updateUser(uid, { disabled: shouldBlock });
+    
+    if (shouldBlock) {
+      console.log(`Revoking tokens for ${uid}`);
+      await admin.auth().revokeRefreshTokens(uid);
+    }
+    
+    return res.json({ ok: true, uid, disabled: shouldBlock });
+  } catch (e: any) {
+    console.error(`Block/Unblock error for ${uid}:`, e);
+    return errorResponse(res, 500, 'operation_failed', 'Failed to update user status', trace);
+  }
+});
+
 // OLD FUNCTIONS - TEMPORARILY DISABLED DUE TO REGION MISMATCH
 // These are replaced by the new notification system below
 /*
