@@ -386,8 +386,8 @@ const AppContent = () => {
               </div>
             </SidebarProvider>
             
-            {/* Mobile Sticky Ad */}
-            <AdBanner type="mobile" slotId="1234567890" />
+            {/* Sticky Footer Ad (Floating Card Style) - Shows on ALL devices */}
+            <AdBanner type="sticky-footer" slotId="1234567890" />
             
         </BrowserRouter>
       </TooltipProvider>

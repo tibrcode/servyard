@@ -3,10 +3,10 @@ import { StyledAdContainer } from "./StyledAdContainer";
 import { GoogleAdUnit } from "./GoogleAdUnit";
 
 interface AdBannerProps {
-  type: "mobile" | "sidebar";
+  type: "mobile" | "sidebar" | "sticky-footer";
   position?: "top" | "bottom";
   className?: string;
-  slotId?: string; // Optional: allow passing specific slot IDs
+  slotId?: string;
 }
 
 export const AdBanner = ({ type, position = "bottom", className = "", slotId = "1234567890" }: AdBannerProps) => {
@@ -23,15 +23,60 @@ export const AdBanner = ({ type, position = "bottom", className = "", slotId = "
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Only show mobile banner on mobile devices and sidebar banner on desktop
-  if ((type === "mobile" && !isMobile) || (type === "sidebar" && isMobile)) {
-    return null;
-  }
+  // Handle body padding for sticky footer to prevent content overlap
+  useEffect(() => {
+    if (type === "sticky-footer" && isVisible) {
+      // Add padding to body equal to ad height + margins (approx 100px for mobile, 120px for desktop)
+      const padding = isMobile ? "100px" : "120px";
+      document.body.style.paddingBottom = padding;
+      return () => {
+        document.body.style.paddingBottom = "";
+      };
+    }
+  }, [type, isVisible, isMobile]);
+
+  // Logic for showing/hiding based on type and device
+  if (type === "mobile" && !isMobile) return null;
+  if (type === "sidebar" && isMobile) return null;
+  // sticky-footer shows on ALL devices
 
   if (!isVisible) {
     return null;
   }
 
+  // Styles for the new Sticky Footer (Floating Card)
+  if (type === "sticky-footer") {
+    return (
+      <div className={`fixed bottom-4 left-4 right-4 z-50 flex justify-center pointer-events-none ${className}`}>
+        <div className="w-full max-w-4xl pointer-events-auto shadow-2xl drop-shadow-2xl">
+          <StyledAdContainer 
+            // No onClose prop = No close button
+            className="bg-background/95 backdrop-blur-xl border border-primary/20 rounded-2xl shadow-lg overflow-hidden"
+            label="Sponsored"
+          >
+            {slotId === "1234567890" ? (
+              <div className="flex flex-col items-center justify-center text-center py-4">
+                <span className="text-xs font-medium uppercase tracking-widest mb-1 text-primary">
+                  Premium Ad Space
+                </span>
+                <span className="text-[10px] text-muted-foreground">
+                  {isMobile ? "Mobile Footer (Floating)" : "Desktop Footer (Floating)"}
+                </span>
+              </div>
+            ) : (
+              <GoogleAdUnit 
+                slot={slotId} 
+                format="horizontal"
+                style={{ display: 'block', width: '100%', maxHeight: isMobile ? '60px' : '90px' }}
+              />
+            )}
+          </StyledAdContainer>
+        </div>
+      </div>
+    );
+  }
+
+  // Legacy styles for other types (if still used)
   const mobileStyles = type === "mobile" ? 
     `fixed ${position === 'bottom' ? 'bottom-0' : 'top-0'} left-0 right-0 z-50 p-2 bg-background/80 backdrop-blur-md border-t border-border shadow-lg` : 
     "";
@@ -47,11 +92,6 @@ export const AdBanner = ({ type, position = "bottom", className = "", slotId = "
         className={type === "mobile" ? "h-auto min-h-[60px] border-none shadow-none bg-transparent" : "min-h-[280px]"}
         label={type === "mobile" ? "Ad" : "Sponsored"}
       >
-        {/* 
-           In a real scenario, you would use the GoogleAdUnit component.
-           For now, we show a placeholder if the slotId is the default dummy one.
-           Once you have real AdSense slots, replace the condition or remove the placeholder.
-        */}
         {slotId === "1234567890" ? (
            <div className={`
             flex flex-col items-center justify-center text-center
