@@ -207,10 +207,6 @@ export function AppSidebar({ currentLanguage = 'en', onLanguageChange, onLocatio
           </SidebarGroup>
         )}
 
-        {/* Sidebar Ad */}
-        <div className="px-2 py-4 mt-auto">
-          <AdBanner type="sidebar" slotId="1234567890" />
-        </div>
 
       </SidebarContent>
     </Sidebar>

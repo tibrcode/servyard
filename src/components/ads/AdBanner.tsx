@@ -47,8 +47,8 @@ export const AdBanner = ({ type, position = "bottom", className = "", slotId = "
   // Styles for the new Sticky Footer (Floating Card)
   if (type === "sticky-footer") {
     return (
-      <div className={`fixed bottom-4 left-4 right-4 z-50 flex justify-center pointer-events-none ${className}`}>
-        <div className="w-full max-w-4xl pointer-events-auto shadow-2xl drop-shadow-2xl">
+      <div className={`fixed bottom-2 left-2 right-2 md:bottom-4 md:left-4 md:right-4 z-50 flex justify-center pointer-events-none ${className}`}>
+        <div className="w-full pointer-events-auto shadow-2xl drop-shadow-2xl">
           <StyledAdContainer 
             // No onClose prop = No close button
             className="bg-background/95 backdrop-blur-xl border border-primary/20 rounded-2xl shadow-lg overflow-hidden"
