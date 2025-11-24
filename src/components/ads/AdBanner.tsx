@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { X } from "lucide-react";
+import { StyledAdContainer } from "./StyledAdContainer";
+import { GoogleAdUnit } from "./GoogleAdUnit";
 
 interface AdBannerProps {
   type: "mobile" | "sidebar";
   position?: "top" | "bottom";
   className?: string;
+  slotId?: string; // Optional: allow passing specific slot IDs
 }
 
-export const AdBanner = ({ type, position = "bottom", className = "" }: AdBannerProps) => {
+export const AdBanner = ({ type, position = "bottom", className = "", slotId = "1234567890" }: AdBannerProps) => {
   const [isVisible, setIsVisible] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -31,55 +33,44 @@ export const AdBanner = ({ type, position = "bottom", className = "" }: AdBanner
   }
 
   const mobileStyles = type === "mobile" ? 
-    `fixed ${position === 'bottom' ? 'bottom-0' : 'top-0'} left-0 right-0 z-50 bg-background border-t border-border` : 
+    `fixed ${position === 'bottom' ? 'bottom-0' : 'top-0'} left-0 right-0 z-50 p-2 bg-background/80 backdrop-blur-md border-t border-border shadow-lg` : 
     "";
   
   const sidebarStyles = type === "sidebar" ? 
-    "sticky top-4 bg-muted border border-border rounded-lg" : 
+    "sticky top-20 mb-6" : 
     "";
 
   return (
     <div className={`${mobileStyles} ${sidebarStyles} ${className}`}>
-      <div className={`relative ${type === "mobile" ? "h-16 flex items-center justify-center px-4" : "h-64 p-4"}`}>
-        {/* Close button */}
-        <button
-          onClick={() => setIsVisible(false)}
-          className="absolute top-2 right-2 p-1 rounded-full hover:bg-background/80 transition-colors"
-          aria-label="Close ad"
-        >
-          <X className="h-3 w-3" />
-        </button>
-
-        {/* Ad content placeholder */}
-        <div className={`
-          bg-gradient-to-r from-primary/10 to-primary/5 
-          border border-primary/20 rounded-md
-          flex items-center justify-center
-          text-sm text-muted-foreground
-          ${type === "mobile" ? "w-full h-12" : "w-full h-full"}
-        `}>
-          {type === "mobile" ? (
-            <span>Advertisement Space • 320x50</span>
-          ) : (
-            <div className="text-center">
-              <div>Advertisement Space</div>
-              <div className="text-xs mt-1">300x250</div>
-            </div>
-          )}
-        </div>
-
-        {/* AdSense integration placeholder */}
-        {process.env.NODE_ENV === 'production' && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            {/* Replace with actual AdSense code */}
-            <ins className="adsbygoogle"
-                 style={{ display: 'inline-block', width: type === "mobile" ? '320px' : '300px', height: type === "mobile" ? '50px' : '250px' }}
-                 data-ad-client="ca-pub-xxxxxxxxxx"
-                 data-ad-slot="xxxxxxxxxx">
-            </ins>
+      <StyledAdContainer 
+        onClose={() => setIsVisible(false)}
+        className={type === "mobile" ? "h-auto min-h-[60px] border-none shadow-none bg-transparent" : "min-h-[280px]"}
+        label={type === "mobile" ? "Ad" : "Sponsored"}
+      >
+        {/* 
+           In a real scenario, you would use the GoogleAdUnit component.
+           For now, we show a placeholder if the slotId is the default dummy one.
+           Once you have real AdSense slots, replace the condition or remove the placeholder.
+        */}
+        {slotId === "1234567890" ? (
+           <div className={`
+            flex flex-col items-center justify-center text-center
+            text-muted-foreground/50
+            ${type === "mobile" ? "w-full h-12" : "w-full h-full p-8"}
+          `}>
+            <span className="text-xs font-medium uppercase tracking-widest mb-1">Google Ads</span>
+            <span className="text-[10px] opacity-70">
+              {type === "mobile" ? "Responsive Banner" : "Sidebar Rectangle"}
+            </span>
           </div>
+        ) : (
+          <GoogleAdUnit 
+            slot={slotId} 
+            format={type === "mobile" ? "horizontal" : "rectangle"}
+            style={{ display: 'block', width: '100%' }}
+          />
         )}
-      </div>
+      </StyledAdContainer>
     </div>
   );
 };
