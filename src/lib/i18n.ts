@@ -1559,7 +1559,7 @@ export const translations: Record<string, Translation> = {
       }
     },
     footer: {
-      tagline: "Connecting service providers with customers worldwide",
+      tagline: "A comprehensive platform that streamlines appointment scheduling for service providers while enabling customers to discover and book quality services in their vicinity",
       copyright: "© 2024 ServYard. All rights reserved.",
       paymentDisclaimer: "Payments are processed directly between providers and customers",
       links: {
@@ -2335,7 +2335,7 @@ export const translations: Record<string, Translation> = {
       browserNotSupportedDesc: "يرجى استخدام متصفح حديث"
     },
     footer: {
-      tagline: "ربط مقدمي الخدمات بالعملاء في جميع أنحاء العالم",
+      tagline: "منصة متكاملة لتنظيم مواعيد وأعمال مزودي الخدمات، مع تمكين العملاء من اكتشاف وحجز الخدمات المميزة في مناطقهم",
       copyright: "© 2024 سيرف يارد. جميع الحقوق محفوظة.",
       paymentDisclaimer: "المدفوعات تتم معالجتها مباشرة بين مقدمي الخدمات والعملاء",
       links: {
