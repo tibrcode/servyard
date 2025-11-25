@@ -936,6 +936,32 @@ export interface Translation {
     importWillMerge?: string;
   };
 
+  // Services Page
+  servicesPage?: {
+    services: string;
+    appointments: string;
+    map: string;
+    offers: string;
+    searchRadius: string;
+    km: string;
+    nearest: string;
+    providersInArea: string;
+    showingAllProviders: string;
+    provider: string;
+    duration: string;
+    city: string;
+    minutes: string;
+    bookAppointment: string;
+    viewAllServices: string;
+    noReviews: string;
+    appointment: string;
+    priceOnRequest: string;
+    locationNotSupported: string;
+    locationSet: string;
+    locationFailed: string;
+    error: string;
+  };
+
   // Location Picker
   locationPicker?: {
     title: string;
@@ -1970,6 +1996,30 @@ export const translations: Record<string, Translation> = {
       verifyFileIntegrity: "Verify file integrity before importing",
       importWillMerge: "Import will merge with existing data"
     },
+    servicesPage: {
+      services: "Services",
+      appointments: "Appointments",
+      map: "Map",
+      offers: "Offers",
+      searchRadius: "Search Radius:",
+      km: "km",
+      nearest: "Nearest",
+      providersInArea: "Providers in area:",
+      showingAllProviders: "Showing all providers regardless of search radius",
+      provider: "Provider:",
+      duration: "Duration:",
+      city: "City:",
+      minutes: "minutes",
+      bookAppointment: "Book Appointment",
+      viewAllServices: "View All Services",
+      noReviews: "No reviews",
+      appointment: "Appointment",
+      priceOnRequest: "Price on request",
+      locationNotSupported: "Location Not Supported",
+      locationSet: "Location Set",
+      locationFailed: "Failed to get location",
+      error: "Error"
+    },
     locationPicker: {
       title: "Set Location",
       description: "Set your geographic location to show your services to nearby customers",
@@ -2986,6 +3036,30 @@ export const translations: Record<string, Translation> = {
       createBackupsRegularly: "قم بإنشاء نسخة احتياطية بشكل دوري",
       verifyFileIntegrity: "تحقق من صحة الملف قبل الاستيراد",
       importWillMerge: "الاستيراد سيدمج البيانات مع الموجودة"
+    },
+    servicesPage: {
+      services: "الخدمات",
+      appointments: "حجز",
+      map: "الخريطة",
+      offers: "العروض",
+      searchRadius: "نطاق البحث:",
+      km: "كم",
+      nearest: "الأقرب مسافة",
+      providersInArea: "المزودين في المنطقة:",
+      showingAllProviders: "يتم عرض جميع المزودين بغض النظر عن نطاق البحث",
+      provider: "المزود:",
+      duration: "المدة:",
+      city: "المدينة:",
+      minutes: "دقيقة",
+      bookAppointment: "حجز موعد",
+      viewAllServices: "عرض كل الخدمات",
+      noReviews: "لا توجد تقييمات",
+      appointment: "حجز موعد",
+      priceOnRequest: "السعر عند الطلب",
+      locationNotSupported: "الموقع غير مدعوم",
+      locationSet: "تم تحديد موقعك",
+      locationFailed: "فشل تحديد الموقع",
+      error: "خطأ"
     },
     locationPicker: {
       title: "تحديد الموقع",
