@@ -433,6 +433,30 @@ Base font size: 15px
   }
 
   /* ═══════════════════════════════════════════════════════════════════════════
+     DASHBOARD BUTTONS - Green hover effect for outline buttons
+     ═══════════════════════════════════════════════════════════════════════════ */
+  .light button.bg-muted:hover,
+  .light button[class*="bg-muted"]:hover,
+  .light .bg-muted.hover\:bg-primary:hover {
+    background: hsl(var(--primary)) !important;
+    color: white !important;
+    border-color: hsl(var(--primary)) !important;
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3) !important;
+  }
+
+  .light button.bg-muted:hover svg,
+  .light button[class*="bg-muted"]:hover svg,
+  .light .bg-muted.hover\:bg-primary:hover svg {
+    color: white !important;
+  }
+
+  .light button.bg-muted:hover span,
+  .light button[class*="bg-muted"]:hover span,
+  .light .bg-muted.hover\:bg-primary:hover span {
+    color: white !important;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
      STATS CARDS - Provider dashboard stat cards
      ═══════════════════════════════════════════════════════════════════════════ */
   .light .bg-muted\/50,
