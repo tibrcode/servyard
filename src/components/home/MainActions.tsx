@@ -53,32 +53,12 @@ export const MainActions = ({
 
   return (
     <section 
-      className="relative py-12 md:py-16"
+      className="relative py-6 md:py-8"
       dir={isRTL ? 'rtl' : 'ltr'}
     >
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
-          {/* Hero Content */}
-          <div className="animate-luxury-fade mb-8">
-            <h1 
-              className="text-5xl md:text-7xl lg:text-8xl font-display font-bold bg-gradient-to-r from-primary via-primary-glow to-primary bg-clip-text text-transparent"
-              style={{ 
-                textShadow: '2px 2px 0 rgba(34, 197, 94, 0.35), 4px 4px 0 rgba(34, 197, 94, 0.15)'
-              }}
-            >
-              ServYard
-            </h1>
-            <p 
-              className="text-xl md:text-2xl lg:text-3xl mt-2 font-display font-semibold bg-gradient-to-r from-primary via-primary-glow to-primary bg-clip-text text-transparent"
-              style={{ 
-                textShadow: '1px 1px 0 rgba(34, 197, 94, 0.3), 2px 2px 0 rgba(34, 197, 94, 0.12)'
-              }}
-            >
-              {isRTL ? 'منصة الخدمات المتميزة' : 'Premium Service Marketplace'}
-            </p>
-          </div>
-
-          {/* Action Buttons Grid */}
+          {/* Action Buttons Grid - moved up since hero is now in header */}
           <div className="animate-luxury-scale">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 max-w-4xl mx-auto">
               {/* Button 1: Services */}

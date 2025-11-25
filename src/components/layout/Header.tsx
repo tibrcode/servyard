@@ -117,15 +117,27 @@ export const Header = ({
       <div className="container mx-auto px-2 sm:px-4 py-2">
         {/* Stack layout: Logo on top, buttons below */}
         <div className="flex flex-col gap-1">
-          {/* Top row: Menu Trigger & Logo */}
+          {/* Top row: Menu Trigger & Logo with tagline */}
           <div className="flex items-center gap-1.5 sm:gap-3 min-w-0">
             <SidebarTrigger 
               aria-label="Toggle sidebar" 
               className="ml-0 sm:ml-2 h-8 w-8 sm:h-10 sm:w-10 p-1.5 flex-shrink-0 border border-border/50 rounded-md hover:bg-accent [&>svg]:h-5 [&>svg]:w-5 sm:[&>svg]:h-6 sm:[&>svg]:w-6" 
             />
-            <Link to="/" className="flex items-center leading-none min-w-0 overflow-hidden" aria-label="ServYard home">
-              {/* Logo stays consistent - always visible */}
-              <BrandLogo height={50} />
+            <Link to="/" className="flex flex-col items-start leading-none min-w-0 overflow-hidden" aria-label="ServYard home">
+              {/* Logo - doubled size for better visibility */}
+              <BrandLogo height={80} />
+              {/* Golden tagline under logo */}
+              <span 
+                className="text-xs sm:text-sm font-semibold mt-0.5"
+                style={{ 
+                  background: 'linear-gradient(90deg, #D4AF37, #F4E4BA, #D4AF37)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text'
+                }}
+              >
+                {isRTL ? 'منصة الخدمات المتميزة' : 'Premium Service Marketplace'}
+              </span>
             </Link>
           </div>
 
