@@ -408,7 +408,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
           return {
             id: service.id,
             name: service.name,
-            price: service.approximate_price || service.price_range || (isRTL ? 'السعر عند الطلب' : 'Price on request'),
+            price: service.approximate_price || service.price_range || (t.servicesPage?.priceOnRequest || (isRTL ? 'السعر عند الطلب' : 'Price on request')),
             provider_name: provider.full_name,
             average_rating: rating?.avg || 0,
             reviews_count: rating?.count || 0,
@@ -489,7 +489,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
             onClick={() => setActiveView('services')}
           >
             <List className="w-5 h-5" />
-            <span className="text-[10px] sm:text-xs font-bold leading-tight">{isRTL ? 'الخدمات' : 'Services'}</span>
+            <span className="text-[10px] sm:text-xs font-bold leading-tight">{t.servicesPage?.services || (isRTL ? 'الخدمات' : 'Services')}</span>
           </Button>
 
           <Button
@@ -502,7 +502,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
             onClick={() => setActiveView('appointments')}
           >
             <Calendar className="w-5 h-5" />
-            <span className="text-[10px] sm:text-xs font-bold leading-tight">{isRTL ? 'حجز' : 'Appointments'}</span>
+            <span className="text-[10px] sm:text-xs font-bold leading-tight">{t.servicesPage?.appointments || (isRTL ? 'حجز' : 'Appointments')}</span>
           </Button>
 
           <Button
@@ -515,7 +515,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
             onClick={() => setActiveView('map')}
           >
             <MapIcon className="w-5 h-5" />
-            <span className="text-[10px] sm:text-xs font-bold leading-tight">{isRTL ? 'الخريطة' : 'Map'}</span>
+            <span className="text-[10px] sm:text-xs font-bold leading-tight">{t.servicesPage?.map || (isRTL ? 'الخريطة' : 'Map')}</span>
           </Button>
 
           <Button
@@ -528,7 +528,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
             onClick={() => setActiveView('offers')}
           >
             <Sparkles className="w-5 h-5" />
-            <span className="text-[10px] sm:text-xs font-bold leading-tight">{isRTL ? 'العروض' : 'Offers'}</span>
+            <span className="text-[10px] sm:text-xs font-bold leading-tight">{t.servicesPage?.offers || (isRTL ? 'العروض' : 'Offers')}</span>
           </Button>
         </div>
 
@@ -624,11 +624,11 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                   <div className="flex items-center gap-2">
                     <MapPin className="w-5 h-5 text-primary" />
                     <span className="font-semibold">
-                      {isRTL ? 'المزودين في المنطقة:' : 'Providers in area:'} {mapMarkers.length}
+                      {t.servicesPage?.providersInArea || (isRTL ? 'المزودين في المنطقة:' : 'Providers in area:')} {mapMarkers.length}
                     </span>
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    {isRTL ? 'يتم عرض جميع المزودين بغض النظر عن نطاق البحث' : 'Showing all providers regardless of search radius'}
+                    {t.servicesPage?.showingAllProviders || (isRTL ? 'يتم عرض جميع المزودين بغض النظر عن نطاق البحث' : 'Showing all providers regardless of search radius')}
                   </div>
                 </div>
 
@@ -752,7 +752,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                             ) : (
                               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px', height: '16px' }}>
                                 <div className="text-muted-foreground" style={{ fontSize: '10px' }}>
-                                  ⭐ {isRTL ? 'لا توجد تقييمات' : 'No reviews'}
+                                  ⭐ {t.servicesPage?.noReviews || (isRTL ? 'لا توجد تقييمات' : 'No reviews')}
                                 </div>
                                 
                                 {/* Actions: Share & Favorite */}
@@ -786,7 +786,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                                 {service.type === 'booking' ? (
                                   <div style={{ fontSize: '14px', fontWeight: '600', color: 'hsl(var(--primary))' }}>
-                                    {isRTL ? 'حجز موعد' : 'Appointment'}
+                                    {t.servicesPage?.appointment || (isRTL ? 'حجز موعد' : 'Appointment')}
                                   </div>
                                 ) : service.has_discount && service.discount_price ? (
                                   <>
@@ -846,22 +846,22 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
 
                               <p className="text-muted-foreground" style={{ fontSize: '12px' }}>
                                 <span className="text-primary" style={{ fontWeight: '600' }}>
-                                  {isRTL ? 'المزود:' : 'Provider:'}
+                                  {t.servicesPage?.provider || (isRTL ? 'المزود:' : 'Provider:')}
                                 </span> {provider?.full_name || t.ui.noData}
                               </p>
 
                               {service.duration_minutes && (
                                 <p className="text-muted-foreground" style={{ fontSize: '12px' }}>
                                   <span className="text-primary" style={{ fontWeight: '600' }}>
-                                    {isRTL ? 'المدة:' : 'Duration:'}
-                                  </span> {service.duration_minutes} {isRTL ? 'دقيقة' : 'minutes'}
+                                    {t.servicesPage?.duration || (isRTL ? 'المدة:' : 'Duration:')}
+                                  </span> {service.duration_minutes} {t.servicesPage?.minutes || (isRTL ? 'دقيقة' : 'minutes')}
                                 </p>
                               )}
 
                               {provider?.city && (
                                 <p className="text-muted-foreground" style={{ fontSize: '12px' }}>
                                   <span className="text-primary" style={{ fontWeight: '600' }}>
-                                    {isRTL ? 'المدينة:' : 'City:'}
+                                    {t.servicesPage?.city || (isRTL ? 'المدينة:' : 'City:')}
                                   </span> {provider.city}
                                 </p>
                               )}
@@ -880,7 +880,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                     }}
                                   >
                                     <Calendar className="h-4 w-4 mr-2" />
-                                    {isRTL ? 'حجز موعد' : 'Book Appointment'}
+                                    {t.servicesPage?.bookAppointment || (isRTL ? 'حجز موعد' : 'Book Appointment')}
                                   </Button>
                                 )}
                                 <Button
@@ -892,7 +892,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                   }}
                                 >
                                   <ExternalLink className="h-4 w-4 mr-2" />
-                                  {isRTL ? 'عرض كل الخدمات' : 'View All Services'}
+                                  {t.servicesPage?.viewAllServices || (isRTL ? 'عرض كل الخدمات' : 'View All Services')}
                                 </Button>
                               </div>
                             </div>
@@ -1035,7 +1035,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                           ) : (
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px', height: '16px' }}>
                               <div className="text-muted-foreground" style={{ fontSize: '10px' }}>
-                                ⭐ {isRTL ? 'لا توجد تقييمات' : 'No reviews'}
+                                ⭐ {t.servicesPage?.noReviews || (isRTL ? 'لا توجد تقييمات' : 'No reviews')}
                               </div>
                               
                               {/* Actions: Share & Favorite */}
@@ -1068,7 +1068,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                               {service.type === 'booking' ? (
                                 <div style={{ fontSize: '14px', fontWeight: '600', color: 'hsl(var(--primary))' }}>
-                                  {isRTL ? 'حجز موعد' : 'Appointment'}
+                                  {t.servicesPage?.appointment || (isRTL ? 'حجز موعد' : 'Appointment')}
                                 </div>
                               ) : service.has_discount && service.discount_price ? (
                                 <>
@@ -1145,7 +1145,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                               {/* Provider */}
                               <p className="text-muted-foreground" style={{ fontSize: '12px' }}>
                                 <span className="text-primary" style={{ fontWeight: '600' }}>
-                                  {isRTL ? 'المزود:' : 'Provider:'}
+                                  {t.servicesPage?.provider || (isRTL ? 'المزود:' : 'Provider:')}
                                 </span> {provider?.full_name || t.ui.noData}
                               </p>
 
@@ -1153,8 +1153,8 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                               {service.duration_minutes && (
                                 <p className="text-muted-foreground" style={{ fontSize: '12px' }}>
                                   <span className="text-primary" style={{ fontWeight: '600' }}>
-                                    {isRTL ? 'المدة:' : 'Duration:'}
-                                  </span> {service.duration_minutes} {isRTL ? 'دقيقة' : 'minutes'}
+                                    {t.servicesPage?.duration || (isRTL ? 'المدة:' : 'Duration:')}
+                                  </span> {service.duration_minutes} {t.servicesPage?.minutes || (isRTL ? 'دقيقة' : 'minutes')}
                                 </p>
                               )}
 
@@ -1162,7 +1162,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                               {provider?.city && (
                                 <p className="text-muted-foreground" style={{ fontSize: '12px' }}>
                                   <span className="text-primary" style={{ fontWeight: '600' }}>
-                                    {isRTL ? 'المدينة:' : 'City:'}
+                                    {t.servicesPage?.city || (isRTL ? 'المدينة:' : 'City:')}
                                   </span> {provider.city}
                                 </p>
                               )}
@@ -1182,7 +1182,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                     }}
                                   >
                                     <Calendar className="h-4 w-4 mr-2" />
-                                    {isRTL ? 'حجز موعد' : 'Book Appointment'}
+                                    {t.servicesPage?.bookAppointment || (isRTL ? 'حجز موعد' : 'Book Appointment')}
                                   </Button>
                                 )}
                                 <Button
@@ -1194,7 +1194,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                   }}
                                 >
                                   <ExternalLink className="h-4 w-4 mr-2" />
-                                  {isRTL ? 'عرض كل الخدمات' : 'View All Services'}
+                                  {t.servicesPage?.viewAllServices || (isRTL ? 'عرض كل الخدمات' : 'View All Services')}
                                 </Button>
                               </div>
                             </div>
@@ -1357,7 +1357,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                             ) : (
                               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px', height: '16px' }}>
                                 <div className="text-muted-foreground" style={{ fontSize: '10px' }}>
-                                  ⭐ {isRTL ? 'لا توجد تقييمات' : 'No reviews'}
+                                  ⭐ {t.servicesPage?.noReviews || (isRTL ? 'لا توجد تقييمات' : 'No reviews')}
                                 </div>
                                 
                                 {/* Actions: Share & Favorite */}
@@ -1391,7 +1391,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                                 {service.type === 'booking' ? (
                                   <div style={{ fontSize: '14px', fontWeight: '600', color: 'hsl(var(--primary))' }}>
-                                    {isRTL ? 'حجز موعد' : 'Appointment'}
+                                    {t.servicesPage?.appointment || (isRTL ? 'حجز موعد' : 'Appointment')}
                                   </div>
                                 ) : service.has_discount && service.discount_price ? (
                                   <>
@@ -1456,7 +1456,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                 {/* Provider */}
                                 <p className="text-muted-foreground" style={{ fontSize: '12px' }}>
                                   <span className="text-primary" style={{ fontWeight: '600' }}>
-                                    {isRTL ? 'المزود:' : 'Provider:'}
+                                    {t.servicesPage?.provider || (isRTL ? 'المزود:' : 'Provider:')}
                                   </span> {provider?.full_name || t.ui.noData}
                                 </p>
 
@@ -1464,8 +1464,8 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                 {service.duration_minutes && (
                                   <p className="text-muted-foreground" style={{ fontSize: '12px' }}>
                                     <span className="text-primary" style={{ fontWeight: '600' }}>
-                                      {isRTL ? 'المدة:' : 'Duration:'}
-                                    </span> {service.duration_minutes} {isRTL ? 'دقيقة' : 'minutes'}
+                                      {t.servicesPage?.duration || (isRTL ? 'المدة:' : 'Duration:')}
+                                    </span> {service.duration_minutes} {t.servicesPage?.minutes || (isRTL ? 'دقيقة' : 'minutes')}
                                   </p>
                                 )}
 
@@ -1473,7 +1473,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                 {provider?.city && (
                                   <p className="text-muted-foreground" style={{ fontSize: '12px' }}>
                                     <span className="text-primary" style={{ fontWeight: '600' }}>
-                                      {isRTL ? 'المدينة:' : 'City:'}
+                                      {t.servicesPage?.city || (isRTL ? 'المدينة:' : 'City:')}
                                     </span> {provider.city}
                                   </p>
                                 )}
@@ -1493,7 +1493,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                       }}
                                     >
                                       <Calendar className="h-4 w-4 mr-2" />
-                                      {isRTL ? 'حجز موعد' : 'Book Appointment'}
+                                      {t.servicesPage?.bookAppointment || (isRTL ? 'حجز موعد' : 'Book Appointment')}
                                     </Button>
                                   )}
                                   <Button
@@ -1505,7 +1505,7 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
                                     }}
                                   >
                                     <ExternalLink className="h-4 w-4 mr-2" />
-                                    {isRTL ? 'عرض كل الخدمات' : 'View All Services'}
+                                    {t.servicesPage?.viewAllServices || (isRTL ? 'عرض كل الخدمات' : 'View All Services')}
                                   </Button>
                                 </div>
                               </div>
