@@ -60,9 +60,12 @@ export const MainActions = ({
         <div className="max-w-4xl mx-auto text-center">
           {/* Hero Content */}
           <div className="animate-luxury-fade mb-8">
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-bold bg-gradient-to-r from-primary via-primary-glow to-primary bg-clip-text text-transparent whitespace-pre-line">
-              {t.home.title}
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-bold bg-gradient-to-r from-primary via-primary-glow to-primary bg-clip-text text-transparent">
+              ServYard
             </h1>
+            <p className="text-lg md:text-2xl lg:text-3xl mt-2 text-muted-foreground font-medium">
+              {isRTL ? 'منصة الخدمات المتميزة' : 'Premium Service Marketplace'}
+            </p>
           </div>
 
           {/* Action Buttons Grid */}
