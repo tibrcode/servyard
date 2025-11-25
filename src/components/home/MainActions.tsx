@@ -63,7 +63,7 @@ export const MainActions = ({
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-bold bg-gradient-to-r from-primary via-primary-glow to-primary bg-clip-text text-transparent">
               ServYard
             </h1>
-            <p className="text-lg md:text-2xl lg:text-3xl mt-2 text-muted-foreground font-medium">
+            <p className="text-xl md:text-2xl lg:text-3xl mt-2 font-display font-semibold bg-gradient-to-r from-primary via-primary-glow to-primary bg-clip-text text-transparent">
               {isRTL ? 'منصة الخدمات المتميزة' : 'Premium Service Marketplace'}
             </p>
           </div>
