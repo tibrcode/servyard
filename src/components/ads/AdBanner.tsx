@@ -49,15 +49,23 @@ export const AdBanner = ({ type, position = "bottom", className = "", slotId = "
   // Styles for the new Sticky Footer (Floating Card)
   if (type === "sticky-footer") {
     return (
-      <div className={`fixed bottom-0 left-0 right-0 z-50 flex justify-center pointer-events-none ${className}`}>
+      <div 
+        className={`fixed bottom-0 left-0 right-0 z-50 flex justify-center pointer-events-none ${className}`}
+        style={{ margin: 0, padding: 0 }}
+      >
         <div className="w-full max-w-4xl pointer-events-auto shadow-2xl drop-shadow-2xl">
-          <StyledAdContainer 
-            // No onClose prop = No close button
+          <div 
             className="bg-background/95 backdrop-blur-xl border-t border-x border-primary/20 rounded-t-xl md:rounded-t-2xl shadow-lg overflow-hidden"
-            label="Sponsored"
+            style={{ margin: 0 }}
           >
             {slotId === "1234567890" ? (
-              <div className="flex flex-col items-center justify-center text-center py-2 md:py-3">
+              <div 
+                className="flex flex-col items-center justify-center text-center"
+                style={{ 
+                  height: isMobile ? '50px' : '90px',
+                  padding: isMobile ? '8px' : '12px'
+                }}
+              >
                 <span className="text-[10px] md:text-xs font-medium uppercase tracking-widest mb-0.5 text-primary">
                   Premium Ad Space
                 </span>
@@ -77,7 +85,7 @@ export const AdBanner = ({ type, position = "bottom", className = "", slotId = "
                 }}
               />
             )}
-          </StyledAdContainer>
+          </div>
         </div>
       </div>
     );
