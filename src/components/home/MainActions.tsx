@@ -62,13 +62,19 @@ export const MainActions = ({
           <div className="animate-luxury-fade mb-8">
             <h1 
               className="text-5xl md:text-7xl lg:text-8xl font-display font-bold bg-gradient-to-r from-primary via-primary-glow to-primary bg-clip-text text-transparent"
-              style={{ textShadow: '0 4px 20px rgba(34, 197, 94, 0.3), 0 2px 8px rgba(34, 197, 94, 0.2)' }}
+              style={{ 
+                textShadow: '0 6px 30px rgba(34, 197, 94, 0.5), 0 3px 12px rgba(34, 197, 94, 0.4), 0 0 60px rgba(34, 197, 94, 0.25)',
+                filter: 'drop-shadow(0 4px 8px rgba(34, 197, 94, 0.3))'
+              }}
             >
               ServYard
             </h1>
             <p 
               className="text-xl md:text-2xl lg:text-3xl mt-2 font-display font-semibold bg-gradient-to-r from-primary via-primary-glow to-primary bg-clip-text text-transparent"
-              style={{ textShadow: '0 2px 12px rgba(34, 197, 94, 0.25), 0 1px 4px rgba(34, 197, 94, 0.15)' }}
+              style={{ 
+                textShadow: '0 4px 20px rgba(34, 197, 94, 0.45), 0 2px 8px rgba(34, 197, 94, 0.35), 0 0 40px rgba(34, 197, 94, 0.2)',
+                filter: 'drop-shadow(0 2px 6px rgba(34, 197, 94, 0.25))'
+              }}
             >
               {isRTL ? 'منصة الخدمات المتميزة' : 'Premium Service Marketplace'}
             </p>
