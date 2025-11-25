@@ -208,6 +208,7 @@ export interface Translation {
     providerNotFound?: string;
     errorLoadingData?: string;
     setLocationPrompt?: string;
+    myLocation?: string;
     // Booking helpers
     missingBookingInfo: string;
     bookingRequestSent: string;
@@ -1102,6 +1103,7 @@ export const translations: Record<string, Translation> = {
       providerNotFound: "Provider not found",
       errorLoadingData: "Error loading data",
       setLocationPrompt: "Please set your location from the header to see nearby services",
+      myLocation: "My Location",
       // Booking helpers
       missingBookingInfo: "Please select date and time for your booking",
       bookingRequestSent: "Your booking request has been sent to the provider",
@@ -2143,6 +2145,7 @@ export const translations: Record<string, Translation> = {
       providerNotFound: "لم يتم العثور على مقدم الخدمة",
       errorLoadingData: "حدث خطأ في تحميل البيانات",
       setLocationPrompt: "يرجى تحديد موقعك من الشريط العلوي لعرض الخدمات القريبة",
+      myLocation: "موقعي الحالي",
       // Booking helpers (Arabic)
       missingBookingInfo: "يرجى اختيار التاريخ والوقت للحجز",
       bookingRequestSent: "تم إرسال طلب الحجز إلى مقدم الخدمة",
