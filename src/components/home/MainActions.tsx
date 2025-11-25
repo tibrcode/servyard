@@ -60,10 +60,16 @@ export const MainActions = ({
         <div className="max-w-4xl mx-auto text-center">
           {/* Hero Content */}
           <div className="animate-luxury-fade mb-8">
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-bold bg-gradient-to-r from-primary via-primary-glow to-primary bg-clip-text text-transparent">
+            <h1 
+              className="text-5xl md:text-7xl lg:text-8xl font-display font-bold bg-gradient-to-r from-primary via-primary-glow to-primary bg-clip-text text-transparent"
+              style={{ textShadow: '0 4px 20px rgba(34, 197, 94, 0.3), 0 2px 8px rgba(34, 197, 94, 0.2)' }}
+            >
               ServYard
             </h1>
-            <p className="text-xl md:text-2xl lg:text-3xl mt-2 font-display font-semibold bg-gradient-to-r from-primary via-primary-glow to-primary bg-clip-text text-transparent">
+            <p 
+              className="text-xl md:text-2xl lg:text-3xl mt-2 font-display font-semibold bg-gradient-to-r from-primary via-primary-glow to-primary bg-clip-text text-transparent"
+              style={{ textShadow: '0 2px 12px rgba(34, 197, 94, 0.25), 0 1px 4px rgba(34, 197, 94, 0.15)' }}
+            >
               {isRTL ? 'منصة الخدمات المتميزة' : 'Premium Service Marketplace'}
             </p>
           </div>
