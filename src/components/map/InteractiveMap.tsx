@@ -161,7 +161,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
         if (mounted) {
           console.error('❌ Google Maps API failed to load after 10s');
           console.error('Check: 1) API Key validity, 2) API is enabled in Google Cloud, 3) Network connection');
-          setError(t.error + ' - Please check API Key configuration');
+          setError(labels.error + ' - Please check API Key configuration');
           setLoading(false);
         }
       }
@@ -171,7 +171,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
       mounted = false;
       clearInterval(checkInterval);
     };
-  }, [t.error]);
+  }, [labels.error]);
 
 
 
@@ -813,11 +813,11 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
           
           // إضافة/تحديث العلامة
           clearMarkers();
-          addMarker(location, t.clickToSelect, true);
+          addMarker(location, labels.clickToSelect, true);
         }
       });
     }
-  }, [apiLoaded, center, zoom, onLocationSelect, t.clickToSelect, addMarker, clearMarkers]);
+  }, [apiLoaded, center, zoom, onLocationSelect, labels.clickToSelect, addMarker, clearMarkers]);
 
   // تحديث موقع ومستوى التكبير للخريطة
   useEffect(() => {
@@ -893,7 +893,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
         }
         
         // إضافة علامة الموقع الحالي (بدون حذف علامات الخدمات)
-        addMarker(location, t.getCurrentLocation, true, true);
+        addMarker(location, labels.getCurrentLocation, true, true);
         
         if (onLocationSelect) {
           onLocationSelect(location);
@@ -910,7 +910,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
       <Card>
         <CardContent className="flex items-center justify-center p-8">
           <Loader2 className="w-8 h-8 animate-spin" />
-          <span className="ml-2">{t.loading}</span>
+          <span className="ml-2">{labels.loading}</span>
         </CardContent>
       </Card>
     );
@@ -920,7 +920,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
     return (
       <Alert variant="destructive">
         <AlertDescription>
-          <div className="font-semibold mb-2">{t.error}</div>
+          <div className="font-semibold mb-2">{labels.error}</div>
           <div className="text-sm">{error}</div>
           {error.includes('API Key') && (
             <div className="mt-2 text-xs">
@@ -946,7 +946,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
             className="w-full sm:w-auto shrink-0"
           >
             <Navigation className="w-4 h-4 mr-2" />
-            {t.getCurrentLocation}
+            {labels.getCurrentLocation}
           </Button>
         )}
       </div>
