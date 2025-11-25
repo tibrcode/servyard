@@ -468,10 +468,10 @@ const Services = ({ currentLanguage = 'en' }: ServicesProps) => {
           ) : (
             <div className="text-center py-2 bg-muted/30 rounded-lg border border-border/50">
               <p className="text-sm text-muted-foreground">
-                {isRTL 
+                {t.ui?.setLocationPrompt || (isRTL 
                   ? "يرجى تحديد موقعك من الشريط العلوي لعرض الخدمات القريبة" 
                   : "Please set your location from the header to see nearby services"
-                }
+                )}
               </p>
             </div>
           )}

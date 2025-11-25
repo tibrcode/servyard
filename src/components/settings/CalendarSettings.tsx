@@ -67,9 +67,7 @@ export function CalendarSettings({ language = 'ar' }: CalendarSettingsProps) {
           <CardTitle>{t.calendarSettings?.title || 'Calendar Settings'}</CardTitle>
         </div>
         <CardDescription>
-          {isRTL 
-            ? 'تحكم في كيفية إضافة الحجوزات إلى تقويمك' 
-            : 'Manage how bookings are added to your calendar'}
+          {t.calendarSettings?.description || 'Manage how bookings are added to your calendar'}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -79,9 +77,7 @@ export function CalendarSettings({ language = 'ar' }: CalendarSettingsProps) {
               {t.calendarSettings?.autoAdd || 'Automatic Addition'}
             </Label>
             <p className="text-sm text-muted-foreground">
-              {isRTL 
-                ? 'إضافة الحجوزات المؤكدة تلقائياً إلى التقويم' 
-                : 'Automatically add confirmed bookings to calendar'}
+              {t.calendarSettings?.autoAddDesc || 'Automatically add confirmed bookings to calendar'}
             </p>
           </div>
           <Switch

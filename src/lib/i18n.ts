@@ -207,6 +207,7 @@ export interface Translation {
     serviceUpdateFailed?: string;
     providerNotFound?: string;
     errorLoadingData?: string;
+    setLocationPrompt?: string;
     // Booking helpers
     missingBookingInfo: string;
     bookingRequestSent: string;
@@ -894,11 +895,13 @@ export interface Translation {
   // Calendar settings
   calendarSettings?: {
     title: string;
+    description: string;
     saved: string;
     savedDesc: string;
     error: string;
     errorDesc: string;
     autoAdd: string;
+    autoAddDesc: string;
     saveChanges: string;
   };
 
@@ -1072,6 +1075,7 @@ export const translations: Record<string, Translation> = {
       serviceUpdateFailed: "Failed to update service",
       providerNotFound: "Provider not found",
       errorLoadingData: "Error loading data",
+      setLocationPrompt: "Please set your location from the header to see nearby services",
       // Booking helpers
       missingBookingInfo: "Please select date and time for your booking",
       bookingRequestSent: "Your booking request has been sent to the provider",
@@ -1928,11 +1932,13 @@ export const translations: Record<string, Translation> = {
     },
     calendarSettings: {
       title: "Calendar Settings",
+      description: "Manage how bookings are added to your calendar",
       saved: "Settings saved",
       savedDesc: "Calendar preferences updated successfully",
       error: "Error",
       errorDesc: "Failed to save settings",
       autoAdd: "Automatic Addition",
+      autoAddDesc: "Automatically add confirmed bookings to calendar",
       saveChanges: "Save Changes"
     },
     backupSettings: {
@@ -2086,6 +2092,7 @@ export const translations: Record<string, Translation> = {
       serviceUpdateFailed: "حدث خطأ في تحديث الخدمة",
       providerNotFound: "لم يتم العثور على مقدم الخدمة",
       errorLoadingData: "حدث خطأ في تحميل البيانات",
+      setLocationPrompt: "يرجى تحديد موقعك من الشريط العلوي لعرض الخدمات القريبة",
       // Booking helpers (Arabic)
       missingBookingInfo: "يرجى اختيار التاريخ والوقت للحجز",
       bookingRequestSent: "تم إرسال طلب الحجز إلى مقدم الخدمة",
@@ -2942,11 +2949,13 @@ export const translations: Record<string, Translation> = {
     },
     calendarSettings: {
       title: "إعدادات التقويم",
+      description: "إدارة كيفية إضافة الحجوزات إلى التقويم",
       saved: "تم حفظ الإعدادات",
       savedDesc: "تم تحديث تفضيلات التقويم بنجاح",
       error: "خطأ",
       errorDesc: "فشل حفظ الإعدادات",
       autoAdd: "إضافة تلقائية",
+      autoAddDesc: "إضافة الحجوزات المؤكدة تلقائياً إلى التقويم",
       saveChanges: "حفظ التغييرات"
     },
     backupSettings: {
