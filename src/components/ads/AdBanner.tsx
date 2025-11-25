@@ -26,10 +26,10 @@ export const AdBanner = ({ type, position = "bottom", className = "", slotId = "
   // Handle body padding for sticky footer to prevent content overlap
   useEffect(() => {
     if (type === "sticky-footer" && isVisible) {
-      // Add padding to body equal to ad height + margins
-      // Mobile: 50px ad + 16px margins = ~70px
-      // Desktop: 90px ad + 32px margins = ~100px
-      const padding = isMobile ? "70px" : "100px";
+      // Add padding to body equal to ad height only (no margins now)
+      // Mobile: 50px ad height
+      // Desktop: 90px ad height
+      const padding = isMobile ? "50px" : "90px";
       document.body.style.paddingBottom = padding;
       return () => {
         document.body.style.paddingBottom = "";
@@ -49,11 +49,11 @@ export const AdBanner = ({ type, position = "bottom", className = "", slotId = "
   // Styles for the new Sticky Footer (Floating Card)
   if (type === "sticky-footer") {
     return (
-      <div className={`fixed bottom-2 left-2 right-2 md:bottom-3 md:left-4 md:right-4 z-50 flex justify-center pointer-events-none ${className}`}>
+      <div className={`fixed bottom-0 left-0 right-0 z-50 flex justify-center pointer-events-none ${className}`}>
         <div className="w-full max-w-4xl pointer-events-auto shadow-2xl drop-shadow-2xl">
           <StyledAdContainer 
             // No onClose prop = No close button
-            className="bg-background/95 backdrop-blur-xl border border-primary/20 rounded-xl md:rounded-2xl shadow-lg overflow-hidden"
+            className="bg-background/95 backdrop-blur-xl border-t border-x border-primary/20 rounded-t-xl md:rounded-t-2xl shadow-lg overflow-hidden"
             label="Sponsored"
           >
             {slotId === "1234567890" ? (
