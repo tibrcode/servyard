@@ -318,6 +318,125 @@ Base font size: 15px
     color: #333 !important;
   }
 
+  /* ═══════════════════════════════════════════════════════════════════════════
+     LIGHT MODE PREMIUM CARDS & BUTTONS - White elevated style
+     ═══════════════════════════════════════════════════════════════════════════ */
+  
+  /* All cards in light mode - white with shadow */
+  .light .bg-card,
+  .light [data-slot="card"],
+  .light .rounded-lg.border,
+  .light .rounded-xl.border,
+  .light .rounded-2xl.border {
+    background: white !important;
+    border-color: rgba(0, 0, 0, 0.06) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+  }
+
+  /* Card hover effect in light mode */
+  .light .bg-card:hover,
+  .light [data-slot="card"]:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.06) !important;
+  }
+
+  /* Stat cards and info boxes in light mode */
+  .light .bg-muted,
+  .light .bg-secondary {
+    background: white !important;
+    border: 1px solid rgba(0, 0, 0, 0.06) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+  }
+
+  /* Buttons in light mode - ghost/outline style with white background */
+  .light button[class*="ghost"],
+  .light button[class*="outline"],
+  .light .btn-ghost,
+  .light .btn-outline {
+    background: white !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06) !important;
+  }
+
+  .light button[class*="ghost"]:hover,
+  .light button[class*="outline"]:hover {
+    background: rgba(255, 255, 255, 0.95) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  /* Tab buttons in light mode */
+  .light [role="tablist"] button,
+  .light .tabs button {
+    background: white !important;
+    border: 1px solid rgba(0, 0, 0, 0.06) !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05) !important;
+  }
+
+  .light [role="tablist"] button[data-state="active"],
+  .light [role="tablist"] button[aria-selected="true"] {
+    background: hsl(var(--primary)) !important;
+    color: white !important;
+    border-color: hsl(var(--primary)) !important;
+    box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3) !important;
+  }
+
+  /* Input fields in light mode */
+  .light input,
+  .light textarea,
+  .light select,
+  .light [role="combobox"] {
+    background: white !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+  }
+
+  .light input:focus,
+  .light textarea:focus,
+  .light select:focus {
+    border-color: hsl(var(--primary)) !important;
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.15) !important;
+  }
+
+  /* Dropdown menus and popovers in light mode */
+  .light [role="menu"],
+  .light [role="listbox"],
+  .light [data-radix-popper-content-wrapper] > div {
+    background: white !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
+  }
+
+  /* Dialog/Modal in light mode */
+  .light [role="dialog"],
+  .light [data-state="open"][role="alertdialog"] {
+    background: white !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
+  }
+
+  /* Badge/Chip elements in light mode */
+  .light .badge,
+  .light [class*="Badge"] {
+    background: white !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+  }
+
+  /* Sidebar items in light mode */
+  .light [data-sidebar] button,
+  .light [data-sidebar] a {
+    background: transparent !important;
+  }
+
+  .light [data-sidebar] button:hover,
+  .light [data-sidebar] a:hover {
+    background: rgba(0, 0, 0, 0.04) !important;
+  }
+
+  .light [data-sidebar] button[data-active="true"],
+  .light [data-sidebar] a[data-active="true"] {
+    background: white !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08) !important;
+  }
+
   /* Nested card styling - lighter background for cards inside cards */
   .card-nested {
     background-color: hsl(var(--card-nested));
