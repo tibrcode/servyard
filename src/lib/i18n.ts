@@ -32,6 +32,7 @@ export interface Translation {
     login?: string;
     myAccount?: string;
     dashboard?: string;
+    headerTagline?: string;
   };
 
   // Authentication
@@ -1166,6 +1167,7 @@ export const translations: Record<string, Translation> = {
       login: "Login",
       myAccount: "My Account",
       dashboard: "Dashboard",
+      headerTagline: "Premium Service Marketplace",
     },
     ui: {
       languageChanged: "Language Changed",
@@ -2367,6 +2369,7 @@ export const translations: Record<string, Translation> = {
       login: "تسجيل الدخول",
       myAccount: "حسابي",
       dashboard: "لوحة التحكم",
+      headerTagline: "منصة الخدمات المتميزة",
     },
     ui: {
       languageChanged: "تم تغيير اللغة",

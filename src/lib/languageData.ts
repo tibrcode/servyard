@@ -1121,7 +1121,7 @@ export const additionalLanguages = {
   },
   id: {
     nav: { home: "Beranda", services: "Layanan", providerLogin: "Login Penyedia", customerLogin: "Login Pelanggan", register: "Daftar", language: "Bahasa", location: "Lokasi", theme: "Tema", notifications: "Notifikasi", settings: "Pengaturan" },
-    home: { title: "ServYard - Pasar Layanan Premium", subtitle: "Terhubung dengan penyedia layanan terverifikasi di area Anda", searchPlaceholder: "Cari layanan...", findServices: "Cari Layanan", becomeProvider: "Jadi Penyedia", featuredCategories: "Kategori Unggulan", servicesOnMap: "Layanan di Peta", login: "Masuk", dashboard: "Dasbor" },
+    home: { title: "ServYard - Pasar Layanan Premium", subtitle: "Terhubung dengan penyedia layanan terverifikasi di area Anda", searchPlaceholder: "Cari layanan...", findServices: "Cari Layanan", becomeProvider: "Jadi Penyedia", featuredCategories: "Kategori Unggulan", servicesOnMap: "Layanan di Peta", login: "Masuk", dashboard: "Dasbor", headerTagline: "Pasar Layanan Premium" },
     ui: { languageChanged: "Bahasa diubah", interfaceUpdated: "Bahasa antarmuka diperbarui", loadMore: "Muat lebih banyak layanan", noData: "Tidak ada data", coming_soon: "Segera", relevance: "Relevansi", highestRated: "Peringkat tertinggi", priceLowHigh: "Harga: Rendah ke Tinggi", priceHighLow: "Harga: Tinggi ke Rendah", loading: "Memuat...", loadingMoreServices: "Memuat lebih banyak layanan...", allCategories: "Semua Kategori", accessDenied: "Akses ditolak", providerAccessRequired: "Memerlukan akses penyedia", statusUpdated: "Status diperbarui", serviceDeleted: "Layanan dihapus", serviceDeleteFailed: "Gagal menghapus layanan", errorLoadingServices: "Gagal memuat layanan", verified: "Terverifikasi", minutes: "menit", pageNotFound: "Halaman tidak ditemukan", goHome: "Kembali ke Beranda", serviceNotFound: "Layanan tidak ditemukan", serviceUpdated: "Layanan diperbarui", serviceUpdateFailed: "Gagal memperbarui layanan", providerNotFound: "Penyedia tidak ditemukan", errorLoadingData: "Kesalahan memuat data", setLocationPrompt: "Silakan atur lokasi Anda dari header untuk melihat layanan terdekat", myLocation: "Lokasi Saya", missingBookingInfo: "Info pemesanan kurang", bookingRequestSent: "Permintaan pemesanan terkirim", loginRequired: "Harus login", customerAccessRequired: "Memerlukan akses pelanggan", serviceCreated: "Layanan dibuat", serviceCreateFailed: "Gagal membuat layanan" },
     dashboard: { main: "Navigasi Utama", account: "Akun", dashboards: "Dasbor", providerDashboard: "Dasbor Penyedia", customerDashboard: "Dasbor Pelanggan" },
     auth: {
@@ -1269,7 +1269,7 @@ export const additionalLanguages = {
   },
   fr: {
     nav: { home: "Accueil", services: "Services", providerLogin: "Connexion prestataire", customerLogin: "Connexion client", register: "S'inscrire", language: "Langue", location: "Emplacement", theme: "Thème", notifications: "Notifications", settings: "Paramètres" },
-    home: { title: "ServYard - Marché de services premium", subtitle: "Connectez-vous à des prestataires vérifiés près de chez vous", searchPlaceholder: "Rechercher des services...", findServices: "Trouver des services", becomeProvider: "Devenir prestataire", featuredCategories: "Catégories en vedette", servicesOnMap: "Services sur la carte", login: "Connexion", dashboard: "Tableau de bord" },
+    home: { title: "ServYard - Marché de services premium", subtitle: "Connectez-vous à des prestataires vérifiés près de chez vous", searchPlaceholder: "Rechercher des services...", findServices: "Trouver des services", becomeProvider: "Devenir prestataire", featuredCategories: "Catégories en vedette", servicesOnMap: "Services sur la carte", login: "Connexion", dashboard: "Tableau de bord", headerTagline: "Marché de Services Premium" },
     ui: { languageChanged: "Langue modifiée", interfaceUpdated: "Langue de l'interface mise à jour", loadMore: "Charger plus de services", noData: "Aucune donnée disponible", coming_soon: "Bientôt", relevance: "Pertinence", highestRated: "Mieux notés", priceLowHigh: "Prix : du plus bas au plus élevé", priceHighLow: "Prix : du plus élevé au plus bas", loading: "Chargement...", loadingMoreServices: "Chargement de services supplémentaires...", allCategories: "Toutes les catégories", accessDenied: "Accès refusé", providerAccessRequired: "Accès prestataire requis", statusUpdated: "Statut mis à jour", serviceDeleted: "Service supprimé", serviceDeleteFailed: "Échec de la suppression du service", errorLoadingServices: "Erreur lors du chargement des services", verified: "Vérifié", minutes: "minutes", pageNotFound: "Page introuvable", goHome: "Retour à l'accueil", serviceNotFound: "Service introuvable", serviceUpdated: "Service mis à jour", serviceUpdateFailed: "Échec de la mise à jour du service", providerNotFound: "Prestataire introuvable", errorLoadingData: "Erreur lors du chargement des données", setLocationPrompt: "Veuillez définir votre emplacement depuis l'en-tête pour voir les services à proximité", myLocation: "Ma Position", missingBookingInfo: "Informations de réservation manquantes", bookingRequestSent: "Demande de réservation envoyée", loginRequired: "Connexion requise", customerAccessRequired: "Accès client requis", serviceCreated: "Service créé", serviceCreateFailed: "Échec de la création du service" },
     dashboard: { main: "Navigation principale", account: "Compte", dashboards: "Tableaux de bord", providerDashboard: "Tableau de bord prestataire", customerDashboard: "Tableau de bord client" },
     services: {
@@ -1733,7 +1733,7 @@ export const additionalLanguages = {
   },
   ko: {
     nav: { home: "홈", services: "서비스", providerLogin: "제공자 로그인", customerLogin: "고객 로그인", register: "회원가입", language: "언어", location: "위치", theme: "테마", notifications: "알림", settings: "설정" },
-    home: { title: "ServYard - 프리미엄 서비스 마켓", subtitle: "인증된 서비스 제공자와 연결하세요", searchPlaceholder: "서비스 검색...", findServices: "서비스 찾기", becomeProvider: "제공자 되기", featuredCategories: "추천 카테고리", servicesOnMap: "지도에서 서비스", login: "로그인", dashboard: "대시보드" },
+    home: { title: "ServYard - 프리미엄 서비스 마켓", subtitle: "인증된 서비스 제공자와 연결하세요", searchPlaceholder: "서비스 검색...", findServices: "서비스 찾기", becomeProvider: "제공자 되기", featuredCategories: "추천 카테고리", servicesOnMap: "지도에서 서비스", login: "로그인", dashboard: "대시보드", headerTagline: "프리미엄 서비스 마켓플레이스" },
     ui: { languageChanged: "언어가 변경되었습니다", interfaceUpdated: "인터페이스 언어가 업데이트되었습니다", loadMore: "더 많은 서비스 보기", noData: "데이터 없음", coming_soon: "곧 제공", relevance: "관련도", highestRated: "최고 평점", priceLowHigh: "가격 낮은순", priceHighLow: "가격 높은순", loading: "로딩 중...", loadingMoreServices: "더 많은 서비스를 로딩 중...", allCategories: "모든 카테고리", accessDenied: "접근 거부", providerAccessRequired: "제공자 권한 필요", statusUpdated: "상태가 업데이트되었습니다", serviceDeleted: "서비스가 삭제되었습니다", serviceDeleteFailed: "서비스 삭제 실패", errorLoadingServices: "서비스 로딩 실패", verified: "인증됨", minutes: "분", pageNotFound: "페이지를 찾을 수 없습니다", goHome: "홈으로", serviceNotFound: "서비스를 찾을 수 없습니다", serviceUpdated: "서비스가 업데이트되었습니다", serviceUpdateFailed: "서비스 업데이트 실패", providerNotFound: "제공자를 찾을 수 없습니다", errorLoadingData: "데이터 로딩 오류", setLocationPrompt: "헤더에서 위치를 설정하여 주변 서비스를 확인하세요", myLocation: "내 위치", missingBookingInfo: "예약 정보가 누락되었습니다", bookingRequestSent: "예약 요청이 전송되었습니다", loginRequired: "로그인이 필요합니다", customerAccessRequired: "고객 권한 필요", serviceCreated: "서비스가 생성되었습니다", serviceCreateFailed: "서비스 생성 실패" },
     dashboard: { main: "주요 메뉴", account: "계정", dashboards: "대시보드", providerDashboard: "제공자 대시보드", customerDashboard: "고객 대시보드" },
     actions: { viewTerms: "이용약관 보기", search: "검색", book: "예약", contact: "연락하기", share: "공유", websiteLabel: "웹사이트", locationLabel: "위치", instagram: "Instagram", facebook: "Facebook", tiktok: "TikTok", viewProvider: "제공자 보기", login: "로그인", register: "회원가입", save: "저장", cancel: "취소", edit: "수정", delete: "삭제", confirm: "확인", back: "뒤로", next: "다음", submit: "제출" },
@@ -1881,7 +1881,7 @@ export const additionalLanguages = {
   },
   ja: {
     nav: { home: "ホーム", services: "サービス", providerLogin: "提供者ログイン", customerLogin: "顧客ログイン", register: "登録", language: "言語", location: "位置情報", theme: "テーマ", notifications: "通知", settings: "設定" },
-    home: { title: "ServYard - プレミアムサービスマーケット", subtitle: "認証済みサービス提供者とつながる", searchPlaceholder: "サービスを検索...", findServices: "サービスを探す", becomeProvider: "提供者になる", featuredCategories: "注目のカテゴリ", servicesOnMap: "マップでサービス", login: "ログイン", dashboard: "ダッシュボード" },
+    home: { title: "ServYard - プレミアムサービスマーケット", subtitle: "認証済みサービス提供者とつながる", searchPlaceholder: "サービスを検索...", findServices: "サービスを探す", becomeProvider: "提供者になる", featuredCategories: "注目のカテゴリ", servicesOnMap: "マップでサービス", login: "ログイン", dashboard: "ダッシュボード", headerTagline: "プレミアムサービスマーケット" },
     ui: { languageChanged: "言語が変更されました", interfaceUpdated: "インターフェイス言語を更新しました", loadMore: "さらにサービスを読み込む", noData: "データなし", coming_soon: "近日公開", relevance: "関連度", highestRated: "高評価", priceLowHigh: "価格: 安い順", priceHighLow: "価格: 高い順", loading: "読み込み中...", loadingMoreServices: "サービスをさらに読み込み中...", allCategories: "すべてのカテゴリ", accessDenied: "アクセスが拒否されました", providerAccessRequired: "提供者アクセスが必要です", statusUpdated: "ステータスを更新しました", serviceDeleted: "サービスを削除しました", serviceDeleteFailed: "サービスの削除に失敗しました", errorLoadingServices: "サービスの読み込みエラー", verified: "認証済み", minutes: "分", pageNotFound: "ページが見つかりません", goHome: "ホームへ", serviceNotFound: "サービスが見つかりません", serviceUpdated: "サービスを更新しました", serviceUpdateFailed: "サービスの更新に失敗しました", providerNotFound: "提供者が見つかりません", errorLoadingData: "データ読み込みエラー", setLocationPrompt: "ヘッダーから位置を設定して近くのサービスを表示", myLocation: "現在地", missingBookingInfo: "予約情報が不足しています", bookingRequestSent: "予約リクエストを送信しました", loginRequired: "ログインが必要です", customerAccessRequired: "顧客アクセスが必要です", serviceCreated: "サービスを作成しました", serviceCreateFailed: "サービスの作成に失敗しました" },
     dashboard: { main: "メインナビゲーション", account: "アカウント", dashboards: "ダッシュボード", providerDashboard: "提供者ダッシュボード", customerDashboard: "顧客ダッシュボード" },
     actions: { viewTerms: "利用規約を表示", search: "検索", book: "予約", contact: "連絡", share: "共有", websiteLabel: "ウェブサイト", locationLabel: "位置情報", instagram: "Instagram", facebook: "Facebook", tiktok: "TikTok", viewProvider: "提供者を見る", login: "ログイン", register: "登録", save: "保存", cancel: "キャンセル", edit: "編集", delete: "削除", confirm: "確認", back: "戻る", next: "次へ", submit: "送信" },
@@ -2029,7 +2029,7 @@ export const additionalLanguages = {
   },
   ru: {
     nav: { home: "Главная", services: "Услуги", providerLogin: "Вход для поставщиков", customerLogin: "Вход для клиентов", register: "Регистрация", language: "Язык", location: "Местоположение", theme: "Тема", notifications: "Уведомления", settings: "Настройки" },
-    home: { title: "ServYard - Премиум-маркетплейс услуг", subtitle: "Свяжитесь с проверенными поставщиками услуг рядом с вами", searchPlaceholder: "Поиск услуг...", findServices: "Найти услуги", becomeProvider: "Стать поставщиком", featuredCategories: "Популярные категории", servicesOnMap: "Услуги на карте", login: "Войти", dashboard: "Панель управления" },
+    home: { title: "ServYard - Премиум-маркетплейс услуг", subtitle: "Свяжитесь с проверенными поставщиками услуг рядом с вами", searchPlaceholder: "Поиск услуг...", findServices: "Найти услуги", becomeProvider: "Стать поставщиком", featuredCategories: "Популярные категории", servicesOnMap: "Услуги на карте", login: "Войти", dashboard: "Панель управления", headerTagline: "Премиум-маркетплейс услуг" },
     ui: { languageChanged: "Язык изменён", interfaceUpdated: "Язык интерфейса обновлён", loadMore: "Загрузить больше услуг", noData: "Нет данных", coming_soon: "Скоро", relevance: "Актуальность", highestRated: "Лучший рейтинг", priceLowHigh: "Цена: по возрастанию", priceHighLow: "Цена: по убыванию", loading: "Загрузка...", loadingMoreServices: "Загрузка дополнительных услуг...", allCategories: "Все категории", accessDenied: "Доступ запрещён", providerAccessRequired: "Требуются права поставщика", statusUpdated: "Статус обновлён", serviceDeleted: "Услуга удалена", serviceDeleteFailed: "Не удалось удалить услугу", errorLoadingServices: "Ошибка загрузки услуг", verified: "Проверено", minutes: "мин", pageNotFound: "Страница не найдена", goHome: "На главную", serviceNotFound: "Услуга не найдена", serviceUpdated: "Услуга обновлена", serviceUpdateFailed: "Не удалось обновить услугу", providerNotFound: "Поставщик не найден", errorLoadingData: "Ошибка загрузки данных", setLocationPrompt: "Установите местоположение в заголовке для просмотра ближайших услуг", myLocation: "Моё местоположение", missingBookingInfo: "Отсутствует информация о бронировании", bookingRequestSent: "Запрос на бронирование отправлен", loginRequired: "Требуется вход", customerAccessRequired: "Требуются права клиента", serviceCreated: "Услуга создана", serviceCreateFailed: "Не удалось создать услугу" },
     dashboard: { main: "Основная навигация", account: "Аккаунт", dashboards: "Панели", providerDashboard: "Панель поставщика", customerDashboard: "Панель клиента" },
     actions: { viewTerms: "Посмотреть Условия и Положения", search: "Поиск", book: "Забронировать", contact: "Связаться", share: "Поделиться", websiteLabel: "Сайт", locationLabel: "Местоположение", instagram: "Instagram", facebook: "Facebook", tiktok: "TikTok", viewProvider: "Смотреть поставщика", login: "Войти", register: "Регистрация", save: "Сохранить", cancel: "Отмена", edit: "Редактировать", delete: "Удалить", confirm: "Подтвердить", back: "Назад", next: "Далее", submit: "Отправить" },
@@ -2210,6 +2210,7 @@ export const additionalLanguages = {
     home: {
       title: "ServYard - 高端服务市场",
       subtitle: "连接您所在地区的认证服务商",
+      headerTagline: "高端服务市场",
       searchPlaceholder: "搜索服务...",
       findServices: "查找服务",
       becomeProvider: "成为服务商",
@@ -3001,6 +3002,7 @@ export const additionalLanguages = {
     home: {
       title: "ServYard - Mercado Premium de Servicios",
       subtitle: "Conecta con proveedores de servicios verificados en tu área",
+      headerTagline: "Mercado Premium de Servicios",
       searchPlaceholder: "Buscar servicios...",
       findServices: "Encontrar Servicios",
       becomeProvider: "Ser Proveedor",
@@ -3767,6 +3769,7 @@ export const additionalLanguages = {
     home: {
       title: "ServYard - प्रीमियम सेवा मार्केटप्लेस",
       subtitle: "अपने क्षेत्र में सत्यापित सेवा प्रदाताओं से जुड़ें",
+      headerTagline: "प्रीमियम सेवा मार्केटप्लेस",
       searchPlaceholder: "सेवाएँ खोजें...",
       findServices: "सेवाएँ खोजें",
       becomeProvider: "प्रदाता बनें",
@@ -4289,6 +4292,7 @@ export const additionalLanguages = {
     home: {
       title: "ServYard - Marketplace de Serviços Premium",
       subtitle: "Conecte-se a prestadores verificados na sua região",
+      headerTagline: "Marketplace de Serviços Premium",
       searchPlaceholder: "Pesquisar serviços...",
       findServices: "Encontrar Serviços",
       becomeProvider: "Torne-se um Prestador",
@@ -4699,6 +4703,7 @@ export const additionalLanguages = {
     home: {
       title: "ServYard - Marketplace di servizi premium",
       subtitle: "Connettiti con fornitori verificati nella tua zona",
+      headerTagline: "Marketplace di Servizi Premium",
       searchPlaceholder: "Cerca servizi...",
       findServices: "Trova servizi",
       becomeProvider: "Diventa fornitore",
@@ -5083,6 +5088,7 @@ export const additionalLanguages = {
     home: {
       title: "ServYard - Premium-Service-Marktplatz",
       subtitle: "Verbinden Sie sich mit verifizierten Anbietern in Ihrer Nähe",
+      headerTagline: "Premium-Dienstleistungsmarkt",
       searchPlaceholder: "Nach Diensten suchen...",
       findServices: "Dienste finden",
       becomeProvider: "Anbieter werden",
@@ -5456,6 +5462,7 @@ export const additionalLanguages = {
     home: {
       title: "ServYard - Premium Hizmet Pazaryeri",
       subtitle: "Bölgenizdeki doğrulanmış sağlayıcılarla bağlantı kurun",
+      headerTagline: "Premium Hizmet Pazaryeri",
       searchPlaceholder: "Hizmet ara...",
       findServices: "Hizmet bul",
       becomeProvider: "Sağlayıcı ol",
@@ -5818,6 +5825,7 @@ export const additionalLanguages = {
     home: {
       title: "ServYard - اعلیٰ معیار کی خدمات کا مارکیٹ پلیس",
       subtitle: "اپنے علاقے میں تصدیق شدہ فراہم کنندگان سے رابطہ کریں",
+      headerTagline: "پریمیم سروس مارکیٹ پلیس",
       searchPlaceholder: "خدمات تلاش کریں...",
       findServices: "خدمات تلاش کریں",
       becomeProvider: "فراہم کنندہ بنیں",
@@ -6216,7 +6224,7 @@ export const additionalLanguages = {
 
   fil: {
     nav: { home: "Home", services: "Mga Serbisyo", providerLogin: "Login ng Provider", customerLogin: "Login ng Customer", register: "Mag-register", language: "Wika", location: "Lokasyon", theme: "Tema", notifications: "Mga Notipikasyon", settings: "Mga Setting" },
-    home: { title: "ServYard - Premium Service Marketplace", subtitle: "Kumuha ng mga verified na provider sa inyong lugar", searchPlaceholder: "Maghanap ng mga serbisyo...", findServices: "Hanapin ang Mga Serbisyo", becomeProvider: "Maging Provider", featuredCategories: "Mga Tampok na Kategorya", servicesOnMap: "Mga Serbisyo sa Mapa", login: "Mag-login", dashboard: "Dashboard" },
+    home: { title: "ServYard - Premium Service Marketplace", subtitle: "Kumuha ng mga verified na provider sa inyong lugar", headerTagline: "Premium Service Marketplace", searchPlaceholder: "Maghanap ng mga serbisyo...", findServices: "Hanapin ang Mga Serbisyo", becomeProvider: "Maging Provider", featuredCategories: "Mga Tampok na Kategorya", servicesOnMap: "Mga Serbisyo sa Mapa", login: "Mag-login", dashboard: "Dashboard" },
     ui: { languageChanged: "Napalitan ang wika", interfaceUpdated: "Na-update ang wika ng interface", loadMore: "Mag-load pa ng serbisyo", loadingMoreServices: "Naglo-load pa ng mga serbisyo...", noData: "Walang datos", coming_soon: "Malapit na", relevance: "Kaugnayan", highestRated: "Pinakamataas na Rating", priceLowHigh: "Presyo: Mababa pataas", priceHighLow: "Presyo: Mataas pababa", loading: "Naglo-load...", allCategories: "Lahat ng Kategorya", errorLoadingServices: "Nabigong i-load ang mga serbisyo", minutes: "minuto", verified: "Na-verify", pageNotFound: "Hindi natagpuan ang pahina", goHome: "Bumalik sa Home", providerNotFound: "Hindi nakita ang provider", errorLoadingData: "May error sa pag-load ng data", setLocationPrompt: "Itakda ang iyong lokasyon mula sa header para makita ang mga serbisyo sa malapit", myLocation: "Aking Lokasyon" },
     dashboard: { main: "Pangunahing Nabigasyon", account: "Account", dashboards: "Mga Dashboard", providerDashboard: "Dashboard ng Provider", customerDashboard: "Dashboard ng Customer" },
     actions: { viewTerms: "Tingnan ang Mga Tuntunin at Kundisyon", search: "Hanapin", book: "Mag-book", contact: "Makipag-ugnayan", share: "Ibahagi", websiteLabel: "Website", locationLabel: "Lokasyon", instagram: "Instagram", facebook: "Facebook", tiktok: "TikTok", viewProvider: "Tingnan ang Provider", login: "Mag-login", register: "Mag-register", save: "I-save", cancel: "Kanselahin", edit: "I-edit", delete: "I-delete", confirm: "Kumpirmahin", back: "Bumalik", next: "Susunod", submit: "Isumite" },

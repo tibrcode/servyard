@@ -141,7 +141,7 @@ export const Header = ({
                   backgroundClip: 'text'
                 }}
               >
-                {isRTL ? 'منصة الخدمات المتميزة' : 'Premium Service Marketplace'}
+                {t.home?.headerTagline || (isRTL ? 'منصة الخدمات المتميزة' : 'Premium Service Marketplace')}
               </span>
             </Link>
           </div>
