@@ -12,7 +12,8 @@ import {
   ShoppingBag,
   LogOut,
   Clock,
-  Heart
+  Heart,
+  HelpCircle
 } from "lucide-react";
 import { Bell } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
@@ -71,6 +72,7 @@ export function AppSidebar({ currentLanguage = 'en', onLanguageChange, onLocatio
     { title: t.nav.notifications || 'Notifications', url: "/notifications", icon: Bell, badge: unreadCount },
     { title: isRTL ? 'المفضلة' : 'Favorites', url: "/favorites", icon: Heart },
     { title: isRTL ? 'المنطقة الزمنية' : 'Timezone', url: "/timezone", icon: Clock },
+    { title: t.userGuide?.title || (isRTL ? 'دليل المستخدم' : 'User Guide'), url: "/user-guide", icon: HelpCircle },
   ];
 
   const authNavItems = user ? [] : [

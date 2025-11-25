@@ -1042,6 +1042,91 @@ export interface Translation {
     services: string;
   };
 
+  // User Guide
+  userGuide?: {
+    title: string;
+    subtitle: string;
+    generalSection: string;
+    gettingStarted: {
+      title: string;
+      content: string;
+      steps: string[];
+    };
+    createAccount: {
+      title: string;
+      content: string;
+      steps: string[];
+    };
+    bookingServices: {
+      title: string;
+      content: string;
+      steps: string[];
+    };
+    ratingsReviews: {
+      title: string;
+      content: string;
+      steps: string[];
+    };
+    favorites: {
+      title: string;
+      content: string;
+      steps: string[];
+    };
+    location: {
+      title: string;
+      content: string;
+      steps: string[];
+    };
+    notifications: {
+      title: string;
+      content: string;
+      steps: string[];
+    };
+    language: {
+      title: string;
+      content: string;
+      steps: string[];
+    };
+    timezone: {
+      title: string;
+      content: string;
+      steps: string[];
+    };
+    forProviders: {
+      title: string;
+      dashboard: {
+        title: string;
+        content: string;
+        steps: string[];
+      };
+      services: {
+        title: string;
+        content: string;
+        steps: string[];
+      };
+      offers: {
+        title: string;
+        content: string;
+        steps: string[];
+      };
+    };
+    forCustomers: {
+      title: string;
+      dashboard: {
+        title: string;
+        content: string;
+        steps: string[];
+      };
+    };
+    needHelp: {
+      title: string;
+      content: string;
+      contactUs: string;
+      termsOfService: string;
+      privacyPolicy: string;
+    };
+  };
+
   // Provider appointment text
   appointment?: string;
 }
@@ -2090,6 +2175,141 @@ export const translations: Record<string, Translation> = {
       viewDetails: "View Details",
       services: "services"
     },
+    userGuide: {
+      title: "User Guide",
+      subtitle: "Everything you need to know about using ServYard",
+      generalSection: "General Guide",
+      gettingStarted: {
+        title: "Getting Started",
+        content: "Welcome to ServYard! Start by browsing services or creating an account to access all features.",
+        steps: [
+          "Browse available services on the homepage",
+          "Use the search bar to find specific services",
+          "Filter by category, rating, or location"
+        ]
+      },
+      createAccount: {
+        title: "Create an Account",
+        content: "Join ServYard as a customer to book services or as a provider to offer your services.",
+        steps: [
+          "Click 'Join as Customer' or 'Join as Provider' from the sidebar",
+          "Fill in your details and verify your email address",
+          "Complete your profile for better visibility and trust"
+        ]
+      },
+      bookingServices: {
+        title: "Booking Services",
+        content: "Book appointments with service providers easily and quickly.",
+        steps: [
+          "Select a service you want to book",
+          "Choose your preferred date and time slot",
+          "Confirm your booking and wait for provider approval"
+        ]
+      },
+      ratingsReviews: {
+        title: "Ratings & Reviews",
+        content: "Share your experience and help others make informed decisions.",
+        steps: [
+          "After a completed service, you can leave a review",
+          "Rate the service from 1 to 5 stars",
+          "Write detailed feedback about your experience"
+        ]
+      },
+      favorites: {
+        title: "Favorites",
+        content: "Save your favorite services and providers for quick access.",
+        steps: [
+          "Click the heart icon on any service or provider card",
+          "Access your favorites from the sidebar menu",
+          "Easily book or contact from your saved favorites"
+        ]
+      },
+      location: {
+        title: "Location Services",
+        content: "Find services near you using location features.",
+        steps: [
+          "Enable location access or set your location manually from the header",
+          "Use the interactive map to explore nearby services",
+          "Filter search results by distance radius"
+        ]
+      },
+      notifications: {
+        title: "Notifications",
+        content: "Stay updated on your bookings and new offers.",
+        steps: [
+          "Enable notifications when prompted by your browser",
+          "Receive instant alerts for booking updates and confirmations",
+          "Get notified about special offers and promotions from providers"
+        ]
+      },
+      language: {
+        title: "Language Settings",
+        content: "ServYard supports 16 languages for your convenience.",
+        steps: [
+          "Click the language icon in the header",
+          "Select your preferred language from the list",
+          "The entire interface will update immediately"
+        ]
+      },
+      timezone: {
+        title: "Timezone Settings",
+        content: "Set your timezone for accurate appointment scheduling.",
+        steps: [
+          "Go to Timezone settings from the sidebar menu",
+          "Select your timezone from the list",
+          "All booking times will display in your local time"
+        ]
+      },
+      forProviders: {
+        title: "For Service Providers",
+        dashboard: {
+          title: "Provider Dashboard",
+          content: "Manage your business from the comprehensive provider dashboard.",
+          steps: [
+            "View your bookings, revenue, and rating statistics",
+            "Manage pending booking requests with approve/reject options",
+            "Track your service performance over time"
+          ]
+        },
+        services: {
+          title: "Managing Services",
+          content: "Add and manage your service offerings to attract customers.",
+          steps: [
+            "Add new services with detailed descriptions and pricing",
+            "Set service duration and availability schedule",
+            "Add photos to showcase your work and build trust"
+          ]
+        },
+        offers: {
+          title: "Special Offers",
+          content: "Create promotional offers to attract more customers.",
+          steps: [
+            "Create discount offers (percentage or fixed amount)",
+            "Set offer duration with start and end dates",
+            "Active offers appear highlighted to potential customers"
+          ]
+        }
+      },
+      forCustomers: {
+        title: "For Customers",
+        dashboard: {
+          title: "Customer Dashboard",
+          content: "Track your bookings and manage your account easily.",
+          steps: [
+            "View your complete booking history",
+            "Track upcoming and active appointments",
+            "Leave reviews for completed services"
+          ]
+        }
+      },
+      needHelp: {
+        title: "Need More Help?",
+        content: "If you have any questions or need assistance, please don't hesitate to contact our support team. We're here to help!",
+        contactUs: "Contact Us",
+        termsOfService: "Terms of Service",
+        privacyPolicy: "Privacy Policy"
+      }
+    },
     appointment: "Appointment",
   },
   ar: {
@@ -3132,6 +3352,141 @@ export const translations: Record<string, Translation> = {
       bookAppointment: "حجز موعد",
       viewDetails: "عرض التفاصيل",
       services: "خدمات"
+    },
+    userGuide: {
+      title: "دليل المستخدم",
+      subtitle: "كل ما تحتاج معرفته لاستخدام سيرف يارد",
+      generalSection: "الدليل العام",
+      gettingStarted: {
+        title: "البدء",
+        content: "مرحباً بك في سيرف يارد! ابدأ بتصفح الخدمات أو إنشاء حساب للوصول إلى جميع المميزات.",
+        steps: [
+          "تصفح الخدمات المتاحة في الصفحة الرئيسية",
+          "استخدم شريط البحث للعثور على خدمات محددة",
+          "فلترة حسب الفئة أو التقييم أو الموقع"
+        ]
+      },
+      createAccount: {
+        title: "إنشاء حساب",
+        content: "انضم إلى سيرف يارد كعميل لحجز الخدمات أو كمقدم خدمة لعرض خدماتك.",
+        steps: [
+          "انقر على 'الانضمام كعميل' أو 'الانضمام كمقدم خدمة' من القائمة الجانبية",
+          "أدخل بياناتك وتحقق من بريدك الإلكتروني",
+          "أكمل ملفك الشخصي لمزيد من الظهور والثقة"
+        ]
+      },
+      bookingServices: {
+        title: "حجز الخدمات",
+        content: "احجز مواعيد مع مقدمي الخدمات بسهولة وسرعة.",
+        steps: [
+          "اختر الخدمة التي تريد حجزها",
+          "حدد التاريخ والوقت المفضل لديك",
+          "أكد الحجز وانتظر موافقة مقدم الخدمة"
+        ]
+      },
+      ratingsReviews: {
+        title: "التقييمات والمراجعات",
+        content: "شارك تجربتك وساعد الآخرين على اتخاذ قرارات مستنيرة.",
+        steps: [
+          "بعد اكتمال الخدمة، يمكنك ترك مراجعة",
+          "قيّم الخدمة من 1 إلى 5 نجوم",
+          "اكتب تعليقاً مفصلاً عن تجربتك"
+        ]
+      },
+      favorites: {
+        title: "المفضلة",
+        content: "احفظ خدماتك ومقدمي الخدمات المفضلين للوصول السريع.",
+        steps: [
+          "انقر على أيقونة القلب على أي بطاقة خدمة أو مقدم خدمة",
+          "الوصول إلى المفضلة من القائمة الجانبية",
+          "احجز أو تواصل بسهولة من المفضلة المحفوظة"
+        ]
+      },
+      location: {
+        title: "خدمات الموقع",
+        content: "اعثر على الخدمات القريبة منك باستخدام ميزات الموقع.",
+        steps: [
+          "فعّل الوصول للموقع أو حدد موقعك يدوياً من الشريط العلوي",
+          "استخدم الخريطة التفاعلية لاستكشاف الخدمات القريبة",
+          "فلتر نتائج البحث حسب نطاق المسافة"
+        ]
+      },
+      notifications: {
+        title: "الإشعارات",
+        content: "ابقَ على اطلاع بحجوزاتك والعروض الجديدة.",
+        steps: [
+          "فعّل الإشعارات عند ظهور طلب المتصفح",
+          "استلم تنبيهات فورية لتحديثات الحجز والتأكيدات",
+          "احصل على إشعارات بالعروض الخاصة من مقدمي الخدمات"
+        ]
+      },
+      language: {
+        title: "إعدادات اللغة",
+        content: "سيرف يارد يدعم 16 لغة لراحتك.",
+        steps: [
+          "انقر على أيقونة اللغة في الشريط العلوي",
+          "اختر لغتك المفضلة من القائمة",
+          "ستتحدث الواجهة بأكملها فوراً"
+        ]
+      },
+      timezone: {
+        title: "إعدادات المنطقة الزمنية",
+        content: "حدد منطقتك الزمنية لجدولة المواعيد بدقة.",
+        steps: [
+          "اذهب إلى إعدادات المنطقة الزمنية من القائمة الجانبية",
+          "اختر منطقتك الزمنية من القائمة",
+          "ستُعرض جميع أوقات الحجز بتوقيتك المحلي"
+        ]
+      },
+      forProviders: {
+        title: "لمقدمي الخدمات",
+        dashboard: {
+          title: "لوحة التحكم",
+          content: "أدر عملك من لوحة تحكم مقدم الخدمة الشاملة.",
+          steps: [
+            "اعرض إحصائيات الحجوزات والإيرادات والتقييمات",
+            "أدر طلبات الحجز المعلقة بخيارات القبول/الرفض",
+            "تتبع أداء خدماتك عبر الزمن"
+          ]
+        },
+        services: {
+          title: "إدارة الخدمات",
+          content: "أضف وأدر عروض خدماتك لجذب العملاء.",
+          steps: [
+            "أضف خدمات جديدة بأوصاف وأسعار مفصلة",
+            "حدد مدة الخدمة وجدول التوفر",
+            "أضف صوراً لعرض عملك وبناء الثقة"
+          ]
+        },
+        offers: {
+          title: "العروض الخاصة",
+          content: "أنشئ عروضاً ترويجية لجذب المزيد من العملاء.",
+          steps: [
+            "أنشئ عروض خصم (نسبة مئوية أو مبلغ ثابت)",
+            "حدد مدة العرض بتواريخ البداية والنهاية",
+            "تظهر العروض النشطة بشكل مميز للعملاء المحتملين"
+          ]
+        }
+      },
+      forCustomers: {
+        title: "للعملاء",
+        dashboard: {
+          title: "لوحة تحكم العميل",
+          content: "تتبع حجوزاتك وأدر حسابك بسهولة.",
+          steps: [
+            "اعرض سجل حجوزاتك الكامل",
+            "تتبع المواعيد القادمة والنشطة",
+            "اترك مراجعات للخدمات المكتملة"
+          ]
+        }
+      },
+      needHelp: {
+        title: "هل تحتاج مساعدة إضافية؟",
+        content: "إذا كان لديك أي أسئلة أو تحتاج مساعدة، لا تتردد في التواصل مع فريق الدعم لدينا. نحن هنا للمساعدة!",
+        contactUs: "تواصل معنا",
+        termsOfService: "شروط الخدمة",
+        privacyPolicy: "سياسة الخصوصية"
+      }
     },
     appointment: "موعد",
   },

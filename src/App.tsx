@@ -39,6 +39,7 @@ const NotFound = React.lazy(() => import("@/pages/NotFound"));
 const DebugNotifications = React.lazy(() => import("@/pages/DebugNotifications"));
 const NotificationsHistory = React.lazy(() => import("@/pages/NotificationsHistory"));
 const Favorites = React.lazy(() => import("@/pages/Favorites"));
+const UserGuide = React.lazy(() => import("@/pages/UserGuide"));
 
 import { NotificationLogProvider, useNotificationLog } from "@/contexts/NotificationLogContext";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -374,6 +375,7 @@ const AppContent = () => {
                       <Route path="/complete-profile" element={<CompleteProfile currentLanguage={currentLanguage} />} />
                       <Route path="/about" element={<AboutUs currentLanguage={currentLanguage} />} />
                       <Route path="/contact" element={<ContactUs currentLanguage={currentLanguage} />} />
+                      <Route path="/user-guide" element={<UserGuide currentLanguage={currentLanguage} />} />
                       <Route path="/debug/notifications" element={<DebugNotifications />} />
                       <Route path="/notifications" element={<NotificationsHistory />} />
                       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
