@@ -324,10 +324,7 @@ Base font size: 15px
   
   /* All cards in light mode - white with shadow */
   .light .bg-card,
-  .light [data-slot="card"],
-  .light .rounded-lg.border,
-  .light .rounded-xl.border,
-  .light .rounded-2xl.border {
+  .light [data-slot="card"] {
     background: white !important;
     border-color: rgba(0, 0, 0, 0.06) !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04) !important;
@@ -340,32 +337,14 @@ Base font size: 15px
   }
 
   /* Stat cards and info boxes in light mode */
-  .light .bg-muted,
-  .light .bg-secondary {
+  .light .bg-muted {
     background: white !important;
     border: 1px solid rgba(0, 0, 0, 0.06) !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
   }
 
-  /* Buttons in light mode - ghost/outline style with white background */
-  .light button[class*="ghost"],
-  .light button[class*="outline"],
-  .light .btn-ghost,
-  .light .btn-outline {
-    background: white !important;
-    border: 1px solid rgba(0, 0, 0, 0.08) !important;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06) !important;
-  }
-
-  .light button[class*="ghost"]:hover,
-  .light button[class*="outline"]:hover {
-    background: rgba(255, 255, 255, 0.95) !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
-  }
-
-  /* Tab buttons in light mode */
-  .light [role="tablist"] button,
-  .light .tabs button {
+  /* Tab buttons in light mode - only navigation tabs */
+  .light [role="tablist"]:not(header *) button {
     background: white !important;
     border: 1px solid rgba(0, 0, 0, 0.06) !important;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05) !important;
@@ -380,10 +359,9 @@ Base font size: 15px
   }
 
   /* Input fields in light mode */
-  .light input,
+  .light input:not([type="checkbox"]):not([type="radio"]),
   .light textarea,
-  .light select,
-  .light [role="combobox"] {
+  .light select {
     background: white !important;
     border: 1px solid rgba(0, 0, 0, 0.1) !important;
     box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04) !important;
@@ -410,14 +388,6 @@ Base font size: 15px
   .light [data-state="open"][role="alertdialog"] {
     background: white !important;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
-  }
-
-  /* Badge/Chip elements in light mode */
-  .light .badge,
-  .light [class*="Badge"] {
-    background: white !important;
-    border: 1px solid rgba(0, 0, 0, 0.1) !important;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
   }
 
   /* Sidebar items in light mode */
