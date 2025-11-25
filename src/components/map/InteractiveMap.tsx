@@ -78,24 +78,22 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   // Use translation system
   const { t, isRTL } = useTranslation(currentLanguage);
 
-  // Translation object using global translations where available
+  // Translation object using global translations
   const labels = {
-    title: isRTL ? "الخريطة التفاعلية" : "Interactive Map",
-    description: isRTL 
-      ? "انقر على الخريطة لتحديد موقع أو اسحب العلامة" 
-      : "Click on map to select location or drag the marker",
-    loading: isRTL ? "جاري تحميل الخريطة..." : "Loading map...",
-    error: isRTL ? "خطأ في تحميل الخريطة" : "Error loading map",
+    title: t.interactiveMap?.title || "Interactive Map",
+    description: t.interactiveMap?.clickToSelect || "Click on map to select location or drag the marker",
+    loading: t.interactiveMap?.loading || "Loading map...",
+    error: t.interactiveMap?.error || "Error loading map",
     apiKeyMissing: isRTL 
       ? "يرجى إضافة Google Maps API Key في ملف .env.local"
       : "Please add Google Maps API Key in .env.local",
-    getCurrentLocation: t.ui?.myLocation || (isRTL ? "موقعي الحالي" : "My Location"),
-    clickToSelect: isRTL ? "انقر لتحديد الموقع" : "Click to select location",
-    top: isRTL ? "ممتاز" : "TOP",
-    noReviews: isRTL ? "لا توجد تقييمات" : "No reviews",
-    bookAppointment: isRTL ? "حجز موعد" : "Book Appointment",
-    viewDetails: isRTL ? "عرض التفاصيل" : "View Details",
-    services: isRTL ? "خدمة" : "services"
+    getCurrentLocation: t.ui?.myLocation || t.interactiveMap?.getCurrentLocation || "My Location",
+    clickToSelect: t.interactiveMap?.clickToSelect || "Click to select location",
+    top: t.interactiveMap?.top || t.favorites?.top || "TOP",
+    noReviews: t.interactiveMap?.noReviews || t.favorites?.noReviews || "No reviews",
+    bookAppointment: t.interactiveMap?.bookAppointment || t.favorites?.bookAppointment || "Book Appointment",
+    viewDetails: t.interactiveMap?.viewDetails || "View Details",
+    services: t.interactiveMap?.services || "services"
   };
 
   // تحميل Google Maps API مع معالجة أفضل للأخطاء

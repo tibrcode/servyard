@@ -1039,6 +1039,7 @@ export interface Translation {
     noReviews: string;
     bookAppointment: string;
     viewDetails: string;
+    services: string;
   };
 
   // Provider appointment text
@@ -2086,7 +2087,8 @@ export const translations: Record<string, Translation> = {
       top: "TOP",
       noReviews: "No reviews",
       bookAppointment: "Book Appointment",
-      viewDetails: "View Details"
+      viewDetails: "View Details",
+      services: "services"
     },
     appointment: "Appointment",
   },
@@ -3128,7 +3130,8 @@ export const translations: Record<string, Translation> = {
       top: "ممتاز",
       noReviews: "لا توجد تقييمات",
       bookAppointment: "حجز موعد",
-      viewDetails: "عرض التفاصيل"
+      viewDetails: "عرض التفاصيل",
+      services: "خدمات"
     },
     appointment: "موعد",
   },
