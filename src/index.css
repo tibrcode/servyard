@@ -407,6 +407,48 @@ Base font size: 15px
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08) !important;
   }
 
+  /* ═══════════════════════════════════════════════════════════════════════════
+     HEADER - White elevated style in light mode
+     ═══════════════════════════════════════════════════════════════════════════ */
+  .light header.fixed {
+    background: white !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04) !important;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     STATS CARDS - Provider dashboard stat cards
+     ═══════════════════════════════════════════════════════════════════════════ */
+  .light .bg-muted\/50,
+  .light .bg-muted\/70 {
+    background: white !important;
+    border: 1px solid rgba(0, 0, 0, 0.06) !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+  }
+
+  .light .bg-muted\/50:hover,
+  .light .bg-muted\/70:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.06) !important;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     SERVICE & BOOKING CARDS - Provider services and customer bookings
+     ═══════════════════════════════════════════════════════════════════════════ */
+  .light .space-y-3 > [class*="Card"],
+  .light .space-y-4 > [class*="Card"],
+  .light [data-slot="card"].bg-muted\/50 {
+    background: white !important;
+    border: 1px solid rgba(0, 0, 0, 0.06) !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+    border-radius: 12px !important;
+  }
+
+  .light .space-y-3 > [class*="Card"]:hover,
+  .light .space-y-4 > [class*="Card"]:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+    transform: translateY(-1px);
+  }
+
   /* Nested card styling - lighter background for cards inside cards */
   .card-nested {
     background-color: hsl(var(--card-nested));
