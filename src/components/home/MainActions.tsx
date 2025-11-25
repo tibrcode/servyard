@@ -63,7 +63,7 @@ export const MainActions = ({
             <h1 
               className="text-5xl md:text-7xl lg:text-8xl font-display font-bold bg-gradient-to-r from-primary via-primary-glow to-primary bg-clip-text text-transparent"
               style={{ 
-                textShadow: '3px 3px 0 rgba(34, 197, 94, 0.4), 6px 6px 0 rgba(34, 197, 94, 0.2)'
+                textShadow: '2px 2px 0 rgba(34, 197, 94, 0.35), 4px 4px 0 rgba(34, 197, 94, 0.15)'
               }}
             >
               ServYard
@@ -71,7 +71,7 @@ export const MainActions = ({
             <p 
               className="text-xl md:text-2xl lg:text-3xl mt-2 font-display font-semibold bg-gradient-to-r from-primary via-primary-glow to-primary bg-clip-text text-transparent"
               style={{ 
-                textShadow: '2px 2px 0 rgba(34, 197, 94, 0.35), 4px 4px 0 rgba(34, 197, 94, 0.15)'
+                textShadow: '1px 1px 0 rgba(34, 197, 94, 0.3), 2px 2px 0 rgba(34, 197, 94, 0.12)'
               }}
             >
               {isRTL ? 'منصة الخدمات المتميزة' : 'Premium Service Marketplace'}
