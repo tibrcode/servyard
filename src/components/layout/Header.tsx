@@ -123,12 +123,17 @@ export const Header = ({
               aria-label="Toggle sidebar" 
               className="ml-0 sm:ml-2 h-8 w-8 sm:h-10 sm:w-10 p-1.5 flex-shrink-0 border border-border/50 rounded-md hover:bg-accent [&>svg]:h-5 [&>svg]:w-5 sm:[&>svg]:h-6 sm:[&>svg]:w-6" 
             />
-            <Link to="/" className="flex flex-col items-start leading-none min-w-0 overflow-hidden" aria-label="ServYard home">
+            <Link 
+              to="/" 
+              className="flex flex-col items-start leading-none min-w-0 overflow-hidden" 
+              aria-label="ServYard home"
+              onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}
+            >
               {/* Logo - doubled size for better visibility */}
               <BrandLogo height={80} />
-              {/* Golden tagline under logo */}
+              {/* Golden tagline under logo - larger text */}
               <span 
-                className="text-xs sm:text-sm font-semibold mt-0.5"
+                className="text-sm sm:text-base md:text-lg font-semibold mt-0.5"
                 style={{ 
                   background: 'linear-gradient(90deg, #D4AF37, #F4E4BA, #D4AF37)',
                   WebkitBackgroundClip: 'text',
