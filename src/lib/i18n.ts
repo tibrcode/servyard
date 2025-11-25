@@ -1045,78 +1045,87 @@ export interface Translation {
   // User Guide
   userGuide?: {
     title: string;
-    subtitle: string;
-    generalSection: string;
-    gettingStarted: {
-      title: string;
-      content: string;
-      steps: string[];
-    };
-    createAccount: {
-      title: string;
-      content: string;
-      steps: string[];
-    };
-    bookingServices: {
-      title: string;
-      content: string;
-      steps: string[];
-    };
-    ratingsReviews: {
-      title: string;
-      content: string;
-      steps: string[];
-    };
-    favorites: {
-      title: string;
-      content: string;
-      steps: string[];
-    };
-    location: {
-      title: string;
-      content: string;
-      steps: string[];
-    };
-    notifications: {
-      title: string;
-      content: string;
-      steps: string[];
-    };
-    language: {
-      title: string;
-      content: string;
-      steps: string[];
-    };
-    timezone: {
-      title: string;
-      content: string;
-      steps: string[];
-    };
+    heroSubtitle: string;
     forProviders: {
+      badge: string;
       title: string;
-      dashboard: {
+      subtitle: string;
+    };
+    providerBenefits: {
+      organizeSchedule: {
         title: string;
-        content: string;
-        steps: string[];
+        description: string;
+        highlights: string[];
       };
-      services: {
+      growBusiness: {
         title: string;
-        content: string;
-        steps: string[];
+        description: string;
+        highlights: string[];
       };
-      offers: {
+      saveTime: {
         title: string;
-        content: string;
-        steps: string[];
+        description: string;
+        highlights: string[];
+      };
+      buildReputation: {
+        title: string;
+        description: string;
+        highlights: string[];
+      };
+      trackPerformance: {
+        title: string;
+        description: string;
+        highlights: string[];
+      };
+      specialOffers: {
+        title: string;
+        description: string;
+        highlights: string[];
       };
     };
-    forCustomers: {
-      title: string;
-      dashboard: {
+    howItWorks: {
+      provider: {
         title: string;
-        content: string;
-        steps: string[];
+        step1: { title: string; description: string; };
+        step2: { title: string; description: string; };
+        step3: { title: string; description: string; };
+        step4: { title: string; description: string; };
       };
+    };
+    dashboardPreview: {
+      title: string;
+      description: string;
+      stats: string;
+      statsDesc: string;
+      bookings: string;
+      bookingsDesc: string;
+      services: string;
+      servicesDesc: string;
+      reviews: string;
+      reviewsDesc: string;
+    };
+    divider: string;
+    forCustomers: {
+      badge: string;
+      title: string;
+      subtitle: string;
+    };
+    customerBenefits: {
+      findServices: { title: string; description: string; };
+      bookInstantly: { title: string; description: string; };
+      trustedProviders: { title: string; description: string; };
+      stayInformed: { title: string; description: string; };
+    };
+    features: {
+      title: string;
+      multiLanguage: { title: string; description: string; };
+      locationBased: { title: string; description: string; };
+      mobileFirst: { title: string; description: string; };
+      secure: { title: string; description: string; };
+    };
+    cta: {
+      becomeProvider: string;
+      joinAsCustomer: string;
     };
     needHelp: {
       title: string;
@@ -2177,134 +2186,157 @@ export const translations: Record<string, Translation> = {
     },
     userGuide: {
       title: "User Guide",
-      subtitle: "Everything you need to know about using ServYard",
-      generalSection: "General Guide",
-      gettingStarted: {
-        title: "Getting Started",
-        content: "Welcome to ServYard! Start by browsing services or creating an account to access all features.",
-        steps: [
-          "Browse available services on the homepage",
-          "Use the search bar to find specific services",
-          "Filter by category, rating, or location"
-        ]
-      },
-      createAccount: {
-        title: "Create an Account",
-        content: "Join ServYard as a customer to book services or as a provider to offer your services.",
-        steps: [
-          "Click 'Join as Customer' or 'Join as Provider' from the sidebar",
-          "Fill in your details and verify your email address",
-          "Complete your profile for better visibility and trust"
-        ]
-      },
-      bookingServices: {
-        title: "Booking Services",
-        content: "Book appointments with service providers easily and quickly.",
-        steps: [
-          "Select a service you want to book",
-          "Choose your preferred date and time slot",
-          "Confirm your booking and wait for provider approval"
-        ]
-      },
-      ratingsReviews: {
-        title: "Ratings & Reviews",
-        content: "Share your experience and help others make informed decisions.",
-        steps: [
-          "After a completed service, you can leave a review",
-          "Rate the service from 1 to 5 stars",
-          "Write detailed feedback about your experience"
-        ]
-      },
-      favorites: {
-        title: "Favorites",
-        content: "Save your favorite services and providers for quick access.",
-        steps: [
-          "Click the heart icon on any service or provider card",
-          "Access your favorites from the sidebar menu",
-          "Easily book or contact from your saved favorites"
-        ]
-      },
-      location: {
-        title: "Location Services",
-        content: "Find services near you using location features.",
-        steps: [
-          "Enable location access or set your location manually from the header",
-          "Use the interactive map to explore nearby services",
-          "Filter search results by distance radius"
-        ]
-      },
-      notifications: {
-        title: "Notifications",
-        content: "Stay updated on your bookings and new offers.",
-        steps: [
-          "Enable notifications when prompted by your browser",
-          "Receive instant alerts for booking updates and confirmations",
-          "Get notified about special offers and promotions from providers"
-        ]
-      },
-      language: {
-        title: "Language Settings",
-        content: "ServYard supports 16 languages for your convenience.",
-        steps: [
-          "Click the language icon in the header",
-          "Select your preferred language from the list",
-          "The entire interface will update immediately"
-        ]
-      },
-      timezone: {
-        title: "Timezone Settings",
-        content: "Set your timezone for accurate appointment scheduling.",
-        steps: [
-          "Go to Timezone settings from the sidebar menu",
-          "Select your timezone from the list",
-          "All booking times will display in your local time"
-        ]
-      },
+      heroSubtitle: "Discover how ServYard helps service providers organize their business and reach more customers",
       forProviders: {
-        title: "For Service Providers",
-        dashboard: {
-          title: "Provider Dashboard",
-          content: "Manage your business from the comprehensive provider dashboard.",
-          steps: [
-            "View your bookings, revenue, and rating statistics",
-            "Manage pending booking requests with approve/reject options",
-            "Track your service performance over time"
+        badge: "For Service Providers",
+        title: "Transform How You Manage Your Business",
+        subtitle: "Join thousands of service providers who have simplified their scheduling and grown their customer base with ServYard"
+      },
+      providerBenefits: {
+        organizeSchedule: {
+          title: "Organize Your Schedule",
+          description: "No more messy appointment books or missed calls. ServYard automatically manages your schedule, sends reminders, and keeps everything organized in one place.",
+          highlights: [
+            "Automatic booking management",
+            "Smart conflict detection",
+            "Weekly availability settings",
+            "Holiday & special dates management"
           ]
         },
-        services: {
-          title: "Managing Services",
-          content: "Add and manage your service offerings to attract customers.",
-          steps: [
-            "Add new services with detailed descriptions and pricing",
-            "Set service duration and availability schedule",
-            "Add photos to showcase your work and build trust"
+        growBusiness: {
+          title: "Grow Your Business",
+          description: "Reach new customers who are actively searching for your services. Your profile appears to thousands of potential clients in your area.",
+          highlights: [
+            "Appear in search results",
+            "Get discovered on the map",
+            "Build your online reputation",
+            "Attract customers 24/7"
           ]
         },
-        offers: {
-          title: "Special Offers",
-          content: "Create promotional offers to attract more customers.",
-          steps: [
-            "Create discount offers (percentage or fixed amount)",
-            "Set offer duration with start and end dates",
-            "Active offers appear highlighted to potential customers"
+        saveTime: {
+          title: "Save Precious Time",
+          description: "Stop wasting time on phone calls and manual scheduling. Customers book directly, you approve with one tap, and everyone gets notified automatically.",
+          highlights: [
+            "One-tap booking approval",
+            "Automatic notifications",
+            "No phone tag needed",
+            "Focus on your craft"
+          ]
+        },
+        buildReputation: {
+          title: "Build Your Reputation",
+          description: "Collect reviews from satisfied customers and showcase your quality. Good reviews bring more customers, creating a growth cycle for your business.",
+          highlights: [
+            "Verified customer reviews",
+            "Star rating display",
+            "TOP provider badges",
+            "Trust indicators"
+          ]
+        },
+        trackPerformance: {
+          title: "Track Your Performance",
+          description: "See exactly how your business is doing. Track bookings, revenue, and customer satisfaction all in your personalized dashboard.",
+          highlights: [
+            "Revenue tracking",
+            "Booking statistics",
+            "Rating analytics",
+            "Growth insights"
+          ]
+        },
+        specialOffers: {
+          title: "Create Special Offers",
+          description: "Attract more customers with promotional discounts. Create time-limited offers that appear highlighted to potential customers.",
+          highlights: [
+            "Percentage discounts",
+            "Fixed amount offers",
+            "Scheduled promotions",
+            "Highlighted visibility"
           ]
         }
       },
-      forCustomers: {
-        title: "For Customers",
-        dashboard: {
-          title: "Customer Dashboard",
-          content: "Track your bookings and manage your account easily.",
-          steps: [
-            "View your complete booking history",
-            "Track upcoming and active appointments",
-            "Leave reviews for completed services"
-          ]
+      howItWorks: {
+        provider: {
+          title: "How to Get Started as a Provider",
+          step1: {
+            title: "Create Your Profile",
+            description: "Sign up in minutes. Add your business details, services, pricing, and photos to create a professional profile."
+          },
+          step2: {
+            title: "Set Your Availability",
+            description: "Define your working hours for each day. Add holidays or special dates when you're unavailable."
+          },
+          step3: {
+            title: "Receive Bookings",
+            description: "Customers find you and book appointments. You get instant notifications and can approve or reschedule with one tap."
+          },
+          step4: {
+            title: "Deliver & Grow",
+            description: "Provide your excellent service, collect reviews, and watch your business grow as more customers discover you."
+          }
         }
+      },
+      dashboardPreview: {
+        title: "Your Provider Dashboard",
+        description: "Everything you need to manage your business in one powerful dashboard:",
+        stats: "Real-time Statistics",
+        statsDesc: "Bookings, revenue, ratings",
+        bookings: "Booking Management",
+        bookingsDesc: "Approve, reject, reschedule",
+        services: "Service Management",
+        servicesDesc: "Add, edit, price services",
+        reviews: "Reviews & Ratings",
+        reviewsDesc: "Monitor your reputation"
+      },
+      divider: "Also for Customers",
+      forCustomers: {
+        badge: "For Customers",
+        title: "Find & Book Services Effortlessly",
+        subtitle: "Discover trusted service providers and book appointments in seconds"
+      },
+      customerBenefits: {
+        findServices: {
+          title: "Find Services Easily",
+          description: "Search by category, location, or rating to find exactly what you need."
+        },
+        bookInstantly: {
+          title: "Book Instantly",
+          description: "See real-time availability and book appointments in seconds."
+        },
+        trustedProviders: {
+          title: "Trusted Providers",
+          description: "Read real reviews from other customers to make informed decisions."
+        },
+        stayInformed: {
+          title: "Stay Informed",
+          description: "Get notifications for booking confirmations, reminders, and special offers."
+        }
+      },
+      features: {
+        title: "Platform Features",
+        multiLanguage: {
+          title: "16 Languages",
+          description: "Use ServYard in your preferred language"
+        },
+        locationBased: {
+          title: "Location-Based",
+          description: "Find services near you with interactive maps"
+        },
+        mobileFirst: {
+          title: "Mobile Friendly",
+          description: "Works perfectly on any device"
+        },
+        secure: {
+          title: "Secure & Private",
+          description: "Your data is protected and encrypted"
+        }
+      },
+      cta: {
+        becomeProvider: "Become a Provider Now",
+        joinAsCustomer: "Join as Customer"
       },
       needHelp: {
         title: "Need More Help?",
-        content: "If you have any questions or need assistance, please don't hesitate to contact our support team. We're here to help!",
+        content: "Our support team is here to help you succeed",
         contactUs: "Contact Us",
         termsOfService: "Terms of Service",
         privacyPolicy: "Privacy Policy"
@@ -3355,134 +3387,157 @@ export const translations: Record<string, Translation> = {
     },
     userGuide: {
       title: "دليل المستخدم",
-      subtitle: "كل ما تحتاج معرفته لاستخدام سيرف يارد",
-      generalSection: "الدليل العام",
-      gettingStarted: {
-        title: "البدء",
-        content: "مرحباً بك في سيرف يارد! ابدأ بتصفح الخدمات أو إنشاء حساب للوصول إلى جميع المميزات.",
-        steps: [
-          "تصفح الخدمات المتاحة في الصفحة الرئيسية",
-          "استخدم شريط البحث للعثور على خدمات محددة",
-          "فلترة حسب الفئة أو التقييم أو الموقع"
-        ]
-      },
-      createAccount: {
-        title: "إنشاء حساب",
-        content: "انضم إلى سيرف يارد كعميل لحجز الخدمات أو كمقدم خدمة لعرض خدماتك.",
-        steps: [
-          "انقر على 'الانضمام كعميل' أو 'الانضمام كمقدم خدمة' من القائمة الجانبية",
-          "أدخل بياناتك وتحقق من بريدك الإلكتروني",
-          "أكمل ملفك الشخصي لمزيد من الظهور والثقة"
-        ]
-      },
-      bookingServices: {
-        title: "حجز الخدمات",
-        content: "احجز مواعيد مع مقدمي الخدمات بسهولة وسرعة.",
-        steps: [
-          "اختر الخدمة التي تريد حجزها",
-          "حدد التاريخ والوقت المفضل لديك",
-          "أكد الحجز وانتظر موافقة مقدم الخدمة"
-        ]
-      },
-      ratingsReviews: {
-        title: "التقييمات والمراجعات",
-        content: "شارك تجربتك وساعد الآخرين على اتخاذ قرارات مستنيرة.",
-        steps: [
-          "بعد اكتمال الخدمة، يمكنك ترك مراجعة",
-          "قيّم الخدمة من 1 إلى 5 نجوم",
-          "اكتب تعليقاً مفصلاً عن تجربتك"
-        ]
-      },
-      favorites: {
-        title: "المفضلة",
-        content: "احفظ خدماتك ومقدمي الخدمات المفضلين للوصول السريع.",
-        steps: [
-          "انقر على أيقونة القلب على أي بطاقة خدمة أو مقدم خدمة",
-          "الوصول إلى المفضلة من القائمة الجانبية",
-          "احجز أو تواصل بسهولة من المفضلة المحفوظة"
-        ]
-      },
-      location: {
-        title: "خدمات الموقع",
-        content: "اعثر على الخدمات القريبة منك باستخدام ميزات الموقع.",
-        steps: [
-          "فعّل الوصول للموقع أو حدد موقعك يدوياً من الشريط العلوي",
-          "استخدم الخريطة التفاعلية لاستكشاف الخدمات القريبة",
-          "فلتر نتائج البحث حسب نطاق المسافة"
-        ]
-      },
-      notifications: {
-        title: "الإشعارات",
-        content: "ابقَ على اطلاع بحجوزاتك والعروض الجديدة.",
-        steps: [
-          "فعّل الإشعارات عند ظهور طلب المتصفح",
-          "استلم تنبيهات فورية لتحديثات الحجز والتأكيدات",
-          "احصل على إشعارات بالعروض الخاصة من مقدمي الخدمات"
-        ]
-      },
-      language: {
-        title: "إعدادات اللغة",
-        content: "سيرف يارد يدعم 16 لغة لراحتك.",
-        steps: [
-          "انقر على أيقونة اللغة في الشريط العلوي",
-          "اختر لغتك المفضلة من القائمة",
-          "ستتحدث الواجهة بأكملها فوراً"
-        ]
-      },
-      timezone: {
-        title: "إعدادات المنطقة الزمنية",
-        content: "حدد منطقتك الزمنية لجدولة المواعيد بدقة.",
-        steps: [
-          "اذهب إلى إعدادات المنطقة الزمنية من القائمة الجانبية",
-          "اختر منطقتك الزمنية من القائمة",
-          "ستُعرض جميع أوقات الحجز بتوقيتك المحلي"
-        ]
-      },
+      heroSubtitle: "اكتشف كيف يساعد سيرف يارد مقدمي الخدمات في تنظيم أعمالهم والوصول إلى المزيد من العملاء",
       forProviders: {
-        title: "لمقدمي الخدمات",
-        dashboard: {
-          title: "لوحة التحكم",
-          content: "أدر عملك من لوحة تحكم مقدم الخدمة الشاملة.",
-          steps: [
-            "اعرض إحصائيات الحجوزات والإيرادات والتقييمات",
-            "أدر طلبات الحجز المعلقة بخيارات القبول/الرفض",
-            "تتبع أداء خدماتك عبر الزمن"
+        badge: "لمقدمي الخدمات",
+        title: "غيّر طريقة إدارة عملك",
+        subtitle: "انضم إلى آلاف مقدمي الخدمات الذين بسّطوا جدولة مواعيدهم ووسّعوا قاعدة عملائهم مع سيرف يارد"
+      },
+      providerBenefits: {
+        organizeSchedule: {
+          title: "نظّم جدولك",
+          description: "لا مزيد من دفاتر المواعيد الفوضوية أو المكالمات الفائتة. سيرف يارد يدير جدولك تلقائياً، يرسل التذكيرات، ويحافظ على كل شيء منظماً في مكان واحد.",
+          highlights: [
+            "إدارة الحجوزات تلقائياً",
+            "كشف ذكي للتعارضات",
+            "إعدادات التوفر الأسبوعية",
+            "إدارة العطلات والتواريخ الخاصة"
           ]
         },
-        services: {
-          title: "إدارة الخدمات",
-          content: "أضف وأدر عروض خدماتك لجذب العملاء.",
-          steps: [
-            "أضف خدمات جديدة بأوصاف وأسعار مفصلة",
-            "حدد مدة الخدمة وجدول التوفر",
-            "أضف صوراً لعرض عملك وبناء الثقة"
+        growBusiness: {
+          title: "نمّي عملك",
+          description: "اوصل إلى عملاء جدد يبحثون بنشاط عن خدماتك. ملفك الشخصي يظهر لآلاف العملاء المحتملين في منطقتك.",
+          highlights: [
+            "الظهور في نتائج البحث",
+            "الاكتشاف على الخريطة",
+            "بناء سمعتك الإلكترونية",
+            "جذب العملاء على مدار الساعة"
           ]
         },
-        offers: {
-          title: "العروض الخاصة",
-          content: "أنشئ عروضاً ترويجية لجذب المزيد من العملاء.",
-          steps: [
-            "أنشئ عروض خصم (نسبة مئوية أو مبلغ ثابت)",
-            "حدد مدة العرض بتواريخ البداية والنهاية",
-            "تظهر العروض النشطة بشكل مميز للعملاء المحتملين"
+        saveTime: {
+          title: "وفّر وقتك الثمين",
+          description: "توقف عن إضاعة الوقت في المكالمات الهاتفية والجدولة اليدوية. العملاء يحجزون مباشرة، تقبل بنقرة واحدة، والجميع يتلقى إشعاراً تلقائياً.",
+          highlights: [
+            "قبول الحجز بنقرة واحدة",
+            "إشعارات تلقائية",
+            "لا حاجة للمكالمات المتكررة",
+            "ركّز على مهنتك"
+          ]
+        },
+        buildReputation: {
+          title: "ابنِ سمعتك",
+          description: "اجمع التقييمات من العملاء الراضين واعرض جودة عملك. التقييمات الجيدة تجلب المزيد من العملاء، مما يخلق دورة نمو لعملك.",
+          highlights: [
+            "تقييمات عملاء موثقة",
+            "عرض تقييم النجوم",
+            "شارات مقدم خدمة ممتاز",
+            "مؤشرات الثقة"
+          ]
+        },
+        trackPerformance: {
+          title: "تابع أداءك",
+          description: "شاهد بالضبط كيف يسير عملك. تتبع الحجوزات والإيرادات ورضا العملاء في لوحة تحكمك الشخصية.",
+          highlights: [
+            "تتبع الإيرادات",
+            "إحصائيات الحجوزات",
+            "تحليلات التقييمات",
+            "رؤى النمو"
+          ]
+        },
+        specialOffers: {
+          title: "أنشئ عروضاً خاصة",
+          description: "اجذب المزيد من العملاء بخصومات ترويجية. أنشئ عروضاً محدودة الوقت تظهر بشكل مميز للعملاء المحتملين.",
+          highlights: [
+            "خصومات بالنسبة المئوية",
+            "عروض بمبلغ ثابت",
+            "عروض ترويجية مجدولة",
+            "ظهور مميز"
           ]
         }
       },
-      forCustomers: {
-        title: "للعملاء",
-        dashboard: {
-          title: "لوحة تحكم العميل",
-          content: "تتبع حجوزاتك وأدر حسابك بسهولة.",
-          steps: [
-            "اعرض سجل حجوزاتك الكامل",
-            "تتبع المواعيد القادمة والنشطة",
-            "اترك مراجعات للخدمات المكتملة"
-          ]
+      howItWorks: {
+        provider: {
+          title: "كيف تبدأ كمقدم خدمة",
+          step1: {
+            title: "أنشئ ملفك الشخصي",
+            description: "سجّل في دقائق. أضف تفاصيل عملك، خدماتك، أسعارك، وصورك لإنشاء ملف احترافي."
+          },
+          step2: {
+            title: "حدد أوقات توفرك",
+            description: "حدد ساعات عملك لكل يوم. أضف العطلات أو التواريخ الخاصة التي لا تكون فيها متاحاً."
+          },
+          step3: {
+            title: "استقبل الحجوزات",
+            description: "العملاء يجدونك ويحجزون المواعيد. تحصل على إشعارات فورية ويمكنك القبول أو إعادة الجدولة بنقرة واحدة."
+          },
+          step4: {
+            title: "قدّم خدمتك وانمُ",
+            description: "قدم خدمتك الممتازة، اجمع التقييمات، وشاهد عملك ينمو كلما اكتشفك المزيد من العملاء."
+          }
         }
+      },
+      dashboardPreview: {
+        title: "لوحة تحكم مقدم الخدمة",
+        description: "كل ما تحتاجه لإدارة عملك في لوحة تحكم واحدة قوية:",
+        stats: "إحصائيات فورية",
+        statsDesc: "الحجوزات، الإيرادات، التقييمات",
+        bookings: "إدارة الحجوزات",
+        bookingsDesc: "قبول، رفض، إعادة جدولة",
+        services: "إدارة الخدمات",
+        servicesDesc: "إضافة، تعديل، تسعير الخدمات",
+        reviews: "التقييمات والمراجعات",
+        reviewsDesc: "راقب سمعتك"
+      },
+      divider: "أيضاً للعملاء",
+      forCustomers: {
+        badge: "للعملاء",
+        title: "ابحث واحجز الخدمات بسهولة",
+        subtitle: "اكتشف مقدمي خدمات موثوقين واحجز المواعيد في ثوانٍ"
+      },
+      customerBenefits: {
+        findServices: {
+          title: "ابحث عن الخدمات بسهولة",
+          description: "ابحث حسب الفئة أو الموقع أو التقييم للعثور على ما تحتاجه بالضبط."
+        },
+        bookInstantly: {
+          title: "احجز فوراً",
+          description: "شاهد التوفر الفوري واحجز المواعيد في ثوانٍ."
+        },
+        trustedProviders: {
+          title: "مقدمو خدمات موثوقون",
+          description: "اقرأ تقييمات حقيقية من عملاء آخرين لاتخاذ قرارات مستنيرة."
+        },
+        stayInformed: {
+          title: "ابقَ على اطلاع",
+          description: "احصل على إشعارات لتأكيدات الحجز والتذكيرات والعروض الخاصة."
+        }
+      },
+      features: {
+        title: "مميزات المنصة",
+        multiLanguage: {
+          title: "16 لغة",
+          description: "استخدم سيرف يارد بلغتك المفضلة"
+        },
+        locationBased: {
+          title: "قائم على الموقع",
+          description: "ابحث عن الخدمات القريبة بخرائط تفاعلية"
+        },
+        mobileFirst: {
+          title: "متوافق مع الجوال",
+          description: "يعمل بشكل مثالي على أي جهاز"
+        },
+        secure: {
+          title: "آمن وخاص",
+          description: "بياناتك محمية ومشفرة"
+        }
+      },
+      cta: {
+        becomeProvider: "كن مقدم خدمة الآن",
+        joinAsCustomer: "انضم كعميل"
       },
       needHelp: {
         title: "هل تحتاج مساعدة إضافية؟",
-        content: "إذا كان لديك أي أسئلة أو تحتاج مساعدة، لا تتردد في التواصل مع فريق الدعم لدينا. نحن هنا للمساعدة!",
+        content: "فريق الدعم لدينا هنا لمساعدتك على النجاح",
         contactUs: "تواصل معنا",
         termsOfService: "شروط الخدمة",
         privacyPolicy: "سياسة الخصوصية"
