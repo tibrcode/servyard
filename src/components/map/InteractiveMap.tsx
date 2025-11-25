@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { MapPin, Navigation, Loader2 } from "lucide-react";
 import { getCategoryIcon, getCategoryColor } from "@/lib/categoryIcons";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Location {
   latitude: number;
@@ -74,7 +75,9 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   const [apiLoaded, setApiLoaded] = useState(false);
   const [currentLocation, setCurrentLocation] = useState<Location | null>(null);
 
-  const isRTL = currentLanguage === 'ar';
+  // Use translation system
+  const { t } = useLanguage();
+  const isRTL = currentLanguage === 'ar' || currentLanguage === 'ur';
 
   // Translation object using global translations where available
   const labels = {
@@ -87,7 +90,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
     apiKeyMissing: isRTL 
       ? "يرجى إضافة Google Maps API Key في ملف .env.local"
       : "Please add Google Maps API Key in .env.local",
-    getCurrentLocation: isRTL ? "موقعي الحالي" : "My Location",
+    getCurrentLocation: t.ui?.myLocation || (isRTL ? "موقعي الحالي" : "My Location"),
     clickToSelect: isRTL ? "انقر لتحديد الموقع" : "Click to select location",
     top: isRTL ? "ممتاز" : "TOP",
     noReviews: isRTL ? "لا توجد تقييمات" : "No reviews",
