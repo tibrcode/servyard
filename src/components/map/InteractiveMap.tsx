@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { MapPin, Navigation, Loader2 } from "lucide-react";
 import { getCategoryIcon, getCategoryColor } from "@/lib/categoryIcons";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { useTranslation } from "@/lib/i18n";
 
 interface Location {
   latitude: number;
@@ -76,8 +76,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   const [currentLocation, setCurrentLocation] = useState<Location | null>(null);
 
   // Use translation system
-  const { t } = useLanguage();
-  const isRTL = currentLanguage === 'ar' || currentLanguage === 'ur';
+  const { t, isRTL } = useTranslation(currentLanguage);
 
   // Translation object using global translations where available
   const labels = {
