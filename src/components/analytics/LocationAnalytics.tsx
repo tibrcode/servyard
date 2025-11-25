@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { MapPin, TrendingUp, Users, BarChart } from "lucide-react";
 import { db } from "@/integrations/firebase/client";
 import { collection, getDocs, query, where } from "firebase/firestore";
+import { useTranslation } from "@/lib/i18n";
 
 interface LocationAnalyticsProps {
   currentLanguage: string;
@@ -32,21 +33,7 @@ const LocationAnalytics: React.FC<LocationAnalyticsProps> = ({ currentLanguage }
   const [totalProviders, setTotalProviders] = useState(0);
   const [totalCountries, setTotalCountries] = useState(0);
 
-  const isRTL = currentLanguage === 'ar';
-
-  const t = {
-    title: isRTL ? "تحليلات الموقع الجغرافي" : "Location Analytics",
-    description: isRTL 
-      ? "إحصائيات المزودين والخدمات حسب المنطقة"
-      : "Provider and service statistics by region",
-    loading: isRTL ? "جاري التحميل..." : "Loading...",
-    topRegions: isRTL ? "أكثر المناطق نشاطاً" : "Most Active Regions",
-    providers: isRTL ? "مزود" : "Providers",
-    services: isRTL ? "خدمة" : "Services",
-    countries: isRTL ? "بلد" : "Countries",
-    totalProviders: isRTL ? "إجمالي المزودين" : "Total Providers",
-    noData: isRTL ? "لا توجد بيانات" : "No data available"
-  };
+  const { t, isRTL } = useTranslation(currentLanguage as 'ar' | 'en');
 
   useEffect(() => {
     loadAnalytics();
@@ -117,7 +104,7 @@ const LocationAnalytics: React.FC<LocationAnalyticsProps> = ({ currentLanguage }
         <CardContent className="flex items-center justify-center p-8">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
-            <p className="text-sm text-muted-foreground">{t.loading}</p>
+            <p className="text-sm text-muted-foreground">{t.locationAnalytics?.loading || 'Loading...'}</p>
           </div>
         </CardContent>
       </Card>
@@ -132,7 +119,7 @@ const LocationAnalytics: React.FC<LocationAnalyticsProps> = ({ currentLanguage }
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <Users className="w-4 h-4" />
-              {t.totalProviders}
+              {t.locationAnalytics?.totalProviders || 'Total Providers'}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -144,7 +131,7 @@ const LocationAnalytics: React.FC<LocationAnalyticsProps> = ({ currentLanguage }
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <MapPin className="w-4 h-4" />
-              {t.countries}
+              {t.locationAnalytics?.countries || 'Countries'}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -156,7 +143,7 @@ const LocationAnalytics: React.FC<LocationAnalyticsProps> = ({ currentLanguage }
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <BarChart className="w-4 h-4" />
-              {t.topRegions}
+              {t.locationAnalytics?.topRegions || 'Most Active Regions'}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -170,14 +157,14 @@ const LocationAnalytics: React.FC<LocationAnalyticsProps> = ({ currentLanguage }
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <TrendingUp className="w-5 h-5" />
-            {t.topRegions}
+            {t.locationAnalytics?.topRegions || 'Most Active Regions'}
           </CardTitle>
-          <CardDescription>{t.description}</CardDescription>
+          <CardDescription>{t.locationAnalytics?.description || 'Provider and service statistics by region'}</CardDescription>
         </CardHeader>
         <CardContent>
           {stats.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
-              {t.noData}
+              {t.locationAnalytics?.noData || 'No data available'}
             </div>
           ) : (
             <div className="space-y-4">
@@ -197,10 +184,10 @@ const LocationAnalytics: React.FC<LocationAnalyticsProps> = ({ currentLanguage }
                   </div>
                   <div className="text-right">
                     <div className="font-semibold">
-                      {region.providerCount} {t.providers}
+                      {region.providerCount} {t.locationAnalytics?.providers || 'Providers'}
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      {region.serviceCount} {t.services}
+                      {region.serviceCount} {t.locationAnalytics?.services || 'Services'}
                     </div>
                   </div>
                 </div>

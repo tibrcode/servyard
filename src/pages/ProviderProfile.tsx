@@ -116,8 +116,8 @@ const ProviderProfile = ({ currentLanguage, onLanguageChange }: ProviderProfileP
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold mb-2">{isRTL ? 'لم يتم العثور على مقدم الخدمة' : 'Provider not found'}</h2>
-          <Button onClick={() => window.history.back()}>{isRTL ? 'عودة' : 'Go Back'}</Button>
+          <h2 className="text-2xl font-bold mb-2">{t.ui.providerNotFound}</h2>
+          <Button onClick={() => window.history.back()}>{t.ui.goBack || 'Go Back'}</Button>
         </div>
       </div>
     );
@@ -415,7 +415,7 @@ const ProviderProfile = ({ currentLanguage, onLanguageChange }: ProviderProfileP
                             <div className="flex items-center gap-1 ml-2 rtl:mr-2 rtl:ml-0">
                               <ShareButton
                                 title={service.name}
-                                text={`${isRTL ? 'احجز' : 'Book'} ${service.name} ${isRTL ? 'من' : 'from'} ${profile.full_name} | ServYard 📱`}
+                                text={`${t.ui.bookService || 'Book'} ${service.name} ${t.ui.fromProvider || 'from'} ${profile.full_name} | ServYard 📱`}
                                 url={`${window.location.origin}/services?serviceId=${service.id}`}
                                 variant="ghost"
                                 size="sm"

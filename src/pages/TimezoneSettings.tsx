@@ -46,7 +46,7 @@ export default function TimezoneSettings({ currentLanguage }: TimezoneSettingsPr
   const handleSave = async () => {
     if (!user) {
       toast({
-        title: isRTL ? 'تنبيه' : 'Notice',
+        title: t.timezone?.notice || 'Notice',
         description: isRTL 
           ? 'يجب تسجيل الدخول لحفظ المنطقة الزمنية' 
           : 'Please log in to save your timezone',
@@ -64,7 +64,7 @@ export default function TimezoneSettings({ currentLanguage }: TimezoneSettingsPr
       });
 
       toast({
-        title: isRTL ? 'تم الحفظ بنجاح' : 'Saved Successfully',
+        title: t.timezone?.savedSuccessfully || 'Saved Successfully',
         description: isRTL 
           ? 'تم تحديث المنطقة الزمنية بنجاح' 
           : 'Timezone has been updated successfully',
@@ -72,8 +72,8 @@ export default function TimezoneSettings({ currentLanguage }: TimezoneSettingsPr
     } catch (error) {
       console.error('Error saving timezone:', error);
       toast({
-        title: isRTL ? 'خطأ' : 'Error',
-        description: isRTL ? 'فشل حفظ المنطقة الزمنية' : 'Failed to save timezone',
+        title: t.calendarSettings?.error || 'Error',
+        description: t.timezone?.saveFailed || 'Failed to save timezone',
         variant: 'destructive',
       });
     } finally {
@@ -119,7 +119,7 @@ export default function TimezoneSettings({ currentLanguage }: TimezoneSettingsPr
           className="mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          {isRTL ? 'رجوع' : 'Back'}
+          {t.timezone?.back || 'Back'}
         </Button>
 
         {/* Main Card */}
@@ -127,7 +127,7 @@ export default function TimezoneSettings({ currentLanguage }: TimezoneSettingsPr
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-2xl">
               <Globe className="h-6 w-6" />
-              {isRTL ? 'إعدادات المنطقة الزمنية' : 'Timezone Settings'}
+              {t.timezone?.title || 'Timezone Settings'}
             </CardTitle>
             <CardDescription>
               {isRTL 
@@ -144,7 +144,7 @@ export default function TimezoneSettings({ currentLanguage }: TimezoneSettingsPr
                   <div className="flex items-center justify-center gap-2 text-muted-foreground">
                     <Clock className="h-4 w-4" />
                     <span className="text-sm">
-                      {isRTL ? 'الوقت الحالي في منطقتك' : 'Current time in your timezone'}
+                      {t.timezone?.currentTime || 'Current time in your timezone'}
                     </span>
                   </div>
                   <div className="text-4xl font-bold">
@@ -164,16 +164,16 @@ export default function TimezoneSettings({ currentLanguage }: TimezoneSettingsPr
             {/* Timezone Selector */}
             <div className="space-y-3">
               <Label className="text-base font-semibold">
-                {isRTL ? 'اختر المنطقة الزمنية' : 'Select Timezone'}
+                {t.timezone?.selectTimezone || 'Select Timezone'}
               </Label>
               <Select value={selectedTimezone} onValueChange={setSelectedTimezone}>
                 <SelectTrigger className="w-full h-12">
-                  <SelectValue placeholder={isRTL ? 'اختر المنطقة الزمنية' : 'Select timezone'} />
+                  <SelectValue placeholder={t.timezone?.selectTimezone || 'Select timezone'} />
                 </SelectTrigger>
                 <SelectContent className="max-h-96">
                   {/* Group timezones by region */}
                   <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
-                    {isRTL ? 'الشرق الأوسط وشمال أفريقيا' : 'Middle East & North Africa'}
+                    {t.timezone?.middleEast || 'Middle East & North Africa'}
                   </div>
                   {commonTimezones.filter(tz => 
                     tz.value.includes('Dubai') || tz.value.includes('Riyadh') || 
@@ -189,7 +189,7 @@ export default function TimezoneSettings({ currentLanguage }: TimezoneSettingsPr
                   ))}
 
                   <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground border-t mt-2">
-                    {isRTL ? 'أوروبا' : 'Europe'}
+                    {t.timezone?.europe || 'Europe'}
                   </div>
                   {commonTimezones.filter(tz => tz.value.includes('Europe')).map((tz) => (
                     <SelectItem key={tz.value} value={tz.value}>
@@ -198,7 +198,7 @@ export default function TimezoneSettings({ currentLanguage }: TimezoneSettingsPr
                   ))}
 
                   <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground border-t mt-2">
-                    {isRTL ? 'آسيا' : 'Asia'}
+                    {t.timezone?.asia || 'Asia'}
                   </div>
                   {commonTimezones.filter(tz => 
                     tz.value.includes('Asia') && 
@@ -210,7 +210,7 @@ export default function TimezoneSettings({ currentLanguage }: TimezoneSettingsPr
                   ))}
 
                   <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground border-t mt-2">
-                    {isRTL ? 'أمريكا' : 'Americas'}
+                    {t.timezone?.americas || 'Americas'}
                   </div>
                   {commonTimezones.filter(tz => tz.value.includes('America')).map((tz) => (
                     <SelectItem key={tz.value} value={tz.value}>
@@ -219,7 +219,7 @@ export default function TimezoneSettings({ currentLanguage }: TimezoneSettingsPr
                   ))}
 
                   <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground border-t mt-2">
-                    {isRTL ? 'أفريقيا' : 'Africa'}
+                    {t.timezone?.africa || 'Africa'}
                   </div>
                   {commonTimezones.filter(tz => tz.value.includes('Africa')).map((tz) => (
                     <SelectItem key={tz.value} value={tz.value}>
@@ -228,7 +228,7 @@ export default function TimezoneSettings({ currentLanguage }: TimezoneSettingsPr
                   ))}
 
                   <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground border-t mt-2">
-                    {isRTL ? 'أستراليا والمحيط الهادئ' : 'Australia & Pacific'}
+                    {t.timezone?.pacific || 'Australia & Pacific'}
                   </div>
                   {commonTimezones.filter(tz => 
                     tz.value.includes('Australia') || tz.value.includes('Pacific')
@@ -247,24 +247,24 @@ export default function TimezoneSettings({ currentLanguage }: TimezoneSettingsPr
                 <CheckCircle className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
                 <div className="space-y-2 text-sm">
                   <p className="font-medium text-blue-900 dark:text-blue-100">
-                    {isRTL ? 'لماذا المنطقة الزمنية مهمة؟' : 'Why is timezone important?'}
+                    {t.timezone?.whyImportant || 'Why is timezone important?'}
                   </p>
                   <ul className="space-y-1 text-blue-800 dark:text-blue-200">
                     <li className="flex items-start gap-2">
                       <span className="text-blue-600 dark:text-blue-400">•</span>
-                      <span>{isRTL ? 'حساب أوقات الحجز المتاحة بدقة' : 'Accurate booking time calculations'}</span>
+                      <span>{t.timezone?.accurateBooking || 'Accurate booking time calculations'}</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-blue-600 dark:text-blue-400">•</span>
-                      <span>{isRTL ? 'إرسال الإشعارات في الوقت المناسب' : 'Timely notification delivery'}</span>
+                      <span>{t.timezone?.timelyNotifications || 'Timely notification delivery'}</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-blue-600 dark:text-blue-400">•</span>
-                      <span>{isRTL ? 'احترام ساعات الهدوء المحلية' : 'Respect local quiet hours'}</span>
+                      <span>{t.timezone?.respectQuietHours || 'Respect local quiet hours'}</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-blue-600 dark:text-blue-400">•</span>
-                      <span>{isRTL ? 'تجربة سلسة للمستخدمين حول العالم' : 'Seamless experience worldwide'}</span>
+                      <span>{t.timezone?.seamlessExperience || 'Seamless experience worldwide'}</span>
                     </li>
                   </ul>
                 </div>
@@ -282,14 +282,14 @@ export default function TimezoneSettings({ currentLanguage }: TimezoneSettingsPr
                 {saving ? (
                   <>
                     <Clock className="h-4 w-4 mr-2 animate-spin" />
-                    {isRTL ? 'جاري الحفظ...' : 'Saving...'}
+                    {t.timezone?.saving || 'Saving...'}
                   </>
                 ) : (
                   <>
                     <CheckCircle className="h-4 w-4 mr-2" />
                     {user 
-                      ? (isRTL ? 'حفظ المنطقة الزمنية' : 'Save Timezone')
-                      : (isRTL ? 'تسجيل الدخول للحفظ' : 'Login to Save')
+                      ? (t.timezone?.saveTimezone || 'Save Timezone')
+                      : (t.timezone?.loginToSave || 'Login to Save')
                     }
                   </>
                 )}
@@ -298,9 +298,7 @@ export default function TimezoneSettings({ currentLanguage }: TimezoneSettingsPr
 
             {!user && (
               <p className="text-sm text-center text-muted-foreground">
-                {isRTL 
-                  ? 'يمكنك التصفح دون تسجيل الدخول، لكن للحفظ يجب تسجيل الدخول' 
-                  : 'You can browse without logging in, but login is required to save'}
+                {t.timezone?.browseWithoutLogin || 'You can browse without logging in, but login is required to save'}
               </p>
             )}
           </CardContent>

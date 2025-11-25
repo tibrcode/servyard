@@ -259,14 +259,14 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
                 <div className="bg-green-100 p-1.5 sm:p-3 rounded-full">
                   <CheckCircle2 className="h-3 w-3 sm:h-5 sm:w-5 text-green-600" />
                 </div>
-                <CardTitle className="text-[10px] sm:text-sm font-medium leading-tight">{isRTL ? 'مفعلة' : 'Active'}</CardTitle>
+                <CardTitle className="text-[10px] sm:text-sm font-medium leading-tight">{t.dashboardCommon?.active || 'Active'}</CardTitle>
               </div>
             </CardHeader>
             <CardContent className="p-2 sm:p-6 pt-0 sm:pt-0">
               <div className="text-center">
                 <div className="text-sm sm:text-xl lg:text-2xl font-bold mb-0 sm:mb-1">{confirmedBookingsCount}</div>
                 <p className="text-[9px] sm:text-xs text-muted-foreground hidden sm:block">
-                  {isRTL ? 'حجوزات مفعّلة' : 'Active Bookings'}
+                  {t.dashboardCommon?.activeBookings || 'Active Bookings'}
                 </p>
               </div>
             </CardContent>
@@ -278,14 +278,14 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
                 <div className="bg-yellow-100 p-1.5 sm:p-3 rounded-full">
                   <AlertCircle className="h-3 w-3 sm:h-5 sm:w-5 text-yellow-600" />
                 </div>
-                <CardTitle className="text-[10px] sm:text-sm font-medium leading-tight">{isRTL ? 'انتظار' : 'Pending'}</CardTitle>
+                <CardTitle className="text-[10px] sm:text-sm font-medium leading-tight">{t.dashboardCommon?.pending || 'Pending'}</CardTitle>
               </div>
             </CardHeader>
             <CardContent className="p-2 sm:p-6 pt-0 sm:pt-0">
               <div className="text-center">
                 <div className="text-sm sm:text-xl lg:text-2xl font-bold mb-0 sm:mb-1">{pendingBookingsCount}</div>
                 <p className="text-[9px] sm:text-xs text-muted-foreground hidden sm:block">
-                  {isRTL ? 'بانتظار التأكيد' : 'Awaiting Confirmation'}
+                  {t.dashboardCommon?.awaitingConfirmation || 'Awaiting Confirmation'}
                 </p>
               </div>
             </CardContent>
@@ -373,7 +373,7 @@ const ProviderDashboard = ({ currentLanguage }: ProviderDashboardProps) => {
                     <Settings className="h-6 w-6 sm:h-8 sm:w-8 md:h-4 md:w-4" />
                   </div>
                   <span className="block mx-auto text-center font-medium text-foreground w-full px-1 leading-tight tracking-normal text-[10px] sm:text-xs whitespace-normal md:w-auto md:text-sm md:mx-0">
-                    {isRTL ? 'إعدادات' : 'Settings'}
+                    {t.dashboardCommon?.settings || 'Settings'}
                   </span>
                 </div>
               </TabsTrigger>

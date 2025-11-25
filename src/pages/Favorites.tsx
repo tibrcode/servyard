@@ -44,15 +44,15 @@ export default function Favorites() {
       await removeFavorite(itemId);
 
       toast({
-        title: isRTL ? 'تمت الإزالة' : 'Removed',
-        description: isRTL ? 'تم إزالة العنصر من المفضلة' : 'Item removed from favorites',
+        title: t.favorites.removed,
+        description: t.favorites.removedDesc,
       });
     } catch (error) {
       console.error('Error removing favorite:', error);
       toast({
         variant: 'destructive',
-        title: isRTL ? 'خطأ' : 'Error',
-        description: isRTL ? 'حدث خطأ أثناء الإزالة' : 'Error removing favorite',
+        title: t.toast.error,
+        description: t.favorites.removeError,
       });
     } finally {
       setRemovingId(null);
@@ -67,8 +67,8 @@ export default function Favorites() {
     } else {
       toast({
         variant: 'destructive',
-        title: isRTL ? 'خطأ' : 'Error',
-        description: isRTL ? 'لم يتم العثور على المزود' : 'Provider not found',
+        title: t.toast.error,
+        description: t.favorites.providerNotFound,
       });
     }
   };
@@ -81,7 +81,7 @@ export default function Favorites() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <p className="text-muted-foreground">
-          {isRTL ? 'يرجى تسجيل الدخول لعرض المفضلة' : 'Please log in to view favorites'}
+          {t.favorites.loginRequired}
         </p>
       </div>
     );
@@ -94,7 +94,7 @@ export default function Favorites() {
         <div className="mb-6">
           <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
             <Heart className="h-6 w-6 sm:h-8 sm:w-8 text-red-500 fill-red-500" />
-            {isRTL ? 'المفضلة' : 'Favorites'}
+            {t.favorites.title}
           </h1>
         </div>
 
@@ -103,11 +103,11 @@ export default function Favorites() {
           <TabsList className="grid w-full grid-cols-2 mb-6">
             <TabsTrigger value="services" className="flex items-center gap-2">
               <Package className="h-4 w-4" />
-              {isRTL ? 'الخدمات' : 'Services'} ({serviceFavorites.length})
+              {t.favorites.services} ({serviceFavorites.length})
             </TabsTrigger>
             <TabsTrigger value="providers" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
-              {isRTL ? 'مزودو الخدمة' : 'Providers'} ({providerFavorites.length})
+              {t.favorites.providers} ({providerFavorites.length})
             </TabsTrigger>
           </TabsList>
 
@@ -130,13 +130,13 @@ export default function Favorites() {
               <CardContent className="py-12 text-center">
                 <Heart className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
                 <h3 className="text-lg font-semibold mb-2">
-                  {isRTL ? 'لا توجد خدمات مفضلة' : 'No favorite services'}
+                  {t.favorites.noFavoriteServices}
                 </h3>
                 <p className="text-muted-foreground mb-4">
-                  {isRTL ? 'ابدأ بإضافة خدماتك المفضلة' : 'Start adding your favorite services'}
+                  {t.favorites.startAddingServices}
                 </p>
                 <Button onClick={() => navigate('/services')}>
-                  {isRTL ? 'تصفح الخدمات' : 'Browse Services'}
+                  {t.favorites.browseServices}
                   <ArrowRight className={`h-4 w-4 ${isRTL ? 'mr-2' : 'ml-2'}`} />
                 </Button>
               </CardContent>
@@ -158,10 +158,10 @@ export default function Favorites() {
                       <CardContent className="p-6 flex flex-col items-center justify-center min-h-[300px] text-center">
                         <AlertCircle className="h-12 w-12 text-red-500 mb-3" />
                         <h3 className="font-semibold mb-2 text-red-700 dark:text-red-300">
-                          {isRTL ? 'الخدمة غير متوفرة' : 'Service Unavailable'}
+                          {t.favorites.serviceUnavailable}
                         </h3>
                         <p className="text-sm text-red-600 dark:text-red-400 mb-4">
-                          {isRTL ? 'تم حذف هذه الخدمة من قبل المزود' : 'This service was deleted by the provider'}
+                          {t.favorites.serviceDeleted}
                         </p>
                         <Button
                           variant="outline"
@@ -175,7 +175,7 @@ export default function Favorites() {
                           ) : (
                             <Trash2 className="h-4 w-4 mr-2" />
                           )}
-                          {isRTL ? 'إزالة من المفضلة' : 'Remove from Favorites'}
+                          {t.favorites.removeFromFavorites}
                         </Button>
                       </CardContent>
                     </Card>
@@ -218,7 +218,7 @@ export default function Favorites() {
                         }}
                       >
                         <Badge className="bg-amber-500 text-white text-xs px-2 py-0.5">
-                          {isRTL ? 'الأفضل' : 'TOP'}
+                          {t.favorites.top}
                         </Badge>
                       </div>
                     )}
@@ -292,7 +292,7 @@ export default function Favorites() {
                                 handleRemove(favorite.item_id);
                               }}
                               disabled={removingId === favorite.item_id}
-                              title={isRTL ? 'إزالة من المفضلة' : 'Remove from favorites'}
+                              title={t.favorites.removeFromFavorites}
                             >
                               {removingId === favorite.item_id ? (
                                 <div className="h-4 w-4 border-2 border-red-700 border-t-transparent rounded-full animate-spin" />
@@ -304,7 +304,7 @@ export default function Favorites() {
                         ) : (
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px', height: '16px' }}>
                             <div className="text-muted-foreground" style={{ fontSize: '10px' }}>
-                              ⭐ {isRTL ? 'لا توجد تقييمات' : 'No reviews'}
+                              ⭐ {t.favorites.noReviews}
                             </div>
                             
                             {/* Favorite Button - Remove Action */}
@@ -317,7 +317,7 @@ export default function Favorites() {
                                 handleRemove(favorite.item_id);
                               }}
                               disabled={removingId === favorite.item_id}
-                              title={isRTL ? 'إزالة من المفضلة' : 'Remove from favorites'}
+                              title={t.favorites.removeFromFavorites}
                             >
                               {removingId === favorite.item_id ? (
                                 <div className="h-4 w-4 border-2 border-red-700 border-t-transparent rounded-full animate-spin" />
@@ -333,7 +333,7 @@ export default function Favorites() {
                           <div style={{ fontSize: '18px', color: '#f59e0b', fontWeight: '700' }}>
                             {service.approximate_price 
                               ? `${service.approximate_price} ${provider?.currency_code || 'AED'}`
-                              : service.price_range || (isRTL ? 'السعر عند الطلب' : 'Price on request')
+                              : service.price_range || t.favorites.priceOnRequest
                             }
                           </div>
                           <ChevronDown
@@ -373,7 +373,7 @@ export default function Favorites() {
                             {provider?.full_name && (
                               <p className="text-muted-foreground" style={{ fontSize: '12px' }}>
                                 <span className="text-primary" style={{ fontWeight: '600' }}>
-                                  {isRTL ? 'المزود:' : 'Provider:'}
+                                  {t.favorites.provider}
                                 </span> {provider.full_name}
                               </p>
                             )}
@@ -382,8 +382,8 @@ export default function Favorites() {
                             {service.duration_minutes && (
                               <p className="text-muted-foreground" style={{ fontSize: '12px' }}>
                                 <span className="text-primary" style={{ fontWeight: '600' }}>
-                                  {isRTL ? 'المدة:' : 'Duration:'}
-                                </span> {service.duration_minutes} {isRTL ? 'دقيقة' : 'minutes'}
+                                  {t.favorites.duration}
+                                </span> {service.duration_minutes} {t.favorites.minutes}
                               </p>
                             )}
 
@@ -391,7 +391,7 @@ export default function Favorites() {
                             {provider?.city && (
                               <p className="text-muted-foreground" style={{ fontSize: '12px' }}>
                                 <span className="text-primary" style={{ fontWeight: '600' }}>
-                                  {isRTL ? 'المدينة:' : 'City:'}
+                                  {t.favorites.city}
                                 </span> {provider.city}
                               </p>
                             )}
@@ -411,7 +411,7 @@ export default function Favorites() {
                                   }}
                                 >
                                   <Calendar className="h-4 w-4 mr-2" />
-                                  {isRTL ? 'حجز موعد' : 'Book Appointment'}
+                                  {t.favorites.bookAppointment}
                                 </Button>
                               )}
                               <Button
@@ -423,7 +423,7 @@ export default function Favorites() {
                                 }}
                               >
                                 <ExternalLink className="h-4 w-4 mr-2" />
-                                {isRTL ? 'عرض المزود' : 'View Provider'}
+                                {t.favorites.viewProvider}
                               </Button>
                             </div>
                           </div>
@@ -457,13 +457,13 @@ export default function Favorites() {
               <CardContent className="py-12 text-center">
                 <Heart className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
                 <h3 className="text-lg font-semibold mb-2">
-                  {isRTL ? 'لا يوجد مزودو خدمة مفضلين' : 'No favorite providers'}
+                  {t.favorites.noFavoriteProviders}
                 </h3>
                 <p className="text-muted-foreground mb-4">
-                  {isRTL ? 'ابدأ بإضافة مزودي خدمة مفضلين' : 'Start adding your favorite providers'}
+                  {t.favorites.startAddingProviders}
                 </p>
                 <Button onClick={() => navigate('/services')}>
-                  {isRTL ? 'تصفح الخدمات' : 'Browse Services'}
+                  {t.favorites.browseServices}
                   <ArrowRight className={`h-4 w-4 ${isRTL ? 'mr-2' : 'ml-2'}`} />
                 </Button>
               </CardContent>
@@ -480,10 +480,10 @@ export default function Favorites() {
                       <CardContent className="p-6 flex flex-col items-center justify-center min-h-[250px] text-center">
                         <AlertCircle className="h-12 w-12 text-red-500 mb-3" />
                         <h3 className="font-semibold mb-2 text-red-700 dark:text-red-300">
-                          {isRTL ? 'المزود غير متاح' : 'Provider Unavailable'}
+                          {t.favorites.providerUnavailable}
                         </h3>
                         <p className="text-sm text-red-600 dark:text-red-400 mb-4">
-                          {isRTL ? 'تم حذف حساب هذا المزود' : 'This provider account was deleted'}
+                          {t.favorites.providerDeleted}
                         </p>
                         <Button
                           variant="outline"
@@ -497,7 +497,7 @@ export default function Favorites() {
                           ) : (
                             <Trash2 className="h-4 w-4 mr-2" />
                           )}
-                          {isRTL ? 'إزالة من المفضلة' : 'Remove from Favorites'}
+                          {t.favorites.removeFromFavorites}
                         </Button>
                       </CardContent>
                     </Card>
@@ -568,7 +568,7 @@ export default function Favorites() {
                         className="w-full"
                         onClick={() => handleViewProvider(favorite.item_id)}
                       >
-                        {isRTL ? 'عرض الملف الشخصي' : 'View Profile'}
+                        {t.favorites.viewProfile}
                         <ExternalLink className={`h-4 w-4 ${isRTL ? 'mr-2' : 'ml-2'}`} />
                       </Button>
                     </CardContent>

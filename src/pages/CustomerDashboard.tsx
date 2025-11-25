@@ -200,7 +200,7 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
               <div className="flex flex-col items-center text-center gap-1 sm:gap-2">
                 <Star className="w-5 h-5 sm:w-6 sm:h-6 text-purple-500 flex-shrink-0" />
                 <p className="text-lg sm:text-xl lg:text-2xl font-bold leading-tight">{reviews.length}</p>
-                <p className="text-[10px] sm:text-xs font-medium text-muted-foreground leading-tight">{isRTL ? 'تقييمات' : 'Reviews'}</p>
+                <p className="text-[10px] sm:text-xs font-medium text-muted-foreground leading-tight">{t.dashboardCommon.reviews}</p>
               </div>
             </CardContent>
           </Card>
@@ -210,7 +210,7 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
               <div className="flex flex-col items-center text-center gap-1 sm:gap-2">
                 <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-blue-500 flex-shrink-0" />
                 <p className="text-lg sm:text-xl lg:text-2xl font-bold leading-tight">{upcomingBookingsCount}</p>
-                <p className="text-[10px] sm:text-xs font-medium text-muted-foreground leading-tight">{isRTL ? 'قادمة' : 'Upcoming'}</p>
+                <p className="text-[10px] sm:text-xs font-medium text-muted-foreground leading-tight">{t.dashboardCommon.upcoming}</p>
               </div>
             </CardContent>
           </Card>
@@ -220,7 +220,7 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
               <div className="flex flex-col items-center text-center gap-1 sm:gap-2">
                 <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-green-500 flex-shrink-0" />
                 <p className="text-lg sm:text-xl lg:text-2xl font-bold leading-tight">{completedBookingsCount}</p>
-                <p className="text-[10px] sm:text-xs font-medium text-muted-foreground leading-tight">{isRTL ? 'مكتملة' : 'Completed'}</p>
+                <p className="text-[10px] sm:text-xs font-medium text-muted-foreground leading-tight">{t.dashboardCommon.completed}</p>
               </div>
             </CardContent>
           </Card>
@@ -239,7 +239,7 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
                     <List className="h-6 w-6 sm:h-8 sm:w-8 md:h-4 md:w-4" />
                   </div>
                   <span className="block mx-auto text-center font-medium text-foreground w-full px-1 leading-tight tracking-normal text-[10px] sm:text-xs whitespace-normal md:w-auto md:text-sm md:mx-0">
-                    {isRTL ? 'خدماتي' : 'My Services'}
+                    {t.dashboardCommon.myServices}
                   </span>
                 </div>
               </TabsTrigger>
@@ -253,7 +253,7 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
                     <Calendar className="h-6 w-6 sm:h-8 sm:w-8 md:h-4 md:w-4" />
                   </div>
                   <span className="block mx-auto text-center font-medium text-foreground w-full px-1 leading-tight tracking-normal text-[10px] sm:text-xs whitespace-normal md:w-auto md:text-sm md:mx-0">
-                    {isRTL ? 'مواعيدي' : 'My Appointments'}
+                    {t.dashboardCommon.myAppointments}
                   </span>
                 </div>
               </TabsTrigger>
@@ -272,7 +272,7 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
                     )}
                   </div>
                   <span className="block mx-auto text-center font-medium text-foreground w-full px-1 leading-tight tracking-normal text-[10px] sm:text-xs whitespace-normal md:w-auto md:text-sm md:mx-0">
-                    {isRTL ? 'المفضلة' : 'Favorites'}
+                    {t.dashboardCommon.favorites}
                     {favoritesCount > 0 && (
                       <span className="hidden md:inline-flex ml-1 items-center justify-center rounded-full bg-primary px-1.5 py-0.5 text-[10px] text-primary-foreground">
                         {favoritesCount}
@@ -319,7 +319,7 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
                     <Settings className="h-6 w-6 sm:h-8 sm:w-8 md:h-4 md:w-4" />
                   </div>
                   <span className="block mx-auto text-center font-medium text-foreground w-full px-1 leading-tight tracking-normal text-[10px] sm:text-xs whitespace-normal md:w-auto md:text-sm md:mx-0">
-                    {isRTL ? 'إعدادات' : 'Settings'}
+                    {t.dashboardCommon.settings}
                   </span>
                 </div>
               </TabsTrigger>
@@ -329,7 +329,7 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
             <TabsContent value="services" className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>{isRTL ? 'خدماتي' : 'My Services'}</CardTitle>
+                  <CardTitle>{t.dashboardCommon.myServices}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   {user && (
@@ -348,7 +348,7 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
             <TabsContent value="appointments" className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>{isRTL ? 'مواعيدي' : 'My Appointments'}</CardTitle>
+                  <CardTitle>{t.dashboardCommon.myAppointments}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   {user && (

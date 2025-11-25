@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { MapPin, Loader2 } from "lucide-react";
+import { useTranslation } from "@/lib/i18n";
 
 interface AddressAutocompleteProps {
   onAddressSelect: (address: {
@@ -39,13 +40,10 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
   const [loading, setLoading] = useState(true);
   const [value, setValue] = useState("");
 
-  const isRTL = currentLanguage === 'ar';
+  const { t, isRTL } = useTranslation(currentLanguage as 'ar' | 'en');
 
-  const defaultLabel = label || (isRTL ? "العنوان" : "Address");
-  const defaultPlaceholder = placeholder || (isRTL 
-    ? "ابدأ الكتابة للبحث عن عنوان..."
-    : "Start typing to search for an address..."
-  );
+  const defaultLabel = label || (t.addressAutocomplete?.address || "Address");
+  const defaultPlaceholder = placeholder || (t.addressAutocomplete?.startTyping || "Start typing to search for an address...");
 
   const initializeAutocomplete = useCallback(() => {
     if (!inputRef.current) return;
@@ -122,7 +120,7 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
         <div className="flex items-center gap-2 p-2 border rounded-md">
           <Loader2 className="w-4 h-4 animate-spin" />
           <span className="text-sm text-muted-foreground">
-            {isRTL ? "جاري التحميل..." : "Loading..."}
+            {t.addressAutocomplete?.loading || 'Loading...'}
           </span>
         </div>
       </div>

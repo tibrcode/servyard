@@ -201,6 +201,7 @@ export interface Translation {
     minutes?: string;
     pageNotFound?: string;
     goHome?: string;
+    goBack?: string;
     serviceNotFound?: string;
     serviceUpdated?: string;
     serviceUpdateFailed?: string;
@@ -213,6 +214,9 @@ export interface Translation {
     customerAccessRequired: string;
     serviceCreated: string;
     serviceCreateFailed: string;
+    // Share
+    bookService: string;
+    fromProvider: string;
   };
 
   // Provider related
@@ -776,6 +780,239 @@ export interface Translation {
       contactUs: string;
     };
   };
+
+  // Favorites page
+  favorites?: {
+    title: string;
+    services: string;
+    providers: string;
+    noFavoriteServices: string;
+    noFavoriteProviders: string;
+    startAddingServices: string;
+    startAddingProviders: string;
+    browseServices: string;
+    serviceUnavailable: string;
+    serviceDeleted: string;
+    providerUnavailable: string;
+    providerDeleted: string;
+    removeFromFavorites: string;
+    removed: string;
+    removedDesc: string;
+    removeError: string;
+    providerNotFound: string;
+    loginRequired: string;
+    viewProvider: string;
+    viewProfile: string;
+    bookAppointment: string;
+    provider: string;
+    duration: string;
+    city: string;
+    minutes: string;
+    priceOnRequest: string;
+    top: string;
+    noReviews: string;
+  };
+
+  // Timezone settings
+  timezone?: {
+    title: string;
+    back: string;
+    currentTime: string;
+    selectTimezone: string;
+    middleEast: string;
+    europe: string;
+    asia: string;
+    americas: string;
+    africa: string;
+    pacific: string;
+    whyImportant: string;
+    accurateBooking: string;
+    timelyNotifications: string;
+    respectQuietHours: string;
+    seamlessExperience: string;
+    saving: string;
+    saveTimezone: string;
+    loginToSave: string;
+    notice: string;
+    savedSuccessfully: string;
+    saveFailed: string;
+    browseWithoutLogin: string;
+    label: string;
+    placeholder: string;
+    hint: string;
+  };
+
+  // Service types
+  serviceTypes?: {
+    title: string;
+    generalService: string;
+    appointmentBooking: string;
+    generalServiceDesc: string;
+    appointmentDesc: string;
+    serviceInfo: string;
+    bookingSettings: string;
+    weeklySchedule: string;
+    scheduleUpdated: string;
+  };
+
+  // Discount
+  discount?: {
+    title: string;
+    description: string;
+    discountedPrice: string;
+    originalPrice: string;
+    percentage: string;
+    badgeNote: string;
+    discountPricePlaceholder: string;
+    discountPercentagePlaceholder: string;
+  };
+
+  // Dashboard common
+  dashboardCommon?: {
+    reviews: string;
+    upcoming: string;
+    completed: string;
+    myServices: string;
+    myAppointments: string;
+    favorites: string;
+    myReviews: string;
+    settings: string;
+    active: string;
+    activeBookings: string;
+    pending: string;
+    awaitingConfirmation: string;
+  };
+
+  // Settings page
+  settingsPage?: {
+    notifications: string;
+    calendar: string;
+    backup: string;
+    timezone: string;
+  };
+
+  // Calendar settings
+  calendarSettings?: {
+    title: string;
+    saved: string;
+    savedDesc: string;
+    error: string;
+    errorDesc: string;
+    autoAdd: string;
+    saveChanges: string;
+  };
+
+  // Backup settings
+  backupSettings?: {
+    exportTitle: string;
+    exported: string;
+    exportedDesc: string;
+    exportError: string;
+    exportErrorDesc: string;
+    importError: string;
+    importErrorDesc: string;
+    information: string;
+    servicesOffers: string;
+    exporting: string;
+    exportBackup: string;
+    importTitle: string;
+    importDesc: string;
+    importFile: string;
+    importing: string;
+    importBackup: string;
+    warning: string;
+    warningDesc: string;
+    createBackupDesc?: string;
+    willExport?: string;
+    fileFormat?: string;
+    processing?: string;
+    importantNotes?: string;
+    keepBackupsSafe?: string;
+    createBackupsRegularly?: string;
+    verifyFileIntegrity?: string;
+    importWillMerge?: string;
+  };
+
+  // Location Picker
+  locationPicker?: {
+    title: string;
+    description: string;
+    getCurrentLocation: string;
+    manualEntry: string;
+    latitude: string;
+    longitude: string;
+    saveManual: string;
+    locationSet: string;
+    noLocation: string;
+    errorPermission: string;
+    errorUnavailable: string;
+    errorTimeout: string;
+    errorGeneric: string;
+    errorInvalidCoords: string;
+    locating: string;
+    accuracy: string;
+    howToFind: string;
+    howToFindDesc: string;
+  };
+
+  // Location Analytics
+  locationAnalytics?: {
+    title: string;
+    description: string;
+    loading: string;
+    topRegions: string;
+    providers: string;
+    services: string;
+    countries: string;
+    totalProviders: string;
+    noData: string;
+  };
+
+  // Address Autocomplete
+  addressAutocomplete?: {
+    address: string;
+    loading: string;
+    startTyping: string;
+  };
+
+  // Advanced Search
+  advancedSearch?: {
+    title: string;
+    country: string;
+    city: string;
+    allCountries: string;
+    allCities: string;
+    onlyWithLocation: string;
+    applyFilters: string;
+    resetFilters: string;
+    activeFilters: string;
+  };
+
+  // Favorite Button
+  favoriteButton?: {
+    addedToFavorites: string;
+    removedFromFavorites: string;
+    loginRequired: string;
+    loginRequiredDesc: string;
+    addToFavorites: string;
+    removeFromFavorites: string;
+  };
+
+  // Interactive Map
+  interactiveMap?: {
+    title: string;
+    loading: string;
+    error: string;
+    getCurrentLocation: string;
+    clickToSelect: string;
+    top: string;
+    noReviews: string;
+    bookAppointment: string;
+    viewDetails: string;
+  };
+
+  // Provider appointment text
+  appointment?: string;
 }
 
 // Base translations (English + a few fully covered langs)
@@ -829,6 +1066,7 @@ export const translations: Record<string, Translation> = {
       minutes: "minutes",
       pageNotFound: "Page not found",
       goHome: "Go Home",
+      goBack: "Go Back",
       serviceNotFound: "Service not found",
       serviceUpdated: "Service updated successfully",
       serviceUpdateFailed: "Failed to update service",
@@ -841,6 +1079,9 @@ export const translations: Record<string, Translation> = {
       customerAccessRequired: "You need to be logged in as a customer to access this action.",
       serviceCreated: "Service created successfully",
       serviceCreateFailed: "Failed to create service",
+      // Share
+      bookService: "Book",
+      fromProvider: "from"
     },
     dashboard: {
       main: "Main Navigation",
@@ -1135,6 +1376,7 @@ export const translations: Record<string, Translation> = {
       saved: "Settings saved",
       savedDesc: "Notification settings updated successfully",
       saveFailed: "Failed to save settings",
+      saveFailedDesc: "An error occurred while saving settings",
       permissionDenied: "Notification Permission Denied",
       permissionDeniedDesc: "Please enable notifications in browser settings",
       requestPermission: "Request Permission",
@@ -1144,6 +1386,21 @@ export const translations: Record<string, Translation> = {
       testNotificationSent: "✅ Test notification sent successfully",
       testNotificationFailed: "❌ Failed to send test notification",
       checkNotificationCenter: "Check the notification center at the top",
+      error: "Error",
+      userNotFound: "User ID not found",
+      notificationsRequired: "Notifications Required",
+      notificationsRequiredDesc: "Please enable notifications first by clicking \"Request Permission\" button above",
+      noFcmToken: "No FCM Token Saved",
+      noFcmTokenDesc: "Please click \"Request Permission\" first to save your FCM token",
+      fcmTokenMissing: "FCM Token Missing",
+      fcmTokenMissingDesc: "Please re-request notification permission using \"Request Permission\" button",
+      permissionError: "Permission Error",
+      permissionErrorDesc: "Function permissions issue. Try again in a moment.",
+      failedToSend: "Failed to send",
+      requestError: "Request error",
+      loading: "Loading...",
+      oneHour: "1h",
+      oneDay: "1d",
     },
     forms: {
       name: "Name",
@@ -1571,6 +1828,209 @@ export const translations: Record<string, Translation> = {
         contactUs: "Contact Us"
       }
     },
+    favorites: {
+      title: "Favorites",
+      services: "Services",
+      providers: "Providers",
+      noFavoriteServices: "No favorite services",
+      noFavoriteProviders: "No favorite providers",
+      startAddingServices: "Start adding your favorite services",
+      startAddingProviders: "Start adding your favorite providers",
+      browseServices: "Browse Services",
+      serviceUnavailable: "Service Unavailable",
+      serviceDeleted: "This service was deleted by the provider",
+      providerUnavailable: "Provider Unavailable",
+      providerDeleted: "This provider account was deleted",
+      removeFromFavorites: "Remove from Favorites",
+      removed: "Removed",
+      removedDesc: "Item removed from favorites",
+      removeError: "Error removing favorite",
+      providerNotFound: "Provider not found",
+      loginRequired: "Please log in to view favorites",
+      viewProvider: "View Provider",
+      viewProfile: "View Profile",
+      bookAppointment: "Book Appointment",
+      provider: "Provider:",
+      duration: "Duration:",
+      city: "City:",
+      minutes: "minutes",
+      priceOnRequest: "Price on request",
+      top: "TOP",
+      noReviews: "No reviews"
+    },
+    timezone: {
+      title: "Timezone Settings",
+      back: "Back",
+      currentTime: "Current time in your timezone",
+      selectTimezone: "Select Timezone",
+      middleEast: "Middle East & North Africa",
+      europe: "Europe",
+      asia: "Asia",
+      americas: "Americas",
+      africa: "Africa",
+      pacific: "Australia & Pacific",
+      whyImportant: "Why is timezone important?",
+      accurateBooking: "Accurate booking time calculations",
+      timelyNotifications: "Timely notification delivery",
+      respectQuietHours: "Respect local quiet hours",
+      seamlessExperience: "Seamless experience worldwide",
+      saving: "Saving...",
+      saveTimezone: "Save Timezone",
+      loginToSave: "Login to Save",
+      notice: "Notice",
+      savedSuccessfully: "Saved Successfully",
+      saveFailed: "Failed to save timezone",
+      browseWithoutLogin: "You can browse without logging in, but login is required to save",
+      label: "Timezone",
+      placeholder: "Select timezone",
+      hint: "Used to calculate times accurately"
+    },
+    serviceTypes: {
+      title: "Service Type",
+      generalService: "General Service",
+      appointmentBooking: "Appointment / Booking",
+      generalServiceDesc: "Standard service with price display and details",
+      appointmentDesc: "Appointment booking only without price display (e.g., Medical Consultation)",
+      serviceInfo: "Service Info",
+      bookingSettings: "Booking Settings",
+      weeklySchedule: "Weekly Schedule",
+      scheduleUpdated: "Schedule updated successfully"
+    },
+    discount: {
+      title: "🎉 Discount Offer",
+      description: "Add a discount to attract more customers",
+      discountedPrice: "Discounted Price",
+      originalPrice: "Original price:",
+      percentage: "Discount Percentage (%)",
+      badgeNote: "Discount badge will appear on service card",
+      discountPricePlaceholder: "e.g., 80",
+      discountPercentagePlaceholder: "e.g., 20"
+    },
+    dashboardCommon: {
+      reviews: "Reviews",
+      upcoming: "Upcoming",
+      completed: "Completed",
+      myServices: "My Services",
+      myAppointments: "My Appointments",
+      favorites: "Favorites",
+      myReviews: "My Reviews",
+      settings: "Settings",
+      active: "Active",
+      activeBookings: "Active Bookings",
+      pending: "Pending",
+      awaitingConfirmation: "Awaiting Confirmation"
+    },
+    settingsPage: {
+      notifications: "Notifications",
+      calendar: "Calendar",
+      backup: "Backup",
+      timezone: "Timezone"
+    },
+    calendarSettings: {
+      title: "Calendar Settings",
+      saved: "Settings saved",
+      savedDesc: "Calendar preferences updated successfully",
+      error: "Error",
+      errorDesc: "Failed to save settings",
+      autoAdd: "Automatic Addition",
+      saveChanges: "Save Changes"
+    },
+    backupSettings: {
+      exportTitle: "Export Data",
+      exported: "Data Exported",
+      exportedDesc: "Backup saved successfully",
+      exportError: "Export Error",
+      exportErrorDesc: "Failed to create backup",
+      importError: "Import Error",
+      importErrorDesc: "Failed to read backup file",
+      information: "Information",
+      servicesOffers: ", Services, Offers",
+      exporting: "Exporting...",
+      exportBackup: "Download Backup",
+      importTitle: "Import Data",
+      importDesc: "Restore or merge data from a backup",
+      importFile: "Select Backup File",
+      importing: "Importing...",
+      importBackup: "Import Backup",
+      warning: "Warning",
+      warningDesc: "Data restoration may take time and requires special permissions",
+      createBackupDesc: "Create a backup of all your data",
+      willExport: "Will export: Profile, Bookings, Reviews",
+      fileFormat: "File format: JSON (can be opened with any text editor)",
+      processing: "Processing...",
+      importantNotes: "Important Notes:",
+      keepBackupsSafe: "Keep backups in a safe place",
+      createBackupsRegularly: "Create backups regularly",
+      verifyFileIntegrity: "Verify file integrity before importing",
+      importWillMerge: "Import will merge with existing data"
+    },
+    locationPicker: {
+      title: "Set Location",
+      description: "Set your geographic location to show your services to nearby customers",
+      getCurrentLocation: "Use My Current Location",
+      manualEntry: "Manual Entry",
+      latitude: "Latitude",
+      longitude: "Longitude",
+      saveManual: "Save Coordinates",
+      locationSet: "Location Set Successfully!",
+      noLocation: "Location Not Set Yet",
+      errorPermission: "Location permission denied",
+      errorUnavailable: "Location information unavailable",
+      errorTimeout: "Location request timed out",
+      errorGeneric: "Error getting location",
+      errorInvalidCoords: "Invalid coordinates",
+      locating: "Locating...",
+      accuracy: "Accuracy",
+      howToFind: "How to find my coordinates?",
+      howToFindDesc: "Open Google Maps, right-click on your location, and select the numbers at the top to copy coordinates"
+    },
+    locationAnalytics: {
+      title: "Location Analytics",
+      description: "Provider and service statistics by region",
+      loading: "Loading...",
+      topRegions: "Most Active Regions",
+      providers: "Providers",
+      services: "Services",
+      countries: "Countries",
+      totalProviders: "Total Providers",
+      noData: "No data available"
+    },
+    addressAutocomplete: {
+      address: "Address",
+      loading: "Loading...",
+      startTyping: "Start typing to search for an address..."
+    },
+    advancedSearch: {
+      title: "Advanced Search",
+      country: "Country",
+      city: "City",
+      allCountries: "All Countries",
+      allCities: "All Cities",
+      onlyWithLocation: "Only with geographic location",
+      applyFilters: "Apply Filters",
+      resetFilters: "Reset",
+      activeFilters: "Active Filters"
+    },
+    favoriteButton: {
+      addedToFavorites: "Added to favorites",
+      removedFromFavorites: "Removed from favorites",
+      loginRequired: "Please log in",
+      loginRequiredDesc: "You must be logged in to add favorites",
+      addToFavorites: "Add to favorites",
+      removeFromFavorites: "Remove from favorites"
+    },
+    interactiveMap: {
+      title: "Interactive Map",
+      loading: "Loading map...",
+      error: "Error loading map",
+      getCurrentLocation: "My Location",
+      clickToSelect: "Click to select location",
+      top: "TOP",
+      noReviews: "No reviews",
+      bookAppointment: "Book Appointment",
+      viewDetails: "View Details"
+    },
+    appointment: "Appointment",
   },
   ar: {
     nav: {
@@ -1620,6 +2080,7 @@ export const translations: Record<string, Translation> = {
       minutes: "دقائق",
       pageNotFound: "الصفحة غير موجودة",
       goHome: "العودة للرئيسية",
+      goBack: "عودة",
       serviceNotFound: "لم يتم العثور على الخدمة",
       serviceUpdated: "تم تحديث الخدمة بنجاح",
       serviceUpdateFailed: "حدث خطأ في تحديث الخدمة",
@@ -1632,6 +2093,9 @@ export const translations: Record<string, Translation> = {
       customerAccessRequired: "يجب أن تقوم بتسجيل الدخول كعميل للمتابعة",
       serviceCreated: "تم إنشاء الخدمة بنجاح",
       serviceCreateFailed: "فشل إنشاء الخدمة",
+      // Share (Arabic)
+      bookService: "احجز",
+      fromProvider: "من"
     },
     dashboard: {
       main: "التنقل الرئيسي",
@@ -2319,9 +2783,12 @@ export const translations: Record<string, Translation> = {
       completions: "اكتمال الخدمة",
       quietHours: "ساعات الهدوء",
       quietHoursDesc: "تعطيل الإشعارات خلال ساعات معينة",
+      quietHoursTooltip: "يتم تعطيل الإشعارات (باستثناء التذكيرات الهامة) خلال هذه الفترة. يتم تأجيل التذكيرات حتى انتهائها.",
       enableQuietHours: "تفعيل ساعات الهدوء",
       quietStart: "بداية الهدوء",
       quietEnd: "نهاية الهدوء",
+      startTime: "من",
+      endTime: "إلى",
       testNotification: "اختبار الإشعار",
       sendTest: "إرسال إشعار تجريبي",
       testSent: "تم إرسال الإشعار التجريبي!",
@@ -2332,7 +2799,35 @@ export const translations: Record<string, Translation> = {
       permissionDenied: "تم رفض إذن الإشعارات",
       permissionDeniedDesc: "يرجى تفعيل الإشعارات في إعدادات المتصفح",
       browserNotSupported: "المتصفح لا يدعم الإشعارات",
-      browserNotSupportedDesc: "يرجى استخدام متصفح حديث"
+      browserNotSupportedDesc: "يرجى استخدام متصفح حديث",
+      save: "حفظ الإعدادات",
+      saving: "جاري الحفظ...",
+      saved: "تم حفظ الإعدادات",
+      savedDesc: "تم تحديث إعدادات الإشعارات بنجاح",
+      saveFailed: "فشل حفظ الإعدادات",
+      saveFailedDesc: "حدث خطأ أثناء حفظ الإعدادات",
+      requestPermission: "طلب الصلاحية",
+      reminderSummaryLabel: "ملخص التذكيرات",
+      noneSelected: "لم يتم اختيار أي وقت",
+      sendTestNotification: "إرسال إشعار تجريبي",
+      testNotificationSent: "✅ تم إرسال إشعار تجريبي",
+      testNotificationFailed: "❌ فشل إرسال الإشعار التجريبي",
+      checkNotificationCenter: "تحقق من مركز الإشعارات في الأعلى",
+      error: "خطأ",
+      userNotFound: "المستخدم غير معرف",
+      notificationsRequired: "تفعيل الإشعارات مطلوب",
+      notificationsRequiredDesc: "يرجى تفعيل الإشعارات أولاً عن طريق زر \"طلب الصلاحية\" في الأعلى",
+      noFcmToken: "لم يتم حفظ رمز الإشعارات",
+      noFcmTokenDesc: "يرجى الضغط على \"طلب الصلاحية\" أولاً لحفظ رمز الإشعارات",
+      fcmTokenMissing: "رمز الإشعارات مفقود",
+      fcmTokenMissingDesc: "يرجى إعادة طلب صلاحية الإشعارات عن طريق زر \"طلب الصلاحية\"",
+      permissionError: "خطأ في الصلاحيات",
+      permissionErrorDesc: "الوظيفة محمية. تم حل المشكلة، حاول مرة أخرى.",
+      failedToSend: "فشل الإرسال",
+      requestError: "خطأ في الطلب",
+      loading: "جاري التحميل...",
+      oneHour: "ساعة واحدة",
+      oneDay: "يوم واحد"
     },
     footer: {
       tagline: "منصة متكاملة لتنظيم مواعيد وأعمال مزودي الخدمات، مع تمكين العملاء من اكتشاف وحجز الخدمات المميزة في مناطقهم",
@@ -2347,6 +2842,209 @@ export const translations: Record<string, Translation> = {
         contactUs: "اتصل بنا"
       }
     },
+    favorites: {
+      title: "المفضلة",
+      services: "الخدمات",
+      providers: "مزودو الخدمة",
+      noFavoriteServices: "لا توجد خدمات مفضلة",
+      noFavoriteProviders: "لا يوجد مزودو خدمة مفضلين",
+      startAddingServices: "ابدأ بإضافة خدماتك المفضلة",
+      startAddingProviders: "ابدأ بإضافة مزودي خدمة مفضلين",
+      browseServices: "تصفح الخدمات",
+      serviceUnavailable: "الخدمة غير متوفرة",
+      serviceDeleted: "تم حذف هذه الخدمة من قبل المزود",
+      providerUnavailable: "المزود غير متاح",
+      providerDeleted: "تم حذف حساب هذا المزود",
+      removeFromFavorites: "إزالة من المفضلة",
+      removed: "تمت الإزالة",
+      removedDesc: "تم إزالة العنصر من المفضلة",
+      removeError: "حدث خطأ أثناء الإزالة",
+      providerNotFound: "لم يتم العثور على المزود",
+      loginRequired: "يرجى تسجيل الدخول لعرض المفضلة",
+      viewProvider: "عرض المزود",
+      viewProfile: "عرض الملف الشخصي",
+      bookAppointment: "حجز موعد",
+      provider: "المزود:",
+      duration: "المدة:",
+      city: "المدينة:",
+      minutes: "دقيقة",
+      priceOnRequest: "السعر عند الطلب",
+      top: "الأفضل",
+      noReviews: "لا توجد تقييمات"
+    },
+    timezone: {
+      title: "إعدادات المنطقة الزمنية",
+      back: "رجوع",
+      currentTime: "الوقت الحالي في منطقتك",
+      selectTimezone: "اختر المنطقة الزمنية",
+      middleEast: "الشرق الأوسط وشمال أفريقيا",
+      europe: "أوروبا",
+      asia: "آسيا",
+      americas: "أمريكا",
+      africa: "أفريقيا",
+      pacific: "أستراليا والمحيط الهادئ",
+      whyImportant: "لماذا المنطقة الزمنية مهمة؟",
+      accurateBooking: "حساب أوقات الحجز المتاحة بدقة",
+      timelyNotifications: "إرسال الإشعارات في الوقت المناسب",
+      respectQuietHours: "احترام ساعات الهدوء المحلية",
+      seamlessExperience: "تجربة سلسة للمستخدمين حول العالم",
+      saving: "جاري الحفظ...",
+      saveTimezone: "حفظ المنطقة الزمنية",
+      loginToSave: "تسجيل الدخول للحفظ",
+      notice: "تنبيه",
+      savedSuccessfully: "تم الحفظ بنجاح",
+      saveFailed: "فشل حفظ المنطقة الزمنية",
+      browseWithoutLogin: "يمكنك التصفح دون تسجيل الدخول، لكن للحفظ يجب تسجيل الدخول",
+      label: "المنطقة الزمنية",
+      placeholder: "اختر المنطقة الزمنية",
+      hint: "يستخدم لحساب الأوقات بدقة"
+    },
+    serviceTypes: {
+      title: "نوع الخدمة",
+      generalService: "خدمة عامة",
+      appointmentBooking: "موعد / حجز",
+      generalServiceDesc: "خدمة عادية مع عرض السعر والتفاصيل",
+      appointmentDesc: "حجز موعد فقط بدون عرض سعر (مثل: استشارة طبية)",
+      serviceInfo: "معلومات الخدمة",
+      bookingSettings: "إعدادات الحجز",
+      weeklySchedule: "الجدول الأسبوعي",
+      scheduleUpdated: "تم تحديث الجدول بنجاح"
+    },
+    discount: {
+      title: "🎉 عرض تخفيض",
+      description: "أضف عرض تخفيض لجذب المزيد من العملاء",
+      discountedPrice: "السعر بعد التخفيض",
+      originalPrice: "السعر الأصلي:",
+      percentage: "نسبة التخفيض (%)",
+      badgeNote: "سيظهر badge التخفيض على بطاقة الخدمة",
+      discountPricePlaceholder: "مثال: 80",
+      discountPercentagePlaceholder: "مثال: 20"
+    },
+    dashboardCommon: {
+      reviews: "تقييمات",
+      upcoming: "قادمة",
+      completed: "مكتملة",
+      myServices: "خدماتي",
+      myAppointments: "مواعيدي",
+      favorites: "المفضلة",
+      myReviews: "تقييماتي",
+      settings: "إعدادات",
+      active: "مفعلة",
+      activeBookings: "حجوزات مفعّلة",
+      pending: "انتظار",
+      awaitingConfirmation: "بانتظار التأكيد"
+    },
+    settingsPage: {
+      notifications: "الإشعارات",
+      calendar: "التقويم",
+      backup: "النسخ الاحتياطي",
+      timezone: "المنطقة الزمنية"
+    },
+    calendarSettings: {
+      title: "إعدادات التقويم",
+      saved: "تم حفظ الإعدادات",
+      savedDesc: "تم تحديث تفضيلات التقويم بنجاح",
+      error: "خطأ",
+      errorDesc: "فشل حفظ الإعدادات",
+      autoAdd: "إضافة تلقائية",
+      saveChanges: "حفظ التغييرات"
+    },
+    backupSettings: {
+      exportTitle: "تصدير البيانات",
+      exported: "تم تصدير البيانات",
+      exportedDesc: "تم حفظ النسخة الاحتياطية بنجاح",
+      exportError: "خطأ في التصدير",
+      exportErrorDesc: "فشل في إنشاء النسخة الاحتياطية",
+      importError: "خطأ في الاستيراد",
+      importErrorDesc: "فشل في قراءة ملف النسخة الاحتياطية",
+      information: "معلومة",
+      servicesOffers: "، الخدمات، العروض",
+      exporting: "جاري التصدير...",
+      exportBackup: "تنزيل النسخة الاحتياطية",
+      importTitle: "استيراد البيانات",
+      importDesc: "استعادة أو دمج بيانات من نسخة احتياطية",
+      importFile: "اختر ملف النسخة الاحتياطية",
+      importing: "جاري الاستيراد...",
+      importBackup: "استيراد النسخة الاحتياطية",
+      warning: "تحذير",
+      warningDesc: "استعادة البيانات قد تستغرق بعض الوقت وتتطلب صلاحيات خاصة",
+      createBackupDesc: "إنشاء نسخة احتياطية من جميع بياناتك",
+      willExport: "سيتم تصدير: الملف الشخصي، الحجوزات، التقييمات",
+      fileFormat: "صيغة الملف: JSON (يمكن فتحه بأي محرر نصوص)",
+      processing: "جاري المعالجة...",
+      importantNotes: "ملاحظات مهمة:",
+      keepBackupsSafe: "احتفظ بالنسخ الاحتياطية في مكان آمن",
+      createBackupsRegularly: "قم بإنشاء نسخة احتياطية بشكل دوري",
+      verifyFileIntegrity: "تحقق من صحة الملف قبل الاستيراد",
+      importWillMerge: "الاستيراد سيدمج البيانات مع الموجودة"
+    },
+    locationPicker: {
+      title: "تحديد الموقع",
+      description: "حدد موقعك الجغرافي لتظهر خدماتك للعملاء القريبين",
+      getCurrentLocation: "استخدام موقعي الحالي",
+      manualEntry: "إدخال يدوي",
+      latitude: "خط العرض",
+      longitude: "خط الطول",
+      saveManual: "حفظ الإحداثيات",
+      locationSet: "تم تعيين الموقع بنجاح!",
+      noLocation: "لم يتم تحديد الموقع بعد",
+      errorPermission: "تم رفض إذن الموقع",
+      errorUnavailable: "معلومات الموقع غير متاحة",
+      errorTimeout: "انتهت مهلة طلب الموقع",
+      errorGeneric: "حدث خطأ في الحصول على الموقع",
+      errorInvalidCoords: "إحداثيات غير صالحة",
+      locating: "جاري تحديد موقعك...",
+      accuracy: "الدقة",
+      howToFind: "كيف أجد إحداثياتي؟",
+      howToFindDesc: "افتح خرائط Google، انقر بزر الماوس الأيمن على موقعك، واختر الأرقام أعلى القائمة لنسخ الإحداثيات"
+    },
+    locationAnalytics: {
+      title: "تحليلات الموقع الجغرافي",
+      description: "إحصائيات المزودين والخدمات حسب المنطقة",
+      loading: "جاري التحميل...",
+      topRegions: "أكثر المناطق نشاطاً",
+      providers: "مزود",
+      services: "خدمة",
+      countries: "بلد",
+      totalProviders: "إجمالي المزودين",
+      noData: "لا توجد بيانات"
+    },
+    addressAutocomplete: {
+      address: "العنوان",
+      loading: "جاري التحميل...",
+      startTyping: "ابدأ الكتابة للبحث عن عنوان..."
+    },
+    advancedSearch: {
+      title: "البحث المتقدم",
+      country: "البلد",
+      city: "المدينة",
+      allCountries: "جميع البلدان",
+      allCities: "جميع المدن",
+      onlyWithLocation: "فقط من لديهم موقع جغرافي",
+      applyFilters: "تطبيق الفلاتر",
+      resetFilters: "إعادة تعيين",
+      activeFilters: "فلاتر نشطة"
+    },
+    favoriteButton: {
+      addedToFavorites: "تمت الإضافة إلى المفضلة",
+      removedFromFavorites: "تمت الإزالة من المفضلة",
+      loginRequired: "يرجى تسجيل الدخول",
+      loginRequiredDesc: "يجب تسجيل الدخول لإضافة عناصر إلى المفضلة",
+      addToFavorites: "إضافة للمفضلة",
+      removeFromFavorites: "إزالة من المفضلة"
+    },
+    interactiveMap: {
+      title: "الخريطة التفاعلية",
+      loading: "جاري تحميل الخريطة...",
+      error: "خطأ في تحميل الخريطة",
+      getCurrentLocation: "موقعي الحالي",
+      clickToSelect: "انقر لتحديد الموقع",
+      top: "ممتاز",
+      noReviews: "لا توجد تقييمات",
+      bookAppointment: "حجز موعد",
+      viewDetails: "عرض التفاصيل"
+    },
+    appointment: "موعد",
   },
 };
 

@@ -207,10 +207,10 @@ export default function CompleteProfile({ currentLanguage }: CompleteProfileProp
             </div>
 
             <div className="space-y-2">
-              <Label>{isRTL ? 'المنطقة الزمنية *' : 'Timezone *'}</Label>
+              <Label>{t.timezone?.label || 'Timezone'} *</Label>
               <Select value={timezone} onValueChange={setTimezone} disabled={saving}>
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder={isRTL ? 'اختر المنطقة الزمنية' : 'Select timezone'} />
+                  <SelectValue placeholder={t.timezone?.placeholder || 'Select timezone'} />
                 </SelectTrigger>
                 <SelectContent className="max-h-72">
                   {commonTimezones.map((tz) => (
@@ -221,9 +221,7 @@ export default function CompleteProfile({ currentLanguage }: CompleteProfileProp
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground">
-                {isRTL 
-                  ? 'يستخدم لحساب الأوقات بدقة'
-                  : 'Used to calculate times accurately'}
+                {t.timezone?.hint || 'Used to calculate times accurately'}
               </p>
             </div>
 

@@ -76,7 +76,8 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
 
   const isRTL = currentLanguage === 'ar';
 
-  const t = {
+  // Translation object using global translations where available
+  const labels = {
     title: isRTL ? "الخريطة التفاعلية" : "Interactive Map",
     description: isRTL 
       ? "انقر على الخريطة لتحديد موقع أو اسحب العلامة" 
@@ -87,7 +88,12 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
       ? "يرجى إضافة Google Maps API Key في ملف .env.local"
       : "Please add Google Maps API Key in .env.local",
     getCurrentLocation: isRTL ? "موقعي الحالي" : "My Location",
-    clickToSelect: isRTL ? "انقر لتحديد الموقع" : "Click to select location"
+    clickToSelect: isRTL ? "انقر لتحديد الموقع" : "Click to select location",
+    top: isRTL ? "ممتاز" : "TOP",
+    noReviews: isRTL ? "لا توجد تقييمات" : "No reviews",
+    bookAppointment: isRTL ? "حجز موعد" : "Book Appointment",
+    viewDetails: isRTL ? "عرض التفاصيل" : "View Details",
+    services: isRTL ? "خدمة" : "services"
   };
 
   // تحميل Google Maps API مع معالجة أفضل للأخطاء
@@ -442,7 +448,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                   gap: 4px;
                 ">
                   <span>📍</span>
-                  <span>${isRTL ? `${servicesCount} خدمة` : `${servicesCount} services`}</span>
+                  <span>${servicesCount} ${labels.services || 'services'}</span>
                 </div>
               </div>
             </div>
@@ -543,7 +549,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                       box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
                     ">
                       <span>⭐</span>
-                      <span>${isRTL ? 'ممتاز' : 'TOP'}</span>
+                      <span>${labels.top}</span>
                     </div>
                   ` : ''}
                   
@@ -602,7 +608,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                       margin-bottom: 10px;
                       height: 16px;
                     ">
-                      ⭐ ${isRTL ? 'لا توجد تقييمات' : 'No reviews'}
+                      ⭐ ${labels.noReviews}
                     </div>
                   `}
                   
@@ -614,7 +620,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                         color: #2563eb;
                         font-weight: 700;
                       ">
-                        ${isRTL ? 'حجز موعد' : 'Book Appointment'}
+                        ${labels.bookAppointment}
                       </div>
                     ` : service.has_discount && service.discount_price ? `
                       <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
@@ -680,7 +686,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                     ontouchstart="this.style.transform='scale(0.98)';"
                     ontouchend="this.style.transform='scale(1)';"
                   >
-                    ${isRTL ? 'عرض التفاصيل' : 'View Details'}
+                    ${labels.viewDetails}
                   </button>
                 </div>
               `;

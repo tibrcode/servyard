@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Filter, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useTranslation } from "@/lib/i18n";
 
 interface AdvancedSearchFiltersProps {
   onFilterChange: (filters: {
@@ -38,19 +39,7 @@ const AdvancedSearchFilters: React.FC<AdvancedSearchFiltersProps> = ({
   const [hasLocation, setHasLocation] = useState<boolean>(false);
   const [activeFilters, setActiveFilters] = useState(0);
 
-  const isRTL = currentLanguage === 'ar';
-
-  const t = {
-    title: isRTL ? "البحث المتقدم" : "Advanced Search",
-    country: isRTL ? "البلد" : "Country",
-    city: isRTL ? "المدينة" : "City",
-    allCountries: isRTL ? "جميع البلدان" : "All Countries",
-    allCities: isRTL ? "جميع المدن" : "All Cities",
-    onlyWithLocation: isRTL ? "فقط من لديهم موقع جغرافي" : "Only with geographic location",
-    applyFilters: isRTL ? "تطبيق الفلاتر" : "Apply Filters",
-    resetFilters: isRTL ? "إعادة تعيين" : "Reset",
-    activeFilters: isRTL ? "فلاتر نشطة" : "Active Filters"
-  };
+  const { t, isRTL } = useTranslation(currentLanguage as 'ar' | 'en');
 
   // عند تغيير الفلاتر
   useEffect(() => {
@@ -82,11 +71,11 @@ const AdvancedSearchFilters: React.FC<AdvancedSearchFiltersProps> = ({
         <CardTitle className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Filter className="w-5 h-5" />
-            {t.title}
+            {t.advancedSearch?.title || 'Advanced Search'}
           </div>
           {activeFilters > 0 && (
             <Badge variant="secondary">
-              {activeFilters} {t.activeFilters}
+              {activeFilters} {t.advancedSearch?.activeFilters || 'Active Filters'}
             </Badge>
           )}
         </CardTitle>
@@ -94,13 +83,13 @@ const AdvancedSearchFilters: React.FC<AdvancedSearchFiltersProps> = ({
       <CardContent className="space-y-4">
         {/* فلتر البلد */}
         <div className="space-y-2">
-          <Label>{t.country}</Label>
+          <Label>{t.advancedSearch?.country || 'Country'}</Label>
           <Select value={country} onValueChange={setCountry}>
             <SelectTrigger>
-              <SelectValue placeholder={t.allCountries} />
+              <SelectValue placeholder={t.advancedSearch?.allCountries || 'All Countries'} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">{t.allCountries}</SelectItem>
+              <SelectItem value="all">{t.advancedSearch?.allCountries || 'All Countries'}</SelectItem>
               {availableCountries.map((c) => (
                 <SelectItem key={c} value={c}>
                   {c}
@@ -112,13 +101,13 @@ const AdvancedSearchFilters: React.FC<AdvancedSearchFiltersProps> = ({
 
         {/* فلتر المدينة */}
         <div className="space-y-2">
-          <Label>{t.city}</Label>
+          <Label>{t.advancedSearch?.city || 'City'}</Label>
           <Select value={city} onValueChange={setCity} disabled={!country || country === 'all'}>
             <SelectTrigger>
-              <SelectValue placeholder={t.allCities} />
+              <SelectValue placeholder={t.advancedSearch?.allCities || 'All Cities'} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">{t.allCities}</SelectItem>
+              <SelectItem value="all">{t.advancedSearch?.allCities || 'All Cities'}</SelectItem>
               {availableCities.map((c) => (
                 <SelectItem key={c} value={c}>
                   {c}
@@ -138,7 +127,7 @@ const AdvancedSearchFilters: React.FC<AdvancedSearchFiltersProps> = ({
             className="w-4 h-4"
           />
           <Label htmlFor="has-location" className="cursor-pointer">
-            {t.onlyWithLocation}
+            {t.advancedSearch?.onlyWithLocation || 'Only with geographic location'}
           </Label>
         </div>
 
@@ -146,12 +135,12 @@ const AdvancedSearchFilters: React.FC<AdvancedSearchFiltersProps> = ({
         <div className="flex gap-2 pt-2">
           <Button onClick={handleApplyFilters} className="flex-1">
             <Filter className="w-4 h-4 mr-2" />
-            {t.applyFilters}
+            {t.advancedSearch?.applyFilters || 'Apply Filters'}
           </Button>
           {activeFilters > 0 && (
             <Button onClick={handleResetFilters} variant="outline">
               <X className="w-4 h-4 mr-2" />
-              {t.resetFilters}
+              {t.advancedSearch?.resetFilters || 'Reset'}
             </Button>
           )}
         </div>

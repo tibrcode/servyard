@@ -122,14 +122,14 @@ export function BackupSettings({ userId, userType, language = 'ar' }: BackupSett
       URL.revokeObjectURL(url);
 
       toast({
-        title: isRTL ? 'تم تصدير البيانات' : 'Data Exported',
-        description: isRTL ? 'تم حفظ النسخة الاحتياطية بنجاح' : 'Backup saved successfully',
+        title: t.backupSettings?.exported || 'Data Exported',
+        description: t.backupSettings?.exportedDesc || 'Backup saved successfully',
       });
     } catch (error) {
       console.error('Export error:', error);
       toast({
-        title: isRTL ? 'خطأ في التصدير' : 'Export Error',
-        description: isRTL ? 'فشل في إنشاء النسخة الاحتياطية' : 'Failed to create backup',
+        title: t.backupSettings?.exportError || 'Export Error',
+        description: t.backupSettings?.exportErrorDesc || 'Failed to create backup',
         variant: 'destructive',
       });
     } finally {
@@ -176,7 +176,7 @@ export function BackupSettings({ userId, userType, language = 'ar' }: BackupSett
           // Note: Actual import would require Cloud Functions with admin privileges
           // This is a placeholder for the UI
           toast({
-            title: isRTL ? 'معلومة' : 'Information',
+            title: t.backupSettings?.information || 'Information',
             description: isRTL 
               ? 'استعادة البيانات تتطلب صلاحيات إدارية. يرجى الاتصال بالدعم الفني.'
               : 'Data restoration requires admin privileges. Please contact support.',
@@ -186,8 +186,8 @@ export function BackupSettings({ userId, userType, language = 'ar' }: BackupSett
         } catch (error) {
           console.error('Import error:', error);
           toast({
-            title: isRTL ? 'خطأ في الاستيراد' : 'Import Error',
-            description: isRTL ? 'فشل في قراءة ملف النسخة الاحتياطية' : 'Failed to read backup file',
+            title: t.backupSettings?.importError || 'Import Error',
+            description: t.backupSettings?.importErrorDesc || 'Failed to read backup file',
             variant: 'destructive',
           });
         } finally {
@@ -209,12 +209,10 @@ export function BackupSettings({ userId, userType, language = 'ar' }: BackupSett
         <CardHeader>
           <div className="flex items-center gap-2">
             <Download className="w-5 h-5 text-primary" />
-            <CardTitle>{isRTL ? 'تصدير البيانات' : 'Export Data'}</CardTitle>
+            <CardTitle>{t.backupSettings?.exportTitle || 'Export Data'}</CardTitle>
           </div>
           <CardDescription>
-            {isRTL 
-              ? 'إنشاء نسخة احتياطية من جميع بياناتك'
-              : 'Create a backup of all your data'}
+            {t.backupSettings?.createBackupDesc || 'Create a backup of all your data'}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -222,20 +220,16 @@ export function BackupSettings({ userId, userType, language = 'ar' }: BackupSett
             <div className="flex items-start gap-2">
               <Database className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
               <div className="text-sm text-muted-foreground">
-                {isRTL 
-                  ? 'سيتم تصدير: الملف الشخصي، الحجوزات، التقييمات'
-                  : 'Will export: Profile, Bookings, Reviews'}
+                {t.backupSettings?.willExport || 'Will export: Profile, Bookings, Reviews'}
                 {userType === 'provider' && (
-                  <span>{isRTL ? '، الخدمات، العروض' : ', Services, Offers'}</span>
+                  <span>{t.backupSettings?.servicesOffers || ', Services, Offers'}</span>
                 )}
               </div>
             </div>
             <div className="flex items-start gap-2">
               <FileJson className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
               <div className="text-sm text-muted-foreground">
-                {isRTL 
-                  ? 'صيغة الملف: JSON (يمكن فتحه بأي محرر نصوص)'
-                  : 'File format: JSON (can be opened with any text editor)'}
+                {t.backupSettings?.fileFormat || 'File format: JSON (can be opened with any text editor)'}
               </div>
             </div>
           </div>
@@ -248,8 +242,8 @@ export function BackupSettings({ userId, userType, language = 'ar' }: BackupSett
           >
             <Download className="w-4 h-4 mr-2" />
             {isExporting 
-              ? (isRTL ? 'جاري التصدير...' : 'Exporting...') 
-              : (isRTL ? 'تنزيل النسخة الاحتياطية' : 'Download Backup')}
+              ? (t.backupSettings?.exporting || 'Exporting...') 
+              : (t.backupSettings?.exportBackup || 'Download Backup')}
           </Button>
         </CardContent>
       </Card>
@@ -259,12 +253,10 @@ export function BackupSettings({ userId, userType, language = 'ar' }: BackupSett
         <CardHeader>
           <div className="flex items-center gap-2">
             <Upload className="w-5 h-5 text-primary" />
-            <CardTitle>{isRTL ? 'استيراد البيانات' : 'Import Data'}</CardTitle>
+            <CardTitle>{t.backupSettings?.importTitle || 'Import Data'}</CardTitle>
           </div>
           <CardDescription>
-            {isRTL 
-              ? 'استعادة أو دمج بيانات من نسخة احتياطية'
-              : 'Restore or merge data from a backup'}
+            {t.backupSettings?.importDesc || 'Restore or merge data from a backup'}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -272,16 +264,14 @@ export function BackupSettings({ userId, userType, language = 'ar' }: BackupSett
             <div className="flex items-start gap-2">
               <AlertCircle className="w-4 h-4 text-yellow-600 dark:text-yellow-500 mt-0.5 flex-shrink-0" />
               <div className="text-sm text-yellow-800 dark:text-yellow-200">
-                {isRTL 
-                  ? 'تحذير: استعادة البيانات قد تستغرق بعض الوقت وتتطلب صلاحيات خاصة'
-                  : 'Warning: Data restoration may take time and requires special permissions'}
+                {t.backupSettings?.warningDesc || 'Data restoration may take time and requires special permissions'}
               </div>
             </div>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="backup-file">
-              {isRTL ? 'اختر ملف النسخة الاحتياطية' : 'Select Backup File'}
+              {t.backupSettings?.importFile || 'Select Backup File'}
             </Label>
             <input
               id="backup-file"
@@ -303,7 +293,7 @@ export function BackupSettings({ userId, userType, language = 'ar' }: BackupSett
           {isImporting && (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <CheckCircle2 className="w-4 h-4 animate-spin" />
-              {isRTL ? 'جاري المعالجة...' : 'Processing...'}
+              {t.backupSettings?.processing || 'Processing...'}
             </div>
           )}
         </CardContent>
@@ -316,13 +306,13 @@ export function BackupSettings({ userId, userType, language = 'ar' }: BackupSett
             <Database className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
             <div className="space-y-2 text-sm text-muted-foreground">
               <p className="font-medium text-foreground">
-                {isRTL ? 'ملاحظات مهمة:' : 'Important Notes:'}
+                {t.backupSettings?.importantNotes || 'Important Notes:'}
               </p>
               <ul className="list-disc list-inside space-y-1 mr-4">
-                <li>{isRTL ? 'احتفظ بالنسخ الاحتياطية في مكان آمن' : 'Keep backups in a safe place'}</li>
-                <li>{isRTL ? 'قم بإنشاء نسخة احتياطية بشكل دوري' : 'Create backups regularly'}</li>
-                <li>{isRTL ? 'تحقق من صحة الملف قبل الاستيراد' : 'Verify file integrity before importing'}</li>
-                <li>{isRTL ? 'الاستيراد سيدمج البيانات مع الموجودة' : 'Import will merge with existing data'}</li>
+                <li>{t.backupSettings?.keepBackupsSafe || 'Keep backups in a safe place'}</li>
+                <li>{t.backupSettings?.createBackupsRegularly || 'Create backups regularly'}</li>
+                <li>{t.backupSettings?.verifyFileIntegrity || 'Verify file integrity before importing'}</li>
+                <li>{t.backupSettings?.importWillMerge || 'Import will merge with existing data'}</li>
               </ul>
             </div>
           </div>

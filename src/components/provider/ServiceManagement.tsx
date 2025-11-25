@@ -193,7 +193,7 @@ export const ServiceManagement = ({ currentLanguage, currencyCode }: ServiceMana
           size="sm"
         >
           <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-2 flex-shrink-0" />
-          <span className="break-words text-xs sm:text-sm">{t.provider.addService} / {isRTL ? 'موعد' : 'Appointment'}</span>
+          <span className="break-words text-xs sm:text-sm">{t.provider.addService} / {t.appointment || 'Appointment'}</span>
         </Button>
       </div>
 

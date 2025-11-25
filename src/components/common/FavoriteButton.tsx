@@ -9,6 +9,7 @@ import { toggleFavorite, isFavorite } from '@/lib/firebase/favoriteFunctions';
 import { FavoriteType } from '@/types/favorites';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/lib/i18n';
 
 interface FavoriteButtonProps {
   type: FavoriteType;
@@ -24,6 +25,7 @@ interface FavoriteButtonProps {
   size?: 'default' | 'sm' | 'lg' | 'icon';
   className?: string;
   showLabel?: boolean;
+  language?: string;
 }
 
 export function FavoriteButton({
@@ -34,23 +36,14 @@ export function FavoriteButton({
   size = 'icon',
   className,
   showLabel = false,
+  language = 'ar',
 }: FavoriteButtonProps) {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { t } = useTranslation(language as 'ar' | 'en');
   const [isFav, setIsFav] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
-
-  const isRTL = true; // Get from context
-
-  const t = {
-    addedToFavorites: isRTL ? 'تمت الإضافة إلى المفضلة' : 'Added to favorites',
-    removedFromFavorites: isRTL ? 'تمت الإزالة من المفضلة' : 'Removed from favorites',
-    loginRequired: isRTL ? 'يرجى تسجيل الدخول' : 'Please log in',
-    loginRequiredDesc: isRTL ? 'يجب تسجيل الدخول لإضافة عناصر إلى المفضلة' : 'You must be logged in to add favorites',
-    addToFavorites: isRTL ? 'إضافة للمفضلة' : 'Add to favorites',
-    removeFromFavorites: isRTL ? 'إزالة من المفضلة' : 'Remove from favorites',
-  };
 
   // Check if already favorite
   useEffect(() => {
@@ -75,8 +68,8 @@ export function FavoriteButton({
 
     if (!user) {
       toast({
-        title: t.loginRequired,
-        description: t.loginRequiredDesc,
+        title: t.favoriteButton?.loginRequired || 'Please log in',
+        description: t.favoriteButton?.loginRequiredDesc || 'You must be logged in to add favorites',
         variant: 'destructive',
       });
       return;
@@ -89,7 +82,9 @@ export function FavoriteButton({
       setIsFav(added);
 
       toast({
-        title: added ? t.addedToFavorites : t.removedFromFavorites,
+        title: added 
+          ? (t.favoriteButton?.addedToFavorites || 'Added to favorites')
+          : (t.favoriteButton?.removedFromFavorites || 'Removed from favorites'),
       });
     } catch (error) {
       console.error('Error toggling favorite:', error);
@@ -107,7 +102,7 @@ export function FavoriteButton({
         disabled
       >
         <div className="h-4 w-4 border-2 border-gray-300 border-t-transparent rounded-full animate-spin" />
-        {showLabel && <span className="mr-2">{t.addToFavorites}</span>}
+        {showLabel && <span className="mr-2">{t.favoriteButton?.addToFavorites || 'Add to favorites'}</span>}
       </Button>
     );
   }
@@ -119,7 +114,9 @@ export function FavoriteButton({
       className={cn('relative transition-all [&_svg]:size-6', className)}
       onClick={handleClick}
       disabled={isLoading}
-      title={isFav ? t.removeFromFavorites : t.addToFavorites}
+      title={isFav 
+        ? (t.favoriteButton?.removeFromFavorites || 'Remove from favorites')
+        : (t.favoriteButton?.addToFavorites || 'Add to favorites')}
     >
       {isLoading ? (
         <div className="h-6 w-6 border-2 border-current border-t-transparent rounded-full animate-spin" />
@@ -133,7 +130,9 @@ export function FavoriteButton({
       )}
       {showLabel && (
         <span className="mr-2">
-          {isFav ? t.removeFromFavorites : t.addToFavorites}
+          {isFav 
+            ? (t.favoriteButton?.removeFromFavorites || 'Remove from favorites')
+            : (t.favoriteButton?.addToFavorites || 'Add to favorites')}
         </span>
       )}
     </Button>

@@ -45,13 +45,13 @@ export function CalendarSettings({ language = 'ar' }: CalendarSettingsProps) {
     try {
       localStorage.setItem(CALENDAR_PREFS_KEY, JSON.stringify(prefs));
       toast({
-        title: isRTL ? 'تم حفظ الإعدادات' : 'Settings saved',
-        description: isRTL ? 'تم تحديث تفضيلات التقويم بنجاح' : 'Calendar preferences updated successfully',
+        title: t.calendarSettings?.saved || 'Settings saved',
+        description: t.calendarSettings?.savedDesc || 'Calendar preferences updated successfully',
       });
     } catch (error) {
       toast({
-        title: isRTL ? 'خطأ' : 'Error',
-        description: isRTL ? 'فشل حفظ الإعدادات' : 'Failed to save settings',
+        title: t.calendarSettings?.error || 'Error',
+        description: t.calendarSettings?.errorDesc || 'Failed to save settings',
         variant: 'destructive',
       });
     } finally {
@@ -64,7 +64,7 @@ export function CalendarSettings({ language = 'ar' }: CalendarSettingsProps) {
       <CardHeader>
         <div className="flex items-center gap-2">
           <Calendar className="w-5 h-5 text-primary" />
-          <CardTitle>{isRTL ? 'إعدادات التقويم' : 'Calendar Settings'}</CardTitle>
+          <CardTitle>{t.calendarSettings?.title || 'Calendar Settings'}</CardTitle>
         </div>
         <CardDescription>
           {isRTL 
@@ -76,7 +76,7 @@ export function CalendarSettings({ language = 'ar' }: CalendarSettingsProps) {
         <div className="flex items-center justify-between space-x-2">
           <div className="space-y-0.5">
             <Label className="text-base">
-              {isRTL ? 'إضافة تلقائية' : 'Automatic Addition'}
+              {t.calendarSettings?.autoAdd || 'Automatic Addition'}
             </Label>
             <p className="text-sm text-muted-foreground">
               {isRTL 
@@ -93,7 +93,7 @@ export function CalendarSettings({ language = 'ar' }: CalendarSettingsProps) {
         <div className="flex justify-end">
           <Button onClick={handleSave} disabled={loading} className="gap-2">
             <Save className="w-4 h-4" />
-            {isRTL ? 'حفظ التغييرات' : 'Save Changes'}
+            {t.calendarSettings?.saveChanges || 'Save Changes'}
           </Button>
         </div>
       </CardContent>

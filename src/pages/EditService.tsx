@@ -262,13 +262,13 @@ const EditService: React.FC<EditServiceProps> = ({ currentLanguage }) => {
           <Tabs defaultValue="basic" className="w-full">
             <TabsList className="grid w-full grid-cols-3 mb-6">
               <TabsTrigger value="basic">
-                {isRTL ? 'معلومات الخدمة' : 'Service Info'}
+                {t.serviceTypes?.serviceInfo || 'Service Info'}
               </TabsTrigger>
               <TabsTrigger value="booking">
-                {isRTL ? 'إعدادات الحجز' : 'Booking Settings'}
+                {t.serviceTypes?.bookingSettings || 'Booking Settings'}
               </TabsTrigger>
               <TabsTrigger value="schedule">
-                {isRTL ? 'الجدول الأسبوعي' : 'Weekly Schedule'}
+                {t.serviceTypes?.weeklySchedule || 'Weekly Schedule'}
               </TabsTrigger>
             </TabsList>
 
@@ -277,7 +277,7 @@ const EditService: React.FC<EditServiceProps> = ({ currentLanguage }) => {
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Service Type Selection */}
                 <div className="space-y-4 p-4 bg-muted/30 rounded-lg border">
-                  <h3 className="text-lg font-semibold">{isRTL ? 'نوع الخدمة' : 'Service Type'}</h3>
+                  <h3 className="text-lg font-semibold">{t.serviceTypes?.title || 'Service Type'}</h3>
                   <div className="flex flex-col sm:flex-row gap-4">
                     <div className="flex items-center space-x-2 rtl:space-x-reverse">
                       <input
@@ -290,7 +290,7 @@ const EditService: React.FC<EditServiceProps> = ({ currentLanguage }) => {
                         className="h-4 w-4 border-gray-300 text-primary focus:ring-primary"
                       />
                       <Label htmlFor="type-service" className="cursor-pointer font-medium">
-                        {isRTL ? 'خدمة عامة' : 'General Service'}
+                        {t.serviceTypes?.generalService || 'General Service'}
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2 rtl:space-x-reverse">
@@ -304,14 +304,14 @@ const EditService: React.FC<EditServiceProps> = ({ currentLanguage }) => {
                         className="h-4 w-4 border-gray-300 text-primary focus:ring-primary"
                       />
                       <Label htmlFor="type-booking" className="cursor-pointer font-medium">
-                        {isRTL ? 'موعد / حجز' : 'Appointment / Booking'}
+                        {t.serviceTypes?.appointmentBooking || 'Appointment / Booking'}
                       </Label>
                     </div>
                   </div>
                   <p className="text-sm text-muted-foreground">
                     {formData.type === 'service' 
-                      ? (isRTL ? 'خدمة عادية مع عرض السعر والتفاصيل' : 'Standard service with price display and details')
-                      : (isRTL ? 'حجز موعد فقط بدون عرض سعر (مثل: استشارة طبية)' : 'Appointment booking only without price display (e.g., Medical Consultation)')}
+                      ? (t.serviceTypes?.generalServiceDesc || 'Standard service with price display and details')
+                      : (t.serviceTypes?.appointmentDesc || 'Appointment booking only without price display (e.g., Medical Consultation)')}
                   </p>
                 </div>
 
@@ -389,9 +389,9 @@ const EditService: React.FC<EditServiceProps> = ({ currentLanguage }) => {
             <div className="mt-6 p-4 border rounded-lg bg-gradient-to-br from-amber-50/50 to-orange-50/50 dark:from-amber-950/20 dark:to-orange-950/20">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h4 className="font-semibold text-base">{isRTL ? '🎉 عرض تخفيض' : '🎉 Discount Offer'}</h4>
+                  <h4 className="font-semibold text-base">{t.discount?.title || '🎉 Discount Offer'}</h4>
                   <p className="text-sm text-muted-foreground">
-                    {isRTL ? 'أضف عرض تخفيض لجذب المزيد من العملاء' : 'Add a discount to attract more customers'}
+                    {t.discount?.description || 'Add a discount to attract more customers'}
                   </p>
                 </div>
                 <Switch
@@ -409,34 +409,34 @@ const EditService: React.FC<EditServiceProps> = ({ currentLanguage }) => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                   <div className="space-y-2">
                     <Label htmlFor="discountPrice">
-                      {isRTL ? 'السعر بعد التخفيض' : 'Discounted Price'}
+                      {t.discount?.discountedPrice || 'Discounted Price'}
                     </Label>
                     <Input
                       id="discountPrice"
                       value={formData.discount_price}
                       onChange={(e) => handleInputChange('discount_price', e.target.value)}
-                      placeholder={isRTL ? 'مثال: 80' : 'e.g., 80'}
+                      placeholder={t.discount?.discountPricePlaceholder || 'e.g., 80'}
                     />
                     <p className="text-xs text-muted-foreground">
-                      {isRTL ? 'السعر الأصلي: ' : 'Original price: '}{formData.approximate_price || '---'}
+                      {t.discount?.originalPrice || 'Original price: '}{formData.approximate_price || '---'}
                     </p>
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="discountPercentage">
-                      {isRTL ? 'نسبة التخفيض (%)' : 'Discount Percentage (%)'}
+                      {t.discount?.percentage || 'Discount Percentage (%)'}
                     </Label>
                     <Input
                       id="discountPercentage"
                       type="number"
                       value={formData.discount_percentage}
                       onChange={(e) => handleInputChange('discount_percentage', parseInt(e.target.value) || 0)}
-                      placeholder={isRTL ? 'مثال: 20' : 'e.g., 20'}
+                      placeholder={t.discount?.discountPercentagePlaceholder || 'e.g., 20'}
                       min="1"
                       max="99"
                     />
                     <p className="text-xs text-muted-foreground">
-                      {isRTL ? 'سيظهر badge التخفيض على بطاقة الخدمة' : 'Discount badge will appear on service card'}
+                      {t.discount?.badgeNote || 'Discount badge will appear on service card'}
                     </p>
                   </div>
                 </div>
@@ -507,7 +507,7 @@ const EditService: React.FC<EditServiceProps> = ({ currentLanguage }) => {
                 onScheduleChange={() => {
                   toast({
                     title: t.editProfile.successTitle,
-                    description: isRTL ? 'تم تحديث الجدول بنجاح' : 'Schedule updated successfully',
+                    description: t.serviceTypes?.scheduleUpdated || 'Schedule updated successfully',
                   });
                 }}
               />

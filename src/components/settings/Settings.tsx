@@ -23,15 +23,15 @@ export function Settings({ userId, userType, language = 'ar' }: SettingsProps) {
         <TabsList className="grid w-full grid-cols-3 mb-6">
           <TabsTrigger value="notifications" className="flex items-center gap-2">
             <Bell className="w-4 h-4" />
-            <span>{isRTL ? 'الإشعارات' : 'Notifications'}</span>
+            <span>{t.settingsPage?.notifications || 'Notifications'}</span>
           </TabsTrigger>
           <TabsTrigger value="calendar" className="flex items-center gap-2">
             <Calendar className="w-4 h-4" />
-            <span>{isRTL ? 'التقويم' : 'Calendar'}</span>
+            <span>{t.settingsPage?.calendar || 'Calendar'}</span>
           </TabsTrigger>
           <TabsTrigger value="backup" className="flex items-center gap-2">
             <Database className="w-4 h-4" />
-            <span>{isRTL ? 'النسخ الاحتياطي' : 'Backup'}</span>
+            <span>{t.settingsPage?.backup || 'Backup'}</span>
           </TabsTrigger>
         </TabsList>
 

@@ -142,7 +142,7 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
       console.error('Error saving preferences:', error);
       toast({
         title: t.notificationSettings.saveFailed,
-        description: isRTL ? 'حدث خطأ أثناء حفظ الإعدادات' : 'An error occurred while saving settings',
+        description: t.notificationSettings.saveFailedDesc || 'An error occurred while saving settings',
         variant: 'destructive',
       });
     } finally {
@@ -172,8 +172,8 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
     try {
       if (!userId) {
         toast({
-          title: isRTL ? 'خطأ' : 'Error',
-          description: isRTL ? 'المستخدم غير معرف' : 'User ID not found',
+          title: t.notificationSettings.error || 'Error',
+          description: t.notificationSettings.userNotFound || 'User ID not found',
           variant: 'destructive',
         });
         return;
@@ -182,10 +182,8 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
       // Check if notification permission is granted first
       if (notificationPermission !== 'granted') {
         toast({
-          title: isRTL ? 'تفعيل الإشعارات مطلوب' : 'Notifications Required',
-          description: isRTL 
-            ? 'يرجى تفعيل الإشعارات أولاً عن طريق زر "طلب الصلاحية" في الأعلى'
-            : 'Please enable notifications first by clicking "Request Permission" button above',
+          title: t.notificationSettings.notificationsRequired || 'Notifications Required',
+          description: t.notificationSettings.notificationsRequiredDesc || 'Please enable notifications first by clicking "Request Permission" button above',
           variant: 'destructive',
         });
         return;
@@ -203,10 +201,8 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
       if (!fcmToken) {
         console.error('[handleSendTest] No FCM token found in profile');
         toast({
-          title: isRTL ? 'لم يتم حفظ رمز الإشعارات' : 'No FCM Token Saved',
-          description: isRTL 
-            ? 'يرجى الضغط على "طلب الصلاحية" أولاً لحفظ رمز الإشعارات'
-            : 'Please click "Request Permission" first to save your FCM token',
+          title: t.notificationSettings.noFcmToken || 'No FCM Token Saved',
+          description: t.notificationSettings.noFcmTokenDesc || 'Please click "Request Permission" first to save your FCM token',
           variant: 'destructive',
         });
         return;
@@ -243,8 +239,8 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
         const data = await resp.json().catch(() => null);
         console.log('[Test Notification] Success:', data);
         toast({
-          title: isRTL ? '✅ تم إرسال إشعار تجريبي' : '✅ Test notification sent',
-          description: isRTL ? 'تحقق من مركز الإشعارات في الأعلى' : 'Check your notification center at the top',
+          title: t.notificationSettings.testNotificationSent || '✅ Test notification sent',
+          description: t.notificationSettings.checkNotificationCenter || 'Check your notification center at the top',
         });
       } else {
         const text = await resp.text();
@@ -259,23 +255,19 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
         // Better error messages based on error code
         if (errorData?.error?.code === 'missing_token') {
           toast({
-            title: isRTL ? 'رمز الإشعارات مفقود' : 'FCM Token Missing',
-            description: isRTL 
-              ? 'يرجى إعادة طلب صلاحية الإشعارات عن طريق زر "طلب الصلاحية"'
-              : 'Please re-request notification permission using "Request Permission" button',
+            title: t.notificationSettings.fcmTokenMissing || 'FCM Token Missing',
+            description: t.notificationSettings.fcmTokenMissingDesc || 'Please re-request notification permission using "Request Permission" button',
             variant: 'destructive',
           });
         } else if (resp.status === 403) {
           toast({
-            title: isRTL ? 'خطأ في الصلاحيات' : 'Permission Error',
-            description: isRTL 
-              ? 'الوظيفة محمية. تم حل المشكلة، حاول مرة أخرى.' 
-              : 'Function permissions issue. Try again in a moment.',
+            title: t.notificationSettings.permissionError || 'Permission Error',
+            description: t.notificationSettings.permissionErrorDesc || 'Function permissions issue. Try again in a moment.',
             variant: 'destructive',
           });
         } else {
           toast({
-            title: isRTL ? 'فشل الإرسال' : 'Failed to send',
+            title: t.notificationSettings.failedToSend || 'Failed to send',
             description: `Status: ${resp.status}${errorData?.error?.message ? ` - ${errorData.error.message}` : ''}`,
             variant: 'destructive',
           });
@@ -284,7 +276,7 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
     } catch (e: any) {
       console.error('[Test Notification] Request error:', e);
       toast({
-        title: isRTL ? 'خطأ في الطلب' : 'Request error',
+        title: t.notificationSettings.requestError || 'Request error',
         description: e?.message || String(e),
         variant: 'destructive',
       });
@@ -311,7 +303,7 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
       <Card>
         <CardContent className="p-6">
           <div className="text-center text-muted-foreground">
-            {isRTL ? 'جاري التحميل...' : 'Loading...'}
+            {t.notificationSettings.loading || 'Loading...'}
           </div>
         </CardContent>
       </Card>
@@ -432,11 +424,11 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
                 {preferences.booking_reminders.reminder_times.length === 0
                   ? t.notificationSettings.noneSelected
                   : preferences.booking_reminders.reminder_times.map(m => {
-                      if (m < 60) return (isRTL ? `${m} دقيقة` : `${m} min`);
-                      if (m === 60) return isRTL ? 'ساعة واحدة' : '1h';
+                      if (m < 60) return (isRTL ? `${m} دقيقة` : `${m}m`);
+                      if (m === 60) return t.notificationSettings.oneHour || '1h';
                       if (m < 180) return isRTL ? `${Math.round(m/60)} ساعات` : `${Math.round(m/60)}h`;
                       if (m < 1440) return isRTL ? `${Math.round(m/60)} ساعة` : `${Math.round(m/60)}h`;
-                      if (m === 1440) return isRTL ? 'يوم واحد' : '1d';
+                      if (m === 1440) return t.notificationSettings.oneDay || '1d';
                       return `${m}m`;
                     }).join(isRTL ? '، ' : ', ')
                 }
@@ -615,7 +607,7 @@ export function NotificationSettings({ userId, language = 'ar' }: NotificationSe
             className="w-full"
           >
             <BellRing className="h-4 w-4 mr-2" />
-            {isRTL ? 'إرسال إشعار تجريبي' : 'Send Test Notification'}
+            {t.notificationSettings.sendTestNotification || 'Send Test Notification'}
           </Button>
         </div>
       </CardContent>
