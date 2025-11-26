@@ -6831,6 +6831,14 @@ export const additionalLanguages = {
       cash: "Tunai",
       card: "Kad",
       online: "Dalam Talian",
+      statuses: {
+        pending: "Tertunda",
+        confirmed: "Disahkan",
+        rejected: "Ditolak",
+        completed: "Selesai - menunggu pengesahan",
+        confirmed_completed: "Selesai",
+        cancelled: "Dibatalkan",
+      },
     },
     reviews: {
       title: "Ulasan",
@@ -7590,6 +7598,14 @@ export const additionalLanguages = {
       cash: "เงินสด",
       card: "บัตร",
       online: "ออนไลน์",
+      statuses: {
+        pending: "รอดำเนินการ",
+        confirmed: "ยืนยันแล้ว",
+        rejected: "ถูกปฏิเสธ",
+        completed: "เสร็จสิ้น - รอการยืนยัน",
+        confirmed_completed: "เสร็จสิ้น",
+        cancelled: "ยกเลิกแล้ว",
+      },
     },
     reviews: {
       title: "รีวิว",
@@ -8351,6 +8367,14 @@ export const additionalLanguages = {
       cash: "Tiền mặt",
       card: "Thẻ",
       online: "Trực tuyến",
+      statuses: {
+        pending: "Đang chờ",
+        confirmed: "Đã xác nhận",
+        rejected: "Bị từ chối",
+        completed: "Hoàn thành - chờ xác nhận",
+        confirmed_completed: "Hoàn thành",
+        cancelled: "Đã hủy",
+      },
     },
     reviews: {
       title: "Đánh giá",
@@ -9109,6 +9133,14 @@ export const additionalLanguages = {
       cash: "Gotówka",
       card: "Karta",
       online: "Online",
+      statuses: {
+        pending: "Oczekuje",
+        confirmed: "Potwierdzona",
+        rejected: "Odrzucona",
+        completed: "Zakończona - oczekuje potwierdzenia",
+        confirmed_completed: "Zakończona",
+        cancelled: "Anulowana",
+      },
     },
     reviews: {
       title: "Opinie",
@@ -9867,6 +9899,14 @@ export const additionalLanguages = {
       cash: "Contant",
       card: "Kaart",
       online: "Online",
+      statuses: {
+        pending: "In behandeling",
+        confirmed: "Bevestigd",
+        rejected: "Afgewezen",
+        completed: "Voltooid - wacht op bevestiging",
+        confirmed_completed: "Voltooid",
+        cancelled: "Geannuleerd",
+      },
     },
     reviews: {
       title: "Beoordelingen",
@@ -10625,6 +10665,14 @@ export const additionalLanguages = {
       cash: "Kontant",
       card: "Kort",
       online: "Online",
+      statuses: {
+        pending: "Väntar",
+        confirmed: "Bekräftad",
+        rejected: "Avvisad",
+        completed: "Slutförd - väntar på bekräftelse",
+        confirmed_completed: "Slutförd",
+        cancelled: "Avbokad",
+      },
     },
     reviews: {
       title: "Omdömen",
@@ -11383,6 +11431,14 @@ export const additionalLanguages = {
       cash: "Kontant",
       card: "Kort",
       online: "Online",
+      statuses: {
+        pending: "Venter",
+        confirmed: "Bekreftet",
+        rejected: "Avvist",
+        completed: "Fullført - venter på bekreftelse",
+        confirmed_completed: "Fullført",
+        cancelled: "Kansellert",
+      },
     },
     reviews: {
       title: "Anmeldelser",
@@ -12141,6 +12197,14 @@ export const additionalLanguages = {
       cash: "Kontant",
       card: "Kort",
       online: "Online",
+      statuses: {
+        pending: "Afventer",
+        confirmed: "Bekræftet",
+        rejected: "Afvist",
+        completed: "Fuldført - afventer bekræftelse",
+        confirmed_completed: "Fuldført",
+        cancelled: "Annulleret",
+      },
     },
     reviews: {
       title: "Anmeldelser",
