@@ -48,8 +48,17 @@ export function useProfileData() {
     mutationFn: async (data: Partial<ProfileData>) => {
       if (!user?.uid) throw new Error('User not authenticated');
       const docRef = doc(db, 'profiles', user.uid);
+      
+      // Filter out undefined values - Firebase doesn't accept undefined
+      const cleanData: Record<string, any> = {};
+      for (const [key, value] of Object.entries(data)) {
+        if (value !== undefined) {
+          cleanData[key] = value;
+        }
+      }
+      
       await updateDoc(docRef, {
-        ...data,
+        ...cleanData,
         updated_at: new Date()
       });
     },
