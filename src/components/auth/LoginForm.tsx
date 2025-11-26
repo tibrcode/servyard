@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, Mail, Lock } from "lucide-react";
-import { auth } from "@/integrations/firebase/client";
+import { auth, db } from "@/integrations/firebase/client";
 import { signInWithGoogle } from "@/lib/firebase/googleAuth";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
@@ -81,9 +81,21 @@ export const LoginForm = ({ currentLanguage }: LoginFormProps) => {
     setError('');
     setIsGoogleLoading(true);
     try {
-      await signInWithGoogle();
-      toast({ title: t.auth.loginSuccess, description: t.auth.welcomeBack });
-      navigate('/auth');
+      const result = await signInWithGoogle();
+      const user = result.user;
+      
+      // Check if this is a new user by checking if profile exists in Firestore
+      const profileRef = doc(db, 'profiles', user.uid);
+      const profileSnap = await getDoc(profileRef);
+      
+      if (!profileSnap.exists() || !profileSnap.data()?.user_type || profileSnap.data()?.user_type === 'unknown') {
+        // New user or user without a role - redirect to role selection
+        navigate('/select-role', { replace: true });
+      } else {
+        // Existing user with role - welcome back
+        toast({ title: t.auth.loginSuccess, description: t.auth.welcomeBack });
+        navigate('/auth', { replace: true });
+      }
     } catch (err: any) {
       console.error('Google sign-in error:', err);
       let errorMessage = err?.message || t.auth.loginError;

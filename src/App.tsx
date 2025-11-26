@@ -30,6 +30,7 @@ const ProviderProfile = React.lazy(() => import("@/pages/ProviderProfile"));
 const AdminConsole = React.lazy(() => import('@/pages/AdminConsole'));
 const Terms = React.lazy(() => import("@/pages/Terms"));
 const CompleteProfile = React.lazy(() => import("@/pages/CompleteProfile"));
+const RoleSelection = React.lazy(() => import("@/pages/RoleSelection"));
 const Privacy = React.lazy(() => import("@/pages/Privacy"));
 const Disclaimer = React.lazy(() => import("@/pages/Disclaimer"));
 const ContentPolicy = React.lazy(() => import("@/pages/ContentPolicy"));
@@ -372,6 +373,7 @@ const AppContent = () => {
                       <Route path="/privacy" element={<Privacy currentLanguage={currentLanguage} />} />
                       <Route path="/disclaimer" element={<Disclaimer currentLanguage={currentLanguage} />} />
                       <Route path="/content-policy" element={<ContentPolicy currentLanguage={currentLanguage} />} />
+                      <Route path="/select-role" element={<RoleSelection currentLanguage={currentLanguage} />} />
                       <Route path="/complete-profile" element={<CompleteProfile currentLanguage={currentLanguage} />} />
                       <Route path="/about" element={<AboutUs currentLanguage={currentLanguage} />} />
                       <Route path="/contact" element={<ContactUs currentLanguage={currentLanguage} />} />

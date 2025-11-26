@@ -1139,6 +1139,23 @@ export interface Translation {
 
   // Provider appointment text
   appointment?: string;
+
+  // Role Selection
+  roleSelection?: {
+    title: string;
+    subtitle: string;
+    customerDesc: string;
+    providerDesc: string;
+    customerBenefit1: string;
+    customerBenefit2: string;
+    customerBenefit3: string;
+    providerBenefit1: string;
+    providerBenefit2: string;
+    providerBenefit3: string;
+    continueAsCustomer: string;
+    continueAsProvider: string;
+    note: string;
+  };
 }
 
 // Base translations (English + a few fully covered langs)
@@ -2345,6 +2362,21 @@ export const translations: Record<string, Translation> = {
       }
     },
     appointment: "Appointment",
+    roleSelection: {
+      title: "Welcome to ServYard",
+      subtitle: "Choose your account type to get started",
+      customerDesc: "Find and book services from trusted providers in your area",
+      providerDesc: "Grow your business by showcasing your services to customers",
+      customerBenefit1: "Find the best service providers",
+      customerBenefit2: "Book appointments easily",
+      customerBenefit3: "Track your bookings and favorites",
+      providerBenefit1: "Showcase your services to customers",
+      providerBenefit2: "Manage your bookings efficiently",
+      providerBenefit3: "Grow your business and earn more",
+      continueAsCustomer: "Continue as Customer",
+      continueAsProvider: "Continue as Provider",
+      note: "You can change your account type later from settings"
+    },
   },
   ar: {
     nav: {
@@ -3547,6 +3579,21 @@ export const translations: Record<string, Translation> = {
       }
     },
     appointment: "موعد",
+    roleSelection: {
+      title: "مرحباً بك في سيرف يارد",
+      subtitle: "اختر نوع حسابك للبدء",
+      customerDesc: "ابحث عن الخدمات واحجز مع مزودين موثوقين في منطقتك",
+      providerDesc: "نمّي عملك من خلال عرض خدماتك للعملاء",
+      customerBenefit1: "ابحث عن أفضل مزودي الخدمات",
+      customerBenefit2: "احجز المواعيد بسهولة",
+      customerBenefit3: "تابع حجوزاتك ومفضلاتك",
+      providerBenefit1: "اعرض خدماتك للعملاء",
+      providerBenefit2: "أدر حجوزاتك بكفاءة",
+      providerBenefit3: "نمّي عملك واكسب المزيد",
+      continueAsCustomer: "المتابعة كعميل",
+      continueAsProvider: "المتابعة كمزود خدمة",
+      note: "يمكنك تغيير نوع حسابك لاحقاً من الإعدادات"
+    },
   },
 };
 

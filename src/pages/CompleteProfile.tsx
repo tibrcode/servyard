@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, ClipboardCheck, User, UserPlus } from "lucide-react";
+import { Loader2, ClipboardCheck } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
 import { commonTimezones, getBrowserTimezone } from "@/lib/timezones";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
@@ -57,11 +57,18 @@ export default function CompleteProfile({ currentLanguage }: CompleteProfileProp
 
   useEffect(() => {
     // If user already has role and basic info, send to dashboard
-    if (!loading && user && profile?.user_type && profile.full_name && profile.city && profile.country) {
+    if (!loading && user && profile?.user_type && profile.user_type !== 'unknown' && profile.full_name && profile.city && profile.country) {
       if (profile.user_type === 'provider') navigate('/provider-dashboard', { replace: true });
       if (profile.user_type === 'customer') navigate('/customer-dashboard', { replace: true });
     }
   }, [loading, user, profile, navigate]);
+
+  // If no role selected, redirect to role selection page
+  useEffect(() => {
+    if (!loading && user && !selectedRole && !queryRole) {
+      navigate('/select-role', { replace: true });
+    }
+  }, [loading, user, selectedRole, queryRole, navigate]);
 
   if (!user) {
     return (
@@ -79,48 +86,12 @@ export default function CompleteProfile({ currentLanguage }: CompleteProfileProp
     );
   }
 
-  // If no role is selected yet, show the selection screen
+  // If no role is selected, the useEffect above will redirect to /select-role
+  // Show loading while redirecting
   if (!selectedRole) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4" dir={isRTL ? 'rtl' : 'ltr'}>
-        <div className="max-w-2xl w-full space-y-8">
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-primary mb-2">{t.auth.welcome}</h1>
-            <p className="text-muted-foreground text-lg">{t.auth.subtitle}</p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card 
-              className="cursor-pointer hover:shadow-lg transition-all hover:border-primary group"
-              onClick={() => setSelectedRole('customer')}
-            >
-              <CardHeader className="text-center pb-4">
-                <div className="flex justify-center mb-4">
-                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                    <User className="w-8 h-8 text-primary" />
-                  </div>
-                </div>
-                <CardTitle className="text-xl mb-2">{t.auth.joinAsCustomer}</CardTitle>
-                <CardDescription>{t.auth.customerDescription}</CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card 
-              className="cursor-pointer hover:shadow-lg transition-all hover:border-primary group"
-              onClick={() => setSelectedRole('provider')}
-            >
-              <CardHeader className="text-center pb-4">
-                <div className="flex justify-center mb-4">
-                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                    <UserPlus className="w-8 h-8 text-primary" />
-                  </div>
-                </div>
-                <CardTitle className="text-xl mb-2">{t.auth.joinAsProvider}</CardTitle>
-                <CardDescription>{t.auth.providerDescription}</CardDescription>
-              </CardHeader>
-            </Card>
-          </div>
-        </div>
+      <div className="min-h-screen flex items-center justify-center" dir={isRTL ? 'rtl' : 'ltr'}>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
