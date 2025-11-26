@@ -1,5 +1,21 @@
 // Extended translation data for additional languages
 
+export const additionalLanguages = {
+  tl: {
+    needHelp: { title: "Kailangan ng tulong?", content: "Naririto ang aming support team para tulungan ka sa iyong tagumpay", contactUs: "Makipag-ugnayan sa Amin", termsOfService: "Mga Tuntunin ng Serbisyo", privacyPolicy: "Patakaran sa Privacy" }
+  },
+  "zh-TW": {},
+  ms: {},
+  th: {},
+  vi: {},
+  pl: {},
+  nl: {},
+  sv: {},
+  no: {},
+  da: {},
+  fi: {},
+};
+
 
 
 
