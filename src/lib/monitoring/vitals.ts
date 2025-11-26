@@ -11,14 +11,25 @@ export async function collectWebVitals(cb: VitalsCallback) {
   try {
     // Dynamically import web-vitals (add to dependencies if not present)
     const mod = await import('web-vitals');
-    mod.onCLS((m) => cb({ name: m.name, value: m.value, id: m.id }));
-    mod.onLCP((m) => cb({ name: m.name, value: m.value, id: m.id }));
-    mod.onFID((m) => cb({ name: m.name, value: m.value, id: m.id }));
-    mod.onINP?.((m: any) => cb({ name: m.name, value: m.value, id: m.id })); // future-proof
-    mod.onFCP?.((m: any) => cb({ name: m.name, value: m.value, id: m.id }));
-    mod.onTTFB?.((m: any) => cb({ name: m.name, value: m.value, id: m.id }));
+    
+    // Core Web Vitals (v4+ API)
+    if (mod.onCLS) mod.onCLS((m) => cb({ name: m.name, value: m.value, id: m.id }));
+    if (mod.onLCP) mod.onLCP((m) => cb({ name: m.name, value: m.value, id: m.id }));
+    if (mod.onINP) mod.onINP((m) => cb({ name: m.name, value: m.value, id: m.id }));
+    
+    // Additional metrics (optional)
+    if (mod.onFCP) mod.onFCP((m) => cb({ name: m.name, value: m.value, id: m.id }));
+    if (mod.onTTFB) mod.onTTFB((m) => cb({ name: m.name, value: m.value, id: m.id }));
+    
+    // Legacy FID support (removed in v4, replaced by INP)
+    if ((mod as any).onFID) {
+      (mod as any).onFID((m: any) => cb({ name: m.name, value: m.value, id: m.id }));
+    }
   } catch (e) {
-    console.warn('[Vitals] Failed to load web-vitals module', e);
+    // Silent fail - web vitals are non-critical
+    if (import.meta.env.DEV) {
+      console.warn('[Vitals] Failed to load web-vitals module', e);
+    }
   }
 }
 
