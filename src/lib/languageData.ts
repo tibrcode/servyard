@@ -1,4 +1,8 @@
 // Extended translation data for additional languages
+
+
+
+
 export const additionalLanguages = {
   ar: {
     nav: {

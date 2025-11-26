@@ -4,7 +4,7 @@ export type SupportedLanguage = {
     flag: string;
 };
 
-// 15 supported languages with flags
+// 26 supported languages with flags
 export const supportedLanguages: SupportedLanguage[] = [
     { code: 'en', name: 'English', flag: '🇺🇸' },
     { code: 'ar', name: 'العربية', flag: '🇸🇦' },
@@ -13,6 +13,7 @@ export const supportedLanguages: SupportedLanguage[] = [
     { code: 'fil', name: 'Filipino', flag: '🇵🇭' },
     { code: 'ur', name: 'اردو', flag: '🇵🇰' },
     { code: 'id', name: 'Bahasa Indonesia', flag: '🇮🇩' },
+    { code: 'ms', name: 'Bahasa Melayu', flag: '🇲🇾' },
     { code: 'ko', name: '한국어', flag: '🇰🇷' },
     { code: 'ja', name: '日本語', flag: '🇯🇵' },
     { code: 'tr', name: 'Türkçe', flag: '🇹🇷' },
@@ -21,7 +22,16 @@ export const supportedLanguages: SupportedLanguage[] = [
     { code: 'pt', name: 'Português', flag: '🇵🇹' },
     { code: 'ru', name: 'Русский', flag: '🇷🇺' },
     { code: 'hi', name: 'हिंदी', flag: '🇮🇳' },
-    { code: 'zh', name: '中文', flag: '🇨🇳' },
+    { code: 'zh', name: '简体中文', flag: '🇨🇳' },
+    { code: 'zh-TW', name: '繁體中文', flag: '🇹🇼' },
+    { code: 'th', name: 'ไทย', flag: '🇹🇭' },
+    { code: 'vi', name: 'Tiếng Việt', flag: '🇻🇳' },
+    { code: 'pl', name: 'Polski', flag: '🇵🇱' },
+    { code: 'nl', name: 'Nederlands', flag: '🇳🇱' },
+    { code: 'sv', name: 'Svenska', flag: '🇸🇪' },
+    { code: 'no', name: 'Norsk', flag: '🇳🇴' },
+    { code: 'da', name: 'Dansk', flag: '🇩🇰' },
+    { code: 'fi', name: 'Suomi', flag: '🇫🇮' },
 ];
 
 export const rtlLanguages = ['ar', 'ur'];
