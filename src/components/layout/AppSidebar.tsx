@@ -70,9 +70,9 @@ export function AppSidebar({ currentLanguage = 'en', onLanguageChange, onLocatio
     { title: t.nav.home, url: "/", icon: Home },
     { title: t.nav.services, url: "/services", icon: Search },
     { title: t.nav.notifications || 'Notifications', url: "/notifications", icon: Bell, badge: unreadCount },
-    { title: isRTL ? 'المفضلة' : 'Favorites', url: "/favorites", icon: Heart },
-    { title: isRTL ? 'المنطقة الزمنية' : 'Timezone', url: "/timezone", icon: Clock },
-    { title: t.userGuide?.title || (isRTL ? 'دليل المستخدم' : 'User Guide'), url: "/user-guide", icon: HelpCircle },
+    { title: t.favorites?.title || t.dashboardCommon?.favorites || 'Favorites', url: "/favorites", icon: Heart },
+    { title: t.timezone?.title || t.settingsPage?.timezone || 'Timezone', url: "/timezone", icon: Clock },
+    { title: t.userGuide?.title || 'User Guide', url: "/user-guide", icon: HelpCircle },
   ];
 
   const authNavItems = user ? [] : [
