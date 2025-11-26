@@ -11,17 +11,19 @@ export interface EnrichedServiceFavorite extends Favorite {
   details?: Service;
   provider?: ProviderProfile;
   rating?: { avg: number; count: number };
+  fetchError?: boolean;
 }
 
 export interface EnrichedProviderFavorite extends Favorite {
   details?: ProviderProfile;
+  fetchError?: boolean;
 }
 
 export function useFavoritesData() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-    // Fetch Categories
+  // Fetch Categories
   const { data: categories = [] } = useServiceCategories();
 
   // Fetch Service Favorites
@@ -41,39 +43,47 @@ export function useFavoritesData() {
           if (serviceDoc.exists()) {
             details = { id: serviceDoc.id, ...serviceDoc.data() } as Service;
             
-            // Fetch provider details
+            // Fetch provider details - try 'profiles' first (more reliable), then 'provider_profiles'
             if (details.provider_id) {
-              const providerDoc = await getDoc(doc(db, 'provider_profiles', details.provider_id));
-              // Fallback to 'profiles' collection if not found in 'provider_profiles' (legacy support)
-              if (providerDoc.exists()) {
-                provider = { id: providerDoc.id, ...providerDoc.data() } as ProviderProfile;
-              } else {
-                 const profileDoc = await getDoc(doc(db, 'profiles', details.provider_id));
-                 if (profileDoc.exists()) {
-                    provider = { id: profileDoc.id, ...profileDoc.data() } as ProviderProfile;
-                 }
+              try {
+                const profileDoc = await getDoc(doc(db, 'profiles', details.provider_id));
+                if (profileDoc.exists()) {
+                  provider = { id: profileDoc.id, ...profileDoc.data() } as ProviderProfile;
+                } else {
+                  // Fallback to provider_profiles collection
+                  const providerDoc = await getDoc(doc(db, 'provider_profiles', details.provider_id));
+                  if (providerDoc.exists()) {
+                    provider = { id: providerDoc.id, ...providerDoc.data() } as ProviderProfile;
+                  }
+                }
+              } catch (providerError) {
+                console.warn('Could not fetch provider, continuing without provider details:', providerError);
               }
             }
 
             // Fetch ratings
-            const reviewsQuery = query(
-              collection(db, 'reviews'),
-              where('service_id', '==', fav.item_id)
-            );
-            const reviewsSnapshot = await getDocs(reviewsQuery);
-            if (!reviewsSnapshot.empty) {
-              const total = reviewsSnapshot.docs.reduce((acc, doc) => acc + (doc.data().rating || 0), 0);
-              rating = {
-                avg: total / reviewsSnapshot.size,
-                count: reviewsSnapshot.size
-              };
+            try {
+              const reviewsQuery = query(
+                collection(db, 'reviews'),
+                where('service_id', '==', fav.item_id)
+              );
+              const reviewsSnapshot = await getDocs(reviewsQuery);
+              if (!reviewsSnapshot.empty) {
+                const total = reviewsSnapshot.docs.reduce((acc, doc) => acc + (doc.data().rating || 0), 0);
+                rating = {
+                  avg: total / reviewsSnapshot.size,
+                  count: reviewsSnapshot.size
+                };
+              }
+            } catch (ratingError) {
+              console.warn('Could not fetch ratings:', ratingError);
             }
           }
           
           return { ...fav, details, provider, rating } as EnrichedServiceFavorite;
         } catch (error) {
-          console.error(`Error fetching details for service ${fav.item_id}:`, error);
-          return fav as EnrichedServiceFavorite;
+          console.error('Error fetching details for service, marking as fetch error:', error);
+          return { ...fav, fetchError: true } as EnrichedServiceFavorite;
         }
       }));
       
@@ -93,22 +103,26 @@ export function useFavoritesData() {
         try {
           let details: ProviderProfile | undefined;
           
-          // Try provider_profiles first
-          const providerDoc = await getDoc(doc(db, 'provider_profiles', fav.item_id));
-          if (providerDoc.exists()) {
-            details = { id: providerDoc.id, ...providerDoc.data() } as ProviderProfile;
+          // Try 'profiles' first (more reliable), then 'provider_profiles'
+          const profileDoc = await getDoc(doc(db, 'profiles', fav.item_id));
+          if (profileDoc.exists()) {
+            details = { id: profileDoc.id, ...profileDoc.data() } as ProviderProfile;
           } else {
-            // Fallback to profiles collection (legacy support)
-            const profileDoc = await getDoc(doc(db, 'profiles', fav.item_id));
-            if (profileDoc.exists()) {
-              details = { id: profileDoc.id, ...profileDoc.data() } as ProviderProfile;
+            // Fallback to provider_profiles collection
+            try {
+              const providerDoc = await getDoc(doc(db, 'provider_profiles', fav.item_id));
+              if (providerDoc.exists()) {
+                details = { id: providerDoc.id, ...providerDoc.data() } as ProviderProfile;
+              }
+            } catch (providerError) {
+              console.warn('Could not fetch from provider_profiles:', providerError);
             }
           }
           
           return { ...fav, details } as EnrichedProviderFavorite;
         } catch (error) {
-          console.error(`Error fetching details for provider ${fav.item_id}:`, error);
-          return fav as EnrichedProviderFavorite;
+          console.error('Error fetching details for provider, marking as fetch error:', error);
+          return { ...fav, fetchError: true } as EnrichedProviderFavorite;
         }
       }));
       
