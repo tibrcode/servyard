@@ -125,15 +125,15 @@ export const Header = ({
             />
             <Link 
               to="/" 
-              className="flex flex-col items-start leading-none min-w-0 overflow-hidden" 
+              className="flex items-center gap-2 leading-none min-w-0 overflow-hidden" 
               aria-label="ServYard home"
               onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}
             >
-              {/* Logo - doubled size for better visibility */}
-              <BrandLogo height={80} />
-              {/* Golden tagline under logo - larger text */}
+              {/* Logo */}
+              <BrandLogo height={56} />
+              {/* Golden tagline beside logo - each word on new line */}
               <span 
-                className="text-sm sm:text-base md:text-lg font-semibold mt-0.5"
+                className="text-[11px] sm:text-xs md:text-sm font-semibold leading-tight flex flex-col"
                 style={{ 
                   background: 'linear-gradient(90deg, #D4AF37, #F4E4BA, #D4AF37)',
                   WebkitBackgroundClip: 'text',
@@ -141,7 +141,12 @@ export const Header = ({
                   backgroundClip: 'text'
                 }}
               >
-                {t.home?.headerTagline || (isRTL ? 'منصة الخدمات المتميزة' : 'Premium Service Marketplace')}
+                {(t.home?.headerTagline || (isRTL ? 'منصة الخدمات المتميزة' : 'Premium Service Marketplace'))
+                  .split(' ')
+                  .map((word, idx) => (
+                    <span key={idx}>{word}</span>
+                  ))
+                }
               </span>
             </Link>
           </div>
