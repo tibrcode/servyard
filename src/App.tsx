@@ -349,7 +349,7 @@ const AppContent = () => {
                       <Route path="/services" element={<Services currentLanguage={currentLanguage} />} />
                       <Route path="/favorites" element={
                         <ProtectedRoute requireRole="customer">
-                          <Favorites />
+                          <Favorites currentLanguage={currentLanguage} />
                         </ProtectedRoute>
                       } />
                       <Route path="/provider-dashboard" element={

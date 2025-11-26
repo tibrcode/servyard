@@ -16,11 +16,15 @@ import { getCategoryIcon, getCategoryColor } from '@/lib/categoryIcons';
 import { Service, ProviderProfile } from '@/types/service';
 import { useFavoritesData } from '@/hooks/useFavoritesData';
 
-export default function Favorites() {
+interface FavoritesProps {
+  currentLanguage?: string;
+}
+
+export default function Favorites({ currentLanguage = 'en' }: FavoritesProps) {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { t, isRTL } = useTranslation();
+  const { t, isRTL } = useTranslation(currentLanguage);
   
   const { 
     serviceFavorites, 
@@ -591,7 +595,7 @@ export default function Favorites() {
           }}
           service={selectedService}
           provider={selectedProvider}
-          currentLanguage="en"
+          currentLanguage={currentLanguage}
         />
       )}
       </main>
