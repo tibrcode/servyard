@@ -7340,6 +7340,7 @@ export const additionalLanguages = {
       serviceCreateFailed: "สร้างบริการไม่สำเร็จ",
       setLocationPrompt: "กรุณาตั้งค่าตำแหน่งของคุณจากส่วนหัวเพื่อดูบริการใกล้เคียง",
       myLocation: "ตำแหน่งของฉัน",
+      noData: "ไม่มีข้อมูล",
     },
     dashboard: {
       main: "การนำทางหลัก",
