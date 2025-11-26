@@ -125,15 +125,15 @@ export const Header = ({
             />
             <Link 
               to="/" 
-              className="flex items-center gap-2 leading-none min-w-0 overflow-hidden" 
+              className="flex items-center gap-1 leading-none min-w-0 overflow-hidden" 
               aria-label="ServYard home"
               onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}
             >
-              {/* Logo */}
-              <BrandLogo height={56} />
-              {/* Golden tagline beside logo - each word on new line */}
+              {/* Logo - large size */}
+              <BrandLogo height={80} />
+              {/* Golden tagline beside logo - stacked words, tight spacing */}
               <span 
-                className="text-[11px] sm:text-xs md:text-sm font-semibold leading-tight flex flex-col"
+                className="text-[10px] sm:text-[11px] font-semibold flex flex-col leading-[1.1]"
                 style={{ 
                   background: 'linear-gradient(90deg, #D4AF37, #F4E4BA, #D4AF37)',
                   WebkitBackgroundClip: 'text',
