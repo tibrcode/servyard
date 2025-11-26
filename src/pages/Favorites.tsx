@@ -531,7 +531,7 @@ export default function Favorites({ currentLanguage = 'en' }: FavoritesProps) {
                           {removingId === favorite.item_id ? (
                             <div className="h-4 w-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
                           ) : (
-                            <Heart className="h-4 w-4 text-red-500 fill-red-500" />
+                            <Trash2 className="h-4 w-4 text-red-600" />
                           )}
                         </Button>
                       </div>
