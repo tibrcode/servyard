@@ -149,12 +149,18 @@ export default function Favorites({ currentLanguage = 'en' }: FavoritesProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {serviceFavorites.map((favorite) => {
                 const service = favorite.details;
-                const isDeleted = !service;
+                const hasFetchError = (favorite as { fetchError?: boolean }).fetchError;
+                const isDeleted = !service && !hasFetchError;
                 const isExpanded = expandedServiceId === favorite.item_id;
                 const CategoryIcon = getCategoryIcon(favorite.item_category);
                 const categoryColor = getCategoryColor(favorite.item_category);
                 const rating = favorite.rating || { avg: 0, count: 0 };
                 const isTopService = rating.avg >= 4.5;
+
+                // Skip if there was a fetch error (likely permission issue, not actually deleted)
+                if (hasFetchError) {
+                  return null;
+                }
 
                 if (isDeleted) {
                   return (
