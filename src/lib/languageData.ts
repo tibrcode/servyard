@@ -1,25 +1,6 @@
 // Extended translation data for additional languages
 
 export const additionalLanguages = {
-  tl: {
-    needHelp: { title: "Kailangan ng tulong?", content: "Naririto ang aming support team para tulungan ka sa iyong tagumpay", contactUs: "Makipag-ugnayan sa Amin", termsOfService: "Mga Tuntunin ng Serbisyo", privacyPolicy: "Patakaran sa Privacy" }
-  },
-  "zh-TW": {},
-  ms: {},
-  th: {},
-  vi: {},
-  pl: {},
-  nl: {},
-  sv: {},
-  no: {},
-  da: {},
-  fi: {},
-};
-
-
-
-
-export const additionalLanguages = {
   ar: {
     nav: {
       home: "الرئيسية",
@@ -6507,5 +6488,15 @@ export const additionalLanguages = {
     servicesPage: { services: "Mga Serbisyo", appointments: "Mga Appointment", map: "Mapa", offers: "Mga Alok", searchRadius: "Radius ng Paghahanap:", km: "km", nearest: "Pinakamalapit", providersInArea: "Mga provider sa lugar:", showingAllProviders: "Ipinapakita ang lahat ng provider anuman ang radius ng paghahanap", provider: "Provider:", duration: "Tagal:", city: "Lungsod:", minutes: "minuto", bookAppointment: "Mag-book ng Appointment", viewAllServices: "Tingnan Lahat ng Serbisyo", noReviews: "Wala pang mga review", appointment: "Appointment", priceOnRequest: "Presyo kapag hiniling", locationNotSupported: "Hindi suportado ang lokasyon", locationSet: "Naitakda ang lokasyon", locationFailed: "Hindi nakuha ang lokasyon", error: "Error" },
     interactiveMap: { title: "Interactive Map", loading: "Naglo-load ng mapa...", error: "Error sa paglo-load ng mapa", getCurrentLocation: "Aking Lokasyon", clickToSelect: "Mag-click para pumili ng lokasyon", top: "TOP", noReviews: "Walang review", bookAppointment: "Mag-book", viewDetails: "Tingnan ang Detalye", services: "serbisyo" },
     userGuide: { title: "User Guide", heroSubtitle: "Alamin kung paano tinutulungan ng ServYard ang mga service provider na pamahalaan ang kanilang negosyo at makakuha ng mas maraming customer", forProviders: { badge: "Para sa Service Providers", title: "Baguhin ang paraan ng pamamahala mo sa iyong negosyo", subtitle: "Libu-libong provider ang nag-optimize ng kanilang schedule at pinalawak ang kanilang customer base gamit ang ServYard" }, providerBenefits: { organizeSchedule: { title: "Ayusin ang iyong schedule", description: "Paalam na sa magulo na booking register at mga namiss na tawag. Awtomatikong pinamamahalaan ng ServYard ang iyong schedule, nagpapadala ng mga paalala at inorganisa ang lahat sa isang lugar.", highlights: ["Awtomatikong pamamahala ng booking", "Matalinong pagtukoy ng conflict", "I-set ang lingguhang availability", "Pamahalaan ang mga holiday at espesyal na schedule"] }, growBusiness: { title: "Palakihin ang negosyo", description: "Maabot ang mga bagong customer na aktibong naghahanap ng iyong mga serbisyo. Ipapakita ang iyong profile sa libu-libong potensyal na customer sa iyong lugar.", highlights: ["Lumabas sa mga resulta ng paghahanap", "Matuklasan sa mapa", "Bumuo ng online reputation", "Makakuha ng customer 24/7"] }, saveTime: { title: "Makatipid ng mahalagang oras", description: "Huwag nang mag-aksaya ng oras sa mga tawag at manual scheduling. Direktang nag-book ang mga customer, isa-approve mo lang ng isang tap, lahat ay makakatanggap ng awtomatikong notification.", highlights: ["Isang tap na booking approval", "Awtomatikong mga notification", "Walang phone tag", "Mag-focus sa iyong expertise"] }, buildReputation: { title: "Buuin ang reputation", description: "Mangolekta ng mga review mula sa nasisiyahang customer at ipakita ang iyong kalidad. Ang magagandang review ay nakakaakit ng mas maraming customer, lumilikha ng growth cycle.", highlights: ["Verified na customer reviews", "Ipakita ang star rating", "TOP Provider badge", "Mga trust indicator"] }, trackPerformance: { title: "Subaybayan ang performance", description: "Alamin kung paano ang takbo ng iyong negosyo. Subaybayan ang mga booking, kita at customer satisfaction sa iyong personalized dashboard.", highlights: ["Pagsubaybay ng kita", "Mga booking statistics", "Pagsusuri ng rating", "Mga growth insight"] }, specialOffers: { title: "Gumawa ng special discounts", description: "Makaakit ng mas maraming customer gamit ang promo discounts. Gumawa ng limited-time discounts na nakaka-highlight para sa mga potensyal na customer.", highlights: ["Percent discounts", "Fixed amount discounts", "Booking promos", "Highlighted offers"] } }, howItWorks: { provider: { title: "Paano magsimula bilang provider", step1: { title: "Gumawa ng profile", description: "Mag-sign up sa loob ng ilang minuto. Magdagdag ng business info, mga serbisyo, presyo at mga larawan para gumawa ng professional na profile." }, step2: { title: "I-set ang availability", description: "I-define ang iyong working hours para sa bawat araw. Magdagdag ng mga holiday o espesyal na petsa kung kailan ka hindi available." }, step3: { title: "Makatanggap ng booking", description: "Mahahanap ka ng mga customer at mag-bo-book. Makatanggap ng instant notification at mag-approve o mag-reschedule ng isang tap lang." }, step4: { title: "Magbigay ng serbisyo at lumago", description: "Magbigay ng mahusay na serbisyo, mangolekta ng mga review at panoorin ang paglaki ng iyong negosyo habang mas maraming customer ang nakakahanap sa iyo." } } }, dashboardPreview: { title: "Provider Dashboard", description: "Lahat ng kailangan mo para pamahalaan ang negosyo sa isang powerful na dashboard:", stats: "Real-time statistics", statsDesc: "Mga booking, kita, rating", bookings: "Booking management", bookingsDesc: "I-approve, i-reject, i-reschedule", services: "Service management", servicesDesc: "Magdagdag, mag-edit, magtakda ng presyo", reviews: "Reviews & Ratings", reviewsDesc: "I-monitor ang reputation" }, divider: "May para din sa mga customer", forCustomers: { badge: "Para sa Customers", title: "Madaling maghanap at mag-book ng serbisyo", subtitle: "Matuklasan ang mga trusted provider at mag-book sa loob ng ilang segundo" }, customerBenefits: { findServices: { title: "Madaling maghanap ng serbisyo", description: "Maghanap ayon sa kategorya, lokasyon at rating para mahanap ang eksaktong kailangan mo." }, bookInstantly: { title: "Mag-book agad", description: "Tingnan ang real-time availability at mag-book ng appointment sa loob ng ilang segundo." }, trustedProviders: { title: "Trusted providers", description: "Basahin ang tunay na mga review mula sa ibang customer at gumawa ng informed na desisyon." }, stayInformed: { title: "Manatiling informed", description: "Makatanggap ng booking confirmation, mga paalala at mga special offer alert." } }, features: { title: "Platform features", multiLanguage: { title: "16 na wika", description: "Gamitin ang ServYard sa iyong gustong wika" }, locationBased: { title: "Location-based", description: "Matuklasan ang mga serbisyo sa malapit gamit ang interactive map" }, mobileFirst: { title: "Mobile friendly", description: "Perpektong gumagana sa lahat ng device" }, secure: { title: "Secure at Private", description: "Data protection at encryption" } }, cta: { becomeProvider: "Maging provider ngayon", joinAsCustomer: "Sumali bilang customer" }, needHelp: { title: "Kailangan ng tulong?", content: "Naririto ang aming support team para tulungan ka sa iyong tagumpay", contactUs: "Makipag-ugnayan sa Amin", termsOfService: "Mga Tuntunin ng Serbisyo", privacyPolicy: "Patakaran sa Privacy" } }
-  }
+  },
+  "zh-TW": {},
+  ms: {},
+  th: {},
+  vi: {},
+  pl: {},
+  nl: {},
+  sv: {},
+  no: {},
+  da: {},
+  fi: {},
 };
