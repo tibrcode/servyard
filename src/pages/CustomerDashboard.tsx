@@ -365,7 +365,7 @@ const CustomerDashboard = ({ currentLanguage }: CustomerDashboardProps) => {
 
             {/* Favorites Tab */}
             <TabsContent value="favorites" className="space-y-6">
-              <Favorites />
+              <Favorites currentLanguage={currentLanguage} />
             </TabsContent>
 
             {/* Reviews Tab */}
