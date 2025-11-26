@@ -224,7 +224,7 @@ export const Header = ({
                 className="h-10 w-10 p-0 flex items-center justify-center"
                 asChild
               >
-                <Link to="/timezone" aria-label={isRTL ? 'المنطقة الزمنية' : 'Timezone'}>
+                <Link to="/timezone" aria-label={t.settingsPage?.timezone || (isRTL ? 'المنطقة الزمنية' : 'Timezone')}>
                   <Clock className="h-5 w-5" />
                 </Link>
               </Button>
@@ -237,12 +237,12 @@ export const Header = ({
                     className="h-10 w-10 p-0 flex items-center justify-center"
                     asChild
                   >
-                    <Link to="/timezone" aria-label={isRTL ? 'المنطقة الزمنية' : 'Timezone'}>
+                    <Link to="/timezone" aria-label={t.settingsPage?.timezone || (isRTL ? 'المنطقة الزمنية' : 'Timezone')}>
                       <Clock className="h-5 w-5" />
                     </Link>
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>{isRTL ? 'المنطقة الزمنية' : 'Timezone'}</TooltipContent>
+                <TooltipContent>{t.settingsPage?.timezone || (isRTL ? 'المنطقة الزمنية' : 'Timezone')}</TooltipContent>
               </Tooltip>
             )}
 

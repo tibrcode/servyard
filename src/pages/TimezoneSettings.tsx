@@ -130,9 +130,9 @@ export default function TimezoneSettings({ currentLanguage }: TimezoneSettingsPr
               {t.timezone?.title || 'Timezone Settings'}
             </CardTitle>
             <CardDescription>
-              {isRTL 
+              {t.timezone?.description || (isRTL 
                 ? 'اختر المنطقة الزمنية الخاصة بك لحساب الأوقات والإشعارات بدقة' 
-                : 'Select your timezone for accurate time calculations and notifications'}
+                : 'Select your timezone for accurate time calculations and notifications')}
             </CardDescription>
           </CardHeader>
 

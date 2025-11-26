@@ -129,9 +129,11 @@ export function MyBookings({
     reviewError: isRTL ? 'فشل إرسال التقييم' : 'Failed to submit review',
     noPast: isRTL ? 'ليس لديك حجوزات سابقة' : "You don't have any past bookings",
     statuses: {
-      pending: isRTL ? 'قيد الانتظار' : 'Pending',
-      cancelled: isRTL ? 'ملغي' : 'Cancelled',
-      'no-show': isRTL ? 'لم يحضر' : 'No Show',
+      pending: t.notificationsUI?.bookingStatusPending || (isRTL ? 'قيد الانتظار' : 'Pending'),
+      confirmed: t.notificationsUI?.bookingStatusConfirmed || (isRTL ? 'مؤكد' : 'Confirmed'),
+      cancelled: t.notificationsUI?.bookingStatusCancelled || (isRTL ? 'ملغي' : 'Cancelled'),
+      completed: t.notificationsUI?.bookingStatusCompleted || (isRTL ? 'مكتمل' : 'Completed'),
+      'no-show': t.notificationsUI?.bookingStatusNoShow || (isRTL ? 'لم يحضر' : 'No Show'),
     },
   };
 
