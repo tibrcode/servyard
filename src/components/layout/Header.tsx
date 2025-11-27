@@ -125,30 +125,28 @@ export const Header = ({
             />
             <Link 
               to="/" 
-              className="flex items-center gap-0.5 leading-none min-w-0 overflow-hidden" 
+              className="flex items-center leading-none min-w-0 overflow-hidden" 
               aria-label="ServYard home"
               onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}
             >
               {/* Logo - large size */}
               <BrandLogo height={90} />
-              {/* Golden tagline beside logo - stacked words, very tight spacing */}
+              {/* Golden tagline beside logo - using <br> for zero spacing */}
               <span 
-                className="text-[9px] sm:text-[11px] font-semibold flex flex-col"
+                className="text-[10px] sm:text-[12px] font-semibold ms-1"
                 style={{ 
                   background: 'linear-gradient(90deg, #D4AF37, #F4E4BA, #D4AF37)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
-                  lineHeight: '1.05'
+                  lineHeight: '1.15'
                 }}
-              >
-                {(t.home?.headerTagline || (isRTL ? 'منصة الخدمات المتميزة' : 'Premium Service Marketplace'))
-                  .split(' ')
-                  .map((word, idx) => (
-                    <span key={idx}>{word}</span>
-                  ))
-                }
-              </span>
+                dangerouslySetInnerHTML={{
+                  __html: (t.home?.headerTagline || (isRTL ? 'منصة الخدمات المتميزة' : 'Premium Service Marketplace'))
+                    .split(' ')
+                    .join('<br/>')
+                }}
+              />
             </Link>
           </div>
 
