@@ -125,7 +125,7 @@ export const Header = ({
             />
             <Link 
               to="/" 
-              className="flex items-center leading-none min-w-0 overflow-hidden" 
+              className="flex items-end leading-none min-w-0 overflow-hidden" 
               aria-label="ServYard home"
               onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}
             >
@@ -133,7 +133,7 @@ export const Header = ({
               <BrandLogo height={90} />
               {/* Golden tagline beside logo - using <br> for zero spacing */}
               <span 
-                className="text-[16px] sm:text-lg font-semibold ms-1"
+                className="text-[16px] sm:text-lg font-semibold ms-1 pb-1"
                 style={{ 
                   background: 'linear-gradient(90deg, #D4AF37, #F4E4BA, #D4AF37)',
                   WebkitBackgroundClip: 'text',
