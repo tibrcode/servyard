@@ -133,13 +133,13 @@ export const Header = ({
               <BrandLogo height={90} />
               {/* Golden tagline beside logo - using <br> for zero spacing */}
               <span 
-                className="text-[10px] sm:text-[12px] font-semibold ms-1"
+                className="text-[12px] sm:text-[14px] font-semibold ms-1"
                 style={{ 
                   background: 'linear-gradient(90deg, #D4AF37, #F4E4BA, #D4AF37)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
-                  lineHeight: '1.15'
+                  lineHeight: '1.2'
                 }}
                 dangerouslySetInnerHTML={{
                   __html: (t.home?.headerTagline || (isRTL ? 'منصة الخدمات المتميزة' : 'Premium Service Marketplace'))
