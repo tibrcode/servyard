@@ -125,20 +125,21 @@ export const Header = ({
             />
             <Link 
               to="/" 
-              className="flex items-center gap-1 leading-none min-w-0 overflow-hidden" 
+              className="flex items-center gap-0.5 leading-none min-w-0 overflow-hidden" 
               aria-label="ServYard home"
               onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}
             >
               {/* Logo - large size */}
-              <BrandLogo height={80} />
-              {/* Golden tagline beside logo - stacked words, tight spacing */}
+              <BrandLogo height={90} />
+              {/* Golden tagline beside logo - stacked words, very tight spacing */}
               <span 
-                className="text-[10px] sm:text-[11px] font-semibold flex flex-col leading-[1.1]"
+                className="text-[9px] sm:text-[11px] font-semibold flex flex-col"
                 style={{ 
                   background: 'linear-gradient(90deg, #D4AF37, #F4E4BA, #D4AF37)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text'
+                  backgroundClip: 'text',
+                  lineHeight: '1.05'
                 }}
               >
                 {(t.home?.headerTagline || (isRTL ? 'منصة الخدمات المتميزة' : 'Premium Service Marketplace'))
