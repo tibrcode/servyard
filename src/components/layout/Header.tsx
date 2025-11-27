@@ -133,7 +133,7 @@ export const Header = ({
               <BrandLogo height={90} />
               {/* Golden tagline beside logo - using <br> for zero spacing */}
               <span 
-                className="text-[14px] sm:text-[16px] font-semibold ms-1"
+                className="text-[16px] sm:text-lg font-semibold ms-1"
                 style={{ 
                   background: 'linear-gradient(90deg, #D4AF37, #F4E4BA, #D4AF37)',
                   WebkitBackgroundClip: 'text',
