@@ -239,6 +239,17 @@ export const ServiceManagement = ({ currentLanguage, currencyCode }: ServiceMana
                         </p>
                       )}
 
+                      {service.specialty_description && (
+                        <div className="mb-2 sm:mb-3 p-2 bg-background rounded border border-dashed">
+                          <p className="text-xs font-semibold text-primary mb-1">
+                            {t.addService.specialtyDescription}
+                          </p>
+                          <p className="text-sm text-foreground break-words hyphens-auto">
+                            {service.specialty_description}
+                          </p>
+                        </div>
+                      )}
+
                       <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-muted-foreground">
                         {service.has_discount && service.discount_price ? (
                           <div className="flex items-center gap-2">
