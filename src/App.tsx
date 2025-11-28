@@ -41,6 +41,7 @@ const DebugNotifications = React.lazy(() => import("@/pages/DebugNotifications")
 const NotificationsHistory = React.lazy(() => import("@/pages/NotificationsHistory"));
 const Favorites = React.lazy(() => import("@/pages/Favorites"));
 const UserGuide = React.lazy(() => import("@/pages/UserGuide"));
+const ResetPassword = React.lazy(() => import("@/pages/ResetPassword"));
 
 import { NotificationLogProvider, useNotificationLog } from "@/contexts/NotificationLogContext";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -345,6 +346,7 @@ const AppContent = () => {
                         />
                       } />
                       <Route path="/auth" element={<Auth currentLanguage={currentLanguage} onLanguageChange={handleLanguageChange} />} />
+                      <Route path="/reset-password" element={<ResetPassword currentLanguage={currentLanguage} />} />
                       <Route path="/provider-signup" element={<ProviderSignup currentLanguage={currentLanguage} onLanguageChange={handleLanguageChange} />} />
                       <Route path="/customer-signup" element={<CustomerSignup currentLanguage={currentLanguage} onLanguageChange={handleLanguageChange} />} />
                       <Route path="/services" element={<Services currentLanguage={currentLanguage} />} />

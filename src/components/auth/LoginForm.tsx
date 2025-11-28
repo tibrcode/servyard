@@ -123,7 +123,13 @@ export const LoginForm = ({ currentLanguage }: LoginFormProps) => {
     setResetSuccess(false);
 
     try {
-      await sendPasswordResetEmail(auth, resetEmail.trim());
+      // Get the current domain for the reset password redirect
+      const actionCodeSettings = {
+        url: `${window.location.origin}/reset-password`,
+        handleCodeInApp: true,
+      };
+      
+      await sendPasswordResetEmail(auth, resetEmail.trim(), actionCodeSettings);
       setResetSuccess(true);
       toast({
         title: t.auth.resetPasswordEmailSent,
