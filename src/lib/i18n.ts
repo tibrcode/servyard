@@ -92,6 +92,12 @@ export interface Translation {
     dontHaveAccount: string;
     forgotPassword: string;
     resetPassword: string;
+    resetPasswordEmailSent: string;
+    resetPasswordEmailSentDesc: string;
+    resetPasswordError: string;
+    enterEmailForReset: string;
+    sendResetLink: string;
+    sending: string;
     backToLogin: string;
     createAccount: string;
     signingIn: string;
@@ -1314,6 +1320,12 @@ export const translations: Record<string, Translation> = {
       dontHaveAccount: "Don't have an account?",
       forgotPassword: 'Forgot Password?',
       resetPassword: 'Reset Password',
+      resetPasswordEmailSent: 'Password Reset Email Sent',
+      resetPasswordEmailSentDesc: 'Check your email for a link to reset your password',
+      resetPasswordError: 'Failed to send reset email',
+      enterEmailForReset: 'Enter your email to receive a password reset link',
+      sendResetLink: 'Send Reset Link',
+      sending: 'Sending...',
       backToLogin: 'Back to Login',
       createAccount: 'Create Account',
       signingIn: 'Signing In...',
@@ -2530,6 +2542,12 @@ export const translations: Record<string, Translation> = {
       dontHaveAccount: "ليس لديك حساب؟",
       forgotPassword: "نسيت كلمة المرور؟",
       resetPassword: "إعادة تعيين كلمة المرور",
+      resetPasswordEmailSent: "تم إرسال رابط إعادة التعيين",
+      resetPasswordEmailSentDesc: "تحقق من بريدك الإلكتروني للحصول على رابط إعادة تعيين كلمة المرور",
+      resetPasswordError: "فشل في إرسال رابط إعادة التعيين",
+      enterEmailForReset: "أدخل بريدك الإلكتروني لاستلام رابط إعادة تعيين كلمة المرور",
+      sendResetLink: "إرسال رابط إعادة التعيين",
+      sending: "جاري الإرسال...",
       backToLogin: "العودة لتسجيل الدخول",
       createAccount: "إنشاء حساب",
       signingIn: "جاري تسجيل الدخول...",

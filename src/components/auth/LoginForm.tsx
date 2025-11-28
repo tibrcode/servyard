@@ -2,12 +2,12 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, Mail, Lock } from "lucide-react";
+import { Loader2, Mail, Lock, ArrowLeft } from "lucide-react";
 import { auth, db } from "@/integrations/firebase/client";
 import { signInWithGoogle } from "@/lib/firebase/googleAuth";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { useTranslation } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
@@ -27,7 +27,11 @@ export const LoginForm = ({ currentLanguage }: LoginFormProps) => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isResetLoading, setIsResetLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetSuccess, setResetSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -110,6 +114,117 @@ export const LoginForm = ({ currentLanguage }: LoginFormProps) => {
     }
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!resetEmail.trim()) return;
+    
+    setIsResetLoading(true);
+    setError('');
+    setResetSuccess(false);
+
+    try {
+      await sendPasswordResetEmail(auth, resetEmail.trim());
+      setResetSuccess(true);
+      toast({
+        title: t.auth.resetPasswordEmailSent,
+        description: t.auth.resetPasswordEmailSentDesc
+      });
+    } catch (err: any) {
+      console.error('Password reset error:', err);
+      let errorMessage = t.auth.resetPasswordError;
+      
+      if (err.code === 'auth/user-not-found') {
+        errorMessage = 'لا يوجد حساب مرتبط بهذا البريد الإلكتروني';
+      } else if (err.code === 'auth/invalid-email') {
+        errorMessage = 'البريد الإلكتروني غير صالح';
+      } else if (err.code === 'auth/too-many-requests') {
+        errorMessage = 'تم إرسال طلبات كثيرة. يرجى المحاولة لاحقاً';
+      }
+      
+      setError(errorMessage);
+    } finally {
+      setIsResetLoading(false);
+    }
+  };
+
+  // Forgot Password View
+  if (showForgotPassword) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-center">{t.auth.resetPassword}</CardTitle>
+          <CardDescription className="text-center">
+            {t.auth.enterEmailForReset}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleForgotPassword} className="space-y-4">
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
+            {resetSuccess && (
+              <Alert className="bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-800">
+                <AlertDescription className="text-green-700 dark:text-green-300">
+                  ✅ {t.auth.resetPasswordEmailSentDesc}
+                </AlertDescription>
+              </Alert>
+            )}
+
+            <div className="space-y-2">
+              <Label htmlFor="resetEmail" className="flex items-center gap-2">
+                <Mail className="w-4 h-4" />
+                {t.auth.email}
+              </Label>
+              <Input
+                id="resetEmail"
+                type="email"
+                value={resetEmail}
+                onChange={(e) => setResetEmail(e.target.value)}
+                placeholder={t.auth.emailPlaceholder}
+                required
+                disabled={isResetLoading}
+                autoFocus
+              />
+            </div>
+
+            <Button 
+              type="submit" 
+              className="w-full luxury-button" 
+              disabled={isResetLoading || !resetEmail.trim()}
+            >
+              {isResetLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                  {t.auth.sending}
+                </>
+              ) : (
+                t.auth.sendResetLink
+              )}
+            </Button>
+
+            <Button
+              type="button"
+              variant="ghost"
+              className="w-full"
+              onClick={() => {
+                setShowForgotPassword(false);
+                setError('');
+                setResetSuccess(false);
+                setResetEmail('');
+              }}
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              {t.auth.backToLogin}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -153,6 +268,22 @@ export const LoginForm = ({ currentLanguage }: LoginFormProps) => {
               required
               disabled={isLoading}
             />
+          </div>
+
+          {/* Forgot Password Link */}
+          <div className="text-end">
+            <Button
+              type="button"
+              variant="link"
+              className="text-sm text-primary p-0 h-auto"
+              onClick={() => {
+                setShowForgotPassword(true);
+                setError('');
+                setResetEmail(formData.email);
+              }}
+            >
+              {t.auth.forgotPassword}
+            </Button>
           </div>
 
           <Button type="submit" className="w-full luxury-button" disabled={isLoading}>
