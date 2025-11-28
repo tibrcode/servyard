@@ -243,7 +243,7 @@ export const CustomerSignup = ({ currentLanguage }: CustomerSignupProps) => {
                 </DialogContent>
               </Dialog>
 
-              <div className="flex items-start space-x-2">
+              <div className="flex items-start gap-3">
                 <Checkbox
                   id="customerTermsAccepted"
                   checked={formData.termsAccepted}
@@ -251,8 +251,9 @@ export const CustomerSignup = ({ currentLanguage }: CustomerSignupProps) => {
                     setFormData(prev => ({ ...prev, termsAccepted: !!checked }))
                   }
                   disabled={isLoading}
+                  className="mt-0.5 h-5 w-5 shrink-0 rounded border-2 border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
                 />
-                <Label htmlFor="customerTermsAccepted" className="text-sm leading-tight">
+                <Label htmlFor="customerTermsAccepted" className="text-sm leading-relaxed cursor-pointer">
                   {t.auth.termsAgreement}
                 </Label>
               </div>

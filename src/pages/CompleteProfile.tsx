@@ -197,8 +197,14 @@ export default function CompleteProfile({ currentLanguage }: CompleteProfileProp
             </div>
 
             <div className="flex items-start gap-3">
-              <Checkbox id="termsAccepted" checked={accepted} onCheckedChange={(v) => setAccepted(!!v)} disabled={saving} className="mt-0.5" />
-              <Label htmlFor="termsAccepted" className="text-sm leading-tight cursor-pointer">{t.auth.termsAgreement}</Label>
+              <Checkbox 
+                id="termsAccepted" 
+                checked={accepted} 
+                onCheckedChange={(v) => setAccepted(!!v)} 
+                disabled={saving} 
+                className="mt-0.5 h-5 w-5 shrink-0 rounded border-2 border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground" 
+              />
+              <Label htmlFor="termsAccepted" className="text-sm leading-relaxed cursor-pointer">{t.auth.termsAgreement}</Label>
             </div>
 
             <Button type="submit" className="w-full luxury-button" disabled={saving || !accepted}>
