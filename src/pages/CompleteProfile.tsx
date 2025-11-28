@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, ClipboardCheck } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
@@ -196,13 +196,12 @@ export default function CompleteProfile({ currentLanguage }: CompleteProfileProp
               </p>
             </div>
 
-            <div className="flex items-start gap-3">
-              <Checkbox 
+            <div className="flex items-center gap-3">
+              <Switch 
                 id="termsAccepted" 
                 checked={accepted} 
                 onCheckedChange={(v) => setAccepted(!!v)} 
-                disabled={saving} 
-                className="mt-0.5 h-5 w-5 shrink-0 rounded border-2 border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground" 
+                disabled={saving}
               />
               <Label htmlFor="termsAccepted" className="text-sm leading-relaxed cursor-pointer">{t.auth.termsAgreement}</Label>
             </div>

@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { currencyList, getCurrencyLabel } from "@/lib/currencies";
@@ -505,15 +505,14 @@ export const ProviderSignup = ({ currentLanguage }: ProviderSignupProps) => {
                 </DialogContent>
               </Dialog>
 
-              <div className="flex items-start gap-3">
-                <Checkbox
+              <div className="flex items-center gap-3">
+                <Switch
                   id="termsAccepted"
                   checked={formData.termsAccepted}
                   onCheckedChange={(checked) =>
                     setFormData(prev => ({ ...prev, termsAccepted: !!checked }))
                   }
                   disabled={isLoading}
-                  className="mt-0.5 h-5 w-5 shrink-0 rounded border-2 border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
                 />
                 <Label htmlFor="termsAccepted" className="text-sm leading-relaxed cursor-pointer">
                   {t.auth.termsAgreement}

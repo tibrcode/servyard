@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Loader2, ShoppingBag, Mail, Lock, Phone, MapPin, FileText } from "lucide-react";
 import { auth, db } from "@/integrations/firebase/client";
@@ -243,15 +243,14 @@ export const CustomerSignup = ({ currentLanguage }: CustomerSignupProps) => {
                 </DialogContent>
               </Dialog>
 
-              <div className="flex items-start gap-3">
-                <Checkbox
+              <div className="flex items-center gap-3">
+                <Switch
                   id="customerTermsAccepted"
                   checked={formData.termsAccepted}
                   onCheckedChange={(checked) =>
                     setFormData(prev => ({ ...prev, termsAccepted: !!checked }))
                   }
                   disabled={isLoading}
-                  className="mt-0.5 h-5 w-5 shrink-0 rounded border-2 border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
                 />
                 <Label htmlFor="customerTermsAccepted" className="text-sm leading-relaxed cursor-pointer">
                   {t.auth.termsAgreement}
