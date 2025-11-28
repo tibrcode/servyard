@@ -6962,9 +6962,6 @@ export const additionalLanguages = {
       signOut: "Log Keluar",
       signingIn: "Sedang log masuk...",
       signingUp: "Sedang mendaftar...",
-      passwordRequirements: "Kata laluan mestilah sekurang-kurangnya 8 aksara",
-      confirmPassword: "Sahkan Kata Laluan",
-      passwordMismatch: "Kata laluan tidak sepadan",
     },
     categories: {
       "cleaning-services": "Perkhidmatan Pembersihan",
@@ -7756,9 +7753,6 @@ export const additionalLanguages = {
       signOut: "ออกจากระบบ",
       signingIn: "กำลังเข้าสู่ระบบ...",
       signingUp: "กำลังสมัครสมาชิก...",
-      passwordRequirements: "รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร",
-      confirmPassword: "ยืนยันรหัสผ่าน",
-      passwordMismatch: "รหัสผ่านไม่ตรงกัน",
     },
     categories: {
       "cleaning-services": "บริการทำความสะอาด",
@@ -8552,9 +8546,6 @@ export const additionalLanguages = {
       signOut: "Đăng xuất",
       signingIn: "Đang đăng nhập...",
       signingUp: "Đang đăng ký...",
-      passwordRequirements: "Mật khẩu phải có ít nhất 8 ký tự",
-      confirmPassword: "Xác nhận mật khẩu",
-      passwordMismatch: "Mật khẩu không khớp",
     },
     categories: {
       "cleaning-services": "Dịch vụ Vệ sinh",
@@ -9345,9 +9336,6 @@ export const additionalLanguages = {
       signOut: "Wyloguj się",
       signingIn: "Logowanie...",
       signingUp: "Rejestracja...",
-      passwordRequirements: "Hasło musi mieć co najmniej 8 znaków",
-      confirmPassword: "Potwierdź hasło",
-      passwordMismatch: "Hasła nie są zgodne",
     },
     categories: {
       "cleaning-services": "Usługi sprzątania",
@@ -10138,9 +10126,6 @@ export const additionalLanguages = {
       signOut: "Uitloggen",
       signingIn: "Inloggen...",
       signingUp: "Registreren...",
-      passwordRequirements: "Wachtwoord moet minimaal 8 tekens bevatten",
-      confirmPassword: "Bevestig wachtwoord",
-      passwordMismatch: "Wachtwoorden komen niet overeen",
     },
     categories: {
       "cleaning-services": "Schoonmaakdiensten",
@@ -10931,9 +10916,6 @@ export const additionalLanguages = {
       signOut: "Logga ut",
       signingIn: "Loggar in...",
       signingUp: "Registrerar...",
-      passwordRequirements: "Lösenordet måste innehålla minst 8 tecken",
-      confirmPassword: "Bekräfta lösenord",
-      passwordMismatch: "Lösenorden matchar inte",
     },
     categories: {
       "cleaning-services": "Städtjänster",
@@ -11724,9 +11706,6 @@ export const additionalLanguages = {
       signOut: "Logg ut",
       signingIn: "Logger inn...",
       signingUp: "Registrerer...",
-      passwordRequirements: "Passordet må inneholde minst 8 tegn",
-      confirmPassword: "Bekreft passord",
-      passwordMismatch: "Passordene stemmer ikke",
     },
     categories: {
       "cleaning-services": "Rengjøringstjenester",
@@ -12517,9 +12496,6 @@ export const additionalLanguages = {
       signOut: "Log ud",
       signingIn: "Logger ind...",
       signingUp: "Tilmelder...",
-      passwordRequirements: "Adgangskoden skal indeholde mindst 8 tegn",
-      confirmPassword: "Bekræft adgangskode",
-      passwordMismatch: "Adgangskoderne matcher ikke",
     },
     categories: {
       "cleaning-services": "Rengøringstjenester",
